@@ -53,8 +53,10 @@ body {
 }
 
 .logo-container img {
-  width: 220px;
+  width: 30vw;
+  max-width: 500px;
 }
+
 
 /* Textos */
 .login-box h2 {
