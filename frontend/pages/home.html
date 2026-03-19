@@ -1,0 +1,167 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - Viasugas</title>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="home-container">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../assets/images/Camion-Blanco.png" alt="logo">
+    </div>
+
+    <ul class="menu">
+      <li><span><i class="fas fa-home"></i></span><p>Inicio</p></li>
+      <li><span><i class="fas fa-truck"></i></span><p>Viajes</p></li>
+      <li><span><i class="fas fa-shipping-fast"></i></span><p>Flota</p></li>
+      <li><span><i class="fas fa-users"></i></span><p>Clientes</p></li>
+      <li><span><i class="fas fa-dollar-sign"></i></span><p>Finanzas</p></li>
+      <li><span><i class="fas fa-cog"></i></span><p>Administración</p></li>
+      <li><span><i class="fas fa-chart-bar"></i></span><p>Auditoría</p></li>
+    </ul>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="content">
+
+    <!-- ?? TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-right">
+        <div class="profile">
+          <i class="fas fa-user-circle"></i>
+          <span id="userName">Usuario</span>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+          Salir
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content">
+
+      <h1>Dashboard</h1>
+      <p class="subtitle">Bienvenido de nuevo. Aquí verás el resumen de tus operaciones.</p>
+
+      <!-- ?? GRID PRINCIPAL -->
+      <div class="dashboard-grid">
+
+        <!-- IZQUIERDA -->
+        <div class="left-panel">
+
+          <!-- CARDS -->
+          <div class="cards">
+
+            <div class="card">
+              <div class="card-icon blue"><i class="fas fa-truck"></i></div>
+              <div>
+                <h2 id="viajesActivos">--</h2>
+                <p>Viajes Activos</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-icon green"><i class="fas fa-check"></i></div>
+              <div>
+                <h2 id="viajesFinalizados">--</h2>
+                <p>Viajes Finalizados</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-icon orange"><i class="fas fa-exclamation-triangle"></i></div>
+              <div>
+                <h2 id="facturasPendientes">--</h2>
+                <p>Facturas Pendientes</p>
+                <span class="money" id="totalPendiente">$0</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- TABLA -->
+          <div class="table-container">
+            <div class="table-header">
+              <h2>�ltimos Viajes</h2>
+            </div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Origen</th>
+                  <th>Destino</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+
+              <tbody id="tablaViajes">
+                <tr>
+                  <td colspan="5">Cargando datos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- DERECHA -->
+        <div class="right-panel">
+
+          <!-- VENCIMIENTOS -->
+          <div class="side-card">
+            <h3>Vencimientos</h3>
+
+            <ul id="vencimientosList">
+              <li>
+                Licencias 
+                <span class="badge warning" id="licenciasCount">0</span>
+              </li>
+              <li>
+                SOAT 
+                <span class="badge ok" id="soatCount">0</span>
+              </li>
+              <li>
+                Tecnomecánica 
+                <span class="badge danger" id="tecnoCount">0</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- FACTURACI�N -->
+          <div class="side-card">
+            <h3>Facturación Pendiente</h3>
+
+            <p id="facturacionTexto">
+              No hay facturas pendientes
+            </p>
+
+            <strong id="facturacionValor" class="money">
+              $0
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="../app.js"></script>
+</body>
+</html>
