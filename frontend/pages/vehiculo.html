@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehículos - Viasugas</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/styles/global.css">
+  <link rel="stylesheet" href="/styles/layout.css">
+  <link rel="stylesheet" href="/styles/sidebar.css">
+  <link rel="stylesheet" href="/styles/topbar.css">
+  <link rel="stylesheet" href="/styles/vehiculo.css">
+
+  <!-- ICONOS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar"></div>
+
+  <!-- CONTENIDO -->
+  <div class="content">
+
+    <!-- TOPBAR -->
+    <div id="topbar"></div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+
+      <!-- LAYOUT PRINCIPAL -->
+      <div class="vehiculo-layout">
+
+        <!-- ========================= -->
+        <!-- IZQUIERDA -->
+        <!-- ========================= -->
+        <div class="vehiculo-left">
+
+          <!-- HEADER -->
+          <div class="vehiculo-header">
+            <h2>Vehículos</h2>
+          </div>
+
+          <!-- FILTROS -->
+          <div class="vehiculo-filtros">
+            <div class="filtros-row">
+          
+              <div class="filtro-group">
+                <label>Placa</label>
+                <input type="text" id="filtroPlaca" placeholder="Ej: ABC123">
+              </div>
+          
+              <div class="filtro-group">
+                <label>Propietario</label>
+                <input type="text" id="filtroPropietario" placeholder="Nombre propietario">
+              </div>
+          
+              <div class="filtro-group">
+                <label>Estado</label>
+                <select id="filtroEstado">
+                  <option value="">Todos</option>
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                </select>
+              </div>
+          
+              <button class="btn-filtrar" onclick="filtrarVehiculos()">
+                Filtrar
+              </button>
+          
+              <button class="btn-limpiar" onclick="limpiarFiltros()">
+                Limpiar
+              </button>
+          
+            </div>
+          </div>
+
+          <!-- TABLA -->
+          <div class="vehiculo-tabla">
+
+            <div class="tabla-body">
+              <table class="vehiculo-table">
+                <thead>
+                  <tr>
+                    <th>Placa</th>
+                    <th>Propietario</th>
+                    <th>Todo Riesgo</th>
+                    <th>SOAT</th>
+                    <th>Tecnomecánica</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+
+                <tbody id="vehiculosTable">
+                  <tr>
+                    <td colspan="7">Cargando vehículos...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- DERECHA -->
+        <!-- ========================= -->
+        <div class="vehiculo-right">
+
+          <!-- BOTÓN -->
+          <button class="btn-primary btn-add-right" onclick="abrirModalVehiculo()">
+            <i class="fas fa-plus"></i> Agregar vehículo
+          </button>
+
+          <!-- ALERTAS + ACCIONES -->
+          <div class="vehiculo-side">
+
+            <!-- ALERTAS -->
+            <h3><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
+
+            <ul id="alertasList">
+              <li>⚠️ Cargando alertas...</li>
+            </ul>
+
+            <hr style="margin:15px 0;">
+
+            <!-- ACCIONES -->
+            <h3><i class="fas fa-bolt"></i> Acciones rápidas</h3>
+
+            <div class="acciones-rapidas">
+
+              <button onclick="filtrarVencidos()">
+                <i class="fas fa-times-circle"></i> Ver vencidos
+              </button>
+
+              <button onclick="filtrarProximos()">
+                <i class="fas fa-clock"></i> Por vencer
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="/app.js"></script>
+
+</body>
+</html>

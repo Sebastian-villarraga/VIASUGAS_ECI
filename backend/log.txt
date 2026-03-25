@@ -1,0 +1,6 @@
+nohup: ignoring input
+[dotenv@17.3.1] injecting env (5) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+?? INICIANDO SERVER...
+? Servidor corriendo en puerto 3000
+? DB conectada: { now: 2026-03-25T23:01:17.621Z }
+? El proceso se cerr� con c�digo: 0

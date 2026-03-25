@@ -1,0 +1,62 @@
+/* ========================= */
+/* RESET / GLOBAL */
+/* ========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+/* ========================= */
+/* BODY BASE */
+/* ========================= */
+body {
+  display: flex;
+  height: 100vh;
+}
+
+/* ========================= */
+/* ELEMENTOS GENERALES */
+/* ========================= */
+
+/* Texto secundario */
+.subtitle {
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* Dinero */
+.money {
+  font-size: 13px;
+  color: green;
+}
+
+/* ========================= */
+/* UTILIDADES */
+/* ========================= */
+
+/* BADGES */
+.badge {
+  background: #e74c3c;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.badge.ok {
+  background: #27ae60;
+}
+
+.badge.warning {
+  background: #f39c12;
+}
+
+.badge.danger {
+  background: #e74c3c;
+}

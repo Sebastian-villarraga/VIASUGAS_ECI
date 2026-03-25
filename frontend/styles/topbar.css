@@ -1,0 +1,69 @@
+/* ========================= */
+/* TOPBAR */
+/* ========================= */
+
+.topbar {
+  width: 100%;
+  height: 60px;
+  background: #1e3c72;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 20px;
+  color: white;
+
+  position: sticky;
+  top: 0;
+  z-index: 900;
+}
+
+/* ========================= */
+/* IZQUIERDA */
+/* ========================= */
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-logo {
+  width: 35px;
+}
+
+/* ========================= */
+/* DERECHA */
+/* ========================= */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ========================= */
+/* PERFIL */
+/* ========================= */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+/* ========================= */
+/* BOTÓN LOGOUT */
+/* ========================= */
+.logout-btn {
+  background: #e74c3c;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logout-btn:hover {
+  background: #c0392b;
+}
