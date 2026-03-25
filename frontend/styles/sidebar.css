@@ -1,0 +1,153 @@
+/* ========================= */
+/* SIDEBAR PRO */
+/* ========================= */
+
+.sidebar {
+  width: 70px; /* colapsado */
+  height: 100vh;
+  background: #1e3c72;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  transition: width 0.3s ease;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+/* EXPANSIÓN */
+.sidebar:hover {
+  width: 220px;
+}
+
+/* ========================= */
+/* LOGO */
+/* ========================= */
+.sidebar-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.sidebar-logo img {
+  width: 55px; 
+  height: auto;
+  object-fit: contain;
+  transition: 0.3s;
+}
+
+.sidebar:hover .sidebar-logo img {
+  width: 140px;
+}
+
+/* ========================= */
+/* MENÚ */
+/* ========================= */
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ========================= */
+/* ITEMS */
+/* ========================= */
+.menu-item {
+  display: flex;
+}
+
+.menu-item a {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centrado en modo cerrado */
+  gap: 15px;
+
+  padding: 12px 20px;
+  color: white !important;
+  text-decoration: none;
+
+  transition: 0.2s;
+}
+
+/* CUANDO SE EXPANDE */
+.sidebar:hover .menu-item a {
+  justify-content: flex-start;
+}
+
+/* ICONOS */
+.menu-item i {
+  min-width: 25px;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* TEXTO OCULTO */
+.menu-item span {
+  display: none;
+}
+
+/* TEXTO VISIBLE AL EXPANDIR */
+.sidebar:hover .menu-item span {
+  display: inline;
+}
+
+/* HOVER */
+.menu-item a:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ========================= */
+/* TITULOS (Flota, Finanzas...) */
+/* ========================= */
+.menu-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+
+  pointer-events: none;
+}
+
+/* ICONOS */
+.menu-title i {
+  font-size: 16px;
+}
+
+/* TEXTO OCULTO */
+.menu-title span {
+  display: none;
+}
+
+/* CUANDO SE EXPANDE */
+.sidebar:hover .menu-title {
+  justify-content: flex-start;
+  padding: 12px 20px;
+}
+
+.sidebar:hover .menu-title span {
+  display: inline;
+  margin-left: 10px;
+  opacity: 0.7;
+}
+
+/* ========================= */
+/* CONTENIDO AJUSTE */
+/* ========================= */
+.content {
+  margin-left: 70px;
+  width: calc(100% - 70px);
+  transition: all 0.3s ease;
+}
+
+.sidebar:hover ~ .content {
+  margin-left: 220px;
+  width: calc(100% - 220px);
+}

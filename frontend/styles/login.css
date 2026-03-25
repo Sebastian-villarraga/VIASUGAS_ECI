@@ -1,0 +1,156 @@
+/* ========================= */
+/* LOGIN BODY */
+/* ========================= */
+.login-body {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ========================= */
+/* FONDO LOGIN */
+/* ========================= */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: url("../assets/images/Fondo-Login.png") no-repeat center center/cover;
+
+  filter: blur(2px);
+  z-index: -1;
+}
+
+/* ========================= */
+/* CONTENEDOR */
+/* ========================= */
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+/* ========================= */
+/* CARD */
+/* ========================= */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.55);
+  padding: 35px 30px;
+  border-radius: 14px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+  text-align: center;
+}
+
+/* ========================= */
+/* LOGO */
+/* ========================= */
+.logo-container {
+  margin-bottom: 10px;
+}
+
+.logo-container img {
+  width: 200px;
+  max-width: 80%;
+}
+
+/* ========================= */
+/* TITULO */
+/* ========================= */
+.login-card h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* ========================= */
+/* LABELS */
+/* ========================= */
+.login-card label {
+  display: block;
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: left;
+}
+
+/* ========================= */
+/* INPUTS */
+/* ========================= */
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: 0.2s;
+}
+
+.login-card input:focus {
+  border-color: #2a5298;
+  box-shadow: 0 0 0 2px rgba(42, 82, 152, 0.15);
+}
+
+/* ========================= */
+/* PASSWORD */
+/* ========================= */
+.password-container {
+  position: relative;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.eye-icon:hover {
+  opacity: 1;
+}
+
+/* ========================= */
+/* FORGOT PASSWORD */
+/* ========================= */
+.forgot {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.forgot a {
+  font-size: 13px;
+  color: #2a5298;
+  text-decoration: none;
+}
+
+.forgot a:hover {
+  text-decoration: underline;
+}
+
+/* ========================= */
+/* BOTÓN */
+/* ========================= */
+.login-card button {
+  width: 100%;
+  margin-top: 25px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #2a5298;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-card button:hover {
+  background: #1e3c72;
+}

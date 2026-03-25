@@ -1,0 +1,41 @@
+/* ========================= */
+/* LAYOUT PRINCIPAL */
+/* ========================= */
+.vehiculo-layout {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 20px;
+
+  width: 100%;
+  align-items: start; /* ?? CLAVE */
+}
+
+/* ========================= */
+/* IZQUIERDA */
+/* ========================= */
+.vehiculo-left {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ========================= */
+/* DERECHA */
+/* ========================= */
+.vehiculo-right {
+  width: 100%;
+  display: flex;
+}
+
+/* CARD DERECHA */
+.vehiculo-side {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 20px;
+
+  width: 100%;
+  height: fit-content; /* ?? evita que se baje */
+  position: sticky; /* ?? se queda arriba */
+  top: 20px;
+}

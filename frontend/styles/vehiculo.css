@@ -1,0 +1,263 @@
+/* ========================= */
+/* MAIN */
+/* ========================= */
+.main-content {
+  padding: 25px;
+  background: #f4f6f9;
+  min-height: 100vh;
+}
+
+/* ========================= */
+/* LAYOUT PRINCIPAL */
+/* ========================= */
+.vehiculo-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: start; /* ?? CLAVE: alinea todo arriba */
+}
+
+/* ========================= */
+/* HEADER */
+/* ========================= */
+.vehiculo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.vehiculo-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* ========================= */
+/* BOTÓN */
+/* ========================= */
+.btn-primary {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #2a5298;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1e3c72;
+}
+
+/* BOTÓN DERECHO */
+.btn-add-right {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* ========================= */
+/* FILTROS */
+/* ========================= */
+.vehiculo-filtros {
+  margin-bottom: 20px;
+  padding: 18px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #ddd;
+}
+
+/* FILA */
+.filtros-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* GRUPO */
+.filtro-group {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+.filtro-group label {
+  margin-bottom: 5px;
+  color: #555;
+}
+
+/* INPUTS */
+.filtro-group input,
+.filtro-group select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+}
+
+/* ========================= */
+/* BOTONES FILTRO */
+/* ========================= */
+.btn-filtrar {
+  background: #2a5298;
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-filtrar:hover {
+  background: #1e3c72;
+}
+
+.btn-limpiar {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 9px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-limpiar:hover {
+  background: #c62828;
+}
+
+/* ========================= */
+/* CARDS */
+/* ========================= */
+.vehiculo-cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.vehiculo-card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.vehiculo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* ========================= */
+/* TABLA */
+/* ========================= */
+.vehiculo-tabla {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 15px;
+
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+}
+
+/* HEADER TABLA */
+.tabla-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
+  color: #555;
+  font-size: 13px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+/* BODY TABLA */
+.tabla-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* TABLA REAL */
+.vehiculo-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vehiculo-table th {
+  text-align: left;
+  padding: 10px;
+  background: #f1f3f6;
+  font-size: 13px;
+}
+
+.vehiculo-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+/* ========================= */
+/* PANEL DERECHO */
+/* ========================= */
+.vehiculo-right {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ?? BAJAR CARD */
+.vehiculo-side {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+
+  margin-top: 10px; /* ?? AJUSTE FINO (puedes subir/bajar) */
+}
+
+/* TITULO */
+.vehiculo-side h3 {
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+/* LISTA */
+.vehiculo-side ul {
+  list-style: none;
+  padding: 0;
+}
+
+.vehiculo-side li {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+/* ACCIONES RÁPIDAS */
+.acciones-rapidas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acciones-rapidas button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f3f6;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.acciones-rapidas button:hover {
+  background: #e0e6ed;
+}

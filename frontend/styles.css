@@ -26,6 +26,32 @@ html, body {
 }
 
 /* ========================= */
+/* LOGIN FIX GLOBAL */
+/* ========================= */
+
+/* Evita que el flex del dashboard afecte */
+.login-body {
+  display: block;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Fondo */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: url("./assets/images/Fondo-Login.png") no-repeat center center/cover;
+
+  filter: blur(2px);
+  z-index: -1;
+}
+
+/* ========================= */
 /* LOGIN */
 /* ========================= */
 
@@ -260,14 +286,7 @@ html, body {
   color: green;
 }
 
-/* ========================= */
-/* CONTENT */
-/* ========================= */
-.content {
-  flex: 1;
-  display: flex;              /* ?? IMPORTANTE */
-  flex-direction: column;
-}
+
 
 /* ========================= */
 /* TABLA */
@@ -400,6 +419,174 @@ html, body {
   background: #e74c3c;
 }
 
+
+/* ========================= */
+/* MAIN CONTENT */
+/* ========================= */
+.main-content {
+  padding: 20px;
+}
+
+/* ========================= */
+/* LAYOUT GENERAL */
+/* ========================= */
+body {
+  display: flex;
+  height: 100vh;
+}
+
+/* ========================= */
+/* SIDEBAR PRO */
+/* ========================= */
+
+.sidebar {
+  width: 70px; /* colapsado */
+  height: 100vh;
+  background: #1e3c72;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  transition: width 0.3s ease;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+/* EXPANSIÓN */
+.sidebar:hover {
+  width: 220px;
+}
+
+/* ========================= */
+/* LOGO */
+/* ========================= */
+.sidebar-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.sidebar-logo img {
+  width: 40px;
+  transition: 0.3s;
+}
+
+.sidebar:hover .sidebar-logo img {
+  width: 120px;
+}
+
+/* ========================= */
+/* MENÚ */
+/* ========================= */
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ========================= */
+/* ITEMS */
+/* ========================= */
+.menu-item {
+  display: flex;
+}
+
+.menu-item a {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centrado cuando está cerrado */
+  gap: 15px;
+
+  padding: 12px 20px;
+  color: white !important;
+  text-decoration: none;
+
+  transition: 0.2s;
+}
+
+/* CUANDO SE ABRE */
+.sidebar:hover .menu-item a {
+  justify-content: flex-start;
+}
+
+/* ICONOS */
+.menu-item i {
+  min-width: 25px;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* TEXTO OCULTO COMPLETAMENTE */
+.menu-item span {
+  display: none;
+}
+
+/* TEXTO VISIBLE SOLO AL HOVER */
+.sidebar:hover .menu-item span {
+  display: inline;
+}
+
+/* HOVER */
+.menu-item a:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ========================= */
+/* TITULOS (Flota, Finanzas...) */
+/* ========================= */
+.menu-title {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centrado cuando está cerrado */
+
+  padding: 12px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+
+  pointer-events: none;
+}
+
+/* ICONOS */
+.menu-title i {
+  font-size: 16px;
+}
+
+/* TEXTO OCULTO */
+.menu-title span {
+  display: none;
+}
+
+/* CUANDO SE ABRE */
+.sidebar:hover .menu-title {
+  justify-content: flex-start;
+  padding: 12px 20px;
+}
+
+.sidebar:hover .menu-title span {
+  display: inline;
+  margin-left: 10px;
+  opacity: 0.7;
+}
+
+/* ========================= */
+/* CONTENIDO AJUSTADO */
+/* ========================= */
+.content {
+  margin-left: 70px;
+  width: calc(100% - 70px);
+  transition: all 0.3s ease;
+}
+
+/* cuando sidebar abre */
+.sidebar:hover ~ .content {
+  margin-left: 220px;
+  width: calc(100% - 220px);
+}
 /* ========================= */
 /* TOPBAR */
 /* ========================= */
@@ -408,30 +595,28 @@ html, body {
   height: 60px;
   background: #1e3c72;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 0 20px;
   color: white;
 }
 
-/* IZQUIERDA */
 .topbar-left {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .topbar-logo {
-  width: 40px;
+  width: 35px;
 }
 
-/* DERECHA */
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-/* PERFIL */
 .profile {
   display: flex;
   align-items: center;
@@ -439,7 +624,6 @@ html, body {
   font-size: 14px;
 }
 
-/* BOTÓN */
 .logout-btn {
   background: #e74c3c;
   border: none;
@@ -450,21 +634,27 @@ html, body {
 }
 
 /* ========================= */
-/* MAIN CONTENT */
+/* MAIN */
 /* ========================= */
 .main-content {
   padding: 20px;
+  background: #f4f6f9;
+  height: 100%;
 }
 
 /* ========================= */
 /* RESPONSIVE */
 /* ========================= */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .sidebar {
     width: 60px;
   }
 
-  .menu li p {
-    display: none;
+  .menu li {
+    text-align: center;
+  }
+
+  .menu li a {
+    font-size: 12px;
   }
 }
