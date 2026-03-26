@@ -1,154 +1,135 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home - Viasugas</title>
 
-  <!-- CSS MODULAR -->
+  <!-- CSS -->
   <link rel="stylesheet" href="/styles/global.css">
   <link rel="stylesheet" href="/styles/layout.css">
   <link rel="stylesheet" href="/styles/sidebar.css">
   <link rel="stylesheet" href="/styles/topbar.css">
   <link rel="stylesheet" href="/styles/home.css">
-
-  <!-- ICONOS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/vehiculo.css">
 </head>
 
 <body>
 
-  <!-- SIDEBAR DINÁMICO -->
-  <div id="sidebar"></div>
+<!-- ========================= -->
+<!-- SIDEBAR -->
+<!-- ========================= -->
+<div class="sidebar">
+  <ul class="menu">
 
-  <!-- CONTENIDO -->
-  <div class="content">
+    <li class="menu-item active">
+      <a href="javascript:void(0)" onclick="navigate('home')">
+        <span>Inicio</span>
+      </a>
+    </li>
 
-    <!-- TOPBAR -->
-    <div id="topbar"></div>
+    <li class="menu-item"><a href="#"><span>Manifiestos</span></a></li>
 
-    <!-- MAIN -->
-    <div class="main-content">
+    <li class="menu-section">Flota</li>
 
-      <h1>Dashboard</h1>
-      <p class="subtitle">
-        Bienvenido de nuevo. Aquí verás el resumen de tus operaciones.
-      </p>
+    <li class="menu-item">
+      <a href="javascript:void(0)" onclick="navigate('vehiculos')">
+        <span>Vehículos</span>
+      </a>
+    </li>
 
-      <!-- GRID -->
-      <div class="dashboard-grid">
+    <li class="menu-item"><a href="#"><span>Trailer</span></a></li>
+    <li class="menu-item"><a href="#"><span>Propietarios</span></a></li>
+    <li class="menu-item"><a href="#"><span>Conductores</span></a></li>
 
-        <!-- IZQUIERDA -->
-        <div class="left-panel">
+    <li class="menu-item"><a href="#"><span>Clientes</span></a></li>
+    <li class="menu-item"><a href="#"><span>Terceros</span></a></li>
 
-          <!-- CARDS -->
-          <div class="cards">
+    <li class="menu-section">Finanzas</li>
 
-            <div class="card">
-              <div class="card-icon blue">
-                <i class="fas fa-truck"></i>
-              </div>
-              <div>
-                <h2 id="viajesActivos">--</h2>
-                <p>Viajes Activos</p>
-              </div>
-            </div>
+    <li class="menu-item"><a href="#"><span>Bancos</span></a></li>
+    <li class="menu-item"><a href="#"><span>Transacciones</span></a></li>
+    <li class="menu-item"><a href="#"><span>Gastos</span></a></li>
+    <li class="menu-item"><a href="#"><span>Facturas</span></a></li>
 
-            <div class="card">
-              <div class="card-icon green">
-                <i class="fas fa-check"></i>
-              </div>
-              <div>
-                <h2 id="viajesFinalizados">--</h2>
-                <p>Viajes Finalizados</p>
-              </div>
-            </div>
+    <li class="menu-section">Reportes</li>
 
-            <div class="card">
-              <div class="card-icon orange">
-                <i class="fas fa-exclamation-triangle"></i>
-              </div>
-              <div>
-                <h2 id="facturasPendientes">--</h2>
-                <p>Facturas Pendientes</p>
-                <span class="money" id="totalPendiente">$0</span>
-              </div>
-            </div>
+    <li class="menu-item"><a href="javascript:void(0)" onclick="navigate('dashboard')"><span>Gerencial</span></a></li>
+    <li class="menu-item"><a href="#"><span>Contable</span></a></li>
+    <li class="menu-item"><a href="#"><span>Cartera</span></a></li>
+    <li class="menu-item"><a href="#"><span>Proyecciones</span></a></li>
 
-          </div>
+    <li class="menu-item"><a href="#"><span>Usuarios</span></a></li>
+    <li class="menu-item"><a href="#"><span>Auditoría</span></a></li>
 
-          <!-- TABLA -->
-          <div class="table-container">
-            <div class="table-header">
-              <h2>Últimos Viajes</h2>
-            </div>
+  </ul>
+</div>
 
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Origen</th>
-                  <th>Destino</th>
-                  <th>Estado</th>
-                  <th>Fecha</th>
-                </tr>
-              </thead>
+<!-- ========================= -->
+<!-- CONTENT -->
+<!-- ========================= -->
+<div class="content">
 
-              <tbody id="tablaViajes">
-                <tr>
-                  <td colspan="5">Cargando datos...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+  <!-- TOPBAR -->
+  <div class="topbar">
 
-        </div>
-
-        <!-- DERECHA -->
-        <div class="right-panel">
-
-          <!-- VENCIMIENTOS -->
-          <div class="side-card">
-            <h3>Vencimientos</h3>
-
-            <ul id="vencimientosList">
-              <li>
-                Licencias 
-                <span class="badge warning" id="licenciasCount">0</span>
-              </li>
-              <li>
-                SOAT 
-                <span class="badge ok" id="soatCount">0</span>
-              </li>
-              <li>
-                Tecnomecánica 
-                <span class="badge danger" id="tecnoCount">0</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- FACTURACIÓN -->
-          <div class="side-card">
-            <h3>Facturación Pendiente</h3>
-
-            <p id="facturacionTexto">
-              No hay facturas pendientes
-            </p>
-
-            <strong id="facturacionValor" class="money">
-              $0
-            </strong>
-          </div>
-
-        </div>
-
-      </div>
-
+    <!-- 🔥 LOGO AHORA A LA IZQUIERDA -->
+    <div class="topbar-left">
+      <img src="/assets/images/Fondo-Azul.jpg" class="logo-main">
     </div>
+
+    
+
+    <div class="topbar-right">
+      <div class="profile">
+        <span id="userName">Usuario</span>
+      </div>
+|
+      <button class="logout-btn" onclick="logout()">Salir</button>
+    </div>
+
   </div>
 
-  <!-- JS -->
-  <script src="/app.js"></script>
+  <!-- SPA -->
+  <div class="main-content" id="app-content">
+  
+   
+  
+  
+    <div class="home-container">
+    
+      <!-- LOGO -->
+      <div class="home-logo">
+        <img src="/assets/images/Fondo-Blanco.jpg" alt="Viasugas">
+      </div>
+    
+      <!-- MENSAJE -->
+      <div class="home-content">
+        <h1>Bienvenido a Viasugas</h1>
+        <p>
+          Tu centro de control para la gestión de transporte de carga.  
+          Administra vehículos, monitorea operaciones y toma decisiones con claridad.
+        </p>
+    
+        
+      </div>
+    
+    </div>
+    
+  
+  
+  
+  
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/dashboard.js"></script>
+<script src="/js/vehiculos.js"></script>
+<script src="/js/app.js"></script>
 
 </body>
 </html>
