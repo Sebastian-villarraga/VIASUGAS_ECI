@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/styles/layout.css">
   <link rel="stylesheet" href="/styles/vehiculo.css">
 
-  <!-- 🔥 FONT AWESOME (NECESARIO PARA ICONOS) -->
+  <!-- FONT AWESOME -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
@@ -101,7 +101,7 @@
       <i class="fas fa-plus"></i> Agregar vehículo
     </button>
 
-    <!-- ALERTAS + ACCIONES -->
+    <!-- PANEL -->
     <div class="vehiculo-side">
 
       <!-- ALERTAS -->
@@ -134,9 +134,78 @@
 
 </div>
 
+<!-- ========================= -->
+<!-- 🔥 MODAL VEHICULO 
+<!-- ========================= -->
+<div id="modalVehiculo" class="modal hidden">
+
+  <div class="modal-content">
+
+    <h3>Agregar Vehículo</h3>
+
+    <form id="formVehiculo" class="form-grid">
+
+      <!-- PLACA -->
+      <div class="form-group">
+        <label for="placa">Placa</label>
+        <input type="text" id="placa" required>
+      </div>
+
+      <!-- PROPIETARIO -->
+      <div class="form-group">
+        <label for="propietario">Propietario</label>
+        <input type="text" id="propietario">
+      </div>
+
+      <!-- SOAT -->
+      <div class="form-group">
+        <label for="soat">SOAT</label>
+        <input type="date" id="soat">
+      </div>
+
+      <!-- TECNOMECÁNICA -->
+      <div class="form-group">
+        <label for="tecno">Tecnomecánica</label>
+        <input type="date" id="tecno">
+      </div>
+
+      <!-- TODO RIESGO -->
+      <div class="form-group">
+        <label for="todoRiesgo">Todo Riesgo</label>
+        <input type="date" id="todoRiesgo">
+      </div>
+
+      <!-- ESTADO -->
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <select id="estado">
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </div>
+
+      <!-- BOTONES -->
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+
+        <button type="button" onclick="cerrarModalVehiculo()">
+          Cancelar
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- ========================= -->
 <!-- JS -->
+<!-- ========================= -->
 <script src="/js/api.js"></script>
-<script src="/js/vehiculos.js?v=2"></script>
+<script src="/js/vehiculos.js?v=4"></script>
 
 </body>
 </html>

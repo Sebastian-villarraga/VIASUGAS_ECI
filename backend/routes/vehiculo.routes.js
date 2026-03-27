@@ -2,12 +2,24 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  getVehiculos
+  getVehiculos,
+  crearVehiculo,
+  getAlertasVehiculos
 } = require("../controllers/vehiculo.controller");
 
-// =====================
-// ROUTES
-// =====================
+// =========================
+// GET
+// =========================
 router.get("/", getVehiculos);
+router.get("/alertas", getAlertasVehiculos);
+
+// =========================
+// POST 
+// =========================
+router.post("/", crearVehiculo);
 
 module.exports = router;
+
+
+
+

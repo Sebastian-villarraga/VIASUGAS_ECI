@@ -2,8 +2,11 @@
 // INIT (SPA)
 // =========================
 function initVehiculos() {
-  console.log("?? INIT VEHICULOS");
+  console.log("INIT VEHICULOS");
+
   cargarVehiculos();
+  cargarAlertas();
+  initFormVehiculo(); 
 }
 
 // =========================
@@ -13,7 +16,7 @@ async function cargarVehiculos() {
   try {
     const tabla = document.getElementById("vehiculosTable");
     if (!tabla) {
-      console.warn("?? No existe #vehiculosTable");
+      console.warn("No existe #vehiculosTable");
       return;
     }
 
@@ -24,7 +27,7 @@ async function cargarVehiculos() {
     renderTabla(data);
 
   } catch (error) {
-    console.error("? Error cargando vehículos:", error);
+    console.error("Error cargando vehículos:", error);
 
     const tabla = document.getElementById("vehiculosTable");
     if (tabla) {
@@ -54,14 +57,14 @@ async function filtrarVehiculos() {
 
     const url = `/api/vehiculos${params.length ? "?" + params.join("&") : ""}`;
 
-    console.log("?? URL FILTRO:", url);
+    console.log("URL FILTRO:", url);
 
     const data = await apiFetch(url);
 
     renderTabla(data);
 
   } catch (error) {
-    console.error("? Error filtrando vehículos:", error);
+    console.error("Error filtrando vehículos:", error);
   }
 }
 
@@ -114,10 +117,52 @@ function renderTabla(data) {
 // EDITAR VEHICULO
 // =========================
 function editarVehiculo(placa) {
-  console.log("?? Editar vehículo:", placa);
+  console.log("Editar vehículo:", placa);
+}
 
-  // ?? siguiente paso: abrir modal
-  // abrirModalVehiculo(placa);
+// =========================
+// FORM 
+// =========================
+function initFormVehiculo() {
+  const form = document.getElementById("formVehiculo");
+
+  if (!form) {
+    console.warn("No existe formVehiculo");
+    return;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+      placa: document.getElementById("placa").value,
+      propietario: document.getElementById("propietario").value,
+      vencimiento_soat: document.getElementById("soat").value,
+      vencimiento_tecno: document.getElementById("tecno").value,
+      vencimiento_todo_riesgo: document.getElementById("todoRiesgo").value,
+      estado: document.getElementById("estado").value
+    };
+
+    console.log("ENVIANDO:", data);
+
+    try {
+      await apiFetch("/api/vehiculos", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+
+      console.log("Vehículo creado");
+
+      cerrarModalVehiculo();
+      form.reset();
+
+      await cargarVehiculos(); // ?? refresca tabla
+
+    } catch (error) {
+      console.error("Error creando vehículo:", error);
+      alert("Error al crear vehículo");
+    }
+  });
 }
 
 // =========================
@@ -130,5 +175,53 @@ function formatearFecha(fecha) {
     return new Date(fecha).toLocaleDateString();
   } catch {
     return fecha;
+  }
+}
+
+// =========================
+// MODAL
+// =========================
+function abrirModalVehiculo() {
+  document.getElementById("modalVehiculo").classList.remove("hidden");
+}
+
+function cerrarModalVehiculo() {
+  document.getElementById("modalVehiculo").classList.add("hidden");
+}
+
+// =========================
+// CARGAR ALERTAS
+// =========================
+async function cargarAlertas() {
+  try {
+    const lista = document.getElementById("alertasList");
+
+    const data = await apiFetch("/api/vehiculos/alertas");
+
+    if (!data || data.length === 0) {
+      lista.innerHTML = "<li>Sin alertas</li>";
+      return;
+    }
+
+    lista.innerHTML = data.map(a => {
+      const clase = a.estado === "vencido" ? "alerta-vencido" : "alerta-proximo";
+      const icono = a.estado === "vencido"
+  ? '<i class="fas fa-circle" style="color:#e53935;"></i>'
+  : '<i class="fas fa-circle" style="color:#fbc02d;"></i>';
+
+      return `
+        <li class="alerta-item ${clase}">
+          <div class="alerta-titulo">
+            ${icono} ${a.tipo} - ${a.placa}
+          </div>
+          <div class="alerta-fecha">
+            ${formatearFecha(a.fecha)}
+          </div>
+        </li>
+      `;
+    }).join("");
+
+  } catch (error) {
+    console.error("Error alertas:", error);
   }
 }

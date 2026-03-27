@@ -1,7 +1,7 @@
 const pool = require("../config/db");
 
 // =====================
-// GET VEHICULOS (CON FILTROS)
+// GET VEHICULOS
 // =====================
 const getVehiculos = async (req, res) => {
   try {
@@ -10,7 +10,7 @@ const getVehiculos = async (req, res) => {
     let query = `
       SELECT 
         v.placa,
-        p.nombre AS propietario,
+        COALESCE(p.nombre, '-') AS propietario,
         v.vencimiento_todo_riesgo,
         v.vencimiento_soat,
         v.vencimiento_tecno,
@@ -24,21 +24,18 @@ const getVehiculos = async (req, res) => {
     const values = [];
     let index = 1;
 
-    // ?? FILTRO POR PLACA
     if (placa) {
       query += ` AND v.placa ILIKE $${index}`;
       values.push(`%${placa}%`);
       index++;
     }
 
-    // ?? FILTRO POR PROPIETARIO
     if (propietario) {
       query += ` AND p.nombre ILIKE $${index}`;
       values.push(`%${propietario}%`);
       index++;
     }
 
-    // ?? FILTRO POR ESTADO
     if (estado) {
       query += ` AND v.estado = $${index}`;
       values.push(estado);
@@ -49,17 +46,168 @@ const getVehiculos = async (req, res) => {
 
     const result = await pool.query(query, values);
 
+    console.log("?? VEHICULOS DB:", result.rows);
+
     res.json(result.rows);
 
   } catch (error) {
     console.error("? ERROR VEHICULOS:", error);
     res.status(500).json({ 
-      error: "Error obteniendo vehículos", 
-      detalle: error.message 
+      error: "Error obteniendo vehículos",
+      detalle: error.message
     });
   }
 };
 
+// =====================
+// CREAR VEHICULO
+// =====================
+const crearVehiculo = async (req, res) => {
+  try {
+    const {
+      placa,
+      propietario,
+      vencimiento_soat,
+      vencimiento_tecno,
+      vencimiento_todo_riesgo,
+      estado
+    } = req.body;
+
+    console.log("?? DATA RECIBIDA:", req.body);
+
+    if (!placa) {
+      return res.status(400).json({
+        error: "La placa es obligatoria"
+      });
+    }
+
+    // VALIDAR DUPLICADO
+    const existe = await pool.query(
+      "SELECT placa FROM vehiculo WHERE placa = $1",
+      [placa]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(400).json({
+        error: "El vehículo ya existe"
+      });
+    }
+
+    // BUSCAR PROPIETARIO
+    let id_propietario = null;
+
+    if (propietario) {
+      const resultProp = await pool.query(
+        "SELECT identificacion FROM propietario WHERE nombre ILIKE $1 LIMIT 1",
+        [propietario]
+      );
+
+      if (resultProp.rows.length > 0) {
+        id_propietario = resultProp.rows[0].identificacion;
+      }
+    }
+
+    // INSERT
+    const insertQuery = `
+      INSERT INTO vehiculo (
+        placa,
+        id_propietario,
+        vencimiento_soat,
+        vencimiento_tecno,
+        vencimiento_todo_riesgo,
+        estado
+      )
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `;
+
+    const values = [
+      placa,
+      id_propietario,
+      vencimiento_soat || null,
+      vencimiento_tecno || null,
+      vencimiento_todo_riesgo || null,
+      estado || "activo"
+    ];
+
+    const result = await pool.query(insertQuery, values);
+
+    console.log("? VEHICULO INSERTADO:", result.rows[0]);
+
+    res.status(201).json(result.rows[0]);
+
+  } catch (error) {
+    console.error("? ERROR CREANDO VEHICULO:", error);
+    res.status(500).json({
+      error: "Error creando vehículo",
+      detalle: error.message
+    });
+  }
+};
+
+// =====================
+// ALERTAS VEHICULOS
+// =====================
+const getAlertasVehiculos = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        v.placa,
+        p.nombre AS propietario,
+        v.vencimiento_soat,
+        v.vencimiento_tecno,
+        v.vencimiento_todo_riesgo
+      FROM vehiculo v
+      LEFT JOIN propietario p 
+        ON v.id_propietario = p.identificacion
+    `);
+
+    const hoy = new Date();
+    const limite = new Date();
+    limite.setDate(hoy.getDate() + 7);
+
+    let alertas = [];
+
+    result.rows.forEach(v => {
+
+      const revisar = (fecha, tipo) => {
+        if (!fecha) return;
+
+        const f = new Date(fecha);
+
+        if (f < hoy) {
+          alertas.push({
+            placa: v.placa,
+            tipo,
+            estado: "vencido",
+            fecha
+          });
+        } else if (f <= limite) {
+          alertas.push({
+            placa: v.placa,
+            tipo,
+            estado: "proximo",
+            fecha
+          });
+        }
+      };
+
+      revisar(v.vencimiento_soat, "SOAT");
+      revisar(v.vencimiento_tecno, "Tecnomecánica");
+      revisar(v.vencimiento_todo_riesgo, "Todo Riesgo");
+    });
+
+    res.json(alertas);
+
+  } catch (error) {
+    console.error("Error alertas:", error);
+    res.status(500).json({ error: "Error obteniendo alertas" });
+  }
+};
+
+// =====================
 module.exports = {
-  getVehiculos
+  getVehiculos,
+  crearVehiculo,
+  getAlertasVehiculos
 };
