@@ -1,28 +1,62 @@
 const pool = require("../config/db");
 
 // =====================
-// GET VEHICULOS
+// GET VEHICULOS (CON FILTROS)
 // =====================
 const getVehiculos = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const { placa, propietario, estado } = req.query;
+
+    let query = `
       SELECT 
         v.placa,
-        p.nombre AS id_propietario,
-        v.todo_riesgo,
-        v.soat AS vencimiento_soat,
-        v.tecnomecanica AS vencimiento_tecno,
+        p.nombre AS propietario,
+        v.vencimiento_todo_riesgo,
+        v.vencimiento_soat,
+        v.vencimiento_tecno,
         v.estado
-      FROM Vehiculo v
-      LEFT JOIN Propietario p ON v.propietario = p.identificacion
-      ORDER BY v.placa;
-    `);
+      FROM vehiculo v
+      LEFT JOIN propietario p 
+        ON v.id_propietario = p.identificacion
+      WHERE 1=1
+    `;
+
+    const values = [];
+    let index = 1;
+
+    // ?? FILTRO POR PLACA
+    if (placa) {
+      query += ` AND v.placa ILIKE $${index}`;
+      values.push(`%${placa}%`);
+      index++;
+    }
+
+    // ?? FILTRO POR PROPIETARIO
+    if (propietario) {
+      query += ` AND p.nombre ILIKE $${index}`;
+      values.push(`%${propietario}%`);
+      index++;
+    }
+
+    // ?? FILTRO POR ESTADO
+    if (estado) {
+      query += ` AND v.estado = $${index}`;
+      values.push(estado);
+      index++;
+    }
+
+    query += ` ORDER BY v.placa`;
+
+    const result = await pool.query(query, values);
 
     res.json(result.rows);
 
   } catch (error) {
-    console.error("Error vehículos:", error);
-    res.status(500).json({ error: "Error obteniendo vehículos" });
+    console.error("? ERROR VEHICULOS:", error);
+    res.status(500).json({ 
+      error: "Error obteniendo vehículos", 
+      detalle: error.message 
+    });
   }
 };
 
