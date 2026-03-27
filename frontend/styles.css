@@ -1,5 +1,5 @@
 /* ========================= */
-/* GLOBAL */
+/* RESET & BASE */
 /* ========================= */
 * {
   margin: 0;
@@ -10,439 +10,56 @@
 
 html, body {
   height: 100%;
-  margin: 0;
 }
 
 /* ========================= */
-/* FONDO */
+/* VARIABLES (PRO) */
 /* ========================= */
-.background {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background: url("./assets/images/Fondo-Login.png") no-repeat center center/cover;
-  z-index: -1;
-  filter: brightness(0.9);
+:root {
+  --primary: #2a5298;
+  --primary-dark: #1e3c72;
+  --success: #27ae60;
+  --warning: #f39c12;
+  --danger: #e74c3c;
+  --bg-light: #f4f6f9;
 }
 
 /* ========================= */
-/* LOGIN FIX GLOBAL */
+/* LOGIN */
 /* ========================= */
-
-/* Evita que el flex del dashboard afecte */
 .login-body {
   display: block;
-  margin: 0;
   height: 100vh;
   overflow: hidden;
 }
 
-/* Fondo */
+/* Fondo login */
 .background {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-
-  background: url("./assets/images/Fondo-Login.png") no-repeat center center/cover;
-
+  background: url("/assets/images/Fondo-Login.png") no-repeat center center/cover;
   filter: blur(2px);
   z-index: -1;
 }
 
 /* ========================= */
-/* LOGIN */
+/* LAYOUT APP */
 /* ========================= */
-
-/* CONTENEDOR CENTRADO */
-.main-container {
+body:not(.login-body) {
   display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100vh;
-  padding: 20px;
 }
-
-/* CARD */
-.login-card {
-  width: 100%;
-  max-width: 400px;
-  background: rgba(255, 255, 255, 0.55);
-  padding: 35px 30px;
-  border-radius: 14px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-  text-align: center;
-  backdrop-filter: blur(6px);
-}
-
-/* Logo arriba del card */
-.logo-container {
-  margin-bottom: 10px;
-}
-
-.logo-container img {
-  width: 230px;
-  max-width: 80%;
-}
-
-/* Título */
-.login-card h2 {
-  margin-bottom: 20px;
-  color: #333;
-}
-
-/* Labels */
-.login-card label {
-  display: block;
-  margin-top: 15px;
-  font-size: 14px;
-  text-align: left;
-}
-
-/* Inputs */
-.login-card input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 5px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-  transition: 0.2s;
-}
-
-.login-card input:focus {
-  border-color: #2a5298;
-  box-shadow: 0 0 0 2px rgba(42, 82, 152, 0.15);
-}
-
-/* Password */
-.password-container {
-  position: relative;
-}
-
-.eye-icon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 22px;
-  cursor: pointer;
-  opacity: 0.7;
-}
-
-.eye-icon:hover {
-  opacity: 1;
-}
-
-/* Olvidé contraseña */
-.forgot {
-  margin-top: 10px;
-  text-align: right;
-}
-
-.forgot a {
-  font-size: 13px;
-  color: #2a5298;
-  text-decoration: none;
-}
-
-.forgot a:hover {
-  text-decoration: underline;
-}
-
-/* Botón */
-.login-card button {
-  width: 100%;
-  margin-top: 25px;
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  background: #2a5298;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.login-card button:hover {
-  background: #1e3c72;
-}
-
 
 /* ========================= */
-/* HOME */
-/* ========================= */
-.home-container {
-  display: flex;
-  height: 100%;
-}
-
 /* SIDEBAR */
+/* ========================= */
 .sidebar {
-  width: 80px;
-  background: #1e3c72;
-  color: white;
-  transition: width 0.3s;
-}
-
-.sidebar:hover {
-  width: 220px;
-}
-
-.sidebar-logo {
-  text-align: center;
-  padding: 15px;
-}
-
-.sidebar-logo img {
-  width: 50px;
-}
-
-.menu {
-  list-style: none;
-  margin-top: 20px;
-}
-
-.menu li {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-}
-
-.menu li span {
-  width: 40px;
-  text-align: center;
-}
-
-.menu li p {
-  opacity: 0;
-  margin-left: 10px;
-}
-
-.sidebar:hover .menu li p {
-  opacity: 1;
-}
-
-/* ========================= */
-/* HOME CARDS */
-/* ========================= */
-
-.subtitle {
-  color: #555;
-  margin-bottom: 20px;
-}
-
-/* CONTENEDOR CARDS */
-.cards {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-/* CARD */
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  width: 250px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-/* ICONO */
-.card-icon {
-  width: 45px;
-  height: 45px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 18px;
-}
-
-/* COLORES */
-.blue { background: #2a5298; }
-.green { background: #27ae60; }
-.orange { background: #f39c12; }
-
-/* TEXTO */
-.card h2 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.card p {
-  margin: 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.money {
-  font-size: 13px;
-  color: green;
-}
-
-
-
-/* ========================= */
-/* TABLA */
-/* ========================= */
-
-.table-container {
-  margin-top: 0;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.table-header {
-  margin-bottom: 15px;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table thead {
-  background: #f5f6fa;
-}
-
-.table th, .table td {
-  padding: 12px;
-  text-align: left;
-  font-size: 14px;
-}
-
-.table tbody tr {
-  border-bottom: 1px solid #eee;
-}
-
-.table tbody tr:hover {
-  background: #f9f9f9;
-}
-
-/* ESTADOS */
-.status {
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  color: white;
-}
-
-.status.activo {
-  background: #27ae60;
-}
-
-.status.pendiente {
-  background: #f39c12;
-}
-
-.status.cancelado {
-  background: #e74c3c;
-}
-
-/* ========================= */
-/* GRID DASHBOARD */
-/* ========================= */
-
-.dashboard-grid {
-  display: flex;
-  gap: 20px;
-  margin-top: 30px;
-  align-items: flex-start;
-}
-
-/* IZQUIERDA */
-.left-panel {
-  flex: 2;
-}
-
-/* DERECHA */
-.right-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* CARDS DERECHA */
-.side-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-/* TÍTULO */
-.side-card h3 {
-  margin-bottom: 15px;
-}
-
-/* LISTA */
-.side-card ul {
-  padding-left: 0;
-  list-style: none;
-}
-
-.side-card li {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 14px;
-}
-
-/* BADGE (contador) */
-.badge {
-  background: #e74c3c;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-}
-
-/* ESTADOS DE ALERTA */
-.badge.ok {
-  background: #27ae60;
-}
-
-.badge.warning {
-  background: #f39c12;
-}
-
-.badge.danger {
-  background: #e74c3c;
-}
-
-
-/* ========================= */
-/* MAIN CONTENT */
-/* ========================= */
-.main-content {
-  padding: 20px;
-}
-
-/* ========================= */
-/* LAYOUT GENERAL */
-/* ========================= */
-body {
-  display: flex;
+  width: 70px;
   height: 100vh;
-}
-
-/* ========================= */
-/* SIDEBAR PRO */
-/* ========================= */
-
-.sidebar {
-  width: 70px; /* colapsado */
-  height: 100vh;
-  background: #1e3c72;
+  background: var(--primary-dark);
   color: white;
   position: fixed;
   top: 0;
@@ -456,14 +73,11 @@ body {
   z-index: 1000;
 }
 
-/* EXPANSIÓN */
 .sidebar:hover {
   width: 220px;
 }
 
-/* ========================= */
 /* LOGO */
-/* ========================= */
 .sidebar-logo {
   display: flex;
   justify-content: center;
@@ -485,13 +99,9 @@ body {
 /* ========================= */
 .menu {
   list-style: none;
-  padding: 0;
-  margin: 0;
 }
 
-/* ========================= */
 /* ITEMS */
-/* ========================= */
 .menu-item {
   display: flex;
 }
@@ -499,7 +109,7 @@ body {
 .menu-item a {
   display: flex;
   align-items: center;
-  justify-content: center; /* centrado cuando está cerrado */
+  justify-content: center;
   gap: 15px;
 
   padding: 12px 20px;
@@ -509,7 +119,6 @@ body {
   transition: 0.2s;
 }
 
-/* CUANDO SE ABRE */
 .sidebar:hover .menu-item a {
   justify-content: flex-start;
 }
@@ -518,50 +127,45 @@ body {
 .menu-item i {
   min-width: 25px;
   text-align: center;
-  font-size: 16px;
 }
 
-/* TEXTO OCULTO COMPLETAMENTE */
+/* TEXTO */
 .menu-item span {
   display: none;
 }
 
-/* TEXTO VISIBLE SOLO AL HOVER */
 .sidebar:hover .menu-item span {
   display: inline;
 }
 
 /* HOVER */
 .menu-item a:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255,255,255,0.15);
+}
+
+/* ACTIVO (?? IMPORTANTE) */
+.menu-item.active a {
+  background: rgba(255,255,255,0.25);
 }
 
 /* ========================= */
-/* TITULOS (Flota, Finanzas...) */
+/* TITULOS */
 /* ========================= */
 .menu-title {
   display: flex;
   align-items: center;
-  justify-content: center; /* centrado cuando está cerrado */
+  justify-content: center;
 
   padding: 12px 0;
   font-size: 12px;
   text-transform: uppercase;
-
   pointer-events: none;
 }
 
-/* ICONOS */
-.menu-title i {
-  font-size: 16px;
-}
-
-/* TEXTO OCULTO */
 .menu-title span {
   display: none;
 }
 
-/* CUANDO SE ABRE */
 .sidebar:hover .menu-title {
   justify-content: flex-start;
   padding: 12px 20px;
@@ -574,7 +178,7 @@ body {
 }
 
 /* ========================= */
-/* CONTENIDO AJUSTADO */
+/* CONTENT */
 /* ========================= */
 .content {
   margin-left: 70px;
@@ -582,18 +186,18 @@ body {
   transition: all 0.3s ease;
 }
 
-/* cuando sidebar abre */
 .sidebar:hover ~ .content {
   margin-left: 220px;
   width: calc(100% - 220px);
 }
+
 /* ========================= */
 /* TOPBAR */
 /* ========================= */
 .topbar {
   width: 100%;
   height: 60px;
-  background: #1e3c72;
+  background: var(--primary-dark);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -601,46 +205,74 @@ body {
   color: white;
 }
 
-.topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.topbar-logo {
-  width: 35px;
-}
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.profile {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-}
-
-.logout-btn {
-  background: #e74c3c;
-  border: none;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
 /* ========================= */
 /* MAIN */
 /* ========================= */
 .main-content {
   padding: 20px;
-  background: #f4f6f9;
-  height: 100%;
+  background: var(--bg-light);
+  min-height: calc(100vh - 60px);
 }
+
+/* ========================= */
+/* COMPONENTES */
+/* ========================= */
+
+/* CARDS */
+.cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  gap: 15px;
+  width: 250px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* TABLA */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 12px;
+  font-size: 14px;
+}
+
+.table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+/* STATUS */
+.status {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: white;
+}
+
+.status.activo { background: var(--success); }
+.status.pendiente { background: var(--warning); }
+.status.cancelado { background: var(--danger); }
+
+/* BADGES */
+.badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: white;
+}
+
+.badge.ok { background: var(--success); }
+.badge.warning { background: var(--warning); }
+.badge.danger { background: var(--danger); }
 
 /* ========================= */
 /* RESPONSIVE */
@@ -649,12 +281,47 @@ body {
   .sidebar {
     width: 60px;
   }
+}
 
-  .menu li {
-    text-align: center;
-  }
 
-  .menu li a {
-    font-size: 12px;
-  }
+/* HEADER SIDEBAR */
+.sidebar-header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* TOPBAR */
+.topbar {
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* DERECHA */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* LOGO */
+.logo-topbar {
+  height: 35px;
+}
+
+/* CONTENEDOR DEL LOGO */
+.logo-topbar {
+  height: 40px;          /* ?? tamaño controlado */
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* OPCIONAL: limitar aún más */
+.topbar-right img {
+  max-height: 40px;
 }

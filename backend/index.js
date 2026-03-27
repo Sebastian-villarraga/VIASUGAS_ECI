@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-console.log("INICIANDO SERVER...");
+console.log("?? Iniciando servidor...");
 
 const express = require("express");
 const cors = require("cors");
@@ -11,103 +11,85 @@ const pool = require("./config/db");
 const app = express();
 
 // =====================
+// CONFIG
+// =====================
+const PORT = process.env.PORT || 3000;
+const frontendPath = path.join(__dirname, "../frontend");
+
+// =====================
 // MIDDLEWARES
 // =====================
 app.use(cors());
 app.use(express.json());
 
 // =====================
+// LOG REQUESTS (PRO)
+// =====================
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// =====================
 // RUTAS API
 // =====================
 const manifiestoRoutes = require("./routes/manifiesto.routes");
 const vehiculoRoutes = require("./routes/vehiculo.routes");
+const authRoutes = require("./routes/auth.routes");
 
+app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
 app.use("/api/vehiculos", vehiculoRoutes);
 
 // =====================
-// TESTS
+// HEALTH CHECKS
 // =====================
 app.get("/api", (req, res) => {
-    res.json({ message: "API funcionando correctamente" });
+  res.json({ ok: true, message: "API funcionando correctamente" });
 });
 
-app.get("/test", async (req, res) => {
-    try {
-        const result = await pool.query("SELECT NOW()");
-        res.json(result.rows);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Error en base de datos" });
-    }
-});
-
-// DEBUG RÁPIDO
 app.get("/ping", (req, res) => {
-    res.send("pong");
+  res.send("pong");
 });
 
 // =====================
 // STATIC FRONTEND
 // =====================
-app.use(express.static(path.join(__dirname, "../frontend")));
+app.use(express.static(frontendPath));
 
 // =====================
-// RUTAS DINÁMICAS FRONTEND (SOLUCIÓN PRO)
+// SPA FALLBACK (?? FIX REAL)
 // =====================
-app.get("/:page", (req, res, next) => {
-    const page = req.params.page;
+app.use((req, res, next) => {
+  // ?? NO tocar API
+  if (req.originalUrl.startsWith("/api")) {
+    return res.status(404).json({ error: "API route not found" });
+  }
 
-    // Evitar interferir con API
-    if (page.startsWith("api")) {
-        return next();
-    }
+  // ? SPA fallback
+  res.sendFile(path.join(frontendPath, "pages/home.html"));
+});
+// =====================
+// SERVER START
+// =====================
+app.listen(PORT, "0.0.0.0", async () => {
+  console.log(`? Servidor corriendo en puerto ${PORT}`);
 
-    const filePath = path.join(__dirname, `../frontend/pages/${page}.html`);
-
-    res.sendFile(filePath, (err) => {
-        if (err) {
-            res.status(404).send("Página no encontrada");
-        }
-    });
+  try {
+    const result = await pool.query("SELECT NOW()");
+    console.log("?? DB conectada:", result.rows[0]);
+  } catch (error) {
+    console.error("?? Error DB:", error.message);
+  }
 });
 
 // =====================
-// SERVER
+// ERROR HANDLING GLOBAL
 // =====================
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, "0.0.0.0", () => {
-    console.log("Servidor corriendo en puerto " + PORT);
-});
-
-// =====================
-// TEST DB AL INICIAR
-// =====================
-(async () => {
-    try {
-        const result = await pool.query("SELECT NOW()");
-        console.log("DB conectada:", result.rows[0]);
-    } catch (error) {
-        console.error("Error DB:", error.message);
-    }
-})();
-
-// =====================
-// DEBUG PROCESO
-// =====================
-process.on("exit", (code) => {
-    console.log("El proceso se cerró con código:", code);
-});
-
 process.on("uncaughtException", (err) => {
-    console.error("Error no controlado:", err);
+  console.error("?? Error no controlado:", err);
 });
 
 process.on("unhandledRejection", (err) => {
-    console.error("Promesa rechazada:", err);
+  console.error("?? Promesa rechazada:", err);
 });
-
-setInterval(() => {
-    console.log("backend vivo");
-}, 5000);

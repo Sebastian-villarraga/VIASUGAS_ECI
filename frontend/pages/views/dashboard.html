@@ -1,0 +1,113 @@
+<h1>Dashboard</h1>
+      <p class="subtitle">
+        Bienvenido de nuevo. Aquí verás el resumen de tus operaciones.
+      </p>
+
+      <!-- GRID -->
+      <div class="dashboard-grid">
+
+        <!-- IZQUIERDA -->
+        <div class="left-panel">
+
+          <!-- CARDS -->
+          <div class="cards">
+
+            <div class="card">
+              <div class="card-icon blue">
+                <i class="fas fa-truck"></i>
+              </div>
+              <div>
+                <h2 id="viajesActivos">--</h2>
+                <p>Viajes Activos</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-icon green">
+                <i class="fas fa-check"></i>
+              </div>
+              <div>
+                <h2 id="viajesFinalizados">--</h2>
+                <p>Viajes Finalizados</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-icon orange">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div>
+                <h2 id="facturasPendientes">--</h2>
+                <p>Facturas Pendientes</p>
+                <span class="money" id="totalPendiente">$0</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- TABLA -->
+          <div class="table-container">
+            <div class="table-header">
+              <h2>Últimos Viajes</h2>
+            </div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Origen</th>
+                  <th>Destino</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+
+              <tbody id="tablaViajes">
+                <tr>
+                  <td colspan="5">Cargando datos...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- DERECHA -->
+        <div class="right-panel">
+
+          <!-- VENCIMIENTOS -->
+          <div class="side-card">
+            <h3>Vencimientos</h3>
+
+            <ul id="vencimientosList">
+              <li>
+                Licencias 
+                <span class="badge warning" id="licenciasCount">0</span>
+              </li>
+              <li>
+                SOAT 
+                <span class="badge ok" id="soatCount">0</span>
+              </li>
+              <li>
+                Tecnomecánica 
+                <span class="badge danger" id="tecnoCount">0</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- FACTURACIÓN -->
+          <div class="side-card">
+            <h3>Facturación Pendiente</h3>
+
+            <p id="facturacionTexto">
+              No hay facturas pendientes
+            </p>
+
+            <strong id="facturacionValor" class="money">
+              $0
+            </strong>
+          </div>
+
+        </div>
+
+      </div>

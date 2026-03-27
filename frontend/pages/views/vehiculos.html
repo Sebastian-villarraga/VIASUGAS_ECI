@@ -1,37 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vehículos - Viasugas</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="/styles/global.css">
-  <link rel="stylesheet" href="/styles/layout.css">
-  <link rel="stylesheet" href="/styles/sidebar.css">
-  <link rel="stylesheet" href="/styles/topbar.css">
-  <link rel="stylesheet" href="/styles/vehiculo.css">
-
-  <!-- ICONOS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-
-<body>
-
-  <!-- SIDEBAR -->
-  <div id="sidebar"></div>
-
-  <!-- CONTENIDO -->
-  <div class="content">
-
-    <!-- TOPBAR -->
-    <div id="topbar"></div>
-
-    <!-- MAIN -->
-    <div class="main-content">
-
-      <!-- LAYOUT PRINCIPAL -->
-      <div class="vehiculo-layout">
+<div class="vehiculo-layout">
 
         <!-- ========================= -->
         <!-- IZQUIERDA -->
@@ -88,7 +55,7 @@
                     <th>Propietario</th>
                     <th>Todo Riesgo</th>
                     <th>SOAT</th>
-                    <th>Tecnomecánica</th>
+                    <th>Tecnomecónica</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
@@ -111,7 +78,7 @@
         <!-- ========================= -->
         <div class="vehiculo-right">
 
-          <!-- BOTÓN -->
+          <!-- BOT�N -->
           <button class="btn-primary btn-add-right" onclick="abrirModalVehiculo()">
             <i class="fas fa-plus"></i> Agregar vehículo
           </button>
@@ -123,7 +90,7 @@
             <h3><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
 
             <ul id="alertasList">
-              <li>⚠️ Cargando alertas...</li>
+              <li>?? Cargando alertas...</li>
             </ul>
 
             <hr style="margin:15px 0;">
@@ -148,12 +115,3 @@
         </div>
 
       </div>
-
-    </div>
-  </div>
-
-  <!-- JS -->
-  <script src="/app.js"></script>
-
-</body>
-</html>

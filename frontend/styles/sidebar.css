@@ -1,48 +1,42 @@
 /* ========================= */
-/* SIDEBAR PRO */
+/* SIDEBAR PRO (FIX FINAL) */
 /* ========================= */
 
 .sidebar {
-  width: 70px; /* colapsado */
-  height: 100vh;
+  width: 40px; /* colapsado */
+  height: calc(100vh - 60px);
   background: #1e3c72;
   color: white;
+  box-sizing: border-box; /* ?? CLAVE */
   position: fixed;
-  top: 0;
+  top: 60px;
   left: 0;
 
   display: flex;
   flex-direction: column;
 
   transition: width 0.3s ease;
-  overflow: hidden;
-  z-index: 1000;
+
+  overflow-y: auto;   /* ?? SCROLL */
+  overflow-x: hidden; /* evita scroll horizontal */
+
+  z-index: 900;
 }
 
+/* SCROLL FINO (opcional pero pro) */
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.25);
+  border-radius: 10px;
+}
+
+/* ========================= */
 /* EXPANSIÓN */
+/* ========================= */
 .sidebar:hover {
-  width: 220px;
-}
-
-/* ========================= */
-/* LOGO */
-/* ========================= */
-.sidebar-logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-}
-
-.sidebar-logo img {
-  width: 55px; 
-  height: auto;
-  object-fit: contain;
-  transition: 0.3s;
-}
-
-.sidebar:hover .sidebar-logo img {
-  width: 140px;
+  width: 150px;
 }
 
 /* ========================= */
@@ -50,7 +44,7 @@
 /* ========================= */
 .menu {
   list-style: none;
-  padding: 0;
+  padding: 5px 0;
   margin: 0;
 }
 
@@ -64,26 +58,22 @@
 .menu-item a {
   display: flex;
   align-items: center;
-  justify-content: center; /* centrado en modo cerrado */
-  gap: 15px;
+  justify-content: center;
 
-  padding: 12px 20px;
+  padding: 10px 15px; /* ?? más compacto */
+  font-size: 14px;    /* ?? más pequeño */
+  font-weight: 400;
+
   color: white !important;
   text-decoration: none;
 
+  opacity: 0.85;
   transition: 0.2s;
 }
 
-/* CUANDO SE EXPANDE */
+/* CUANDO EXPANDE */
 .sidebar:hover .menu-item a {
   justify-content: flex-start;
-}
-
-/* ICONOS */
-.menu-item i {
-  min-width: 25px;
-  text-align: center;
-  font-size: 16px;
 }
 
 /* TEXTO OCULTO */
@@ -91,63 +81,51 @@
   display: none;
 }
 
-/* TEXTO VISIBLE AL EXPANDIR */
+/* TEXTO VISIBLE */
 .sidebar:hover .menu-item span {
   display: inline;
 }
 
 /* HOVER */
 .menu-item a:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 1;
 }
 
-/* ========================= */
-/* TITULOS (Flota, Finanzas...) */
-/* ========================= */
-.menu-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 12px 0;
-  font-size: 12px;
-  text-transform: uppercase;
-
-  pointer-events: none;
+/* ACTIVO */
+.menu-item.active a {
+  background: rgba(255,255,255,0.18);
 }
 
-/* ICONOS */
-.menu-title i {
+
+/* ========================= */
+/* SECCIONES (AGRUPADORES) */
+/* ========================= */
+
+.menu-section {
+  display: none; /* ?? OCULTO POR DEFECTO */
+}
+
+/* CUANDO EXPANDE */
+.sidebar:hover .menu-section {
+  display: block;
+  padding: 10px 15px;
   font-size: 16px;
-}
-
-/* TEXTO OCULTO */
-.menu-title span {
-  display: none;
-}
-
-/* CUANDO SE EXPANDE */
-.sidebar:hover .menu-title {
-  justify-content: flex-start;
-  padding: 12px 20px;
-}
-
-.sidebar:hover .menu-title span {
-  display: inline;
-  margin-left: 10px;
-  opacity: 0.7;
+  text-transform: uppercase;
+  opacity: 0.5;
 }
 
 /* ========================= */
-/* CONTENIDO AJUSTE */
+/* CONTENIDO */
 /* ========================= */
 .content {
-  margin-left: 70px;
-  width: calc(100% - 70px);
-  transition: all 0.3s ease;
+  margin-top: 60px;
+  margin-left: 40px;
+  width: 100%;
 }
 
+/* CUANDO EXPANDE */
 .sidebar:hover ~ .content {
-  margin-left: 220px;
-  width: calc(100% - 220px);
+  margin-left: 150px;
+  width: 100%;
 }

@@ -198,3 +198,38 @@
 .badge.danger {
   background: #e74c3c;
 }
+
+
+.home-container {
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding: 20px;
+  padding-top: 20px;
+}
+
+/* LOGO */
+.home-logo img {
+  width: 500px;   /* ?? tamaño grande */
+  max-width: 90%;
+  margin-bottom: 30px;
+}
+
+/* TEXTO */
+.home-content h1 {
+  font-size: 32px;
+  color: #1e3c72;
+  margin-bottom: 10px;
+}
+
+.home-content p {
+  font-size: 16px;
+  color: #555;
+  max-width: 500px;
+  margin: 0 auto 25px;
+  line-height: 1.6;
+}
+
