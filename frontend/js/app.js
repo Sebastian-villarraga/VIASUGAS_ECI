@@ -5,7 +5,7 @@ async function loadView(view) {
   const container = document.getElementById("app-content");
 
   if (!container) {
-    console.error("? #app-content no existe en el DOM");
+    console.error("#app-content no existe en el DOM");
     return;
   }
 
