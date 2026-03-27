@@ -1,159 +1,82 @@
--- Usuarios
-INSERT INTO Usuario VALUES 
-('U1', 'Admin', 'admin@viasugas.com', 'hash123', true, NOW(), NOW()),
-('U2', 'Operador', 'op@viasugas.com', 'hash456', true, NOW(), NOW());
+-- propietario
+INSERT INTO propietario VALUES
+('1070017389', 'Carlos Trujillo', 'carlostg@gmail.com', 3207896524, NOW(), NOW());
 
--- Permisos
-INSERT INTO Permiso VALUES
-('P1', 'ADMIN', 'Administrador', 'Acceso total'),
-('P2', 'OPER', 'Operador', 'Acceso limitado');
+-- usuario
+INSERT INTO usuario VALUES 
+('U1', 'Admin', 'admin@viasugas.com', 'hash123', true, NOW(), NOW());
 
--- Relación usuario_permiso
+-- permiso
+INSERT INTO permiso VALUES
+('P1', 'ADMIN', 'Administrador', 'Acceso total');
+
 INSERT INTO usuario_permiso VALUES
-('U1', 'P1'),
-('U2', 'P2');
+('U1', 'P1');
 
-INSERT INTO Cliente VALUES
-('900123456', 'Cliente Demo', 'cliente@mail.com', 3001234567, 'Cali', 'activo', NOW(), NOW());
+-- cliente
+INSERT INTO cliente VALUES
+('12423534-1', 'Alpina', 'cliente@mail.com', 6018765346, 'Bogota', 'activo', NOW(), NOW());
 
-INSERT INTO EmpresaACargo VALUES
-('800987654', 'Empresa Transporte', 'empresa@mail.com', 3009876543, 'Bogotá', 'activo', NOW(), NOW());
+-- empresa
+INSERT INTO empresa_a_cargo VALUES
+('45672349876-1', 'Transportes', 'empresa@mail.com', 3159986745, 'Bogota', 'activo', NOW(), NOW());
 
-INSERT INTO Propietario VALUES
-('111111111', 'Juan Propietario', 'prop@mail.com', 3011111111, NOW(), NOW());
+-- conductor
+INSERT INTO conductor VALUES
+(1070017347, 'Juan Ramirez', 'jjrojas@gmail.com', 3158827890, 'activo',
+ '2026-09-10','2026-09-10','2026-09-10', NOW(), NOW());
 
-INSERT INTO Conductor VALUES
-(12345678, 'Carlos Ruiz', 'conductor@mail.com', 3022222222, 'activo',
- '2027-01-01', '2026-12-01', '2026-11-01',
- NOW(), NOW());
+-- vehiculo
+INSERT INTO vehiculo VALUES
+('JGV196','1070017389','activo','2026-09-10','2026-09-10','2026-09-10',NOW(),NOW());
 
-INSERT INTO Vehiculo VALUES
-('ABC123', 111111111, 'activo',
- '2026-10-01', '2026-09-01', '2026-12-01',
- NOW(), NOW());
+-- trailer
+INSERT INTO trailer VALUES
+('TY9834','1070017389','activo','2026-09-10',NOW(),NOW());
 
-INSERT INTO Trailer VALUES
-('TRL456', 111111111, 'activo',
- '2026-08-01',
- NOW(), NOW());
-
-INSERT INTO Manifiesto VALUES
+-- manifiesto
+INSERT INTO manifiesto VALUES
 (
- 'M1', 1001,
- '900123456',   -- cliente
- 12345678,      -- conductor
- 'ABC123',      -- vehiculo
- 'TRL456',      -- trailer
- '800987654',   -- empresa
-
- '2026-03-25',
-
- 'Valle', 'Cali',
- 'Antioquia', 'Medellín',
-
+ 'VG-123-4567',
+ 654987321,
+ '12423534-1',
+ 1070017347,
+ 'JGV196',
+ 'TY9834',
+ '45672349876-1',
+ '2026-03-13',
+ 'Cundinamarca','Cajica',
+ 'Valle del Cauca','Cali',
  'en_curso',
-
- 5000000,       -- valor_flete
- 10,            -- porcentaje
- 1000000,       -- anticipo
-
- 'pendiente',   -- gastos
- 'aprobado',    -- documentos
-
- true,
- 'Carga delicada',
-
+ 5000000,4800000,2000000,
+ 'pendiente','pendiente',
+ true,'OK',
  NOW()
 );
 
-INSERT INTO Factura VALUES
+-- factura
+INSERT INTO factura VALUES
 (
- 'F001',
- 'M1',
- '2026-03-25',
- '2026-04-25',
- 5000000,
- 500000,
- 250000,
- 30,
- NOW()
+ 'FV-2-510','VG-123-4567',
+ '2026-02-01','2026-03-01',
+ 10000000,500000,290000,30,NOW()
 );
 
-INSERT INTO Banco VALUES
+-- banco
+INSERT INTO banco VALUES
+('B1','Juan Ramirez','12365489','BBVA','24876435673','ahorros',NOW());
+
+-- tipo transaccion
+INSERT INTO tipo_transaccion VALUES
+('TX1','combustible','gasolina','egreso','activo',NOW());
+
+-- transaccion
+INSERT INTO transaccion VALUES
 (
- 'B1',
- 'Juan Propietario',
- '111111111',
- 'Bancolombia',
- '1234567890',
- 'ahorros',
- NOW()
+ 'T1','B1','TX1','JGV196',NULL,'VG-123-4567',NULL,
+ 4800000,'2026-02-20','pago',NOW()
 );
 
-INSERT INTO TipoTransaccion VALUES
-('T1', 'Combustible', 'Pago gasolina', 'egreso', 'activo', NOW()),
-('T2', 'Flete', 'Pago cliente', 'ingreso', 'activo', NOW());
-
-INSERT INTO Transaccion VALUES
-(
- 'TR1',
- 'B1',
- 'T1',
-
- 'ABC123',
- NULL,
- 'M1',
- NULL,
-
- 200000,
- '2026-03-25',
- 'Carga de gasolina',
-
- NOW()
-),
-
-(
- 'TR2',
- 'B1',
- 'T2',
-
- NULL,
- NULL,
- 'M1',
- 'F001',
-
- 5000000,
- '2026-03-26',
- 'Pago del cliente',
-
- NOW()
-);
-
-INSERT INTO GastosConductor VALUES
-(
- 'GC1',
- 'TR1',
- 12345678,
- 'M1',
- 'Gasolina viaje',
- NOW()
-);
-
-INSERT INTO AuditLogs (
-nombreTabla, operacion, id_registro, id_usuario, dato_antiguo, dato_nuevo, creado
-) VALUES
-(
- 'Manifiesto',
- 'INSERT',
- 1,
- 'U1',
- NULL,
- '{"estado":"en_curso"}',
- NOW()
-);
-
-
-
-
-
-
+-- gastos
+INSERT INTO gastos_conductor VALUES
+('GC1','T1',1070017347,'VG-123-4567','peaje',NOW());

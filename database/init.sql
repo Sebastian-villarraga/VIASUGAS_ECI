@@ -1,17 +1,35 @@
 -- =========================
+-- ENUMS 
+-- =========================
+
+CREATE TYPE tactivo AS ENUM ('activo', 'inactivo');
+CREATE TYPE tcuentabanco AS ENUM ('ahorros', 'corriente');
+CREATE TYPE testadoviaje AS ENUM ('pendiente', 'en_curso', 'finalizado', 'cancelado');
+CREATE TYPE tvalidacion AS ENUM ('pendiente', 'aprobado', 'rechazado');
+CREATE TYPE toperacion AS ENUM ('insert', 'update', 'delete');
+CREATE TYPE tingresoegreso AS ENUM ('ingreso', 'egreso');
+
+-- =========================
+-- DOMINIOS
+-- =========================
+
+CREATE DOMAIN moneda AS NUMERIC(15,2);
+
+-- =========================
 -- TABLAS
 -- =========================
-CREATE TABLE Usuario (
+
+CREATE TABLE usuario (
     id VARCHAR PRIMARY KEY,
     nombre VARCHAR,
     correo VARCHAR UNIQUE,
-    contraseña_hash VARCHAR,
+    contrasena_hash VARCHAR,
     activo BOOLEAN,
     creado TIMESTAMP,
     actualizado TIMESTAMP
 );
 
-CREATE TABLE Permiso (
+CREATE TABLE permiso (
     id VARCHAR PRIMARY KEY,
     codigo VARCHAR UNIQUE,
     nombre VARCHAR,
@@ -22,38 +40,47 @@ CREATE TABLE usuario_permiso (
     id_usuario VARCHAR,
     id_permiso VARCHAR,
     PRIMARY KEY (id_usuario, id_permiso),
-    FOREIGN KEY (id_usuario) REFERENCES Usuario(id),
-    FOREIGN KEY (id_permiso) REFERENCES Permiso(id)
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id),
+    FOREIGN KEY (id_permiso) REFERENCES permiso(id)
 );
 
-CREATE TABLE Cliente (
+CREATE TABLE cliente (
     nit VARCHAR PRIMARY KEY,
     nombre VARCHAR,
     correo VARCHAR,
-    telefono INT,
+    telefono BIGINT,
     direccion VARCHAR,
-    estado TActivo,
+    estado tactivo,
     creado TIMESTAMP,
     actualizado TIMESTAMP
 );
 
-CREATE TABLE EmpresaACargo (
+CREATE TABLE empresa_a_cargo (
     nit VARCHAR PRIMARY KEY,
     nombre VARCHAR,
     correo VARCHAR,
-    telefono INT,
+    telefono BIGINT,
     direccion VARCHAR,
-    estado TActivo,
+    estado tactivo,
     creado TIMESTAMP,
     actualizado TIMESTAMP
 );
 
-CREATE TABLE Conductor (
+CREATE TABLE propietario (
+    identificacion VARCHAR PRIMARY KEY,
+    nombre VARCHAR,
+    correo VARCHAR,
+    telefono BIGINT,
+    creado TIMESTAMP,
+    actualizado TIMESTAMP
+);
+
+CREATE TABLE conductor (
     cedula INT PRIMARY KEY,
     nombre VARCHAR,
     correo VARCHAR,
-    telefono INT,
-    estado TActivo,
+    telefono BIGINT,
+    estado tactivo,
     vencimiento_licencia DATE,
     vencimiento_manip_alimentos DATE,
     vencimiento_sustancia_peligrosa DATE,
@@ -61,36 +88,31 @@ CREATE TABLE Conductor (
     actualizado TIMESTAMP
 );
 
-CREATE TABLE Vehiculo (
+CREATE TABLE vehiculo (
     placa VARCHAR PRIMARY KEY,
-    id_propietario INT,
-    estado TActivo,
+    id_propietario VARCHAR,
+    estado tactivo,
     vencimiento_soat DATE,
     vencimiento_tecno DATE,
     vencimiento_todo_riesgo DATE,
     creado TIMESTAMP,
-    actualizado TIMESTAMP
+    actualizado TIMESTAMP,
+
+    FOREIGN KEY (id_propietario) REFERENCES propietario(identificacion)
 );
 
-CREATE TABLE Trailer (
+CREATE TABLE trailer (
     placa VARCHAR PRIMARY KEY,
-    id_propietario INT,
-    estado TActivo,
+    id_propietario VARCHAR,
+    estado tactivo,
     vencimiento_cert_fumigacion DATE,
     creado TIMESTAMP,
-    actualizado TIMESTAMP
+    actualizado TIMESTAMP,
+
+    FOREIGN KEY (id_propietario) REFERENCES propietario(identificacion)
 );
 
-CREATE TABLE Propietario (
-    identificacion VARCHAR PRIMARY KEY,
-    nombre VARCHAR,
-    correo VARCHAR,
-    telefono INT,
-    creado TIMESTAMP,
-    actualizado TIMESTAMP
-);
-
-CREATE TABLE Manifiesto (
+CREATE TABLE manifiesto (
     id_manifiesto VARCHAR PRIMARY KEY,
     radicado INT UNIQUE,
     id_cliente VARCHAR,
@@ -106,85 +128,85 @@ CREATE TABLE Manifiesto (
     destino_departamento VARCHAR,
     destino_ciudad VARCHAR,
 
-    estado TEstadoViaje,
+    estado testadoviaje,
 
-    valor_flete Moneda,
-    valor_flete_porcentaje Moneda,
-    anticipo_manifiesto Moneda,
+    valor_flete moneda,
+    valor_flete_porcentaje moneda,
+    anticipo_manifiesto moneda,
 
-    gastos TValidacion,
-    documentos TValidacion,
+    gastos tvalidacion,
+    documentos tvalidacion,
 
     novedades BOOLEAN,
     observaciones VARCHAR,
 
     creado TIMESTAMP,
 
-    FOREIGN KEY (id_cliente) REFERENCES Cliente(nit),
-    FOREIGN KEY (id_conductor) REFERENCES Conductor(cedula),
-    FOREIGN KEY (id_vehiculo) REFERENCES Vehiculo(placa),
-    FOREIGN KEY (id_trailer) REFERENCES Trailer(placa),
-    FOREIGN KEY (id_empresa_a_cargo) REFERENCES EmpresaACargo(nit)
+    FOREIGN KEY (id_cliente) REFERENCES cliente(nit),
+    FOREIGN KEY (id_conductor) REFERENCES conductor(cedula),
+    FOREIGN KEY (id_vehiculo) REFERENCES vehiculo(placa),
+    FOREIGN KEY (id_trailer) REFERENCES trailer(placa),
+    FOREIGN KEY (id_empresa_a_cargo) REFERENCES empresa_a_cargo(nit)
 );
 
-CREATE TABLE Factura (
+CREATE TABLE factura (
     codigo_factura VARCHAR PRIMARY KEY,
     id_manifiesto VARCHAR,
     fecha_emision DATE,
     fecha_vencimiento DATE,
-    valor Moneda,
-    retencion_fuente Moneda,
-    retencion_ica Moneda,
+    valor moneda,
+    retencion_fuente moneda,
+    retencion_ica moneda,
     plazo_pago INT,
     creado TIMESTAMP,
 
-    FOREIGN KEY (id_manifiesto) REFERENCES Manifiesto(id_manifiesto)
+    FOREIGN KEY (id_manifiesto) REFERENCES manifiesto(id_manifiesto)
 );
 
-CREATE TABLE Banco (
+CREATE TABLE banco (
     id VARCHAR PRIMARY KEY,
     nombre_titular VARCHAR,
     identificacion VARCHAR,
     nombre_banco VARCHAR,
     numero_cuenta VARCHAR,
-    tipo_cuenta TCuentaBanco,
+    tipo_cuenta tcuentabanco,
     creado TIMESTAMP
 );
 
-CREATE TABLE TipoTransaccion (
+CREATE TABLE tipo_transaccion (
     id VARCHAR PRIMARY KEY,
     categoria VARCHAR,
     descripcion VARCHAR,
-    tipo TIngresoEgreso,
-    estado TActivo,
+    tipo tingresoegreso,
+    estado tactivo,
     creado TIMESTAMP
 );
 
-CREATE TABLE Transaccion (
+CREATE TABLE transaccion (
     id VARCHAR PRIMARY KEY,
     id_banco VARCHAR,
     id_tipo_transaccion VARCHAR,
 
-    id_vehiculo VARCHAR NULL,
-    id_trailer VARCHAR NULL,
-    id_manifiesto VARCHAR NULL,
-    id_factura VARCHAR NULL,
+    id_vehiculo VARCHAR,
+    id_trailer VARCHAR,
+    id_manifiesto VARCHAR,
+    id_factura VARCHAR,
 
-    valor Moneda,
+    valor moneda,
     fecha_pago DATE,
     descripcion VARCHAR,
 
     creado TIMESTAMP,
 
-    FOREIGN KEY (id_banco) REFERENCES Banco(id),
-    FOREIGN KEY (id_tipo_transaccion) REFERENCES TipoTransaccion(id),
-    FOREIGN KEY (id_vehiculo) REFERENCES Vehiculo(placa),
-    FOREIGN KEY (id_trailer) REFERENCES Trailer(placa),
-    FOREIGN KEY (id_manifiesto) REFERENCES Manifiesto(id_manifiesto),
-    FOREIGN KEY (id_factura) REFERENCES Factura(codigo_factura)
+    FOREIGN KEY (id_banco) REFERENCES banco(id),
+    FOREIGN KEY (id_tipo_transaccion) REFERENCES tipo_transaccion(id),
+    FOREIGN KEY (id_vehiculo) REFERENCES vehiculo(placa),
+    FOREIGN KEY (id_trailer) REFERENCES trailer(placa),
+    FOREIGN KEY (id_manifiesto) REFERENCES manifiesto(id_manifiesto),
+    FOREIGN KEY (id_factura) REFERENCES factura(codigo_factura)
 );
 
-CREATE TABLE GastosConductor (
+CREATE TABLE gastos_conductor (
     id VARCHAR PRIMARY KEY,
     id_transaccion VARCHAR NOT NULL,
     id_conductor INT NOT NULL,
@@ -192,43 +214,20 @@ CREATE TABLE GastosConductor (
     descripcion VARCHAR,
     creado TIMESTAMP,
 
-    FOREIGN KEY (id_transaccion) REFERENCES Transaccion(id),
-    FOREIGN KEY (id_conductor) REFERENCES Conductor(cedula),
-    FOREIGN KEY (id_manifiesto) REFERENCES Manifiesto(id_manifiesto)
+    FOREIGN KEY (id_transaccion) REFERENCES transaccion(id),
+    FOREIGN KEY (id_conductor) REFERENCES conductor(cedula),
+    FOREIGN KEY (id_manifiesto) REFERENCES manifiesto(id_manifiesto)
 );
 
-CREATE TABLE AuditLogs (
+CREATE TABLE audit_logs (
     id SERIAL PRIMARY KEY,
-    nombreTabla VARCHAR,
-    operacion TOperacion,
+    nombre_tabla VARCHAR,
+    operacion toperacion,
     id_registro INT,
     id_usuario VARCHAR,
     dato_antiguo JSONB,
     dato_nuevo JSONB,
     creado TIMESTAMP,
 
-    FOREIGN KEY (id_usuario) REFERENCES Usuario(id)
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id)
 );
-
-
--- =========================
--- ENUMS
--- =========================
-
-CREATE TYPE TActivo AS ENUM ('activo', 'inactivo');
-
-CREATE TYPE TCuentaBanco AS ENUM ('ahorros', 'corriente');
-
-CREATE TYPE TEstadoViaje AS ENUM ('pendiente', 'en_curso', 'finalizado', 'cancelado');
-
-CREATE TYPE TValidacion AS ENUM ('pendiente', 'aprobado', 'rechazado');
-
-CREATE TYPE TOperacion AS ENUM ('INSERT', 'UPDATE', 'DELETE');
-
-CREATE TYPE TIngresoEgreso AS ENUM ('ingreso', 'egreso');
-
--- =========================
--- DOMINIOS
--- =========================
-
-CREATE DOMAIN Moneda AS NUMERIC(15,2);
