@@ -36,10 +36,12 @@ app.use((req, res, next) => {
 const manifiestoRoutes = require("./routes/manifiesto.routes");
 const vehiculoRoutes = require("./routes/vehiculo.routes");
 const authRoutes = require("./routes/auth.routes");
+const trailerRoutes = require("./routes/trailer.routes");
 
 app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
 app.use("/api/vehiculos", vehiculoRoutes);
+app.use("/api/trailer", trailerRoutes);
 
 // =====================
 // HEALTH CHECKS

@@ -1,0 +1,295 @@
+const pool = require("../config/db");
+
+// =====================
+// GET TRAILERS
+// =====================
+const getTrailers = async (req, res) => {
+  try {
+    const { placa, propietario, estado } = req.query;
+
+    console.log("QUERY PARAMS:", req.query);
+
+    let query = `
+      SELECT 
+        t.placa,
+        COALESCE(p.nombre, '-') AS propietario,
+        t.vencimiento_cert_fumigacion,
+        t.estado
+      FROM trailer t
+      LEFT JOIN propietario p 
+        ON t.id_propietario = p.identificacion
+      WHERE 1=1
+    `;
+
+    const values = [];
+    let index = 1;
+
+    if (placa && placa.trim() !== "") {
+      query += ` AND t.placa ILIKE $${index}`;
+      values.push(`%${placa.trim()}%`);
+      index++;
+    }
+
+    if (propietario && propietario.trim() !== "") {
+      query += ` AND p.nombre ILIKE $${index}`;
+      values.push(`%${propietario.trim()}%`);
+      index++;
+    }
+
+    if (estado && estado.trim() !== "") {
+      query += ` AND LOWER(t.estado::text) = $${index}`;
+      values.push(estado.trim().toLowerCase());
+      index++;
+    }
+
+    query += ` ORDER BY t.placa`;
+
+    console.log("QUERY FINAL:", query);
+    console.log("VALUES:", values);
+
+    const result = await pool.query(query, values);
+
+    res.json(result.rows);
+
+  } catch (error) {
+    console.error("ERROR TRAILERS:", error);
+    res.status(500).json({ 
+      error: "Error obteniendo trailers",
+      detalle: error.message
+    });
+  }
+};
+
+// =====================
+// CREAR TRAILER
+// =====================
+const crearTrailer = async (req, res) => {
+  try {
+    const {
+      placa,
+      propietario,
+      vencimiento_cert_fumigacion,
+      estado
+    } = req.body;
+
+    console.log("DATA TRAILER:", req.body);
+
+    if (!placa) {
+      return res.status(400).json({
+        error: "La placa es obligatoria"
+      });
+    }
+
+    // VALIDAR DUPLICADO
+    const existe = await pool.query(
+      "SELECT placa FROM trailer WHERE placa = $1",
+      [placa]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(400).json({
+        error: "El trailer ya existe"
+      });
+    }
+
+    // BUSCAR PROPIETARIO
+    let id_propietario = null;
+
+    if (propietario) {
+      const resultProp = await pool.query(
+        "SELECT identificacion FROM propietario WHERE nombre ILIKE $1 LIMIT 1",
+        [propietario]
+      );
+
+      if (resultProp.rows.length > 0) {
+        id_propietario = resultProp.rows[0].identificacion;
+      }
+    }
+
+    // INSERT
+    const insertQuery = `
+      INSERT INTO trailer (
+        placa,
+        id_propietario,
+        vencimiento_cert_fumigacion,
+        estado
+      )
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+    `;
+
+    const values = [
+      placa,
+      id_propietario,
+      vencimiento_cert_fumigacion || null,
+      estado || "activo"
+    ];
+
+    const result = await pool.query(insertQuery, values);
+
+    console.log("TRAILER INSERTADO:", result.rows[0]);
+
+    res.status(201).json(result.rows[0]);
+
+  } catch (error) {
+    console.error("ERROR CREANDO TRAILER:", error);
+    res.status(500).json({
+      error: "Error creando trailer",
+      detalle: error.message
+    });
+  }
+};
+
+// =====================
+// ALERTAS TRAILERS
+// =====================
+const getAlertasTrailers = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        t.placa,
+        p.nombre AS propietario,
+        t.vencimiento_cert_fumigacion
+      FROM trailer t
+      LEFT JOIN propietario p 
+        ON t.id_propietario = p.identificacion
+    `);
+
+    const hoy = new Date();
+    const limite = new Date();
+    limite.setDate(hoy.getDate() + 30);
+
+    let alertas = [];
+
+    result.rows.forEach(t => {
+
+      if (!t.vencimiento_cert_fumigacion) return;
+
+      const f = new Date(t.vencimiento_cert_fumigacion);
+
+      if (f < hoy) {
+        alertas.push({
+          placa: t.placa,
+          tipo: "Fumigación",
+          estado: "vencido",
+          fecha: t.vencimiento_cert_fumigacion
+        });
+      } else if (f <= limite) {
+        alertas.push({
+          placa: t.placa,
+          tipo: "Fumigación",
+          estado: "proximo",
+          fecha: t.vencimiento_cert_fumigacion
+        });
+      }
+    });
+
+    res.json(alertas);
+
+  } catch (error) {
+    console.error("Error alertas trailer:", error);
+    res.status(500).json({ error: "Error obteniendo alertas" });
+  }
+};
+
+// =====================
+// FILTRO RAPIDO
+// =====================
+const getTrailersPorEstadoAlerta = async (req, res) => {
+  try {
+    const { tipo } = req.query;
+
+    const result = await pool.query(`
+      SELECT 
+        t.placa,
+        p.nombre AS propietario,
+        t.vencimiento_cert_fumigacion,
+        t.estado
+      FROM trailer t
+      LEFT JOIN propietario p 
+        ON t.id_propietario = p.identificacion
+    `);
+
+    const hoy = new Date();
+    const limite = new Date();
+    limite.setDate(hoy.getDate() + 30);
+
+    const filtrados = result.rows.filter(t => {
+
+      if (!t.vencimiento_cert_fumigacion) return false;
+
+      const fecha = new Date(t.vencimiento_cert_fumigacion);
+
+      if (tipo === "vencido") {
+        return fecha < hoy;
+      }
+
+      if (tipo === "proximo") {
+        return fecha >= hoy && fecha <= limite;
+      }
+
+      return false;
+    });
+
+    res.json(filtrados);
+
+  } catch (error) {
+    console.error("Error filtro trailer:", error);
+    res.status(500).json({ error: "Error filtrando trailers" });
+  }
+};
+
+// =====================
+// ACTUALIZAR TRAILER
+// =====================
+const actualizarTrailer = async (req, res) => {
+  try {
+    const { placa } = req.params;
+    const {
+      propietario,
+      vencimiento_cert_fumigacion,
+      estado
+    } = req.body;
+
+    let id_propietario = null;
+
+    if (propietario) {
+      const resultProp = await pool.query(
+        "SELECT identificacion FROM propietario WHERE nombre ILIKE $1 LIMIT 1",
+        [propietario]
+      );
+
+      if (resultProp.rows.length > 0) {
+        id_propietario = resultProp.rows[0].identificacion;
+      }
+    }
+
+    await pool.query(`
+      UPDATE trailer SET
+        id_propietario = $1,
+        vencimiento_cert_fumigacion = $2,
+        estado = $3
+      WHERE placa = $4
+    `, [
+      id_propietario,
+      vencimiento_cert_fumigacion || null,
+      estado,
+      placa
+    ]);
+
+    res.json({ ok: true });
+
+  } catch (error) {
+    console.error("Error update trailer:", error);
+    res.status(500).json({ error: "Error actualizando trailer" });
+  }
+};
+
+// =====================
+module.exports = {
+  getTrailers,
+  crearTrailer,
+  getAlertasTrailers,
+  getTrailersPorEstadoAlerta,
+  actualizarTrailer
+};
