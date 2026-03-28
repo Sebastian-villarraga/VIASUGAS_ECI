@@ -10,6 +10,11 @@ function initVehiculos() {
 }
 
 // =========================
+// CONTROL EDICIÓN
+// =========================
+let editando = false;
+
+// =========================
 // CARGAR VEHICULOS
 // =========================
 async function cargarVehiculos() {
@@ -105,7 +110,7 @@ function renderTabla(data) {
       <td>${formatearFecha(v.vencimiento_tecno)}</td>
       <td>${v.estado}</td>
       <td>
-        <button class="btn-icon" onclick="editarVehiculo('${v.placa}')">
+        <button class="btn-icon" onclick="editarVehiculo(this, '${v.placa}')">
           <i class="fas fa-pen"></i>
         </button>
       </td>
@@ -114,10 +119,92 @@ function renderTabla(data) {
 }
 
 // =========================
-// EDITAR VEHICULO
+// EDITAR TABLA VEHICULO
 // =========================
-function editarVehiculo(placa) {
-  console.log("Editar vehículo:", placa);
+function editarVehiculo(btn, placa) {
+
+  if (editando) {
+    alert("Termina de editar la fila actual primero");
+    return;
+  }
+
+  editando = true;
+
+  const fila = btn.closest("tr");
+  const celdas = fila.querySelectorAll("td");
+
+  const valores = [...celdas].slice(0, 6).map(td => td.innerText.trim());
+
+  // inputs
+  celdas[0].innerHTML = `<input value="${valores[0]}" disabled>`;
+  celdas[1].innerHTML = `<input value="${valores[1] === "-" ? "" : valores[1]}">`;
+  celdas[2].innerHTML = `<input type="date" value="${formatoInput(valores[2])}">`;
+  celdas[3].innerHTML = `<input type="date" value="${formatoInput(valores[3])}">`;
+  celdas[4].innerHTML = `<input type="date" value="${formatoInput(valores[4])}">`;
+  celdas[5].innerHTML = `
+    <select>
+      <option value="activo" ${valores[5] === "activo" ? "selected" : ""}>Activo</option>
+      <option value="inactivo" ${valores[5] === "inactivo" ? "selected" : ""}>Inactivo</option>
+    </select>
+  `;
+
+  // botón guardar (solo este activo)
+  celdas[6].innerHTML = `
+    <button class="btn-icon btn-save" onclick="guardarEdicion(this, '${placa}')">
+      <i class="fas fa-save"></i>
+    </button>
+  `;
+
+  // ?? deshabilitar SOLO otros botones (no el actual)
+  document.querySelectorAll(".btn-icon").forEach(b => {
+    if (!b.classList.contains("btn-save")) {
+      b.disabled = true;
+    }
+  });
+}
+
+// =========================
+// EDITAR VEHICULO GUARDAR
+// =========================
+async function guardarEdicion(btn, placa) {
+  const fila = btn.closest("tr");
+  const inputs = fila.querySelectorAll("input, select");
+
+  const data = {
+    propietario: inputs[1].value,
+    vencimiento_todo_riesgo: inputs[2].value,
+    vencimiento_soat: inputs[3].value,
+    vencimiento_tecno: inputs[4].value,
+    estado: inputs[5].value
+  };
+
+  try {
+    await apiFetch(`/api/vehiculos/${placa}`, {
+      method: "PUT",
+      body: JSON.stringify(data)
+    });
+
+    console.log("Vehículo actualizado");
+
+    editando = false; // ?? liberar edición
+
+    // ?? volver a habilitar botones
+    document.querySelectorAll(".btn-icon").forEach(b => {
+      b.disabled = false;
+    });
+
+    cargarVehiculos(); // refresca tabla
+
+  } catch (error) {
+    console.error("Error actualizando:", error);
+  }
+}
+
+function formatoInput(fecha) {
+  if (!fecha || fecha === "-") return "";
+
+  const d = new Date(fecha);
+  return d.toISOString().split("T")[0];
 }
 
 // =========================
@@ -204,15 +291,15 @@ async function cargarAlertas() {
     }
 
     lista.innerHTML = data.map(a => {
-      const clase = a.estado === "vencido" ? "alerta-vencido" : "alerta-proximo";
-      const icono = a.estado === "vencido"
-  ? '<i class="fas fa-circle" style="color:#e53935;"></i>'
-  : '<i class="fas fa-circle" style="color:#fbc02d;"></i>';
+      const clase = a.estado === "vencido"
+        ? "alerta-vencido"
+        : "alerta-proximo";
 
       return `
         <li class="alerta-item ${clase}">
           <div class="alerta-titulo">
-            ${icono} ${a.tipo} - ${a.placa}
+            <i class="fas fa-circle alerta-icono"></i>
+            ${a.tipo} - ${a.placa}
           </div>
           <div class="alerta-fecha">
             ${formatearFecha(a.fecha)}
@@ -223,5 +310,26 @@ async function cargarAlertas() {
 
   } catch (error) {
     console.error("Error alertas:", error);
+  }
+}
+
+// =========================
+// FILTROS RAPIDOS
+// =========================
+async function filtrarVencidos() {
+  try {
+    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=vencido");
+    renderTabla(data);
+  } catch (error) {
+    console.error("Error filtro vencidos:", error);
+  }
+}
+
+async function filtrarProximos() {
+  try {
+    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=proximo");
+    renderTabla(data);
+  } catch (error) {
+    console.error("Error filtro próximos:", error);
   }
 }
