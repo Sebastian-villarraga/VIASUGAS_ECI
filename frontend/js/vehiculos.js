@@ -110,7 +110,7 @@ function renderTabla(data) {
       <td>${formatearFecha(v.vencimiento_tecno)}</td>
       <td>${v.estado}</td>
       <td>
-        <button class="btn-icon" onclick="editarVehiculo(this, '${v.placa}')">
+        <button type="button" class="btn-icon" onclick="editarVehiculo(this, '${v.placa}')">
           <i class="fas fa-pen"></i>
         </button>
       </td>
@@ -138,9 +138,10 @@ function editarVehiculo(btn, placa) {
   // inputs
   celdas[0].innerHTML = `<input value="${valores[0]}" disabled>`;
   celdas[1].innerHTML = `<input value="${valores[1] === "-" ? "" : valores[1]}">`;
-  celdas[2].innerHTML = `<input type="date" value="${formatoInput(valores[2])}">`;
-  celdas[3].innerHTML = `<input type="date" value="${formatoInput(valores[3])}">`;
-  celdas[4].innerHTML = `<input type="date" value="${formatoInput(valores[4])}">`;
+  celdas[2].innerHTML = `<input type="date" value="${formatoInputSeguro(valores[2])}">`;
+  celdas[3].innerHTML = `<input type="date" value="${formatoInputSeguro(valores[3])}">`;
+  celdas[4].innerHTML = `<input type="date" value="${formatoInputSeguro(valores[4])}">`;
+
   celdas[5].innerHTML = `
     <select>
       <option value="activo" ${valores[5] === "activo" ? "selected" : ""}>Activo</option>
@@ -148,20 +149,22 @@ function editarVehiculo(btn, placa) {
     </select>
   `;
 
-  // botón guardar (solo este activo)
+  // botón guardar
   celdas[6].innerHTML = `
-    <button class="btn-icon btn-save" onclick="guardarEdicion(this, '${placa}')">
+    <button type="button" class="btn-icon btn-save" onclick="guardarEdicion(this, '${placa}')">
       <i class="fas fa-save"></i>
     </button>
   `;
 
-  // ?? deshabilitar SOLO otros botones (no el actual)
+  // ?? DESHABILITAR TODOS MENOS ESTE
+  const btnGuardar = fila.querySelector(".btn-save");
+
   document.querySelectorAll(".btn-icon").forEach(b => {
-    if (!b.classList.contains("btn-save")) {
+    if (b !== btnGuardar) {
       b.disabled = true;
     }
   });
-}
+  }
 
 // =========================
 // EDITAR VEHICULO GUARDAR
@@ -184,29 +187,30 @@ async function guardarEdicion(btn, placa) {
       body: JSON.stringify(data)
     });
 
-    console.log("Vehículo actualizado");
+    editando = false;
 
-    editando = false; // ?? liberar edición
-
-    // ?? volver a habilitar botones
     document.querySelectorAll(".btn-icon").forEach(b => {
       b.disabled = false;
     });
 
-    cargarVehiculos(); // refresca tabla
+    cargarVehiculos();
 
   } catch (error) {
     console.error("Error actualizando:", error);
   }
 }
 
-function formatoInput(fecha) {
+function formatoInputSeguro(fecha) {
   if (!fecha || fecha === "-") return "";
 
-  const d = new Date(fecha);
-  return d.toISOString().split("T")[0];
-}
+  // convierte DD/MM/YYYY ? YYYY-MM-DD
+  const partes = fecha.split("/");
+  if (partes.length !== 3) return "";
 
+  const [dia, mes, anio] = partes;
+
+  return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+}
 // =========================
 // FORM 
 // =========================
