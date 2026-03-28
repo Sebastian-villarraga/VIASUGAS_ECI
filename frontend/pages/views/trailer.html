@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Trailers</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/styles/global.css">
+  <link rel="stylesheet" href="/styles/layout.css">
+  <link rel="stylesheet" href="/styles/vehiculo.css">
+
+  <!-- FONT AWESOME -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="vehiculo-layout">
+
+  <!-- ========================= -->
+  <!-- IZQUIERDA -->
+  <!-- ========================= -->
+  <div class="vehiculo-left">
+
+    <!-- HEADER -->
+    <div class="vehiculo-header">
+      <h2>Trailers</h2>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="vehiculo-filtros">
+      <div class="filtros-row">
+    
+        <div class="filtro-group">
+          <label>Placa</label>
+          <input type="text" id="filtroPlaca" placeholder="Ej: ABC123">
+        </div>
+    
+        <div class="filtro-group">
+          <label>Propietario</label>
+          <input type="text" id="filtroPropietario" placeholder="Nombre propietario">
+        </div>
+    
+        <div class="filtro-group">
+          <label>Estado</label>
+          <select id="filtroEstado">
+            <option value="">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+    
+        <button class="btn-filtrar" onclick="filtrarTrailers()">
+          Filtrar
+        </button>
+    
+        <button class="btn-limpiar" onclick="limpiarFiltros()">
+          Limpiar
+        </button>
+    
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="vehiculo-tabla">
+      <div class="tabla-body">
+
+        <table class="vehiculo-table">
+          <thead>
+            <tr>
+              <th>Placa</th>
+              <th>Propietario</th>
+              <th>Cert. Fumigación</th>
+              <th>Estado</th>
+              <th style="width: 80px;">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="vehiculosTable">
+            <tr>
+              <td colspan="5">Cargando trailers...</td>
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- DERECHA -->
+  <!-- ========================= -->
+  <div class="vehiculo-right">
+
+    <!-- BOTÓN -->
+    <button class="btn-primary btn-add-right" onclick="abrirModalVehiculo()">
+      <i class="fas fa-plus"></i> Agregar trailer
+    </button>
+
+    <!-- PANEL -->
+    <div class="vehiculo-side">
+
+      <!-- ALERTAS -->
+      <h3><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
+
+      <ul id="alertasList">
+        <li>Cargando alertas...</li>
+      </ul>
+
+      <hr style="margin:15px 0;">
+
+      <!-- ACCIONES -->
+      <h3><i class="fas fa-bolt"></i> Acciones rápidas</h3>
+
+      <div class="acciones-rapidas">
+
+        <button onclick="filtrarVencidos()">
+          <i class="fas fa-times-circle"></i> Ver vencidos
+        </button>
+
+        <button onclick="filtrarProximos()">
+          <i class="fas fa-clock"></i> Por vencer
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- MODAL TRAILER -->
+<!-- ========================= -->
+<div id="modalVehiculo" class="modal hidden">
+
+  <div class="modal-content">
+
+    <h3>Agregar Trailer</h3>
+
+    <form id="formVehiculo" class="form-grid">
+
+      <!-- PLACA -->
+      <div class="form-group">
+        <label for="placa">Placa</label>
+        <input type="text" id="placa" required>
+      </div>
+
+      <!-- PROPIETARIO -->
+      <div class="form-group">
+        <label for="propietario">Propietario</label>
+        <input type="text" id="propietario">
+      </div>
+
+      <!-- FUMIGACION -->
+      <div class="form-group">
+        <label for="fumigacion">Cert. Fumigación</label>
+        <input type="date" id="fumigacion">
+      </div>
+
+      <!-- ESTADO -->
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <select id="estado">
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </div>
+
+      <!-- BOTONES -->
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+
+        <button type="button" onclick="cerrarModalVehiculo()">
+          Cancelar
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- JS -->
+<!-- ========================= -->
+<script src="/js/api.js"></script>
+<script src="/js/trailer.js"></script>
+
+</body>
+</html>

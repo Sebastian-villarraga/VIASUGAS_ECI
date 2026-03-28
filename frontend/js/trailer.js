@@ -1,44 +1,41 @@
 // =========================
 // INIT (SPA)
 // =========================
-function initVehiculos() {
-  console.log("INIT VEHICULOS");
+function initTrailers() {
+  console.log("INIT TRAILERS");
 
-  cargarVehiculos();
+  cargarTrailers();
   cargarAlertas();
-  initFormVehiculo(); 
+  initFormTrailer(); 
 }
 
 // =========================
 // CONTROL EDICIÓN
 // =========================
-let editando = false;
+let editandoTrailer = false;
 
 // =========================
-// CARGAR VEHICULOS
+// CARGAR TRAILERS
 // =========================
-async function cargarVehiculos() {
+async function cargarTrailers() {
   try {
     const tabla = document.getElementById("vehiculosTable");
-    if (!tabla) {
-      console.warn("No existe #vehiculosTable");
-      return;
-    }
+    if (!tabla) return;
 
-    const data = await apiFetch("/api/vehiculos");
+    const data = await apiFetch("/api/trailers");
 
-    console.log("DATA VEHICULOS:", data);
+    console.log("DATA TRAILERS:", data);
 
     renderTabla(data);
 
   } catch (error) {
-    console.error("Error cargando vehículos:", error);
+    console.error("Error cargando trailers:", error);
 
     const tabla = document.getElementById("vehiculosTable");
     if (tabla) {
       tabla.innerHTML = `
         <tr>
-          <td colspan="7">Error cargando datos</td>
+          <td colspan="5">Error cargando datos</td>
         </tr>
       `;
     }
@@ -46,30 +43,35 @@ async function cargarVehiculos() {
 }
 
 // =========================
-// FILTRAR VEHICULOS
+// FILTRAR TRAILERS
 // =========================
-async function filtrarVehiculos() {
+async function filtrarTrailers() {
   try {
-    const placa = document.getElementById("filtroPlaca").value.trim();
-    const propietario = document.getElementById("filtroPropietario").value.trim();
-    const estado = document.getElementById("filtroEstado").value;
+    const placa = document.getElementById("filtroPlaca")?.value.trim() || "";
+    const propietario = document.getElementById("filtroPropietario")?.value.trim() || "";
+    let estado = document.getElementById("filtroEstado")?.value || "";
 
-    let params = [];
+    const params = new URLSearchParams();
 
-    if (placa) params.push(`placa=${encodeURIComponent(placa)}`);
-    if (propietario) params.push(`propietario=${encodeURIComponent(propietario)}`);
-    if (estado) params.push(`estado=${encodeURIComponent(estado)}`);
+    if (placa) params.append("placa", placa);
+    if (propietario) params.append("propietario", propietario);
 
-    const url = `/api/vehiculos${params.length ? "?" + params.join("&") : ""}`;
+    if (estado !== "") {
+      params.append("estado", estado.toLowerCase().trim());
+    }
+
+    const url = `/api/trailers${params.toString() ? "?" + params.toString() : ""}`;
 
     console.log("URL FILTRO:", url);
 
     const data = await apiFetch(url);
 
+    console.log("RESULTADO:", data);
+
     renderTabla(data);
 
   } catch (error) {
-    console.error("Error filtrando vehículos:", error);
+    console.error("Error filtrando trailers:", error);
   }
 }
 
@@ -81,7 +83,7 @@ function limpiarFiltros() {
   document.getElementById("filtroPropietario").value = "";
   document.getElementById("filtroEstado").value = "";
 
-  cargarVehiculos();
+  cargarTrailers();
 }
 
 // =========================
@@ -95,30 +97,20 @@ function renderTabla(data) {
   if (!data || data.length === 0) {
     tabla.innerHTML = `
       <tr>
-        <td colspan="7">No hay resultados</td>
+        <td colspan="5">No hay resultados</td>
       </tr>
     `;
     return;
   }
 
-  tabla.innerHTML = data.map(v => `
-    <tr 
-      data-placa="${v.placa}"
-      data-propietario="${v.propietario || ""}"
-      data-todo="${v.vencimiento_todo_riesgo || ""}"
-      data-soat="${v.vencimiento_soat || ""}"
-      data-tecno="${v.vencimiento_tecno || ""}"
-      data-estado="${v.estado}"
-    >
-      <td>${v.placa}</td>
-      <td>${v.propietario || "-"}</td>
-      <td>${v.vencimiento_todo_riesgo ? formatearFecha(v.vencimiento_todo_riesgo) : "-"}</td>
-      <td>${v.vencimiento_soat ? formatearFecha(v.vencimiento_soat) : "-"}</td>
-      <td>${v.vencimiento_tecno ? formatearFecha(v.vencimiento_tecno) : "-"}</td>
-      <td>${v.estado}</td>
-
+  tabla.innerHTML = data.map(t => `
+    <tr>
+      <td>${t.placa}</td>
+      <td>${t.propietario || "-"}</td>
+      <td>${formatearFecha(t.vencimiento_cert_fumigacion)}</td>
+      <td>${t.estado}</td>
       <td>
-        <button type="button" class="btn-icon" onclick="editarVehiculo(this, '${v.placa}')">
+        <button type="button" class="btn-icon" onclick="editarTrailer(this, '${t.placa}')">
           <i class="fas fa-pen"></i>
         </button>
       </td>
@@ -127,88 +119,87 @@ function renderTabla(data) {
 }
 
 // =========================
-// EDITAR TABLA VEHICULO
+// EDITAR TABLATRAILER
 // =========================
-function editarVehiculo(btn, placa) {
+function editarTrailer(btn, placa) {
 
-  if (editando) {
-    alert("Termina de editar la fila actual primero");
+  if (editandoTrailer) {
+    alert("Termina de editar primero");
     return;
   }
 
-  editando = true;
+  editandoTrailer = true;
 
   const fila = btn.closest("tr");
   const celdas = fila.querySelectorAll("td");
 
-  // ?? obtener datos reales desde atributos
-  const data = fila.dataset;
+  const valores = [...celdas].slice(0, 4).map(td => td.textContent.trim());
 
-  celdas[0].innerHTML = `<input value="${data.placa}" disabled>`;
-  celdas[1].innerHTML = `<input value="${data.propietario || ""}">`;
+  celdas[0].innerHTML = `<input value="${valores[0]}" disabled>`;
+  celdas[1].innerHTML = `<input value="${valores[1] === "-" ? "" : valores[1]}">`;
+  celdas[2].innerHTML = `<input type="date" value="${formatoInputSeguro(valores[2])}">`;
 
-  celdas[2].innerHTML = `<input type="date" value="${data.todo || ""}">`;
-  celdas[3].innerHTML = `<input type="date" value="${data.soat || ""}">`;
-  celdas[4].innerHTML = `<input type="date" value="${data.tecno || ""}">`;
-
-  celdas[5].innerHTML = `
+  celdas[3].innerHTML = `
     <select>
-      <option value="activo" ${data.estado === "activo" ? "selected" : ""}>Activo</option>
-      <option value="inactivo" ${data.estado === "inactivo" ? "selected" : ""}>Inactivo</option>
+      <option value="activo" ${valores[3] === "activo" ? "selected" : ""}>Activo</option>
+      <option value="inactivo" ${valores[3] === "inactivo" ? "selected" : ""}>Inactivo</option>
     </select>
   `;
 
-  celdas[6].innerHTML = `
-    <button type="button" class="btn-icon btn-save" onclick="guardarEdicion(this, '${placa}')">
+  celdas[4].innerHTML = `
+    <button type="button" class="btn-icon btn-save" onclick="guardarEdicionTrailer(this, '${placa}')">
       <i class="fas fa-save"></i>
     </button>
   `;
 
-  const btnGuardar = celdas[6].querySelector("button");
+  const btnGuardar = celdas[4].querySelector("button");
 
   document.querySelectorAll(".btn-icon").forEach(b => {
-    if (b !== btnGuardar) b.disabled = true;
+    if (b !== btnGuardar) {
+      b.disabled = true;
+    }
   });
 }
 
 // =========================
-// EDITAR VEHICULO GUARDAR
+// GUARDAR EDICION TRAILER
 // =========================
-async function guardarEdicion(btn, placa) {
+async function guardarEdicionTrailer(btn, placa) {
   const fila = btn.closest("tr");
   const inputs = fila.querySelectorAll("input, select");
 
   const data = {
     propietario: inputs[1].value,
-    vencimiento_todo_riesgo: inputs[2].value,
-    vencimiento_soat: inputs[3].value,
-    vencimiento_tecno: inputs[4].value,
-    estado: inputs[5].value
+    vencimiento_cert_fumigacion: inputs[2].value,
+    estado: inputs[3].value
   };
 
   try {
-    await apiFetch(`/api/vehiculos/${placa}`, {
+    await apiFetch(`/api/trailers/${placa}`, {
       method: "PUT",
       body: JSON.stringify(data)
     });
 
-    editando = false;
+    editandoTrailer = false;
 
+    // ?? reactivar botones
     document.querySelectorAll(".btn-icon").forEach(b => {
       b.disabled = false;
     });
 
-    cargarVehiculos();
+    cargarTrailers();
 
   } catch (error) {
-    console.error("Error actualizando:", error);
+    console.error("Error actualizando trailer:", error);
   }
 }
 
+// =========================
+// FORMATO FECHA INPUT
+// =========================
 function formatoInputSeguro(fecha) {
   if (!fecha || fecha === "-") return "";
 
-  // convierte DD/MM/YYYY ? YYYY-MM-DD
   const partes = fecha.split("/");
   if (partes.length !== 3) return "";
 
@@ -216,17 +207,13 @@ function formatoInputSeguro(fecha) {
 
   return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
 }
-
 // =========================
 // FORM 
 // =========================
-function initFormVehiculo() {
+function initFormTrailer() {
   const form = document.getElementById("formVehiculo");
 
-  if (!form) {
-    console.warn("No existe formVehiculo");
-    return;
-  }
+  if (!form) return;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -234,30 +221,23 @@ function initFormVehiculo() {
     const data = {
       placa: document.getElementById("placa").value,
       propietario: document.getElementById("propietario").value,
-      vencimiento_soat: document.getElementById("soat").value,
-      vencimiento_tecno: document.getElementById("tecno").value,
-      vencimiento_todo_riesgo: document.getElementById("todoRiesgo").value,
+      vencimiento_cert_fumigacion: document.getElementById("fumigacion").value,
       estado: document.getElementById("estado").value
     };
 
-    console.log("ENVIANDO:", data);
-
     try {
-      await apiFetch("/api/vehiculos", {
+      await apiFetch("/api/trailers", {
         method: "POST",
         body: JSON.stringify(data)
       });
 
-      console.log("Vehículo creado");
-
       cerrarModalVehiculo();
       form.reset();
 
-      await cargarVehiculos(); // ?? refresca tabla
+      await cargarTrailers();
 
     } catch (error) {
-      console.error("Error creando vehículo:", error);
-      alert("Error al crear vehículo");
+      console.error("Error creando trailer:", error);
     }
   });
 }
@@ -287,13 +267,15 @@ function cerrarModalVehiculo() {
 }
 
 // =========================
-// CARGAR ALERTAS
+// ALERTAS
 // =========================
 async function cargarAlertas() {
   try {
     const lista = document.getElementById("alertasList");
 
-    const data = await apiFetch("/api/vehiculos/alertas");
+    const data = await apiFetch("/api/trailers/alertas");
+    
+    console.log("ALERTAS:", data); // DEBUG
 
     if (!data || data.length === 0) {
       lista.innerHTML = "<li>Sin alertas</li>";
@@ -319,7 +301,7 @@ async function cargarAlertas() {
     }).join("");
 
   } catch (error) {
-    console.error("Error alertas:", error);
+    console.error("Error alertas trailer:", error);
   }
 }
 
@@ -328,18 +310,18 @@ async function cargarAlertas() {
 // =========================
 async function filtrarVencidos() {
   try {
-    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=vencido");
+    const data = await apiFetch("/api/trailers/filtro-alertas?tipo=vencido");
     renderTabla(data);
   } catch (error) {
-    console.error("Error filtro vencidos:", error);
+    console.error(error);
   }
 }
 
 async function filtrarProximos() {
   try {
-    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=proximo");
+    const data = await apiFetch("/api/trailers/filtro-alertas?tipo=proximo");
     renderTabla(data);
   } catch (error) {
-    console.error("Error filtro próximos:", error);
+    console.error(error);
   }
 }
