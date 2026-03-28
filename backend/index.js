@@ -41,7 +41,8 @@ const trailerRoutes = require("./routes/trailer.routes");
 app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
 app.use("/api/vehiculos", vehiculoRoutes);
-app.use("/api/trailers", trailerRoutes);
+app.use("/api/trailer", trailerRoutes);
+
 
 // =====================
 // HEALTH CHECKS
