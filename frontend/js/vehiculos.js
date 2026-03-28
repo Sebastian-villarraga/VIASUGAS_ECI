@@ -102,13 +102,21 @@ function renderTabla(data) {
   }
 
   tabla.innerHTML = data.map(v => `
-    <tr>
+    <tr 
+      data-placa="${v.placa}"
+      data-propietario="${v.propietario || ""}"
+      data-todo="${v.vencimiento_todo_riesgo || ""}"
+      data-soat="${v.vencimiento_soat || ""}"
+      data-tecno="${v.vencimiento_tecno || ""}"
+      data-estado="${v.estado}"
+    >
       <td>${v.placa}</td>
       <td>${v.propietario || "-"}</td>
-      <td>${formatearFecha(v.vencimiento_todo_riesgo)}</td>
-      <td>${formatearFecha(v.vencimiento_soat)}</td>
-      <td>${formatearFecha(v.vencimiento_tecno)}</td>
+      <td>${v.vencimiento_todo_riesgo ? formatearFecha(v.vencimiento_todo_riesgo) : "-"}</td>
+      <td>${v.vencimiento_soat ? formatearFecha(v.vencimiento_soat) : "-"}</td>
+      <td>${v.vencimiento_tecno ? formatearFecha(v.vencimiento_tecno) : "-"}</td>
       <td>${v.estado}</td>
+
       <td>
         <button type="button" class="btn-icon" onclick="editarVehiculo(this, '${v.placa}')">
           <i class="fas fa-pen"></i>
@@ -133,38 +141,35 @@ function editarVehiculo(btn, placa) {
   const fila = btn.closest("tr");
   const celdas = fila.querySelectorAll("td");
 
-  const valores = [...celdas].slice(0, 6).map(td => td.innerText.trim());
+  // ?? obtener datos reales desde atributos
+  const data = fila.dataset;
 
-  // inputs
-  celdas[0].innerHTML = `<input value="${valores[0]}" disabled>`;
-  celdas[1].innerHTML = `<input value="${valores[1] === "-" ? "" : valores[1]}">`;
-  celdas[2].innerHTML = `<input type="date" value="${formatoInputSeguro(valores[2])}">`;
-  celdas[3].innerHTML = `<input type="date" value="${formatoInputSeguro(valores[3])}">`;
-  celdas[4].innerHTML = `<input type="date" value="${formatoInputSeguro(valores[4])}">`;
+  celdas[0].innerHTML = `<input value="${data.placa}" disabled>`;
+  celdas[1].innerHTML = `<input value="${data.propietario || ""}">`;
+
+  celdas[2].innerHTML = `<input type="date" value="${data.todo || ""}">`;
+  celdas[3].innerHTML = `<input type="date" value="${data.soat || ""}">`;
+  celdas[4].innerHTML = `<input type="date" value="${data.tecno || ""}">`;
 
   celdas[5].innerHTML = `
     <select>
-      <option value="activo" ${valores[5] === "activo" ? "selected" : ""}>Activo</option>
-      <option value="inactivo" ${valores[5] === "inactivo" ? "selected" : ""}>Inactivo</option>
+      <option value="activo" ${data.estado === "activo" ? "selected" : ""}>Activo</option>
+      <option value="inactivo" ${data.estado === "inactivo" ? "selected" : ""}>Inactivo</option>
     </select>
   `;
 
-  // botón guardar
   celdas[6].innerHTML = `
     <button type="button" class="btn-icon btn-save" onclick="guardarEdicion(this, '${placa}')">
       <i class="fas fa-save"></i>
     </button>
   `;
 
-  // ?? DESHABILITAR TODOS MENOS ESTE
-  const btnGuardar = fila.querySelector(".btn-save");
+  const btnGuardar = celdas[6].querySelector("button");
 
   document.querySelectorAll(".btn-icon").forEach(b => {
-    if (b !== btnGuardar) {
-      b.disabled = true;
-    }
+    if (b !== btnGuardar) b.disabled = true;
   });
-  }
+}
 
 // =========================
 // EDITAR VEHICULO GUARDAR
@@ -211,6 +216,7 @@ function formatoInputSeguro(fecha) {
 
   return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
 }
+
 // =========================
 // FORM 
 // =========================

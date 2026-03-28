@@ -43,6 +43,7 @@ app.use("/api/manifiestos", manifiestoRoutes);
 app.use("/api/vehiculos", vehiculoRoutes);
 app.use("/api/trailer", trailerRoutes);
 
+
 // =====================
 // HEALTH CHECKS
 // =====================
