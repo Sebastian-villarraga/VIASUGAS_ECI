@@ -412,13 +412,18 @@
 /* ========================= */
 /* ALERTAS */
 /* ========================= */
+
+/* ITEM */
 .alerta-item {
-  padding: 12px;
+  padding: 12px 14px;
   border-radius: 10px;
   margin-bottom: 10px;
   font-size: 13px;
   border-left: 5px solid;
   background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 /* ?? VENCIDO */
@@ -433,14 +438,61 @@
   background: #fff8e1;
 }
 
+/* ICONO */
+.alerta-icono {
+  margin-right: 6px;
+}
+
+/* color del icono según estado */
+.alerta-vencido .alerta-icono {
+  color: #e53935;
+}
+
+.alerta-proximo .alerta-icono {
+  color: #fbc02d;
+}
+
 /* TITULO */
 .alerta-titulo {
   font-weight: 600;
-  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
 }
 
 /* FECHA */
 .alerta-fecha {
   font-size: 12px;
   color: #555;
+}
+
+/* CONTENEDOR ALERTAS */
+#alertasList {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 5px;
+  margin-top: 10px;
+  list-style: none;
+  padding-left: 0;
+}
+
+/* SCROLL */
+#alertasList::-webkit-scrollbar {
+  width: 6px;
+}
+
+#alertasList::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+/* HOVER */
+.alerta-item:hover {
+  transform: translateY(-1px);
+  transition: 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.btn-icon:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

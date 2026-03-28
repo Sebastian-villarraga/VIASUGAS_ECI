@@ -164,7 +164,7 @@ const getAlertasVehiculos = async (req, res) => {
 
     const hoy = new Date();
     const limite = new Date();
-    limite.setDate(hoy.getDate() + 7);
+    limite.setDate(hoy.getDate() + 30);
 
     let alertas = [];
 
@@ -206,8 +206,117 @@ const getAlertasVehiculos = async (req, res) => {
 };
 
 // =====================
+// FILTRO RAPIDO
+// =====================
+const getVehiculosPorEstadoAlerta = async (req, res) => {
+  try {
+    const { tipo } = req.query; // vencido | proximo
+
+    const result = await pool.query(`
+      SELECT 
+        v.placa,
+        p.nombre AS propietario,
+        v.vencimiento_todo_riesgo,
+        v.vencimiento_soat,
+        v.vencimiento_tecno,
+        v.estado
+      FROM vehiculo v
+      LEFT JOIN propietario p 
+        ON v.id_propietario = p.identificacion
+    `);
+
+    const hoy = new Date();
+    const limite = new Date();
+    limite.setDate(hoy.getDate() + 30);
+
+    const filtrados = result.rows.filter(v => {
+
+      const fechas = [
+        v.vencimiento_soat,
+        v.vencimiento_tecno,
+        v.vencimiento_todo_riesgo
+      ].filter(f => f);
+
+      return fechas.some(f => {
+        const fecha = new Date(f);
+
+        if (tipo === "vencido") {
+          return fecha < hoy;
+        }
+
+        if (tipo === "proximo") {
+          return fecha >= hoy && fecha <= limite;
+        }
+
+        return false;
+      });
+    });
+
+    res.json(filtrados);
+
+  } catch (error) {
+    console.error("Error filtro alerta:", error);
+    res.status(500).json({ error: "Error filtrando vehículos" });
+  }
+};
+
+// =====================
+// ACTUALIZAR VEHICULO
+// =====================
+const actualizarVehiculo = async (req, res) => {
+  try {
+    const { placa } = req.params;
+    const {
+      propietario,
+      vencimiento_soat,
+      vencimiento_tecno,
+      vencimiento_todo_riesgo,
+      estado
+    } = req.body;
+
+    let id_propietario = null;
+
+    if (propietario) {
+      const resultProp = await pool.query(
+        "SELECT identificacion FROM propietario WHERE nombre ILIKE $1 LIMIT 1",
+        [propietario]
+      );
+
+      if (resultProp.rows.length > 0) {
+        id_propietario = resultProp.rows[0].identificacion;
+      }
+    }
+
+    await pool.query(`
+      UPDATE vehiculo SET
+        id_propietario = $1,
+        vencimiento_soat = $2,
+        vencimiento_tecno = $3,
+        vencimiento_todo_riesgo = $4,
+        estado = $5
+      WHERE placa = $6
+    `, [
+      id_propietario,
+      vencimiento_soat || null,
+      vencimiento_tecno || null,
+      vencimiento_todo_riesgo || null,
+      estado,
+      placa
+    ]);
+
+    res.json({ ok: true });
+
+  } catch (error) {
+    console.error("Error update:", error);
+    res.status(500).json({ error: "Error actualizando vehículo" });
+  }
+};
+
+// =====================
 module.exports = {
   getVehiculos,
   crearVehiculo,
-  getAlertasVehiculos
+  getAlertasVehiculos,
+  getVehiculosPorEstadoAlerta,
+  actualizarVehiculo
 };
