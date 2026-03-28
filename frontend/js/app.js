@@ -23,12 +23,19 @@ async function loadView(view) {
     // =========================
     // INIT POR VISTA
     // =========================
-    if (view === "dashboard" && typeof initDashboard === "function") {
-      initDashboard();
-    }
+    switch (view) {
+      case "dashboard":
+      case "home":
+        if (typeof initDashboard === "function") initDashboard();
+        break;
 
-    if (view === "vehiculos" && typeof initVehiculos === "function") {
-      initVehiculos();
+      case "vehiculos":
+        if (typeof initVehiculos === "function") initVehiculos();
+        break;
+
+      case "trailer": // ?? FIX CLAVE
+        if (typeof initTrailers === "function") initTrailers();
+        break;
     }
 
     setActiveMenu(view);
@@ -76,20 +83,23 @@ function setActiveMenu(view) {
   if (view === "vehiculos") {
     items[1]?.classList.add("active");
   }
+
+  if (view === "trailer") { 
+    items[2]?.classList.add("active");
+  }
 }
 
 // =========================
 // INIT APP
 // =========================
 function initApp() {
-  console.log("?? App iniciando...");
+  console.log("App iniciando...");
 
   // AUTH
   if (typeof checkAuth === "function") {
     checkAuth();
   }
 
-  // ?? CAMBIO CLAVE
   let view = window.location.hash.replace("#", "");
 
   if (!view) {
