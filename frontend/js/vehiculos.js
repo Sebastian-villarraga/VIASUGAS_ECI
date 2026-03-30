@@ -68,7 +68,6 @@ function renderTabla(data) {
 
   tabla.innerHTML = data.map(v => {
 
-    // ?? NORMALIZAR FECHAS
     const todo = v.vencimiento_todo_riesgo || "";
     const soat = v.vencimiento_soat || "";
     const tecno = v.vencimiento_tecno || "";

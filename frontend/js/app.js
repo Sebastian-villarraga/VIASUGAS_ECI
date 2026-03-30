@@ -36,6 +36,12 @@ async function loadView(view) {
       case "trailer": // ?? FIX CLAVE
         if (typeof initTrailers === "function") initTrailers();
         break;
+      case "propietarios":
+        if (typeof initPropietarios === "function") initPropietarios();
+        break;
+      case "conductores":
+        if (typeof initConductores === "function") initConductores();
+        break;
     }
 
     setActiveMenu(view);
@@ -118,3 +124,5 @@ if (document.readyState === "loading") {
 } else {
   initApp();
 }
+
+

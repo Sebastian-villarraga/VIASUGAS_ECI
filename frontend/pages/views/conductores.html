@@ -1,0 +1,125 @@
+<div class="vehiculo-layout">
+
+  <!-- IZQUIERDA -->
+  <div class="vehiculo-left">
+
+    <div class="vehiculo-header">
+      <h2>Conductores</h2>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="vehiculo-filtros">
+      <div class="filtros-row">
+
+        <div class="filtro-group">
+          <label>Nombre</label>
+          <input type="text" id="filtroNombre">
+        </div>
+
+        <div class="filtro-group">
+          <label>Cédula</label>
+          <input type="text" id="filtroCedula">
+        </div>
+
+        <div class="filtro-group">
+          <label>Estado</label>
+          <select id="filtroEstado">
+            <option value="">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+
+        <button class="btn-limpiar" onclick="limpiarFiltrosConductores()">Limpiar</button>
+
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="vehiculo-tabla">
+      <div class="tabla-body">
+
+        <table class="vehiculo-table">
+          <thead>
+            <tr>
+              <th>Cédula</th>
+              <th>Nombre</th>
+              <th>Licencia</th>
+              <th>Alimentos</th>
+              <th>Sustancias</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="conductoresTable">
+            <tr><td colspan="7">Cargando...</td></tr>
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DERECHA -->
+  <div class="vehiculo-right">
+
+    <button class="btn-primary btn-add-right" onclick="abrirModalConductor()">
+      <i class="fas fa-plus"></i> Agregar conductor
+    </button>
+
+    <div class="vehiculo-side">
+
+      <h3><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
+
+      <ul id="alertasConductores">
+        <li>Cargando alertas...</li>
+      </ul>
+
+      
+      
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalConductor" class="modal hidden">
+  <div class="modal-content">
+
+    <h3>Agregar Conductor</h3>
+
+    <form id="formConductor" class="form-grid">
+
+      <input id="cedula" placeholder="Cédula" required>
+      <input id="nombre" placeholder="Nombre" required>
+      <input id="correo" placeholder="Correo">
+      <input id="telefono" placeholder="Teléfono">
+
+      <label>Licencia</label>
+      <input type="date" id="licencia" required>
+
+      <label>Manipulación alimentos</label>
+      <input type="date" id="alimentos" required>
+
+      <label>Sustancias peligrosas</label>
+      <input type="date" id="sustancias" required>
+
+      <select id="estado">
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Guardar</button>
+        <button type="button" onclick="cerrarModalConductor()">Cancelar</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
