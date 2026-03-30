@@ -1,166 +1,140 @@
 # ?? VIASUGAS - Plataforma de Gestión de Transporte
 
+---
+
 ## ?? Descripción General
 
 VIASUGAS es una plataforma web para la gestión integral de operaciones de transporte de carga.
-Permite administrar vehículos, monitorear vencimientos, gestionar viajes (manifiestos), y controlar procesos financieros asociados.
 
-La aplicación está construida con una arquitectura **fullstack desacoplada**, compuesta por:
+Permite administrar:
 
-* Frontend SPA (Single Page Application)
-* Backend API REST en Node.js
-* Base de datos relacional en PostgreSQL
+* ?? Vehículos
+* ?? Propietarios
+* ????? Conductores
+* ?? Manifiestos (viajes)
+* ?? Alertas de vencimientos
+
+La aplicación sigue una arquitectura **fullstack desacoplada**, con enfoque en escalabilidad tipo SaaS.
 
 ---
 
-## ??? Arquitectura General
+## ?? Arquitectura General
 
 ```
 Frontend (SPA)  <--->  Backend (Express API)  <--->  PostgreSQL
 ```
 
-* El frontend consume la API mediante `fetch`
-* El backend expone endpoints REST
-* PostgreSQL gestiona toda la persistencia
-
 ---
 
-## ?? Tecnologías Utilizadas
+## ?? Tecnologías
 
-### ??? Frontend
+### Frontend
 
 * HTML5
-* CSS3 (modularizado por vistas)
-* JavaScript Vanilla (sin frameworks)
-* SPA custom (router propio con `history.pushState`)
-* Font Awesome (iconos)
+* CSS3 (modular)
+* JavaScript Vanilla
+* SPA custom (router propio)
+* Font Awesome
 
-### ?? Backend
+### Backend
 
 * Node.js
 * Express.js
-* PostgreSQL (pg driver)
-* Arquitectura basada en:
+* PostgreSQL (pg)
 
-  * Routes
-  * Controllers
-
-### ??? Base de Datos
+### Base de Datos
 
 * PostgreSQL
-* Tipos ENUM personalizados
-* Relaciones con claves foráneas
-* Modelo altamente normalizado
+* Relaciones con FK
+* Tipos ENUM
+* Modelo normalizado
 
 ---
 
 ## ?? Estructura del Proyecto
 
 ```
-viasugas/
-¦
-+-- backend/
-¦   +-- config/
-¦   ¦   +-- db.js
-¦   ¦
-¦   +-- controllers/
-¦   ¦   +-- auth.controller.js
-¦   ¦   +-- vehiculo.controller.js
-¦   ¦   +-- manifiesto.controller.js
-¦   ¦
-¦   +-- routes/
-¦   ¦   +-- auth.routes.js
-¦   ¦   +-- vehiculo.routes.js
-¦   ¦   +-- manifiesto.routes.js
-¦   ¦
-¦   +-- index.js
-¦
-+-- frontend/
-¦   +-- assets/
-¦   ¦   +-- images/
-¦   ¦
-¦   +-- styles/
-¦   ¦   +-- global.css
-¦   ¦   +-- layout.css
-¦   ¦   +-- sidebar.css
-¦   ¦   +-- topbar.css
-¦   ¦   +-- home.css
-¦   ¦   +-- login.css
-¦   ¦   +-- vehiculo.css
-¦   ¦
-¦   +-- js/
-¦   ¦   +-- api.js
-¦   ¦   +-- app.js
-¦   ¦   +-- auth.js
-¦   ¦   +-- dashboard.js
-¦   ¦   +-- vehiculos.js
-¦   ¦
-¦   +-- pages/
-¦   ¦   +-- index.html
-¦   ¦   +-- home.html
-¦   ¦   +-- forgot.html
-¦   ¦   +-- views/
-¦   ¦       +-- dashboard.html
-¦   ¦       +-- vehiculos.html
-¦
-+-- database/
-¦   +-- init.sql
-¦   +-- seed.sql
-¦
-+-- package.json
+frontend/
+  js/
+    api.js
+    app.js
+    vehiculos.js
+    propietarios.js
+    conductores.js
+    ui.js
+
+backend/
+  controllers/
+    vehiculo.controller.js
+    propietario.controller.js
+    conductor.controller.js
+
+  routes/
+    vehiculo.routes.js
+    propietario.routes.js
+    conductor.routes.js
 ```
-
----
-
-## ?? Autenticación
-
-Actualmente el sistema tiene un **login en modo desarrollo**:
-
-* No valida credenciales reales
-* Retorna un token simulado (`dev-token`)
-* Guarda usuario en `localStorage`
-
-Flujo:
-
-1. Usuario ingresa credenciales
-2. Se llama `/api/login`
-3. Se guarda token en frontend
-4. Se redirige a la SPA (`home.html`)
 
 ---
 
 ## ?? API Backend
 
-### Base URL
+### ?? Conductores
 
-```
-http://<host>:3000/api
+#### GET `/api/conductores`
+
+Filtros soportados:
+
+* nombre
+* cedula
+* estado
+
+#### POST `/api/conductores`
+
+Crear conductor
+
+#### PUT `/api/conductores/:cedula`
+
+Actualizar conductor
+
+#### GET `/api/conductores/alertas`
+
+Retorna:
+
+* vencimientos de licencia
+* curso alimentos
+* sustancias peligrosas
+
+Incluye:
+
+```json
+{
+  "cedula": 1001,
+  "nombre": "Juan Pérez",
+  "tipo": "Licencia",
+  "estado": "vencido",
+  "fecha": "2026-03-28"
+}
 ```
 
 ---
 
-### ?? Auth
+### ?? Propietarios
 
-#### POST `/api/login`
+#### GET `/api/propietarios`
 
-```json
-{
-  "email": "usuario@mail.com",
-  "password": "123456"
-}
-```
+Filtros:
 
-Respuesta:
+* nombre
+* identificacion
 
-```json
-{
-  "token": "dev-token",
-  "user": {
-    "email": "usuario@mail.com",
-    "nombre": "Usuario Demo"
-  }
-}
-```
+#### POST `/api/propietarios`
+
+Crear propietario
+
+#### PUT `/api/propietarios/:identificacion`
+
+Actualizar propietario
 
 ---
 
@@ -168,211 +142,179 @@ Respuesta:
 
 #### GET `/api/vehiculos`
 
-* Lista todos los vehículos
-* Permite filtros:
+Filtros:
 
-  * `placa`
-  * `propietario`
-  * `estado`
+* placa
+* propietario
+* estado
+
+#### GET `/api/vehiculos/alertas`
+
+Alertas de:
+
+* SOAT
+* Tecnomecánica
+* Todo riesgo
 
 ---
 
-#### POST `/api/vehiculos`
+## ?? Frontend (SPA)
 
-Crea un vehículo
+### ?? Router (`app.js`)
 
-```json
-{
-  "placa": "ABC123",
-  "propietario": "Carlos",
-  "vencimiento_soat": "2026-01-01",
-  "estado": "activo"
+* Navegación dinámica
+* Carga vistas sin recargar
+* Inicializa módulos:
+
+  * `initVehiculos()`
+  * `initPropietarios()`
+  * `initConductores()`
+
+---
+
+## ?? API Client (`api.js`)
+
+* Manejo centralizado de fetch
+* Headers automáticos
+* Manejo de errores
+* Integración con toast global
+
+---
+
+## ?? UI Global (`ui.js`)
+
+Incluye:
+
+### ?? Toast global
+
+* Éxito
+* Error
+* Info
+
+### ?? Helpers reutilizables
+
+* `formatDate()`
+* `renderEstadoBadge()`
+
+---
+
+## ????? Módulo Conductores
+
+### Funcionalidades
+
+* ? Listado
+* ? Filtros dinámicos (sin botón)
+* ? Edición inline
+* ? Creación con modal
+* ? Alertas inteligentes
+* ? Estados visuales (badge)
+
+---
+
+## ?? Sistema de Alertas
+
+### Características
+
+* ?? Vencidos
+* ?? Por vencer (30 días)
+* Scroll interno
+* Contadores dinámicos
+* Agrupación por estado
+
+### UI
+
+* Cards visuales
+* Scroll estilizado
+* Contador interactivo
+
+---
+
+## ?? Filtros Dinámicos (Global)
+
+Todos los módulos usan:
+
+* input ? filtra automáticamente
+* debounce (300ms)
+* sin botón obligatorio
+
+---
+
+## ?? Manejo de Fechas (CRÍTICO)
+
+Problema resuelto:
+
+? desfase por timezone
+? solución aplicada:
+
+* Backend devuelve `YYYY-MM-DD`
+* Frontend NO usa `new Date()`
+
+```js
+function formatDate(fecha) {
+  const [y, m, d] = fecha.split("-");
+  return `${d}/${m}/${y}`;
 }
 ```
 
 ---
 
-#### PUT `/api/vehiculos/:placa`
+## ?? Estados Visuales
 
-Actualiza vehículo
+Sistema global de badges:
 
----
+* ?? Activo
+* ?? Inactivo
 
-#### GET `/api/vehiculos/alertas`
-
-* Retorna vencimientos:
-
-  * SOAT
-  * Tecnomecánica
-  * Todo riesgo
+Reusable en toda la app.
 
 ---
 
-#### GET `/api/vehiculos/filtro-alertas`
+## ? UX Implementada
 
-Filtros:
-
-```
-?tipo=vencido
-?tipo=proximo
-```
-
----
-
-### ?? Manifiestos
-
-#### GET `/api/manifiestos`
-
-Lista viajes
-
-#### POST `/api/manifiestos`
-
-Crea un manifiesto
+* Filtros en tiempo real
+* Scroll interno elegante
+* Alertas agrupadas
+* Feedback visual inmediato (toasts)
+* Edición inline fluida
 
 ---
 
-## ?? Frontend SPA
+## ?? Datos de Prueba
 
-### ?? Router (`app.js`)
+Se incluye dataset con:
 
-* Navegación por hash (`#vehiculos`)
-* Carga vistas dinámicamente:
-
-```
-/pages/views/{view}.html
-```
-
-* Ejecuta funciones por vista:
-
-```js
-initVehiculos()
-initDashboard()
-```
-
----
-
-### ?? API Client (`api.js`)
-
-* Maneja todas las llamadas HTTP
-* Agrega automáticamente:
-
-  * headers
-  * token
-
----
-
-### ?? Módulo Vehículos
-
-Funcionalidades:
-
-* Listado de vehículos
-* Filtros dinámicos
-* Edición inline
-* Creación mediante modal
-* Alertas de vencimientos
-* Acciones rápidas
-
-Flujo:
-
-```
-initVehiculos()
-  ? cargarVehiculos()
-      ? apiFetch()
-          ? renderTabla()
-```
-
----
-
-### ?? Dashboard
-
-* KPIs:
-
-  * viajes activos
-  * finalizados
-  * facturación pendiente
-* tabla de viajes
-* resumen financiero
-
----
-
-## ??? Modelo de Datos
-
-El sistema incluye entidades clave:
-
-* usuario
-* permisos
-* cliente
-* conductor
-* vehículo
-* trailer
-* manifiesto (viaje)
-* factura
-* transacciones
-* gastos
-* auditoría
-
-Características:
-
-* uso de ENUMs
-* relaciones fuertes (FK)
-* estructura escalable tipo ERP
+* vencidos
+* próximos
+* mixtos
+* inactivos
+* casos borde
 
 ---
 
 ## ?? Limitaciones actuales
 
-* Autenticación no segura (modo dev)
-* Sin middleware de autorización
-* Sin validación de datos (backend)
-* Arquitectura backend no separada en capas
-* Manejo de errores básico
+* Auth en modo dev
+* Sin validaciones backend robustas
+* Sin roles/permisos
+* Sin paginación
 
 ---
 
-## ?? Roadmap sugerido
+## ?? Roadmap
 
-* Implementar JWT real
-* Middleware de seguridad
-* Módulo completo de manifiestos (frontend)
-* Facturación automatizada
-* Gestión de conductores
-* Dashboard avanzado (financiero)
-
----
-
-## ?? Ejecución del proyecto
-
-### Backend
-
-```bash
-cd backend
-npm install
-node index.js
-```
-
-### Frontend
-
-* Servido desde Express (static)
-* Acceder a:
-
-```
-http://localhost:3000
-```
-
----
-
-## ?? Notas para desarrollo futuro
-
-* Mantener SPA sin scripts en vistas
-* Centralizar lógica en `app.js`
-* Evitar duplicación de estilos
-* Separar lógica backend en servicios
+* Dashboard avanzado
+* Click en alertas ? filtrar tabla
+* Colores en vencimientos
+* Paginación
+* JWT real
+* Roles y permisos
+* Auditoría
 
 ---
 
 ## ????? Autor
 
-Proyecto desarrollado por Alejandro Villarraga
-Plataforma enfocada en soluciones logísticas sobre arquitectura cloud.
+Alejandro Villarraga
+Arquitectura enfocada en soluciones cloud sobre AWS ??
 
 ---

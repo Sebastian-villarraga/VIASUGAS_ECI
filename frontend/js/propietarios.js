@@ -8,6 +8,13 @@ function initPropietarios() {
 
   cargarPropietarios();
   initFormPropietario();
+
+  // ?? listeners dinámicos
+  document.getElementById("filtroNombre")
+    .addEventListener("input", aplicarFiltrosPropietarios);
+
+  document.getElementById("filtroIdentificacion")
+    .addEventListener("input", aplicarFiltrosPropietarios);
 }
 
 // =========================
@@ -56,15 +63,17 @@ function renderTablaPropietarios(data) {
 // FILTROS
 // =========================
 async function filtrarPropietarios() {
-  const nombre = document.getElementById("filtroNombre").value;
-  const identificacion = document.getElementById("filtroIdentificacion").value;
+  const nombre = document.getElementById("filtroNombre").value.trim();
+  const identificacion = document.getElementById("filtroIdentificacion").value.trim();
 
   let params = [];
 
-  if (nombre) params.push(`nombre=${nombre}`);
-  if (identificacion) params.push(`identificacion=${identificacion}`);
+  if (nombre) params.push(`nombre=${encodeURIComponent(nombre)}`);
+  if (identificacion) params.push(`identificacion=${encodeURIComponent(identificacion)}`);
 
-  const data = await apiFetch(`/api/propietarios?${params.join("&")}`);
+  const url = `/api/propietarios${params.length ? "?" + params.join("&") : ""}`;
+
+  const data = await apiFetch(url);
 
   renderTablaPropietarios(data);
 }
@@ -72,7 +81,19 @@ async function filtrarPropietarios() {
 function limpiarFiltrosProp() {
   document.getElementById("filtroNombre").value = "";
   document.getElementById("filtroIdentificacion").value = "";
+
+  // ?? recargar sin filtros
   cargarPropietarios();
+}
+
+let debounceTimerProp;
+
+function aplicarFiltrosPropietarios() {
+  clearTimeout(debounceTimerProp);
+
+  debounceTimerProp = setTimeout(() => {
+    filtrarPropietarios();
+  }, 300);
 }
 
 // =========================
