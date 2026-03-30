@@ -1,4 +1,4 @@
-const API_URL = "http://100.50.64.39:3000";
+const API_URL = "";
 
 async function apiFetch(endpoint, options = {}) {
   try {
@@ -13,7 +13,8 @@ async function apiFetch(endpoint, options = {}) {
     });
 
     if (!res.ok) {
-      throw new Error("Error en API");
+      const errorText = await res.text();
+      throw new Error(errorText || "Error en API");
     }
 
     return await res.json();

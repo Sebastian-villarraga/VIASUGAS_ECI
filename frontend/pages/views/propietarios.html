@@ -1,0 +1,112 @@
+<div class="vehiculo-layout">
+
+  <!-- IZQUIERDA -->
+  <div class="vehiculo-left">
+
+    <!-- HEADER -->
+    <div class="vehiculo-header">
+      <h2>Propietarios</h2>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="vehiculo-filtros">
+      <div class="filtros-row">
+
+        <div class="filtro-group">
+          <label>Nombre</label>
+          <input type="text" id="filtroNombre" placeholder="Nombre">
+        </div>
+
+        <div class="filtro-group">
+          <label>Identificación</label>
+          <input type="text" id="filtroIdentificacion" placeholder="Cédula / NIT">
+        </div>
+
+        <button class="btn-filtrar" onclick="filtrarPropietarios()">
+          Filtrar
+        </button>
+
+        <button class="btn-limpiar" onclick="limpiarFiltrosProp()">
+          Limpiar
+        </button>
+
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="vehiculo-tabla">
+      <div class="tabla-body">
+
+        <table class="vehiculo-table">
+          <thead>
+            <tr>
+              <th>Identificación</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th style="width: 80px;">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="propietariosTable">
+            <tr>
+              <td colspan="5">Cargando propietarios...</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DERECHA -->
+  <div class="vehiculo-right">
+
+    <button class="btn-primary btn-add-right" onclick="abrirModalPropietario()">
+      <i class="fas fa-plus"></i> Agregar propietario
+    </button>
+
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalPropietario" class="modal hidden">
+
+  <div class="modal-content">
+
+    <h3>Agregar Propietario</h3>
+
+    <form id="formPropietario" class="form-grid">
+
+      <div class="form-group">
+        <label>Identificación</label>
+        <input type="text" id="identificacion" required>
+      </div>
+
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="nombre" required>
+      </div>
+
+      <div class="form-group">
+        <label>Correo</label>
+        <input type="email" id="correo">
+      </div>
+
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="number" id="telefono">
+      </div>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Guardar</button>
+        <button type="button" onclick="cerrarModalPropietario()">Cancelar</button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
