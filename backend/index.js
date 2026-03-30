@@ -44,7 +44,7 @@ const empresaACargoRoutes = require("./routes/empresaACargo.routes");
 app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
 app.use("/api/vehiculos", vehiculoRoutes);
-app.use("/api/trailer", trailerRoutes);
+app.use("/api/trailers", trailerRoutes);
 app.use("/api/propietarios", propietarioRoutes);
 app.use("/api/conductores", conductorRoutes);
 app.use("/api/empresas-a-cargo", empresaACargoRoutes);
