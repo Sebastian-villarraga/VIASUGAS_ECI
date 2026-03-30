@@ -11,7 +11,7 @@ function initTrailers() {
 }
 
 // =========================
-// CONTROL EDICION
+// CONTROL EDICIÓN
 // =========================
 let editandoTrailer = false;
 
@@ -201,7 +201,7 @@ function editarTrailer(btn, placa) {
     </select>
   `;
 
-  // botÃ“n guardar
+  // botón guardar
   celdas[4].innerHTML = `
     <button type="button" class="btn-icon btn-save" onclick="guardarEdicionTrailer(this, '${placa}')">
       <i class="fas fa-save"></i>

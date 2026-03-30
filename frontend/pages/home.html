@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/styles/conductores.css">
   <link rel="stylesheet" href="/styles/empresas-a-cargo.css">
   <link rel="stylesheet" href="/styles/propietarios.css">
+  <link rel="stylesheet" href="/styles/clientes.css">
 </head>
 
 <body>
@@ -62,7 +63,12 @@
       </a>
     </li>
 
-    <li class="menu-item"><a href="#"><span>Clientes</span></a></li>
+    <li class="menu-item">
+      <a href="javascript:void(0)" onclick="navigate('clientes')">
+        <span>Clientes</span>
+      </a>
+    </li>
+    
     <li class="menu-item">
       <a href="javascript:void(0)" onclick="navigate('empresas-a-cargo')">
         <span>Terceros</span>
@@ -159,6 +165,7 @@
 <script src="/js/ui.js"></script>
 <script src="/js/conductores.js"></script>
 <script src="/js/empresas-a-cargo.js"></script>
+<script src="/js/clientes.js"></script>
 
 <div id="toast" class="toast hidden"></div>
 </body>

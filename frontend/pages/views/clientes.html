@@ -1,0 +1,101 @@
+<div class="cliente-layout">
+
+  <div class="cliente-left">
+
+    <!-- HEADER -->
+    <div class="cliente-header">
+      <h2>Clientes</h2>
+
+      <button class="btn-primary" onclick="abrirModalCliente()">
+        <i class="fas fa-plus"></i> Agregar cliente
+      </button>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="cliente-filtros">
+      <div class="filtros-row">
+
+        <div class="filtro-group">
+          <label>NIT</label>
+          <input type="text" id="filtroNit">
+        </div>
+
+        <div class="filtro-group">
+          <label>Nombre</label>
+          <input type="text" id="filtroNombre">
+        </div>
+
+        <div class="filtro-group">
+          <label>Estado</label>
+          <select id="filtroEstado">
+            <option value="">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+
+        <button class="btn-limpiar" onclick="limpiarFiltrosClientes()">
+          Limpiar
+        </button>
+
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="cliente-tabla">
+      <div class="tabla-body">
+
+        <table class="cliente-table">
+          <thead>
+            <tr>
+              <th>NIT</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Dirección</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="clientesTable">
+            <tr><td colspan="7">Cargando...</td></tr>
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalCliente" class="modal hidden">
+  <div class="modal-content">
+
+    <h3>Agregar Cliente</h3>
+
+    <form id="formCliente" class="form-grid">
+
+      <input id="nit" placeholder="NIT" required>
+      <input id="nombre" placeholder="Nombre" required>
+      <input id="correo" placeholder="Correo">
+      <input id="telefono" placeholder="Teléfono">
+      <input id="direccion" placeholder="Dirección">
+
+      <select id="estado">
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Guardar</button>
+        <button type="button" onclick="cerrarModalCliente()">Cancelar</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>

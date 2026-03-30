@@ -33,17 +33,25 @@ async function loadView(view) {
         if (typeof initVehiculos === "function") initVehiculos();
         break;
 
-      case "trailer": // ?? FIX CLAVE
+      case "trailer":
         if (typeof initTrailers === "function") initTrailers();
         break;
+
       case "propietarios":
         if (typeof initPropietarios === "function") initPropietarios();
         break;
+
       case "conductores":
         if (typeof initConductores === "function") initConductores();
         break;
+
       case "empresas-a-cargo":
         if (typeof initEmpresas === "function") initEmpresas();
+        break;
+
+      // ?? NUEVO
+      case "clientes":
+        if (typeof initClientes === "function") initClientes();
         break;
     }
 
