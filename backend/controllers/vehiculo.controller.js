@@ -29,13 +29,13 @@ const getVehiculos = async (req, res) => {
       values.push(`%${placa}%`);
       index++;
     }
-
+    
     if (propietario) {
-      query += ` AND p.nombre ILIKE $${index}`;
+      query += ` AND COALESCE(p.nombre, '') ILIKE $${index}`;
       values.push(`%${propietario}%`);
       index++;
     }
-
+    
     if (estado) {
       query += ` AND v.estado = $${index}`;
       values.push(estado);
@@ -155,7 +155,7 @@ const getAlertasVehiculos = async (req, res) => {
     const result = await pool.query(`
       SELECT 
         v.placa,
-        p.nombre AS propietario,
+        COALESCE(p.nombre, '-') AS propietario,
         v.vencimiento_soat,
         v.vencimiento_tecno,
         v.vencimiento_todo_riesgo
@@ -165,8 +165,11 @@ const getAlertasVehiculos = async (req, res) => {
     `);
 
     const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // ?? clave
+
     const limite = new Date();
     limite.setDate(hoy.getDate() + 30);
+    limite.setHours(23, 59, 59, 999); // ?? clave
 
     let alertas = [];
 
@@ -175,18 +178,22 @@ const getAlertasVehiculos = async (req, res) => {
       const revisar = (fecha, tipo) => {
         if (!fecha) return;
 
+        // ?? NORMALIZAR FECHA (SOLUCIÓN REAL)
         const f = new Date(fecha);
+        f.setHours(0, 0, 0, 0);
 
         if (f < hoy) {
           alertas.push({
             placa: v.placa,
+            propietario: v.propietario,
             tipo,
             estado: "vencido",
             fecha
           });
-        } else if (f <= limite) {
+        } else if (f >= hoy && f <= limite) {
           alertas.push({
             placa: v.placa,
+            propietario: v.propietario,
             tipo,
             estado: "proximo",
             fecha
@@ -199,6 +206,8 @@ const getAlertasVehiculos = async (req, res) => {
       revisar(v.vencimiento_todo_riesgo, "Todo Riesgo");
     });
 
+    console.log("?? ALERTAS GENERADAS:", alertas);
+
     res.json(alertas);
 
   } catch (error) {
@@ -206,18 +215,17 @@ const getAlertasVehiculos = async (req, res) => {
     res.status(500).json({ error: "Error obteniendo alertas" });
   }
 };
-
 // =====================
 // FILTRO RAPIDO
 // =====================
 const getVehiculosPorEstadoAlerta = async (req, res) => {
   try {
-    const { tipo } = req.query; // vencido | proximo
+    const { tipo } = req.query;
 
     const result = await pool.query(`
       SELECT 
         v.placa,
-        p.nombre AS propietario,
+        COALESCE(p.nombre, '-') AS propietario,
         v.vencimiento_todo_riesgo,
         v.vencimiento_soat,
         v.vencimiento_tecno,
@@ -228,8 +236,11 @@ const getVehiculosPorEstadoAlerta = async (req, res) => {
     `);
 
     const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
     const limite = new Date();
     limite.setDate(hoy.getDate() + 30);
+    limite.setHours(23, 59, 59, 999);
 
     const filtrados = result.rows.filter(v => {
 
@@ -241,6 +252,7 @@ const getVehiculosPorEstadoAlerta = async (req, res) => {
 
       return fechas.some(f => {
         const fecha = new Date(f);
+        fecha.setHours(0, 0, 0, 0);
 
         if (tipo === "vencido") {
           return fecha < hoy;

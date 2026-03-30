@@ -19,7 +19,7 @@ let editandoTrailer = false;
 // =========================
 async function cargarTrailers() {
   try {
-    const tabla = document.getElementById("trailerTable");
+    const tabla = document.getElementById("trailerTable");/
     if (!tabla) return;
 
     const data = await apiFetch("/api/trailers");
@@ -258,11 +258,11 @@ function formatearFecha(fecha) {
 // =========================
 // MODAL
 // =========================
-function abrirModalVehiculo() {
+function abrirModalTrailer() {
   document.getElementById("modalTrailer").classList.remove("hidden");
 }
 
-function cerrarModalVehiculo() {
+function cerrarModalTrailer() {
   document.getElementById("modalTrailer").classList.add("hidden");
 }
 
