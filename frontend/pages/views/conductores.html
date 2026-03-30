@@ -1,14 +1,14 @@
-<div class="vehiculo-layout">
+<div class="conductor-layout">
 
   <!-- IZQUIERDA -->
-  <div class="vehiculo-left">
+  <div class="conductor-left">
 
-    <div class="vehiculo-header">
+    <div class="conductor-header">
       <h2>Conductores</h2>
     </div>
 
     <!-- FILTROS -->
-    <div class="vehiculo-filtros">
+    <div class="conductor-filtros">
       <div class="filtros-row">
 
         <div class="filtro-group">
@@ -30,16 +30,18 @@
           </select>
         </div>
 
-        <button class="btn-limpiar" onclick="limpiarFiltrosConductores()">Limpiar</button>
+        <button class="btn-limpiar" onclick="limpiarFiltrosConductores()">
+          Limpiar
+        </button>
 
       </div>
     </div>
 
     <!-- TABLA -->
-    <div class="vehiculo-tabla">
+    <div class="conductor-tabla">
       <div class="tabla-body">
 
-        <table class="vehiculo-table">
+        <table class="conductor-table">
           <thead>
             <tr>
               <th>Cédula</th>
@@ -53,7 +55,9 @@
           </thead>
 
           <tbody id="conductoresTable">
-            <tr><td colspan="7">Cargando...</td></tr>
+            <tr>
+              <td colspan="7">Cargando...</td>
+            </tr>
           </tbody>
 
         </table>
@@ -64,22 +68,21 @@
   </div>
 
   <!-- DERECHA -->
-  <div class="vehiculo-right">
+  <div class="conductor-right">
 
     <button class="btn-primary btn-add-right" onclick="abrirModalConductor()">
       <i class="fas fa-plus"></i> Agregar conductor
     </button>
 
-    <div class="vehiculo-side">
+    <div class="conductor-side">
 
-      <h3><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
+      <h3>
+        <i class="fas fa-exclamation-triangle"></i> Alertas
+      </h3>
 
       <ul id="alertasConductores">
         <li>Cargando alertas...</li>
       </ul>
-
-      
-      
 
     </div>
 
@@ -116,7 +119,9 @@
 
       <div class="modal-actions">
         <button type="submit" class="btn-primary">Guardar</button>
-        <button type="button" onclick="cerrarModalConductor()">Cancelar</button>
+        <button type="button" onclick="cerrarModalConductor()">
+          Cancelar
+        </button>
       </div>
 
     </form>
