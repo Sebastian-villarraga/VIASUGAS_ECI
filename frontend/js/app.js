@@ -42,6 +42,9 @@ async function loadView(view) {
       case "conductores":
         if (typeof initConductores === "function") initConductores();
         break;
+      case "empresas-a-cargo":
+        if (typeof initEmpresas === "function") initEmpresas();
+        break;
     }
 
     setActiveMenu(view);
@@ -82,16 +85,10 @@ function setActiveMenu(view) {
 
   items.forEach(i => i.classList.remove("active"));
 
-  if (view === "home") {
-    items[0]?.classList.add("active");
-  }
+  const activeItem = document.querySelector(`.menu-item[data-view="${view}"]`);
 
-  if (view === "vehiculos") {
-    items[1]?.classList.add("active");
-  }
-
-  if (view === "trailer") { 
-    items[2]?.classList.add("active");
+  if (activeItem) {
+    activeItem.classList.add("active");
   }
 }
 

@@ -15,6 +15,8 @@
   <link rel="stylesheet" href="/styles/trailer.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/styles/conductores.css">
+  <link rel="stylesheet" href="/styles/empresas-a-cargo.css">
+  <link rel="stylesheet" href="/styles/propietarios.css">
 </head>
 
 <body>
@@ -61,7 +63,11 @@
     </li>
 
     <li class="menu-item"><a href="#"><span>Clientes</span></a></li>
-    <li class="menu-item"><a href="#"><span>Terceros</span></a></li>
+    <li class="menu-item">
+      <a href="javascript:void(0)" onclick="navigate('empresas-a-cargo')">
+        <span>Terceros</span>
+      </a>
+    </li>
 
     <li class="menu-section">Finanzas</li>
 
@@ -152,6 +158,7 @@
 <script src="/js/propietarios.js"></script>
 <script src="/js/ui.js"></script>
 <script src="/js/conductores.js"></script>
+<script src="/js/empresas-a-cargo.js"></script>
 
 <div id="toast" class="toast hidden"></div>
 </body>

@@ -1,0 +1,73 @@
+/* ========================= */
+/* LAYOUT */
+/* ========================= */
+.propietario-layout {
+  display: block;
+}
+
+.propietario-left {
+  width: 100%;
+}
+
+/* ========================= */
+/* HEADER */
+/* ========================= */
+.propietario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.propietario-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* ========================= */
+/* FILTROS */
+/* ========================= */
+.propietario-filtros {
+  margin-bottom: 20px;
+  padding: 18px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #ddd;
+}
+
+/* ========================= */
+/* TABLA */
+/* ========================= */
+.propietario-tabla {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0;
+  width: 100%;
+}
+
+.tabla-body {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* ========================= */
+/* TABLE */
+/* ========================= */
+.propietario-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.propietario-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #f1f3f6;
+  font-size: 13px;
+}
+
+.propietario-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}

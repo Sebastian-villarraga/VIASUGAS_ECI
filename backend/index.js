@@ -39,6 +39,7 @@ const authRoutes = require("./routes/auth.routes");
 const trailerRoutes = require("./routes/trailer.routes");
 const propietarioRoutes = require("./routes/propietario.routes");
 const conductorRoutes = require("./routes/conductor.routes");
+const empresaACargoRoutes = require("./routes/empresaACargo.routes");
 
 app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
@@ -46,6 +47,7 @@ app.use("/api/vehiculos", vehiculoRoutes);
 app.use("/api/trailer", trailerRoutes);
 app.use("/api/propietarios", propietarioRoutes);
 app.use("/api/conductores", conductorRoutes);
+app.use("/api/empresas-a-cargo", empresaACargoRoutes);
 
 
 // =====================

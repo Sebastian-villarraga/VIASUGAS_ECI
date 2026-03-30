@@ -1,0 +1,36 @@
+/* ========================= */
+.empresa-layout {
+  display: block;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.empresa-header {
+  margin-bottom: 20px;
+}
+
+.empresa-filtros,
+.empresa-tabla,
+.empresa-side {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 15px;
+}
+
+.empresa-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.empresa-table th,
+.empresa-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.empresa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

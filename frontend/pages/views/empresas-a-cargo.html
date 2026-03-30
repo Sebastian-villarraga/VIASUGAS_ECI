@@ -1,0 +1,101 @@
+<div class="empresa-layout">
+
+  <div class="empresa-left">
+
+    <!-- HEADER -->
+    <div class="empresa-header">
+      <h2>Empresas a Cargo</h2>
+
+      <button class="btn-primary" onclick="abrirModalEmpresa()">
+        <i class="fas fa-plus"></i> Agregar empresa
+      </button>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="empresa-filtros">
+      <div class="filtros-row">
+
+        <div class="filtro-group">
+          <label>NIT</label>
+          <input type="text" id="filtroNit">
+        </div>
+
+        <div class="filtro-group">
+          <label>Nombre</label>
+          <input type="text" id="filtroNombre">
+        </div>
+
+        <div class="filtro-group">
+          <label>Estado</label>
+          <select id="filtroEstado">
+            <option value="">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+
+        <button class="btn-limpiar" onclick="limpiarFiltrosEmpresas()">
+          Limpiar
+        </button>
+
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="empresa-tabla">
+      <div class="tabla-body">
+
+        <table class="empresa-table">
+          <thead>
+            <tr>
+              <th>NIT</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Dirección</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="empresasTable">
+            <tr><td colspan="7">Cargando...</td></tr>
+          </tbody>
+
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalEmpresa" class="modal hidden">
+  <div class="modal-content">
+
+    <h3>Agregar Empresa a Cargo</h3>
+
+    <form id="formEmpresa" class="form-grid">
+
+      <input id="nit" placeholder="NIT" required>
+      <input id="nombre" placeholder="Nombre" required>
+      <input id="correo" placeholder="Correo">
+      <input id="telefono" placeholder="Teléfono">
+      <input id="direccion" placeholder="Dirección">
+
+      <select id="estado">
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Guardar</button>
+        <button type="button" onclick="cerrarModalEmpresa()">Cancelar</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>

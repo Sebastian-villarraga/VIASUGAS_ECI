@@ -1,15 +1,18 @@
-<div class="vehiculo-layout">
+<div class="propietario-layout">
 
-  <!-- IZQUIERDA -->
-  <div class="vehiculo-left">
+  <div class="propietario-left">
 
     <!-- HEADER -->
-    <div class="vehiculo-header">
+    <div class="propietario-header">
       <h2>Propietarios</h2>
+
+      <button class="btn-primary" onclick="abrirModalPropietario()">
+        <i class="fas fa-plus"></i> Agregar propietario
+      </button>
     </div>
 
     <!-- FILTROS -->
-    <div class="vehiculo-filtros">
+    <div class="propietario-filtros">
       <div class="filtros-row">
     
         <div class="filtro-group">
@@ -30,10 +33,10 @@
     </div>
 
     <!-- TABLA -->
-    <div class="vehiculo-tabla">
+    <div class="propietario-tabla">
       <div class="tabla-body">
 
-        <table class="vehiculo-table">
+        <table class="propietario-table">
           <thead>
             <tr>
               <th>Identificación</th>
@@ -53,15 +56,6 @@
 
       </div>
     </div>
-
-  </div>
-
-  <!-- DERECHA -->
-  <div class="vehiculo-right">
-
-    <button class="btn-primary btn-add-right" onclick="abrirModalPropietario()">
-      <i class="fas fa-plus"></i> Agregar propietario
-    </button>
 
   </div>
 
