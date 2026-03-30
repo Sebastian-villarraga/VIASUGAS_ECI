@@ -15,20 +15,20 @@
 
 <body>
 
-<div class="vehiculo-layout">
+<div class="trailer-layout">
 
   <!-- ========================= -->
   <!-- IZQUIERDA -->
   <!-- ========================= -->
-  <div class="vehiculo-left">
+  <div class="trailer-left">
 
     <!-- HEADER -->
-    <div class="vehiculo-header">
+    <div class="trailer-header">
       <h2>Trailers</h2>
     </div>
 
     <!-- FILTROS -->
-    <div class="vehiculo-filtros">
+    <div class="trailer-filtros">
       <div class="filtros-row">
     
         <div class="filtro-group">
@@ -62,10 +62,10 @@
     </div>
 
     <!-- TABLA -->
-    <div class="vehiculo-tabla">
+    <div class="trailer-tabla">
       <div class="tabla-body">
 
-        <table class="vehiculo-table">
+        <table class="trailer-table">
           <thead>
             <tr>
               <th>Placa</th>
@@ -76,7 +76,7 @@
             </tr>
           </thead>
 
-          <tbody id="vehiculosTable">
+          <tbody id="trailerTable">
             <tr>
               <td colspan="5">Cargando trailers...</td>
             </tr>
@@ -92,15 +92,15 @@
   <!-- ========================= -->
   <!-- DERECHA -->
   <!-- ========================= -->
-  <div class="vehiculo-right">
+  <div class="trailer-right">
 
     <!-- BOTÓN -->
-    <button class="btn-primary btn-add-right" onclick="abrirModalVehiculo()">
+    <button class="btn-primary btn-add-right" onclick="abrirModalTrailer()">
       <i class="fas fa-plus"></i> Agregar trailer
     </button>
 
     <!-- PANEL -->
-    <div class="vehiculo-side">
+    <div class="trailer-side">
 
       <!-- ALERTAS -->
       <h3><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
@@ -135,13 +135,13 @@
 <!-- ========================= -->
 <!-- MODAL TRAILER -->
 <!-- ========================= -->
-<div id="modalVehiculo" class="modal hidden">
+<div id="modalTrailer" class="modal hidden">
 
   <div class="modal-content">
 
     <h3>Agregar Trailer</h3>
 
-    <form id="formVehiculo" class="form-grid">
+    <form id="formTrailer" class="form-grid">
 
       <!-- PLACA -->
       <div class="form-group">
@@ -176,7 +176,7 @@
           <i class="fas fa-save"></i> Guardar
         </button>
 
-        <button type="button" onclick="cerrarModalVehiculo()">
+        <button type="button" onclick="cerrarModalTrailer()">
           Cancelar
         </button>
       </div>

@@ -112,10 +112,11 @@ const crearVehiculo = async (req, res) => {
       INSERT INTO vehiculo (
         placa,
         id_propietario,
+        estado,
         vencimiento_soat,
         vencimiento_tecno,
-        vencimiento_todo_riesgo,
-        estado
+        vencimiento_todo_riesgo
+        
       )
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
@@ -124,10 +125,11 @@ const crearVehiculo = async (req, res) => {
     const values = [
       placa,
       id_propietario,
+      estado || "activo",
       vencimiento_soat || null,
       vencimiento_tecno || null,
-      vencimiento_todo_riesgo || null,
-      estado || "activo"
+      vencimiento_todo_riesgo || null
+      
     ];
 
     const result = await pool.query(insertQuery, values);

@@ -496,3 +496,48 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+
+.badge-activo {
+  background: #e6f4ea;
+  color: #1e8e3e;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-inactivo {
+  background: #fdecea;
+  color: #c62828;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ========================= */
+/* BOTON EDITAR
+/* ========================= */
+.acciones {
+  text-align: center;
+}
+
+.btn-icon {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-icon.editar i {
+  color: #3b82f6;
+}
+
+.btn-icon:hover {
+  transform: scale(1.1);
+}
+
+.btn-icon.guardar i {
+  color: #16a34a;
+}

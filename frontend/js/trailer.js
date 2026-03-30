@@ -19,19 +19,19 @@ let editandoTrailer = false;
 // =========================
 async function cargarTrailers() {
   try {
-    const tabla = document.getElementById("vehiculosTable");
+    const tabla = document.getElementById("trailerTable");
     if (!tabla) return;
 
     const data = await apiFetch("/api/trailers");
 
     console.log("DATA TRAILERS:", data);
 
-    renderTabla(data);
+    renderTablaTrailer(data);
 
   } catch (error) {
     console.error("Error cargando trailers:", error);
 
-    const tabla = document.getElementById("vehiculosTable");
+    const tabla = document.getElementById("trailerTable");
     if (tabla) {
       tabla.innerHTML = `
         <tr>
@@ -68,7 +68,7 @@ async function filtrarTrailers() {
 
     console.log("RESULTADO:", data);
 
-    renderTabla(data);
+    renderTablaTrailer(data);
 
   } catch (error) {
     console.error("Error filtrando trailers:", error);
@@ -89,8 +89,8 @@ function limpiarFiltros() {
 // =========================
 // RENDER TABLA
 // =========================
-function renderTabla(data) {
-  const tabla = document.getElementById("vehiculosTable");
+function renderTablaTrailer(data) {
+  const tabla = document.getElementById("trailerTable");
 
   if (!tabla) return;
 
@@ -211,7 +211,7 @@ function formatoInputSeguro(fecha) {
 // FORM 
 // =========================
 function initFormTrailer() {
-  const form = document.getElementById("formVehiculo");
+  const form = document.getElementById("formTrailer");
 
   if (!form) return;
 
@@ -259,11 +259,11 @@ function formatearFecha(fecha) {
 // MODAL
 // =========================
 function abrirModalVehiculo() {
-  document.getElementById("modalVehiculo").classList.remove("hidden");
+  document.getElementById("modalTrailer").classList.remove("hidden");
 }
 
 function cerrarModalVehiculo() {
-  document.getElementById("modalVehiculo").classList.add("hidden");
+  document.getElementById("modalTrailer").classList.add("hidden");
 }
 
 // =========================
@@ -311,7 +311,7 @@ async function cargarAlertas() {
 async function filtrarVencidos() {
   try {
     const data = await apiFetch("/api/trailers/filtro-alertas?tipo=vencido");
-    renderTabla(data);
+    renderTablaTrailer(data);
   } catch (error) {
     console.error(error);
   }
@@ -320,7 +320,7 @@ async function filtrarVencidos() {
 async function filtrarProximos() {
   try {
     const data = await apiFetch("/api/trailers/filtro-alertas?tipo=proximo");
-    renderTabla(data);
+    renderTablaTrailer(data);
   } catch (error) {
     console.error(error);
   }

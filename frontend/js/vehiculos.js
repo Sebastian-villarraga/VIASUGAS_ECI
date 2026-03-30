@@ -6,7 +6,7 @@ function initVehiculos() {
 
   cargarVehiculos();
   cargarAlertas();
-  initFormVehiculo(); 
+  initFormVehiculo();
 }
 
 // =========================
@@ -18,63 +18,32 @@ let editando = false;
 // CARGAR VEHICULOS
 // =========================
 async function cargarVehiculos() {
-  try {
-    const tabla = document.getElementById("vehiculosTable");
-    if (!tabla) {
-      console.warn("No existe #vehiculosTable");
-      return;
-    }
-
-    const data = await apiFetch("/api/vehiculos");
-
-    console.log("DATA VEHICULOS:", data);
-
-    renderTabla(data);
-
-  } catch (error) {
-    console.error("Error cargando vehículos:", error);
-
-    const tabla = document.getElementById("vehiculosTable");
-    if (tabla) {
-      tabla.innerHTML = `
-        <tr>
-          <td colspan="7">Error cargando datos</td>
-        </tr>
-      `;
-    }
-  }
+  const data = await apiFetch("/api/vehiculos");
+  renderTabla(data);
 }
 
 // =========================
-// FILTRAR VEHICULOS
+// FILTRAR
 // =========================
 async function filtrarVehiculos() {
-  try {
-    const placa = document.getElementById("filtroPlaca").value.trim();
-    const propietario = document.getElementById("filtroPropietario").value.trim();
-    const estado = document.getElementById("filtroEstado").value;
+  const placa = document.getElementById("filtroPlaca").value.trim();
+  const propietario = document.getElementById("filtroPropietario").value.trim();
+  const estado = document.getElementById("filtroEstado").value;
 
-    let params = [];
+  let params = [];
 
-    if (placa) params.push(`placa=${encodeURIComponent(placa)}`);
-    if (propietario) params.push(`propietario=${encodeURIComponent(propietario)}`);
-    if (estado) params.push(`estado=${encodeURIComponent(estado)}`);
+  if (placa) params.push(`placa=${encodeURIComponent(placa)}`);
+  if (propietario) params.push(`propietario=${encodeURIComponent(propietario)}`);
+  if (estado) params.push(`estado=${estado}`);
 
-    const url = `/api/vehiculos${params.length ? "?" + params.join("&") : ""}`;
+  const url = `/api/vehiculos${params.length ? "?" + params.join("&") : ""}`;
 
-    console.log("URL FILTRO:", url);
-
-    const data = await apiFetch(url);
-
-    renderTabla(data);
-
-  } catch (error) {
-    console.error("Error filtrando vehículos:", error);
-  }
+  const data = await apiFetch(url);
+  renderTabla(data);
 }
 
 // =========================
-// LIMPIAR FILTROS
+// LIMPIAR
 // =========================
 function limpiarFiltros() {
   document.getElementById("filtroPlaca").value = "";
@@ -85,71 +54,79 @@ function limpiarFiltros() {
 }
 
 // =========================
-// RENDER TABLA
+// RENDER TABLA (FIX CLAVE)
 // =========================
 function renderTabla(data) {
   const tabla = document.getElementById("vehiculosTable");
 
-  if (!tabla) return;
+  console.log("VERSION NUEVA VEHICULOS");
 
   if (!data || data.length === 0) {
-    tabla.innerHTML = `
-      <tr>
-        <td colspan="7">No hay resultados</td>
-      </tr>
-    `;
+    tabla.innerHTML = `<tr><td colspan="7">No hay resultados</td></tr>`;
     return;
   }
 
-  tabla.innerHTML = data.map(v => `
-    <tr 
-      data-placa="${v.placa}"
-      data-propietario="${v.propietario || ""}"
-      data-todo="${v.vencimiento_todo_riesgo || ""}"
-      data-soat="${v.vencimiento_soat || ""}"
-      data-tecno="${v.vencimiento_tecno || ""}"
-      data-estado="${v.estado}"
-    >
-      <td>${v.placa}</td>
-      <td>${v.propietario || "-"}</td>
-      <td>${v.vencimiento_todo_riesgo ? formatearFecha(v.vencimiento_todo_riesgo) : "-"}</td>
-      <td>${v.vencimiento_soat ? formatearFecha(v.vencimiento_soat) : "-"}</td>
-      <td>${v.vencimiento_tecno ? formatearFecha(v.vencimiento_tecno) : "-"}</td>
-      <td>${v.estado}</td>
+  tabla.innerHTML = data.map(v => {
 
-      <td>
-        <button type="button" class="btn-icon" onclick="editarVehiculo(this, '${v.placa}')">
-          <i class="fas fa-pen"></i>
-        </button>
-      </td>
-    </tr>
-  `).join("");
+    // ?? NORMALIZAR FECHAS
+    const todo = v.vencimiento_todo_riesgo || "";
+    const soat = v.vencimiento_soat || "";
+    const tecno = v.vencimiento_tecno || "";
+
+    return `
+      <tr 
+        data-placa="${v.placa}"
+        data-propietario="${v.propietario || ""}"
+        data-todo="${todo}"
+        data-soat="${soat}"
+        data-tecno="${tecno}"
+        data-estado="${v.estado}"
+      >
+        <td>${v.placa}</td>
+        <td>${v.propietario || "-"}</td>
+
+        <td>${todo ? formatearFecha(todo) : "-"}</td>
+        <td>${soat ? formatearFecha(soat) : "-"}</td>
+        <td>${tecno ? formatearFecha(tecno) : "-"}</td>
+
+        <td>${renderEstadoBadge(v.estado)}</td>
+
+        <td class="acciones">
+          <button class="btn-icon editar" onclick="editarVehiculo(this, '${v.placa}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderEstadoBadge(estado) {
+  const clase = estado === "activo" ? "badge-activo" : "badge-inactivo";
+  return `<span class="${clase}">${estado}</span>`;
 }
 
 // =========================
-// EDITAR TABLA VEHICULO
+// EDITAR
 // =========================
 function editarVehiculo(btn, placa) {
 
   if (editando) {
-    alert("Termina de editar la fila actual primero");
+    alert("Termina de editar primero");
     return;
   }
 
   editando = true;
 
   const fila = btn.closest("tr");
+  const data = fila.dataset;
   const celdas = fila.querySelectorAll("td");
 
-  // ?? obtener datos reales desde atributos
-  const data = fila.dataset;
+  celdas[1].innerHTML = `<input value="${data.propietario}">`;
 
-  celdas[0].innerHTML = `<input value="${data.placa}" disabled>`;
-  celdas[1].innerHTML = `<input value="${data.propietario || ""}">`;
-
-  celdas[2].innerHTML = `<input type="date" value="${data.todo || ""}">`;
-  celdas[3].innerHTML = `<input type="date" value="${data.soat || ""}">`;
-  celdas[4].innerHTML = `<input type="date" value="${data.tecno || ""}">`;
+  celdas[2].innerHTML = `<input type="date" value="${data.todo}">`;
+  celdas[3].innerHTML = `<input type="date" value="${data.soat}">`;
+  celdas[4].innerHTML = `<input type="date" value="${data.tecno}">`;
 
   celdas[5].innerHTML = `
     <select>
@@ -159,7 +136,7 @@ function editarVehiculo(btn, placa) {
   `;
 
   celdas[6].innerHTML = `
-    <button type="button" class="btn-icon btn-save" onclick="guardarEdicion(this, '${placa}')">
+    <button class="btn-icon guardar" onclick="guardarEdicion(this, '${placa}')">
       <i class="fas fa-save"></i>
     </button>
   `;
@@ -172,61 +149,102 @@ function editarVehiculo(btn, placa) {
 }
 
 // =========================
-// EDITAR VEHICULO GUARDAR
+// GUARDAR
 // =========================
 async function guardarEdicion(btn, placa) {
   const fila = btn.closest("tr");
   const inputs = fila.querySelectorAll("input, select");
 
   const data = {
-    propietario: inputs[1].value,
-    vencimiento_todo_riesgo: inputs[2].value,
-    vencimiento_soat: inputs[3].value,
-    vencimiento_tecno: inputs[4].value,
-    estado: inputs[5].value
+    propietario: inputs[0].value,
+    vencimiento_todo_riesgo: inputs[1].value,
+    vencimiento_soat: inputs[2].value,
+    vencimiento_tecno: inputs[3].value,
+    estado: inputs[4].value
   };
 
-  try {
-    await apiFetch(`/api/vehiculos/${placa}`, {
-      method: "PUT",
-      body: JSON.stringify(data)
-    });
+  await apiFetch(`/api/vehiculos/${placa}`, {
+    method: "PUT",
+    body: JSON.stringify(data)
+  });
 
-    editando = false;
+  editando = false;
 
-    document.querySelectorAll(".btn-icon").forEach(b => {
-      b.disabled = false;
-    });
+  document.querySelectorAll(".btn-icon").forEach(b => {
+    b.disabled = false;
+  });
 
-    cargarVehiculos();
-
-  } catch (error) {
-    console.error("Error actualizando:", error);
-  }
-}
-
-function formatoInputSeguro(fecha) {
-  if (!fecha || fecha === "-") return "";
-
-  // convierte DD/MM/YYYY ? YYYY-MM-DD
-  const partes = fecha.split("/");
-  if (partes.length !== 3) return "";
-
-  const [dia, mes, anio] = partes;
-
-  return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+  cargarVehiculos();
 }
 
 // =========================
-// FORM 
+// FORMATO FECHA (DISPLAY)
+// =========================
+function formatearFecha(fecha) {
+  if (!fecha) return "-";
+
+  const clean = fecha.split("T")[0];
+  const [year, month, day] = clean.split("-");
+
+  return `${day}/${month}/${year}`;
+}
+
+// =========================
+// FORMATO INPUT (CLAVE)
+// =========================
+function formatFechaInput(fecha) {
+  if (!fecha) return "";
+
+  return fecha.split("T")[0];
+}
+
+// =========================
+// BADGE ESTADO (IGUAL CONDUCTORES)
+// =========================
+function renderEstadoBadge(estado) {
+  const clase = estado === "activo" ? "badge-activo" : "badge-inactivo";
+  return `<span class="${clase}">${estado}</span>`;
+}
+
+// =========================
+// ALERTAS
+// =========================
+async function cargarAlertas() {
+  const lista = document.getElementById("alertasList");
+
+  const data = await apiFetch("/api/vehiculos/alertas");
+
+  if (!data || data.length === 0) {
+    lista.innerHTML = "<li>Sin alertas</li>";
+    return;
+  }
+
+  lista.innerHTML = data.map(a => `
+    <li>
+      ${a.tipo} - ${a.placa} <br>
+      ${formatearFecha(a.fecha)}
+    </li>
+  `).join("");
+}
+
+// =========================
+// FILTROS RAPIDOS
+// =========================
+async function filtrarVencidos() {
+  const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=vencido");
+  renderTabla(data);
+}
+
+async function filtrarProximos() {
+  const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=proximo");
+  renderTabla(data);
+}
+
+// =========================
+// FORM
 // =========================
 function initFormVehiculo() {
   const form = document.getElementById("formVehiculo");
-
-  if (!form) {
-    console.warn("No existe formVehiculo");
-    return;
-  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -240,39 +258,15 @@ function initFormVehiculo() {
       estado: document.getElementById("estado").value
     };
 
-    console.log("ENVIANDO:", data);
+    await apiFetch("/api/vehiculos", {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
 
-    try {
-      await apiFetch("/api/vehiculos", {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
-
-      console.log("Vehículo creado");
-
-      cerrarModalVehiculo();
-      form.reset();
-
-      await cargarVehiculos(); // ?? refresca tabla
-
-    } catch (error) {
-      console.error("Error creando vehículo:", error);
-      alert("Error al crear vehículo");
-    }
+    cerrarModalVehiculo();
+    form.reset();
+    cargarVehiculos();
   });
-}
-
-// =========================
-// UTILIDADES
-// =========================
-function formatearFecha(fecha) {
-  if (!fecha) return "-";
-
-  try {
-    return new Date(fecha).toLocaleDateString();
-  } catch {
-    return fecha;
-  }
 }
 
 // =========================
@@ -284,62 +278,4 @@ function abrirModalVehiculo() {
 
 function cerrarModalVehiculo() {
   document.getElementById("modalVehiculo").classList.add("hidden");
-}
-
-// =========================
-// CARGAR ALERTAS
-// =========================
-async function cargarAlertas() {
-  try {
-    const lista = document.getElementById("alertasList");
-
-    const data = await apiFetch("/api/vehiculos/alertas");
-
-    if (!data || data.length === 0) {
-      lista.innerHTML = "<li>Sin alertas</li>";
-      return;
-    }
-
-    lista.innerHTML = data.map(a => {
-      const clase = a.estado === "vencido"
-        ? "alerta-vencido"
-        : "alerta-proximo";
-
-      return `
-        <li class="alerta-item ${clase}">
-          <div class="alerta-titulo">
-            <i class="fas fa-circle alerta-icono"></i>
-            ${a.tipo} - ${a.placa}
-          </div>
-          <div class="alerta-fecha">
-            ${formatearFecha(a.fecha)}
-          </div>
-        </li>
-      `;
-    }).join("");
-
-  } catch (error) {
-    console.error("Error alertas:", error);
-  }
-}
-
-// =========================
-// FILTROS RAPIDOS
-// =========================
-async function filtrarVencidos() {
-  try {
-    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=vencido");
-    renderTabla(data);
-  } catch (error) {
-    console.error("Error filtro vencidos:", error);
-  }
-}
-
-async function filtrarProximos() {
-  try {
-    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=proximo");
-    renderTabla(data);
-  } catch (error) {
-    console.error("Error filtro próximos:", error);
-  }
 }
