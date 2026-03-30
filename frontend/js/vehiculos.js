@@ -115,7 +115,7 @@ function renderTabla(data) {
       <td>${v.vencimiento_todo_riesgo ? formatearFecha(v.vencimiento_todo_riesgo) : "-"}</td>
       <td>${v.vencimiento_soat ? formatearFecha(v.vencimiento_soat) : "-"}</td>
       <td>${v.vencimiento_tecno ? formatearFecha(v.vencimiento_tecno) : "-"}</td>
-      <td>${v.estado}</td>
+      <td>${renderEstadoBadge(v.estado)}</td>
 
       <td>
         <button type="button" class="btn-icon" onclick="editarVehiculo(this, '${v.placa}')">

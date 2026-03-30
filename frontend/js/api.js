@@ -1,4 +1,4 @@
-const API_URL = "";
+const API_URL = ""; // o ""
 
 async function apiFetch(endpoint, options = {}) {
   try {
@@ -13,13 +13,25 @@ async function apiFetch(endpoint, options = {}) {
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(errorText || "Error en API");
+      const text = await res.text();
+
+      // ?? IMPORTANTE: usa toast global
+      if (typeof showToast === "function") {
+        showToast(text || "Error en la API", "error");
+      }
+
+      return null;
     }
 
     return await res.json();
+
   } catch (err) {
     console.error("API ERROR:", err);
+
+    if (typeof showToast === "function") {
+      showToast("Error de conexión con el servidor", "error");
+    }
+
     return null;
   }
 }

@@ -39,6 +39,9 @@ async function loadView(view) {
       case "propietarios":
         if (typeof initPropietarios === "function") initPropietarios();
         break;
+      case "conductores":
+        if (typeof initConductores === "function") initConductores();
+        break;
     }
 
     setActiveMenu(view);
