@@ -7,10 +7,11 @@ function initTrailers() {
   cargarTrailers();
   cargarAlertas();
   initFormTrailer(); 
+  initEventosFiltros(); 
 }
 
 // =========================
-// CONTROL EDICI”N
+// CONTROL EDICION
 // =========================
 let editandoTrailer = false;
 
@@ -19,8 +20,10 @@ let editandoTrailer = false;
 // =========================
 async function cargarTrailers() {
   try {
-    const tabla = document.getElementById("trailerTable");/
+    const tabla = document.getElementById("trailerTable");
     if (!tabla) return;
+
+    tabla.innerHTML = `<tr><td colspan="5">Cargando trailers...</td></tr>`;
 
     const data = await apiFetch("/api/trailers");
 
@@ -53,8 +56,8 @@ async function filtrarTrailers() {
 
     const params = new URLSearchParams();
 
-    if (placa) params.append("placa", placa);
-    if (propietario) params.append("propietario", propietario);
+    if (placa !== "") params.append("placa", placa);
+    if (propietario !== "") params.append("propietario", propietario);
 
     if (estado !== "") {
       params.append("estado", estado.toLowerCase().trim());
@@ -75,13 +78,40 @@ async function filtrarTrailers() {
   }
 }
 
+function initEventosFiltros() {
+  const placa = document.getElementById("filtroPlaca");
+  const propietario = document.getElementById("filtroPropietario");
+  const estado = document.getElementById("filtroEstado");
+
+  if (!placa || !propietario || !estado) return;
+
+  // ENTER en inputs
+  [placa, propietario].forEach(input => {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        filtrarTrailers();
+      }
+    });
+  });
+
+  // cambio en select
+  estado.addEventListener("change", () => {
+    filtrarTrailers();
+  });
+}
+
 // =========================
 // LIMPIAR FILTROS
 // =========================
 function limpiarFiltros() {
-  document.getElementById("filtroPlaca").value = "";
-  document.getElementById("filtroPropietario").value = "";
-  document.getElementById("filtroEstado").value = "";
+  const placa = document.getElementById("filtroPlaca");
+  const propietario = document.getElementById("filtroPropietario");
+  const estado = document.getElementById("filtroEstado");
+
+  if (placa) placa.value = "";
+  if (propietario) propietario.value = "";
+  if (estado) estado.value = "";
 
   cargarTrailers();
 }
@@ -103,19 +133,32 @@ function renderTablaTrailer(data) {
     return;
   }
 
-  tabla.innerHTML = data.map(t => `
-    <tr>
-      <td>${t.placa}</td>
-      <td>${t.propietario || "-"}</td>
-      <td>${formatearFecha(t.vencimiento_cert_fumigacion)}</td>
-      <td>${t.estado}</td>
-      <td>
-        <button type="button" class="btn-icon" onclick="editarTrailer(this, '${t.placa}')">
-          <i class="fas fa-pen"></i>
-        </button>
-      </td>
-    </tr>
-  `).join("");
+  tabla.innerHTML = data.map(t => {
+
+    const estadoClass = t.estado === "activo"
+      ? "badge-activo"
+      : "badge-inactivo";
+
+    return `
+      <tr>
+        <td>${t.placa}</td>
+        <td>${t.propietario || "-"}</td>
+        <td>${formatearFecha(t.vencimiento_cert_fumigacion)}</td>
+
+        <td>
+          <span class="badge ${estadoClass}">
+            ${t.estado}
+          </span>
+        </td>
+
+        <td>
+          <button type="button" class="btn-icon" onclick="editarTrailer(this, '${t.placa}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 // =========================
@@ -133,19 +176,32 @@ function editarTrailer(btn, placa) {
   const fila = btn.closest("tr");
   const celdas = fila.querySelectorAll("td");
 
-  const valores = [...celdas].slice(0, 4).map(td => td.textContent.trim());
+  const valores = {
+    placa: celdas[0].innerText.trim(),
+    propietario: celdas[1].innerText.trim(),
+    fecha: celdas[2].innerText.trim(),
+    estado: celdas[3].innerText.trim().toLowerCase()
+  };
 
-  celdas[0].innerHTML = `<input value="${valores[0]}" disabled>`;
-  celdas[1].innerHTML = `<input value="${valores[1] === "-" ? "" : valores[1]}">`;
-  celdas[2].innerHTML = `<input type="date" value="${formatoInputSeguro(valores[2])}">`;
+  // inputs
+  celdas[0].innerHTML = `<input value="${valores.placa}" disabled>`;
+
+  celdas[1].innerHTML = `
+    <input value="${valores.propietario === "-" ? "" : valores.propietario}">
+  `;
+
+  celdas[2].innerHTML = `
+    <input type="date" value="${formatoInputSeguro(valores.fecha)}">
+  `;
 
   celdas[3].innerHTML = `
     <select>
-      <option value="activo" ${valores[3] === "activo" ? "selected" : ""}>Activo</option>
-      <option value="inactivo" ${valores[3] === "inactivo" ? "selected" : ""}>Inactivo</option>
+      <option value="activo" ${valores.estado === "activo" ? "selected" : ""}>Activo</option>
+      <option value="inactivo" ${valores.estado === "inactivo" ? "selected" : ""}>Inactivo</option>
     </select>
   `;
 
+  // bot√ìn guardar
   celdas[4].innerHTML = `
     <button type="button" class="btn-icon btn-save" onclick="guardarEdicionTrailer(this, '${placa}')">
       <i class="fas fa-save"></i>
@@ -154,6 +210,7 @@ function editarTrailer(btn, placa) {
 
   const btnGuardar = celdas[4].querySelector("button");
 
+  // deshabilitar otros botones
   document.querySelectorAll(".btn-icon").forEach(b => {
     if (b !== btnGuardar) {
       b.disabled = true;
@@ -166,12 +223,15 @@ function editarTrailer(btn, placa) {
 // =========================
 async function guardarEdicionTrailer(btn, placa) {
   const fila = btn.closest("tr");
-  const inputs = fila.querySelectorAll("input, select");
+
+  const propietario = fila.querySelector("input").value;
+  const fecha = fila.querySelector("input[type='date']").value;
+  const estado = fila.querySelector("select").value;
 
   const data = {
-    propietario: inputs[1].value,
-    vencimiento_cert_fumigacion: inputs[2].value,
-    estado: inputs[3].value
+    propietario,
+    vencimiento_cert_fumigacion: fecha,
+    estado
   };
 
   try {
@@ -182,7 +242,7 @@ async function guardarEdicionTrailer(btn, placa) {
 
     editandoTrailer = false;
 
-    // ?? reactivar botones
+    // reactivar botones
     document.querySelectorAll(".btn-icon").forEach(b => {
       b.disabled = false;
     });
@@ -207,6 +267,7 @@ function formatoInputSeguro(fecha) {
 
   return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
 }
+
 // =========================
 // FORM 
 // =========================
@@ -231,7 +292,7 @@ function initFormTrailer() {
         body: JSON.stringify(data)
       });
 
-      cerrarModalVehiculo();
+      cerrarModalTrailer();
       form.reset();
 
       await cargarTrailers();
@@ -248,11 +309,15 @@ function initFormTrailer() {
 function formatearFecha(fecha) {
   if (!fecha) return "-";
 
-  try {
-    return new Date(fecha).toLocaleDateString();
-  } catch {
-    return fecha;
-  }
+  const f = new Date(fecha);
+
+  if (isNaN(f)) return "-";
+
+  const dia = String(f.getDate()).padStart(2, "0");
+  const mes = String(f.getMonth() + 1).padStart(2, "0");
+  const anio = f.getFullYear();
+
+  return `${dia}/${mes}/${anio}`;
 }
 
 // =========================
@@ -272,31 +337,48 @@ function cerrarModalTrailer() {
 async function cargarAlertas() {
   try {
     const lista = document.getElementById("alertasList");
+    const countV = document.getElementById("countVencidos");
+    const countP = document.getElementById("countProximos");
+
+    if (!lista) return;
 
     const data = await apiFetch("/api/trailers/alertas");
-    
-    console.log("ALERTAS:", data); // DEBUG
+
+    console.log("ALERTAS:", data);
 
     if (!data || data.length === 0) {
-      lista.innerHTML = "<li>Sin alertas</li>";
+      lista.innerHTML = "<div>Sin alertas</div>";
+      countV.textContent = 0;
+      countP.textContent = 0;
       return;
     }
 
+    let vencidos = 0;
+    let proximos = 0;
+
+    data.forEach(a => {
+      if (a.estado === "vencido") vencidos++;
+      else proximos++;
+    });
+
+    countV.textContent = vencidos;
+    countP.textContent = proximos;
+
     lista.innerHTML = data.map(a => {
+
       const clase = a.estado === "vencido"
-        ? "alerta-vencido"
-        : "alerta-proximo";
+        ? "alerta-item vencido"
+        : "alerta-item proximo";
 
       return `
-        <li class="alerta-item ${clase}">
+        <div class="${clase}">
           <div class="alerta-titulo">
-            <i class="fas fa-circle alerta-icono"></i>
             ${a.tipo} - ${a.placa}
           </div>
           <div class="alerta-fecha">
             ${formatearFecha(a.fecha)}
           </div>
-        </li>
+        </div>
       `;
     }).join("");
 
@@ -325,3 +407,5 @@ async function filtrarProximos() {
     console.error(error);
   }
 }
+
+

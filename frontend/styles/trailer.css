@@ -311,3 +311,84 @@
   border-color: orange;
   background: #fff8e1;
 }
+
+/* ========================= */
+/* COLOR ESTADO
+/* ========================= */
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-activo {
+  background: #d1f5e0;
+  color: #1a7f4b;
+}
+
+.badge-inactivo {
+  background: #ffd6d6;
+  color: #b42318;
+}
+
+.alertas-resumen {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.alerta-box {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.alerta-box.vencidos {
+  background: #fbe4e2;
+  color: #d92d20;
+}
+
+.alerta-box.proximos {
+  background: #fff3cd;
+  color: #b58105;
+}
+
+/* LISTA */
+.alertas-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* ITEM */
+.alerta-item {
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: #f9f9f9;
+  position: relative;
+}
+
+/* BORDE IZQUIERDO */
+.alerta-item.vencido {
+  border-left: 4px solid #d92d20;
+  background: #fdecea;
+}
+
+.alerta-item.proximo {
+  border-left: 4px solid #f59e0b;
+  background: #fff7e6;
+}
+
+.alerta-titulo {
+  font-weight: 600;
+}
+
+.alerta-fecha {
+  font-size: 12px;
+  color: #666;
+}
