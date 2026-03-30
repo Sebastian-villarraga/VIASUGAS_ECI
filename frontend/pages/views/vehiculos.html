@@ -10,36 +10,45 @@
     <!-- FILTROS -->
     <div class="vehiculo-filtros">
       <div class="filtros-row">
-
+    
         <div class="filtro-group">
           <label>Placa</label>
-          <input type="text" id="filtroPlaca" placeholder="Ej: ABC123">
+          <input 
+            type="text" 
+            id="filtroPlaca" 
+            placeholder="Ej: ABC123"
+            oninput="aplicarFiltrosVehiculos()"
+          >
         </div>
-
+    
         <div class="filtro-group">
           <label>Propietario</label>
-          <input type="text" id="filtroPropietario" placeholder="Nombre propietario">
+          <input 
+            type="text" 
+            id="filtroPropietario" 
+            placeholder="Nombre propietario"
+            oninput="aplicarFiltrosVehiculos()"
+          >
         </div>
-
+    
         <div class="filtro-group">
           <label>Estado</label>
-          <select id="filtroEstado">
+          <select 
+            id="filtroEstado"
+            onchange="aplicarFiltrosVehiculos()"
+          >
             <option value="">Todos</option>
             <option value="activo">Activo</option>
             <option value="inactivo">Inactivo</option>
           </select>
         </div>
-
-        <button class="btn-filtrar" onclick="filtrarVehiculos()">
-          Filtrar
-        </button>
-
-        <button class="btn-limpiar" onclick="limpiarFiltros()">
+    
+        <button type="button" class="btn-limpiar" onclick="limpiarFiltros()">
           Limpiar
         </button>
-
+    
       </div>
-    </div>
+</div>
 
     <!-- TABLA -->
     <div class="vehiculo-tabla">

@@ -148,16 +148,20 @@ const getAlertasTrailers = async (req, res) => {
     const result = await pool.query(`
       SELECT 
         t.placa,
-        p.nombre AS propietario,
+        COALESCE(p.nombre, '-') AS propietario,
         t.vencimiento_cert_fumigacion
       FROM trailer t
       LEFT JOIN propietario p 
         ON t.id_propietario = p.identificacion
     `);
 
+    // ?? NORMALIZAR FECHAS
     const hoy = new Date();
-    const limite = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const limite = new Date(hoy);
     limite.setDate(hoy.getDate() + 30);
+    limite.setHours(23, 59, 59, 999);
 
     let alertas = [];
 
@@ -166,23 +170,30 @@ const getAlertasTrailers = async (req, res) => {
       if (!t.vencimiento_cert_fumigacion) return;
 
       const f = new Date(t.vencimiento_cert_fumigacion);
+      f.setHours(0, 0, 0, 0);
 
       if (f < hoy) {
         alertas.push({
           placa: t.placa,
+          propietario: t.propietario,
           tipo: "Fumigación",
           estado: "vencido",
           fecha: t.vencimiento_cert_fumigacion
         });
-      } else if (f <= limite) {
+      } 
+      else if (f >= hoy && f <= limite) {
         alertas.push({
           placa: t.placa,
+          propietario: t.propietario,
           tipo: "Fumigación",
           estado: "proximo",
           fecha: t.vencimiento_cert_fumigacion
         });
       }
+
     });
+
+    console.log("?? ALERTAS TRAILERS:", alertas);
 
     res.json(alertas);
 
@@ -202,7 +213,7 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
     const result = await pool.query(`
       SELECT 
         t.placa,
-        p.nombre AS propietario,
+        COALESCE(p.nombre, '-') AS propietario,
         t.vencimiento_cert_fumigacion,
         t.estado
       FROM trailer t
@@ -211,14 +222,18 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
     `);
 
     const hoy = new Date();
-    const limite = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const limite = new Date(hoy);
     limite.setDate(hoy.getDate() + 30);
+    limite.setHours(23, 59, 59, 999);
 
     const filtrados = result.rows.filter(t => {
 
       if (!t.vencimiento_cert_fumigacion) return false;
 
       const fecha = new Date(t.vencimiento_cert_fumigacion);
+      fecha.setHours(0, 0, 0, 0);
 
       if (tipo === "vencido") {
         return fecha < hoy;
@@ -238,7 +253,6 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
     res.status(500).json({ error: "Error filtrando trailers" });
   }
 };
-
 // =====================
 // ACTUALIZAR TRAILER
 // =====================
