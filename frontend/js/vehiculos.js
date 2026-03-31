@@ -136,12 +136,17 @@ function editarVehiculo(btn, placa) {
   const data = fila.dataset;
   const celdas = fila.querySelectorAll("td");
 
-  celdas[1].innerHTML = `<input value="${data.propietario}">`;
+  celdas[1].innerHTML = `<select class="select-propietario"></select>`;
 
+  const selectProp = celdas[1].querySelector("select");
+  cargarPropietariosEnSelect(selectProp, data.propietario);
+
+  // FECHAS
   celdas[2].innerHTML = `<input type="date" value="${formatFechaInput(data.todo)}">`;
   celdas[3].innerHTML = `<input type="date" value="${formatFechaInput(data.soat)}">`;
   celdas[4].innerHTML = `<input type="date" value="${formatFechaInput(data.tecno)}">`;
 
+  // ESTADO
   celdas[5].innerHTML = `
     <select>
       <option value="activo" ${data.estado === "activo" ? "selected" : ""}>Activo</option>
@@ -149,6 +154,7 @@ function editarVehiculo(btn, placa) {
     </select>
   `;
 
+  // BOTÓN GUARDAR
   celdas[6].innerHTML = `
     <button class="btn-icon guardar" onclick="guardarEdicion(this, '${placa}')">
       <i class="fas fa-save"></i>
@@ -157,9 +163,37 @@ function editarVehiculo(btn, placa) {
 
   const btnGuardar = celdas[6].querySelector("button");
 
+  // ?? bloquear otros botones mientras edita
   document.querySelectorAll(".btn-icon").forEach(b => {
     if (b !== btnGuardar) b.disabled = true;
   });
+}
+
+// =========================
+// LISTA DESPLEGABPLE PROPIETARIOS
+// =========================
+async function cargarPropietariosEnSelect(select, seleccionado) {
+  try {
+    const propietarios = await apiFetch("/api/propietarios?estado=activo");
+
+    select.innerHTML = `<option value="">Seleccionar</option>`;
+
+    propietarios.forEach(p => {
+      const option = document.createElement("option");
+      option.value = p.identificacion;
+      option.textContent = `${p.nombre} - ${p.identificacion}`;
+
+      // ?? marcar el actual
+      if (p.nombre === seleccionado || p.identificacion === seleccionado) {
+        option.selected = true;
+      }
+
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error("Error cargando propietarios:", error);
+  }
 }
 
 // =========================
@@ -167,30 +201,68 @@ function editarVehiculo(btn, placa) {
 // =========================
 async function guardarEdicion(btn, placa) {
   const fila = btn.closest("tr");
-  const inputs = fila.querySelectorAll("input, select");
+
+  const propietario = fila.querySelector(".select-propietario")?.value;
+
+  const inputsFecha = fila.querySelectorAll("input[type='date']");
+  const estado = fila.querySelector("td:nth-child(6) select")?.value;
 
   const data = {
-    propietario: inputs[0].value,
-    vencimiento_todo_riesgo: inputs[1].value,
-    vencimiento_soat: inputs[2].value,
-    vencimiento_tecno: inputs[3].value,
-    estado: inputs[4].value
+    propietario: propietario, 
+    vencimiento_todo_riesgo: inputsFecha[0]?.value || null,
+    vencimiento_soat: inputsFecha[1]?.value || null,
+    vencimiento_tecno: inputsFecha[2]?.value || null,
+    estado: estado
   };
 
-  await apiFetch(`/api/vehiculos/${placa}`, {
-    method: "PUT",
-    body: JSON.stringify(data)
-  });
+  try {
+    await apiFetch(`/api/vehiculos/${placa}`, {
+      method: "PUT",
+      body: JSON.stringify(data)
+    });
 
-  editando = false;
+    mostrarToast("VehÃ­culo actualizado correctamente");
 
-  document.querySelectorAll(".btn-icon").forEach(b => {
-    b.disabled = false;
-  });
+    editando = false;
 
-  cargarVehiculos();
+    document.querySelectorAll(".btn-icon").forEach(b => {
+      b.disabled = false;
+    });
+
+    cargarVehiculos();
+
+  } catch (error) {
+    console.error("Error actualizando vehículo:", error);
+    alert("Error al guardar los cambios");
+  }
 }
 
+// =========================
+// MOSTRAR TOAST
+// =========================
+function mostrarToast(mensaje, tipo = "success") {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.textContent = mensaje;
+
+  // colores según tipo
+  toast.style.background =
+    tipo === "error" ? "#dc3545" :
+    tipo === "warning" ? "#ffc107" :
+    "#28a745";
+
+  toast.classList.remove("hidden");
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+
+    setTimeout(() => {
+      toast.classList.add("hidden");
+    }, 300);
+  }, 2500);
+}
 // =========================
 // FORMATO FECHA (DISPLAY)
 // =========================

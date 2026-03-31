@@ -183,17 +183,21 @@ function editarTrailer(btn, placa) {
     estado: celdas[3].innerText.trim().toLowerCase()
   };
 
-  // inputs
+  // ?? placa (no editable)
   celdas[0].innerHTML = `<input value="${valores.placa}" disabled>`;
 
-  celdas[1].innerHTML = `
-    <input value="${valores.propietario === "-" ? "" : valores.propietario}">
-  `;
+  // ?? PROPIETARIO COMO SELECT
+  celdas[1].innerHTML = `<select class="select-propietario-trailer"></select>`;
 
+  const selectProp = celdas[1].querySelector("select");
+  cargarPropietariosEnSelectTrailer(selectProp, valores.propietario);
+
+  // FECHA
   celdas[2].innerHTML = `
     <input type="date" value="${formatoInputSeguro(valores.fecha)}">
   `;
 
+  // ESTADO
   celdas[3].innerHTML = `
     <select>
       <option value="activo" ${valores.estado === "activo" ? "selected" : ""}>Activo</option>
@@ -201,7 +205,7 @@ function editarTrailer(btn, placa) {
     </select>
   `;
 
-  // botón guardar
+  // BOTÓN GUARDAR
   celdas[4].innerHTML = `
     <button type="button" class="btn-icon btn-save" onclick="guardarEdicionTrailer(this, '${placa}')">
       <i class="fas fa-save"></i>
@@ -210,26 +214,53 @@ function editarTrailer(btn, placa) {
 
   const btnGuardar = celdas[4].querySelector("button");
 
-  // deshabilitar otros botones
+  // ?? deshabilitar otros botones
   document.querySelectorAll(".btn-icon").forEach(b => {
-    if (b !== btnGuardar) {
-      b.disabled = true;
-    }
+    if (b !== btnGuardar) b.disabled = true;
   });
 }
 
+// =========================
+// LISTA PROPIETARIOS EN EDICION
+// =========================
+
+async function cargarPropietariosEnSelectTrailer(select, seleccionado) {
+  try {
+    const propietarios = await apiFetch("/api/propietarios?estado=activo");
+
+    select.innerHTML = `<option value="">Seleccionar</option>`;
+
+    propietarios.forEach(p => {
+      const option = document.createElement("option");
+      option.value = p.identificacion;
+      option.textContent = `${p.nombre} - ${p.identificacion}`;
+
+      // ?? seleccionar el actual
+      if (p.nombre === seleccionado || p.identificacion === seleccionado) {
+        option.selected = true;
+      }
+
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error("Error cargando propietarios trailer:", error);
+  }
+}
 // =========================
 // GUARDAR EDICION TRAILER
 // =========================
 async function guardarEdicionTrailer(btn, placa) {
   const fila = btn.closest("tr");
 
-  const inputs = fila.querySelectorAll("input, select");
+  const propietario = fila.querySelector(".select-propietario-trailer")?.value;
+  const fecha = fila.querySelector("input[type='date']")?.value;
+  const estado = fila.querySelector("td:nth-child(4) select")?.value;
 
   const data = {
-    propietario: inputs[1].value, 
-    vencimiento_cert_fumigacion: inputs[2].value,
-    estado: inputs[3].value
+    propietario: propietario, // ?? FK correcta (identificación)
+    vencimiento_cert_fumigacion: fecha || null,
+    estado: estado
   };
 
   try {
@@ -237,6 +268,9 @@ async function guardarEdicionTrailer(btn, placa) {
       method: "PUT",
       body: JSON.stringify(data)
     });
+
+    // ?? TOAST (si ya lo implementaste)
+    mostrarToast("Trailer actualizado correctamente");
 
     editandoTrailer = false;
 
@@ -248,9 +282,9 @@ async function guardarEdicionTrailer(btn, placa) {
 
   } catch (error) {
     console.error("Error actualizando trailer:", error);
+    mostrarToast("Error al guardar", "error");
   }
 }
-
 // =========================
 // FORMATO FECHA INPUT
 // =========================
