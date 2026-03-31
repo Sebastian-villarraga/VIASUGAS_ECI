@@ -2,22 +2,15 @@
 // INIT (SPA)
 // =========================
 function initVehiculos() {
-  console.log("INIT VEHICULOS");
 
-  const intentarInit = () => {
-    const tabla = document.getElementById("vehiculosTable");
+  const tabla = document.getElementById("vehiculosTable");
 
-    
 
-    console.log("? Vista vehiculos renderizada");
-
-    cargarVehiculos();
-    cargarAlertasVehiculos();
-    initFormVehiculo();
-  };
-
-  intentarInit();
+  cargarVehiculos();
+  cargarAlertasVehiculos();
+  initFormVehiculo();
 }
+
 // =========================
 // CONTROL EDICIÓN
 // =========================
@@ -79,7 +72,6 @@ function aplicarFiltrosVehiculos() {
 function renderTabla(data) {
   const tabla = document.getElementById("vehiculosTable");
 
-  console.log("VERSION NUEVA VEHICULOS");
 
   if (!data || data.length === 0) {
     tabla.innerHTML = `<tr><td colspan="7">No hay resultados</td></tr>`;

@@ -2,7 +2,6 @@
 // INIT (SPA)
 // =========================
 function initTrailers() {
-  console.log("INIT TRAILERS");
 
   cargarTrailers();
   cargarAlertas();
@@ -27,7 +26,6 @@ async function cargarTrailers() {
 
     const data = await apiFetch("/api/trailers");
 
-    console.log("DATA TRAILERS:", data);
 
     renderTablaTrailer(data);
 
@@ -65,11 +63,9 @@ async function filtrarTrailers() {
 
     const url = `/api/trailers${params.toString() ? "?" + params.toString() : ""}`;
 
-    console.log("URL FILTRO:", url);
 
     const data = await apiFetch(url);
 
-    console.log("RESULTADO:", data);
 
     renderTablaTrailer(data);
 
