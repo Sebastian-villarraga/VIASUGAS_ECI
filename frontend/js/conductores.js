@@ -1,4 +1,5 @@
 let editandoConductor = false;
+let alertaActiva = null;
 
 // ================= INIT
 function initConductores() {
@@ -187,9 +188,11 @@ function toggleGrupo(tipo) {
   if (tipo === "vencidos") {
     v.style.display = "block";
     p.style.display = "none";
+    filtrarConductoresPorAlerta("vencido");
   } else {
     v.style.display = "none";
     p.style.display = "block";
+    filtrarConductoresPorAlerta("proximo");
   }
 }
 
@@ -302,6 +305,7 @@ async function guardarConductor(btn, id) {
     });
 
     cargarConductores();
+    cargarAlertasConductores();
 
   } catch (error) {
     console.error(error);
@@ -317,4 +321,37 @@ function aplicarFiltrosConductores() {
   debounceTimer = setTimeout(() => {
     filtrarConductores();
   }, 300);
+}
+
+
+// ================= FILTRAR POR ALERTA (CORREGIDO)
+async function filtrarConductoresPorAlerta(tipo) {
+
+  const alertas = await apiFetch("/api/conductores/alertas");
+
+  if (!alertas || alertas.length === 0) {
+    renderTablaConductores([]);
+    return;
+  }
+
+  // ?? FILTRAR SOLO POR EL TIPO CORRECTO
+  const alertasFiltradas = alertas.filter(a => a.estado === tipo);
+
+  // Obtener cedulas únicas SOLO del tipo seleccionado
+  const cedulas = [...new Set(alertasFiltradas.map(a => a.cedula))];
+
+  if (cedulas.length === 0) {
+    renderTablaConductores([]);
+    return;
+  }
+
+  // Traer todos los conductores
+  const conductores = await apiFetch("/api/conductores");
+
+  // ?? FILTRAR SOLO LOS QUE COINCIDEN EXACTAMENTE
+  const filtrados = conductores.filter(c =>
+    cedulas.includes(c.cedula)
+  );
+
+  renderTablaConductores(filtrados);
 }

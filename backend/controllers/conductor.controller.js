@@ -44,7 +44,12 @@ const getConductores = async (req, res) => {
       index++;
     }
 
-    query += ` ORDER BY nombre`;
+    query += ` ORDER BY 
+              CASE 
+                WHEN estado = 'activo' THEN 0
+                ELSE 1
+              END,
+              nombre`;
 
     const result = await pool.query(query, values);
 
@@ -173,10 +178,12 @@ const actualizarConductor = async (req, res) => {
 };
 
 // =====================
-// ALERTAS
+// ALERTAS (SOLO ACTIVOS - FIX ENUM)
 // =====================
 const getAlertasConductores = async (req, res) => {
   try {
+
+    // ?? SIN LOWER (evita error ENUM)
     const result = await pool.query(`
       SELECT 
         cedula,
@@ -185,11 +192,15 @@ const getAlertasConductores = async (req, res) => {
         TO_CHAR(vencimiento_manip_alimentos, 'YYYY-MM-DD') AS vencimiento_manip_alimentos,
         TO_CHAR(vencimiento_sustancia_peligrosa, 'YYYY-MM-DD') AS vencimiento_sustancia_peligrosa
       FROM conductor
+      WHERE estado = 'activo'
     `);
 
     const hoy = new Date();
-    const limite = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const limite = new Date(hoy);
     limite.setDate(hoy.getDate() + 30);
+    limite.setHours(23, 59, 59, 999);
 
     let alertas = [];
 
@@ -199,6 +210,7 @@ const getAlertasConductores = async (req, res) => {
         if (!fecha) return;
 
         const f = new Date(fecha);
+        f.setHours(0, 0, 0, 0);
 
         if (f < hoy) {
           alertas.push({
@@ -208,7 +220,8 @@ const getAlertasConductores = async (req, res) => {
             estado: "vencido",
             fecha
           });
-        } else if (f <= limite) {
+        } 
+        else if (f >= hoy && f <= limite) {
           alertas.push({
             cedula: c.cedula,
             nombre: c.nombre,
@@ -228,10 +241,11 @@ const getAlertasConductores = async (req, res) => {
     res.json(alertas);
 
   } catch (error) {
-    console.error("Error alertas:", error);
+    console.error("Error alertas conductores:", error);
     res.status(500).json({ error: "Error alertas conductores" });
   }
 };
+
 
 // =====================
 module.exports = {

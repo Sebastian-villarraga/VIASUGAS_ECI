@@ -43,7 +43,14 @@ const getClientes = async (req, res) => {
       index++;
     }
 
-    query += ` ORDER BY nombre ASC`;
+    query += `
+      ORDER BY 
+        CASE 
+          WHEN estado = 'activo' THEN 0
+          ELSE 1
+        END,
+        nombre ASC
+    `;
 
     const result = await pool.query(query, values);
 
