@@ -644,6 +644,8 @@ async function guardarManifiesto(btn, idManifiesto) {
   editandoManifiesto = false;
   document.querySelectorAll(".btn-icon").forEach(b => b.disabled = false);
   await cargarManifiestos();
+  aplicarFiltroEsteMes();
+  
 }
 
 // =========================
@@ -701,9 +703,9 @@ function actualizarCardPeriodo() {
   // ?? PRIORIDAD 1: Rango exacto
   if (desde && hasta) {
     card.innerHTML = `
-      ${formatearFecha(desde)}
+      ${formatearFechaLarga(desde)}
       <br>
-      ${formatearFecha(hasta)}
+      ${formatearFechaLarga(hasta)}
     `;
     return;
   }
@@ -815,8 +817,11 @@ function aplicarFiltroMesAnterior() {
 function formatearFechaLarga(fechaStr) {
   if (!fechaStr) return "";
 
-  const fecha = new Date(fechaStr);
-  fecha.setHours(0, 0, 0, 0);
+  // Separar manualmente YYYY-MM-DD
+  const [anio, mes, dia] = fechaStr.split("-").map(Number);
+
+  // Crear fecha en horario LOCAL (no UTC)
+  const fecha = new Date(anio, mes - 1, dia);
 
   const opciones = {
     day: "2-digit",

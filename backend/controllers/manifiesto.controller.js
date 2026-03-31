@@ -130,21 +130,26 @@ const getManifiestos = async (req, res) => {
       index++;
     }
 
-    if (estado) {
+    if (estado && estado !== "Todos") {
       query += ` AND m.estado = $${index}`;
       values.push(estado);
       index++;
     }
 
-    if (id_cliente) {
+    if (id_cliente && id_cliente !== "Todos") {
       query += ` AND m.id_cliente = $${index}`;
       values.push(id_cliente);
       index++;
     }
 
-    query += ` ORDER BY m.fecha DESC, m.radicado DESC`;
+    // ?? ORDEN + LIMITE DURO
+    query += `
+      ORDER BY m.fecha DESC, m.radicado DESC
+      LIMIT 200
+    `;
 
     const result = await pool.query(query, values);
+
     res.json(result.rows);
 
   } catch (error) {
