@@ -39,3 +39,13 @@
   position: sticky; /* ?? se queda arriba */
   top: 20px;
 }
+
+.content {
+  margin-left: 220px;
+  transition: 0.3s;
+}
+
+/* cuando sidebar colapsa */
+.sidebar.collapsed + .content {
+  margin-left: 70px;
+}

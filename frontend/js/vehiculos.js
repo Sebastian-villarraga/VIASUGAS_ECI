@@ -125,11 +125,6 @@ function renderTabla(data) {
   }).join("");
 }
 
-function renderEstadoBadge(estado) {
-  const clase = estado === "activo" ? "badge-activo" : "badge-inactivo";
-  return `<span class="${clase}">${estado}</span>`;
-}
-
 // =========================
 // EDITAR
 // =========================
@@ -148,9 +143,9 @@ function editarVehiculo(btn, placa) {
 
   celdas[1].innerHTML = `<input value="${data.propietario}">`;
 
-  celdas[2].innerHTML = `<input type="date" value="${data.todo}">`;
-  celdas[3].innerHTML = `<input type="date" value="${data.soat}">`;
-  celdas[4].innerHTML = `<input type="date" value="${data.tecno}">`;
+  celdas[2].innerHTML = `<input type="date" value="${formatFechaInput(data.todo)}">`;
+  celdas[3].innerHTML = `<input type="date" value="${formatFechaInput(data.soat)}">`;
+  celdas[4].innerHTML = `<input type="date" value="${formatFechaInput(data.tecno)}">`;
 
   celdas[5].innerHTML = `
     <select>
@@ -227,7 +222,8 @@ function formatFechaInput(fecha) {
 // =========================
 function renderEstadoBadge(estado) {
   const clase = estado === "activo" ? "badge-activo" : "badge-inactivo";
-  return `<span class="${clase}">${estado}</span>`;
+  const texto = estado === "activo" ? "Activo" : "Inactivo";
+  return `<span class="${clase}">${texto}</span>`;
 }
 
 // =========================
@@ -235,56 +231,11 @@ function renderEstadoBadge(estado) {
 // =========================
 async function cargarAlertasVehiculos() {
   try {
-    const lista = document.getElementById("alertasList");
-    const btnV = document.getElementById("btnVencidos");
-    const btnP = document.getElementById("btnProximos");
-
-    if (!lista) {
-      console.warn("alertasList no existe en esta vista (vehiculos)");
-      return;
-    }
-
     const data = await apiFetch("/api/vehiculos/alertas");
 
-    console.log("ALERTAS VEHICULOS:", data);
+    window._alertasVehiculos = data || [];
 
-    if (!data || data.length === 0) {
-      lista.innerHTML = "<li>Sin alertas</li>";
-
-      if (btnV) btnV.textContent = "0 vencidos";
-      if (btnP) btnP.textContent = "0 por vencer";
-
-      return;
-    }
-
-    let vencidos = 0;
-    let proximos = 0;
-
-    // ? IGUAL QUE TRAILER
-    data.forEach(a => {
-      if (a.estado === "vencido") vencidos++;
-      else if (a.estado === "proximo") proximos++;
-    });
-
-    // ? ACTUALIZAR BOTONES
-    if (btnV) btnV.textContent = `${vencidos} vencidos`;
-    if (btnP) btnP.textContent = `${proximos} por vencer`;
-
-    // ? RENDER LISTA
-    lista.innerHTML = data.map(a => {
-
-      const clase = a.estado === "vencido"
-        ? "alerta-item alerta-vencido"
-        : "alerta-item alerta-proximo";
-
-      return `
-        <li class="${clase}">
-          <div><strong>${a.propietario || "Sin nombre"} - ${a.placa}</strong></div>
-          <div>${a.tipo}</div>
-          <div>${formatearFecha(a.fecha)}</div>
-        </li>
-      `;
-    }).join("");
+    renderAlertas(window._alertasVehiculos);
 
   } catch (error) {
     console.error("ERROR ALERTAS VEHICULOS:", error);
@@ -294,32 +245,32 @@ async function cargarAlertasVehiculos() {
 // =========================
 // FILTROS RAPIDOS
 // =========================
-async function filtrarVehiculosVencidos() {
-  try {
-    activarBoton("vencido");
+function filtrarVehiculosVencidos() {
+  activarBoton("vencido");
 
-    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=vencido");
+  const data = window._alertasVehiculos || [];
 
-    console.log("VEHICULOS VENCIDOS:", data);
+  const filtrados = data.filter(a => a.estado === "vencido");
 
-    renderTabla(data);
-  } catch (error) {
-    console.error("Error filtrando vencidos:", error);
-  }
+  renderAlertas(filtrados);
+
+  const placas = [...new Set(filtrados.map(a => a.placa))];
+
+  filtrarTablaPorPlacas(placas);
 }
 
-async function filtrarVehiculosProximos() {
-  try {
-    activarBoton("proximo");
+function filtrarVehiculosProximos() {
+  activarBoton("proximo");
 
-    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=proximo");
+  const data = window._alertasVehiculos || [];
 
-    console.log("VEHICULOS PROXIMOS:", data);
+  const filtrados = data.filter(a => a.estado === "proximo");
 
-    renderTabla(data);
-  } catch (error) {
-    console.error("Error filtrando proximos:", error);
-  }
+  renderAlertas(filtrados);
+
+  const placas = [...new Set(filtrados.map(a => a.placa))];
+
+  filtrarTablaPorPlacas(placas);
 }
 
 function activarBoton(tipo) {
@@ -338,6 +289,71 @@ function activarBoton(tipo) {
   }
 }
 
+
+
+
+
+function filtrarTablaPorPlacas(placas) {
+  const filas = document.querySelectorAll("#vehiculosTable tr");
+
+  filas.forEach(fila => {
+    const placa = fila.dataset?.placa;
+
+    if (!placa) return;
+
+    if (placas.includes(placa)) {
+      fila.style.display = "";
+    } else {
+      fila.style.display = "none";
+    }
+  });
+}
+
+
+// =========================
+// RENDER ALERTAS
+// =========================
+function renderAlertas(data) {
+  const lista = document.getElementById("alertasList");
+  const btnV = document.getElementById("btnVencidos");
+  const btnP = document.getElementById("btnProximos");
+
+  if (!lista) return;
+
+  if (!data || data.length === 0) {
+    lista.innerHTML = `<li class="sin-alertas">Sin alertas</li>`;
+
+    if (btnV) btnV.textContent = "0 vencidos";
+    if (btnP) btnP.textContent = "0 por vencer";
+
+    return;
+  }
+
+  const all = window._alertasVehiculos || [];
+
+  const vencidos = all.filter(a => a.estado === "vencido").length;
+  const proximos = all.filter(a => a.estado === "proximo").length;
+
+  if (btnV) btnV.textContent = `${vencidos} vencidos`;
+  if (btnP) btnP.textContent = `${proximos} por vencer`;
+
+  lista.innerHTML = data.map(a => {
+
+    const clase = a.estado === "vencido"
+      ? "alerta-item alerta-vencido"
+      : "alerta-item alerta-proximo";
+
+    return `
+      <li class="${clase}">
+        <div class="alerta-titulo">
+          <strong>${a.propietario || "Sin nombre"} - ${a.placa}</strong>
+        </div>
+        <div>${a.tipo || "-"}</div>
+        <div class="alerta-fecha">${a.fecha ? formatearFecha(a.fecha) : "-"}</div>
+      </li>
+    `;
+  }).join("");
+}
 // =========================
 // FORM
 // =========================

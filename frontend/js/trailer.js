@@ -224,14 +224,12 @@ function editarTrailer(btn, placa) {
 async function guardarEdicionTrailer(btn, placa) {
   const fila = btn.closest("tr");
 
-  const propietario = fila.querySelector("input").value;
-  const fecha = fila.querySelector("input[type='date']").value;
-  const estado = fila.querySelector("select").value;
+  const inputs = fila.querySelectorAll("input, select");
 
   const data = {
-    propietario,
-    vencimiento_cert_fumigacion: fecha,
-    estado
+    propietario: inputs[1].value, 
+    vencimiento_cert_fumigacion: inputs[2].value,
+    estado: inputs[3].value
   };
 
   try {
@@ -242,7 +240,6 @@ async function guardarEdicionTrailer(btn, placa) {
 
     editandoTrailer = false;
 
-    // reactivar botones
     document.querySelectorAll(".btn-icon").forEach(b => {
       b.disabled = false;
     });
