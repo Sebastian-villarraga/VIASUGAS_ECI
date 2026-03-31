@@ -548,3 +548,152 @@
 .btn-icon.guardar i {
   color: #16a34a;
 }
+
+
+
+/* ========================= */
+/* CARD DERECHO
+/* ========================= */
+
+
+
+.alertas-filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.alertas-filtros button {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#btnVencidos {
+  background: #f8d7da;
+  color: #c0392b;
+}
+
+#btnProximos {
+  background: #fdf2cc;
+  color: #b7950b;
+}
+
+.alertas-container {
+  max-height: 350px; /* ?? altura fija */
+  overflow-y: auto;
+}
+
+.alerta-item {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.alerta-vencido {
+  background: #f8d7da;
+  border-left: 4px solid red;
+}
+
+.alerta-proximo {
+  background: #fdf2cc;
+  border-left: 4px solid orange;
+}
+
+/* =========================
+   FILTROS (BOTONES)
+========================= */
+.alertas-filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.alertas-filtros button {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* ?? vencidos */
+#btnVencidos {
+  background: #f8d7da;
+  color: #c0392b;
+}
+
+/* ?? próximos */
+#btnProximos {
+  background: #fdf2cc;
+  color: #b7950b;
+}
+
+/* ? HOVER BONITO */
+.alertas-filtros button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  filter: brightness(0.98);
+}
+
+/* ?? BOTÓN ACTIVO */
+.alertas-filtros button.activo {
+  outline: 2px solid #2c3e50;
+  transform: scale(1.03);
+}
+
+/* =========================
+   LISTA ALERTAS
+========================= */
+.alertas-container {
+  max-height: 350px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* ? SCROLL PRO */
+.alertas-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.alertas-container::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+
+.alertas-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.35);
+}
+
+/* =========================
+   ITEMS ALERTA
+========================= */
+.alerta-item {
+  padding: 10px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+/* ?? vencido */
+.alerta-vencido {
+  background: #f8d7da;
+  border-left: 4px solid red;
+}
+
+/* ?? próximo */
+.alerta-proximo {
+  background: #fdf2cc;
+  border-left: 4px solid orange;
+}
+
+/* ? HOVER ITEM */
+.alerta-item:hover {
+  transform: translateX(3px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}

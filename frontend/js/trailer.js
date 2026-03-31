@@ -340,7 +340,11 @@ async function cargarAlertas() {
     const countV = document.getElementById("countVencidos");
     const countP = document.getElementById("countProximos");
 
-    if (!lista) return;
+    // ? CLAVE: evitar romper otras vistas (SPA)
+    if (!lista) {
+      console.warn("alertasList no existe en esta vista (trailer)");
+      return;
+    }
 
     const data = await apiFetch("/api/trailers/alertas");
 
@@ -348,8 +352,10 @@ async function cargarAlertas() {
 
     if (!data || data.length === 0) {
       lista.innerHTML = "<div>Sin alertas</div>";
-      countV.textContent = 0;
-      countP.textContent = 0;
+
+      if (countV) countV.textContent = 0;
+      if (countP) countP.textContent = 0;
+
       return;
     }
 
@@ -361,8 +367,9 @@ async function cargarAlertas() {
       else proximos++;
     });
 
-    countV.textContent = vencidos;
-    countP.textContent = proximos;
+    // ? FIX PRINCIPAL
+    if (countV) countV.textContent = vencidos;
+    if (countP) countP.textContent = proximos;
 
     lista.innerHTML = data.map(a => {
 

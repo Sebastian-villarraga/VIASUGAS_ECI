@@ -4,11 +4,25 @@
 function initVehiculos() {
   console.log("INIT VEHICULOS");
 
-  cargarVehiculos();
-  cargarAlertas();
-  initFormVehiculo();
-}
+  const intentarInit = () => {
+    const tabla = document.getElementById("vehiculosTable");
 
+    // ?? si aún no existe el DOM, reintenta
+    if (!tabla) {
+      console.warn("? Esperando render de vista vehiculos...");
+      setTimeout(intentarInit, 50);
+      return;
+    }
+
+    console.log("? Vista vehiculos renderizada");
+
+    cargarVehiculos();
+    cargarAlertasVehiculos();
+    initFormVehiculo();
+  };
+
+  intentarInit();
+}
 // =========================
 // CONTROL EDICIÓN
 // =========================
@@ -46,7 +60,7 @@ async function filtrarVehiculos() {
 // =========================
 // LIMPIAR
 // =========================
-function limpiarFiltros() {
+function limpiarFiltrosVehiculos() {
   document.getElementById("filtroPlaca").value = "";
   document.getElementById("filtroPropietario").value = "";
   document.getElementById("filtroEstado").value = "";
@@ -219,77 +233,109 @@ function renderEstadoBadge(estado) {
 // =========================
 // ALERTAS
 // =========================
-async function cargarAlertas() {
-  const lista = document.getElementById("alertasList");
+async function cargarAlertasVehiculos() {
+  try {
+    const lista = document.getElementById("alertasList");
+    const btnV = document.getElementById("btnVencidos");
+    const btnP = document.getElementById("btnProximos");
 
-  const data = await apiFetch("/api/vehiculos/alertas");
-
-  if (!data || data.length === 0) {
-    lista.innerHTML = "<li>Sin alertas</li>";
-    return;
-  }
-
-  const hoy = new Date();
-
-  let vencidos = 0;
-  let proximos = 0;
-
-  const html = data.map(a => {
-    const fecha = new Date(a.fecha);
-    const diffDias = (fecha - hoy) / (1000 * 60 * 60 * 24);
-
-    let clase = "";
-    let tipoTexto = "";
-
-    if (diffDias < 0) {
-      clase = "alerta-vencido";
-      tipoTexto = "Vencido";
-      vencidos++;
-    } else if (diffDias <= 30) {
-      clase = "alerta-proximo";
-      tipoTexto = "Por vencer";
-      proximos++;
+    if (!lista) {
+      console.warn("alertasList no existe en esta vista (vehiculos)");
+      return;
     }
 
-    return `
-      <li class="alerta-item ${clase}">
-        <div class="alerta-titulo">
-          <i class="fas fa-exclamation-circle alerta-icono"></i>
-          ${a.propietario || "Sin nombre"} - ${a.placa}
-        </div>
-        <div>${a.tipo}</div>
-        <div class="alerta-fecha">
-          ${formatearFecha(a.fecha)}
-        </div>
-      </li>
-    `;
-  }).join("");
+    const data = await apiFetch("/api/vehiculos/alertas");
 
-  // ?? HEADER con contadores
-  lista.innerHTML = `
-    <div style="display:flex; gap:20px; margin-bottom:20px;">
-      <div class="alerta-vencido" style="padding:8px 12px; border-radius:8px;">
-        ${vencidos} vencidos
-      </div>
-      <div class="alerta-proximo" style="padding:8px 12px; border-radius:8px;">
-        ${proximos} por vencer
-      </div>
-    </div>
-    ${html}
-  `;
+    console.log("ALERTAS VEHICULOS:", data);
+
+    if (!data || data.length === 0) {
+      lista.innerHTML = "<li>Sin alertas</li>";
+
+      if (btnV) btnV.textContent = "0 vencidos";
+      if (btnP) btnP.textContent = "0 por vencer";
+
+      return;
+    }
+
+    let vencidos = 0;
+    let proximos = 0;
+
+    // ? IGUAL QUE TRAILER
+    data.forEach(a => {
+      if (a.estado === "vencido") vencidos++;
+      else if (a.estado === "proximo") proximos++;
+    });
+
+    // ? ACTUALIZAR BOTONES
+    if (btnV) btnV.textContent = `${vencidos} vencidos`;
+    if (btnP) btnP.textContent = `${proximos} por vencer`;
+
+    // ? RENDER LISTA
+    lista.innerHTML = data.map(a => {
+
+      const clase = a.estado === "vencido"
+        ? "alerta-item alerta-vencido"
+        : "alerta-item alerta-proximo";
+
+      return `
+        <li class="${clase}">
+          <div><strong>${a.propietario || "Sin nombre"} - ${a.placa}</strong></div>
+          <div>${a.tipo}</div>
+          <div>${formatearFecha(a.fecha)}</div>
+        </li>
+      `;
+    }).join("");
+
+  } catch (error) {
+    console.error("ERROR ALERTAS VEHICULOS:", error);
+  }
 }
 
 // =========================
 // FILTROS RAPIDOS
 // =========================
-async function filtrarVencidos() {
-  const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=vencido");
-  renderTabla(data);
+async function filtrarVehiculosVencidos() {
+  try {
+    activarBoton("vencido");
+
+    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=vencido");
+
+    console.log("VEHICULOS VENCIDOS:", data);
+
+    renderTabla(data);
+  } catch (error) {
+    console.error("Error filtrando vencidos:", error);
+  }
 }
 
-async function filtrarProximos() {
-  const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=proximo");
-  renderTabla(data);
+async function filtrarVehiculosProximos() {
+  try {
+    activarBoton("proximo");
+
+    const data = await apiFetch("/api/vehiculos/filtro-alertas?tipo=proximo");
+
+    console.log("VEHICULOS PROXIMOS:", data);
+
+    renderTabla(data);
+  } catch (error) {
+    console.error("Error filtrando proximos:", error);
+  }
+}
+
+function activarBoton(tipo) {
+  const btnV = document.getElementById("btnVencidos");
+  const btnP = document.getElementById("btnProximos");
+
+  if (!btnV || !btnP) return;
+
+  btnV.classList.remove("activo");
+  btnP.classList.remove("activo");
+
+  if (tipo === "vencido") {
+    btnV.classList.add("activo");
+  } else if (tipo === "proximo") {
+    btnP.classList.add("activo");
+  }
 }
 
 // =========================
@@ -298,15 +344,22 @@ async function filtrarProximos() {
 function initFormVehiculo() {
   const form = document.getElementById("formVehiculo");
 
-  form.addEventListener("submit", async (e) => {
+  if (!form) {
+    console.warn("formVehiculo no existe aún (SPA timing)");
+    return;
+  }
+
+  form.removeEventListener("submit", form._handlerVehiculo);
+
+  const handler = async (e) => {
     e.preventDefault();
 
-    const placa = document.getElementById("placa").value.trim();
-    const propietario = document.getElementById("propietario").value.trim();
-    const soat = document.getElementById("soat").value;
-    const tecno = document.getElementById("tecno").value;
-    const todoRiesgo = document.getElementById("todoRiesgo").value;
-    const estado = document.getElementById("estado").value;
+    const placa = document.getElementById("placa")?.value.trim();
+    const propietario = document.getElementById("propietario")?.value.trim();
+    const soat = document.getElementById("soat")?.value;
+    const tecno = document.getElementById("tecno")?.value;
+    const todoRiesgo = document.getElementById("todoRiesgo")?.value;
+    const estado = document.getElementById("estado")?.value;
 
     if (!placa) {
       alert("La placa es obligatoria");
@@ -332,7 +385,10 @@ function initFormVehiculo() {
     cerrarModalVehiculo();
     form.reset();
     cargarVehiculos();
-  });
+  };
+
+  form._handlerVehiculo = handler;
+  form.addEventListener("submit", handler);
 }
 
 // =========================
