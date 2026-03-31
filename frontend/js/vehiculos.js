@@ -7,12 +7,7 @@ function initVehiculos() {
   const intentarInit = () => {
     const tabla = document.getElementById("vehiculosTable");
 
-    // ?? si aún no existe el DOM, reintenta
-    if (!tabla) {
-      console.warn("? Esperando render de vista vehiculos...");
-      setTimeout(intentarInit, 50);
-      return;
-    }
+    
 
     console.log("? Vista vehiculos renderizada");
 
@@ -359,48 +354,63 @@ function renderAlertas(data) {
 // =========================
 function initFormVehiculo() {
   const form = document.getElementById("formVehiculo");
+  if (!form) return;
 
-  if (!form) {
-    console.warn("formVehiculo no existe aún (SPA timing)");
-    return;
+  // Evitar duplicar listeners
+  if (form._handlerVehiculo) {
+    form.removeEventListener("submit", form._handlerVehiculo);
   }
-
-  form.removeEventListener("submit", form._handlerVehiculo);
 
   const handler = async (e) => {
     e.preventDefault();
 
-    const placa = document.getElementById("placa")?.value.trim();
-    const propietario = document.getElementById("propietario")?.value.trim();
+    const placa = document.getElementById("placa")?.value.trim().toUpperCase();
+    const propietario = document.getElementById("propietario")?.value; // ?? ahora es IDENTIFICACION
     const soat = document.getElementById("soat")?.value;
     const tecno = document.getElementById("tecno")?.value;
     const todoRiesgo = document.getElementById("todoRiesgo")?.value;
     const estado = document.getElementById("estado")?.value;
 
+    // =========================
+    // VALIDACIONES
+    // =========================
     if (!placa) {
       alert("La placa es obligatoria");
       return;
     }
 
+    if (!propietario) {
+      alert("Debe seleccionar un propietario");
+      return;
+    }
+
+    // =========================
+    // PAYLOAD CORRECTO
+    // =========================
     const data = {
       placa,
-      propietario,
+      propietario, // ?? es la identificación real (FK)
       vencimiento_soat: soat || null,
       vencimiento_tecno: tecno || null,
       vencimiento_todo_riesgo: todoRiesgo || null,
-      estado
+      estado: estado || "activo"
     };
 
-    const res = await apiFetch("/api/vehiculos", {
-      method: "POST",
-      body: JSON.stringify(data)
-    });
+    try {
+      const res = await apiFetch("/api/vehiculos", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
 
-    if (!res) return;
+      if (!res) return;
 
-    cerrarModalVehiculo();
-    form.reset();
-    cargarVehiculos();
+      cerrarModalVehiculo();
+      form.reset();
+      cargarVehiculos();
+
+    } catch (error) {
+      console.error("Error creando vehículo:", error);
+    }
   };
 
   form._handlerVehiculo = handler;
@@ -419,6 +429,7 @@ function abrirModalVehiculo() {
   }
 
   modal.classList.remove("hidden");
+  cargarPropietariosSelect();
 }
 
 function cerrarModalVehiculo() {
@@ -432,3 +443,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.abrirModalVehiculo = abrirModalVehiculo;
 window.cerrarModalVehiculo = cerrarModalVehiculo;
+
+
+// =========================
+// CARGAR PROPIETARIOS ACTIVOS
+// =========================
+async function cargarPropietariosSelect() {
+  try {
+    const select = document.getElementById("propietario");
+    if (!select) return;
+
+    // limpiar opciones
+    select.innerHTML = `<option value="">Seleccionar propietario</option>`;
+
+    const propietarios = await apiFetch("/api/propietarios?estado=activo");
+
+    if (!propietarios || propietarios.length === 0) return;
+
+    propietarios.forEach(p => {
+      const option = document.createElement("option");
+      option.value = p.identificacion;   // ?? CLAVE REAL
+      option.textContent = `${p.nombre} - ${p.identificacion}`;
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error("Error cargando propietarios:", error);
+  }
+}

@@ -66,18 +66,22 @@ const crearVehiculo = async (req, res) => {
   try {
     const {
       placa,
-      propietario,
+      propietario, // ?? ahora es IDENTIFICACION
       vencimiento_soat,
       vencimiento_tecno,
       vencimiento_todo_riesgo,
       estado
     } = req.body;
 
-    console.log("?? DATA RECIBIDA:", req.body);
-
     if (!placa) {
       return res.status(400).json({
         error: "La placa es obligatoria"
+      });
+    }
+
+    if (!propietario) {
+      return res.status(400).json({
+        error: "Debe seleccionar un propietario"
       });
     }
 
@@ -93,21 +97,19 @@ const crearVehiculo = async (req, res) => {
       });
     }
 
-    // BUSCAR PROPIETARIO
-    let id_propietario = null;
+    // VALIDAR QUE EL PROPIETARIO EXISTA
+    const propietarioExiste = await pool.query(
+      "SELECT identificacion FROM propietario WHERE identificacion = $1",
+      [propietario]
+    );
 
-    if (propietario) {
-      const resultProp = await pool.query(
-        "SELECT identificacion FROM propietario WHERE nombre ILIKE $1 LIMIT 1",
-        [propietario]
-      );
-
-      if (resultProp.rows.length > 0) {
-        id_propietario = resultProp.rows[0].identificacion;
-      }
+    if (propietarioExiste.rows.length === 0) {
+      return res.status(400).json({
+        error: "El propietario seleccionado no existe"
+      });
     }
 
-    // INSERT
+    // INSERT DIRECTO CON FK REAL
     const insertQuery = `
       INSERT INTO vehiculo (
         placa,
@@ -116,30 +118,26 @@ const crearVehiculo = async (req, res) => {
         vencimiento_soat,
         vencimiento_tecno,
         vencimiento_todo_riesgo
-        
       )
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
 
     const values = [
-      placa,
-      id_propietario,
+      placa.toUpperCase(),
+      propietario,
       estado || "activo",
       vencimiento_soat || null,
       vencimiento_tecno || null,
       vencimiento_todo_riesgo || null
-      
     ];
 
     const result = await pool.query(insertQuery, values);
 
-    console.log("? VEHICULO INSERTADO:", result.rows[0]);
-
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
-    console.error("? ERROR CREANDO VEHICULO:", error);
+    console.error("ERROR CREANDO VEHICULO:", error);
     res.status(500).json({
       error: "Error creando vehículo",
       detalle: error.message
@@ -288,17 +286,22 @@ const actualizarVehiculo = async (req, res) => {
       estado
     } = req.body;
 
-    let id_propietario = null;
+    if (!propietario) {
+      return res.status(400).json({
+        error: "Debe seleccionar un propietario"
+      });
+    }
 
-    if (propietario) {
-      const resultProp = await pool.query(
-        "SELECT identificacion FROM propietario WHERE nombre ILIKE $1 LIMIT 1",
-        [propietario]
-      );
+    // VALIDAR QUE EL PROPIETARIO EXISTA
+    const propietarioExiste = await pool.query(
+      "SELECT identificacion FROM propietario WHERE identificacion = $1",
+      [propietario]
+    );
 
-      if (resultProp.rows.length > 0) {
-        id_propietario = resultProp.rows[0].identificacion;
-      }
+    if (propietarioExiste.rows.length === 0) {
+      return res.status(400).json({
+        error: "El propietario seleccionado no existe"
+      });
     }
 
     await pool.query(`
@@ -310,11 +313,11 @@ const actualizarVehiculo = async (req, res) => {
         estado = $5
       WHERE placa = $6
     `, [
-      id_propietario,
+      propietario,
       vencimiento_soat || null,
       vencimiento_tecno || null,
       vencimiento_todo_riesgo || null,
-      estado,
+      estado || "activo",
       placa
     ]);
 

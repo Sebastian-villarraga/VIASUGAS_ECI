@@ -67,16 +67,20 @@ const crearTrailer = async (req, res) => {
   try {
     const {
       placa,
-      propietario,
+      propietario, // ?? ahora es IDENTIFICACION real
       vencimiento_cert_fumigacion,
       estado
     } = req.body;
 
-    console.log("DATA TRAILER:", req.body);
-
     if (!placa) {
       return res.status(400).json({
         error: "La placa es obligatoria"
+      });
+    }
+
+    if (!propietario) {
+      return res.status(400).json({
+        error: "Debe seleccionar un propietario"
       });
     }
 
@@ -92,21 +96,19 @@ const crearTrailer = async (req, res) => {
       });
     }
 
-    // BUSCAR PROPIETARIO
-    let id_propietario = null;
+    // VALIDAR QUE EL PROPIETARIO EXISTA
+    const propietarioExiste = await pool.query(
+      "SELECT identificacion FROM propietario WHERE identificacion = $1",
+      [propietario]
+    );
 
-    if (propietario) {
-      const resultProp = await pool.query(
-        "SELECT identificacion FROM propietario WHERE nombre ILIKE $1 LIMIT 1",
-        [propietario]
-      );
-
-      if (resultProp.rows.length > 0) {
-        id_propietario = resultProp.rows[0].identificacion;
-      }
+    if (propietarioExiste.rows.length === 0) {
+      return res.status(400).json({
+        error: "El propietario seleccionado no existe"
+      });
     }
 
-    // INSERT
+    // INSERT DIRECTO CON FK REAL
     const insertQuery = `
       INSERT INTO trailer (
         placa,
@@ -119,15 +121,13 @@ const crearTrailer = async (req, res) => {
     `;
 
     const values = [
-      placa,
-      id_propietario,
+      placa.toUpperCase(),
+      propietario,
       vencimiento_cert_fumigacion || null,
       estado || "activo"
     ];
 
     const result = await pool.query(insertQuery, values);
-
-    console.log("TRAILER INSERTADO:", result.rows[0]);
 
     res.status(201).json(result.rows[0]);
 
@@ -265,17 +265,22 @@ const actualizarTrailer = async (req, res) => {
       estado
     } = req.body;
 
-    let id_propietario = null;
+    if (!propietario) {
+      return res.status(400).json({
+        error: "Debe seleccionar un propietario"
+      });
+    }
 
-    if (propietario) {
-      const resultProp = await pool.query(
-        "SELECT identificacion FROM propietario WHERE nombre ILIKE $1 LIMIT 1",
-        [propietario]
-      );
+    // VALIDAR QUE EL PROPIETARIO EXISTA
+    const propietarioExiste = await pool.query(
+      "SELECT identificacion FROM propietario WHERE identificacion = $1",
+      [propietario]
+    );
 
-      if (resultProp.rows.length > 0) {
-        id_propietario = resultProp.rows[0].identificacion;
-      }
+    if (propietarioExiste.rows.length === 0) {
+      return res.status(400).json({
+        error: "El propietario seleccionado no existe"
+      });
     }
 
     await pool.query(`
@@ -285,9 +290,9 @@ const actualizarTrailer = async (req, res) => {
         estado = $3
       WHERE placa = $4
     `, [
-      id_propietario,
+      propietario,
       vencimiento_cert_fumigacion || null,
-      estado,
+      estado || "activo",
       placa
     ]);
 

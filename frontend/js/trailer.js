@@ -270,34 +270,56 @@ function formatoInputSeguro(fecha) {
 // =========================
 function initFormTrailer() {
   const form = document.getElementById("formTrailer");
-
   if (!form) return;
 
-  form.addEventListener("submit", async (e) => {
+  if (form._handlerTrailer) {
+    form.removeEventListener("submit", form._handlerTrailer);
+  }
+
+  const handler = async (e) => {
     e.preventDefault();
 
+    const placa = document.getElementById("placaTrailer")?.value.trim().toUpperCase();
+    const propietario = document.getElementById("propietarioTrailer")?.value;
+    const fumigacion = document.getElementById("fumigacion")?.value;
+    const estado = document.getElementById("estadoTrailer")?.value;
+
+    if (!placa) {
+      alert("La placa del trailer es obligatoria");
+      return;
+    }
+
+    if (!propietario) {
+      alert("Debe seleccionar un propietario");
+      return;
+    }
+
     const data = {
-      placa: document.getElementById("placa").value,
-      propietario: document.getElementById("propietario").value,
-      vencimiento_cert_fumigacion: document.getElementById("fumigacion").value,
-      estado: document.getElementById("estado").value
+      placa,
+      propietario, // ?? ahora es identificacion
+      vencimiento_fumigacion: fumigacion || null,
+      estado: estado || "activo"
     };
 
     try {
-      await apiFetch("/api/trailers", {
+      const res = await apiFetch("/api/trailers", {
         method: "POST",
         body: JSON.stringify(data)
       });
 
+      if (!res) return;
+
       cerrarModalTrailer();
       form.reset();
-
-      await cargarTrailers();
+      cargarTrailers();
 
     } catch (error) {
       console.error("Error creando trailer:", error);
     }
-  });
+  };
+
+  form._handlerTrailer = handler;
+  form.addEventListener("submit", handler);
 }
 
 // =========================
@@ -322,6 +344,7 @@ function formatearFecha(fecha) {
 // =========================
 function abrirModalTrailer() {
   document.getElementById("modalTrailer").classList.remove("hidden");
+  cargarPropietariosTrailerSelect();
 }
 
 function cerrarModalTrailer() {
@@ -413,3 +436,28 @@ async function filtrarProximos() {
 }
 
 
+// =========================
+// CARGAR PROPIETARIOS ACTIVOS (TRAILER)
+// =========================
+async function cargarPropietariosTrailerSelect() {
+  try {
+    const select = document.getElementById("propietarioTrailer");
+    if (!select) return;
+
+    select.innerHTML = `<option value="">Seleccionar propietario</option>`;
+
+    const propietarios = await apiFetch("/api/propietarios?estado=activo");
+
+    if (!propietarios || propietarios.length === 0) return;
+
+    propietarios.forEach(p => {
+      const option = document.createElement("option");
+      option.value = p.identificacion; // ?? FK real
+      option.textContent = `${p.nombre} - ${p.identificacion}`;
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error("Error cargando propietarios trailer:", error);
+  }
+}
