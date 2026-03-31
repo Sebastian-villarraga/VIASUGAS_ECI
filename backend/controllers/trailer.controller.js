@@ -42,7 +42,14 @@ const getTrailers = async (req, res) => {
       index++;
     }
 
-    query += ` ORDER BY t.placa`;
+    query += `
+        ORDER BY 
+          CASE 
+            WHEN t.estado = 'activo' THEN 0
+            ELSE 1
+          END,
+          t.placa ASC
+      `;
 
     console.log("QUERY FINAL:", query);
     console.log("VALUES:", values);
@@ -141,10 +148,11 @@ const crearTrailer = async (req, res) => {
 };
 
 // =====================
-// ALERTAS TRAILERS
+// ALERTAS TRAILERS (SOLO ACTIVOS)
 // =====================
 const getAlertasTrailers = async (req, res) => {
   try {
+
     const result = await pool.query(`
       SELECT 
         t.placa,
@@ -153,9 +161,9 @@ const getAlertasTrailers = async (req, res) => {
       FROM trailer t
       LEFT JOIN propietario p 
         ON t.id_propietario = p.identificacion
+      WHERE t.estado = 'activo'
     `);
 
-    // ?? NORMALIZAR FECHAS
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
@@ -193,8 +201,6 @@ const getAlertasTrailers = async (req, res) => {
 
     });
 
-    console.log("?? ALERTAS TRAILERS:", alertas);
-
     res.json(alertas);
 
   } catch (error) {
@@ -204,7 +210,7 @@ const getAlertasTrailers = async (req, res) => {
 };
 
 // =====================
-// FILTRO RAPIDO
+// FILTRO RAPIDO (SOLO ACTIVOS)
 // =====================
 const getTrailersPorEstadoAlerta = async (req, res) => {
   try {
@@ -219,6 +225,7 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
       FROM trailer t
       LEFT JOIN propietario p 
         ON t.id_propietario = p.identificacion
+      WHERE t.estado = 'activo'
     `);
 
     const hoy = new Date();
@@ -253,6 +260,8 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
     res.status(500).json({ error: "Error filtrando trailers" });
   }
 };
+
+
 // =====================
 // ACTUALIZAR TRAILER
 // =====================

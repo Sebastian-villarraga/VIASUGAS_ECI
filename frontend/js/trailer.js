@@ -279,6 +279,7 @@ async function guardarEdicionTrailer(btn, placa) {
     });
 
     cargarTrailers();
+    cargarAlertas();
 
   } catch (error) {
     console.error("Error actualizando trailer:", error);
@@ -388,44 +389,50 @@ function cerrarModalTrailer() {
 // =========================
 // ALERTAS
 // =========================
-async function cargarAlertas() {
+// =========================
+// ALERTAS (FILTRABLES)
+// =========================
+async function cargarAlertas(tipo = null) {
   try {
     const lista = document.getElementById("alertasList");
     const countV = document.getElementById("countVencidos");
     const countP = document.getElementById("countProximos");
 
-    // ? CLAVE: evitar romper otras vistas (SPA)
-    if (!lista) {
-      console.warn("alertasList no existe en esta vista (trailer)");
-      return;
-    }
+    if (!lista) return;
 
     const data = await apiFetch("/api/trailers/alertas");
 
-    console.log("ALERTAS:", data);
-
     if (!data || data.length === 0) {
       lista.innerHTML = "<div>Sin alertas</div>";
-
       if (countV) countV.textContent = 0;
       if (countP) countP.textContent = 0;
-
       return;
     }
 
-    let vencidos = 0;
-    let proximos = 0;
+    // ?? CONTADORES SIEMPRE COMPLETOS
+    const vencidos = data.filter(a => a.estado === "vencido");
+    const proximos = data.filter(a => a.estado === "proximo");
 
-    data.forEach(a => {
-      if (a.estado === "vencido") vencidos++;
-      else proximos++;
-    });
+    if (countV) countV.textContent = vencidos.length;
+    if (countP) countP.textContent = proximos.length;
 
-    // ? FIX PRINCIPAL
-    if (countV) countV.textContent = vencidos;
-    if (countP) countP.textContent = proximos;
+    // ?? FILTRAR VISUALMENTE SI SE PASA TIPO
+    let dataMostrar = data;
 
-    lista.innerHTML = data.map(a => {
+    if (tipo === "vencido") {
+      dataMostrar = vencidos;
+    }
+
+    if (tipo === "proximo") {
+      dataMostrar = proximos;
+    }
+
+    if (dataMostrar.length === 0) {
+      lista.innerHTML = "<div>Sin alertas</div>";
+      return;
+    }
+
+    lista.innerHTML = dataMostrar.map(a => {
 
       const clase = a.estado === "vencido"
         ? "alerta-item vencido"
@@ -452,21 +459,19 @@ async function cargarAlertas() {
 // FILTROS RAPIDOS
 // =========================
 async function filtrarVencidos() {
-  try {
-    const data = await apiFetch("/api/trailers/filtro-alertas?tipo=vencido");
-    renderTablaTrailer(data);
-  } catch (error) {
-    console.error(error);
-  }
+  const data = await apiFetch("/api/trailers/filtro-alertas?tipo=vencido");
+  renderTablaTrailer(data);
+
+  // ?? FILTRAR ALERTAS VISUALES
+  cargarAlertas("vencido");
 }
 
 async function filtrarProximos() {
-  try {
-    const data = await apiFetch("/api/trailers/filtro-alertas?tipo=proximo");
-    renderTablaTrailer(data);
-  } catch (error) {
-    console.error(error);
-  }
+  const data = await apiFetch("/api/trailers/filtro-alertas?tipo=proximo");
+  renderTablaTrailer(data);
+
+  // ?? FILTRAR ALERTAS VISUALES
+  cargarAlertas("proximo");
 }
 
 

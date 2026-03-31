@@ -230,6 +230,7 @@ async function guardarEdicion(btn, placa) {
     });
 
     cargarVehiculos();
+    cargarAlertasVehiculos();
 
   } catch (error) {
     console.error("Error actualizando vehículo:", error);

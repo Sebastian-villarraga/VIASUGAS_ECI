@@ -42,16 +42,21 @@ const getVehiculos = async (req, res) => {
       index++;
     }
 
-    query += ` ORDER BY v.placa`;
+    query += `
+      ORDER BY 
+        CASE 
+          WHEN v.estado = 'activo' THEN 0
+          ELSE 1
+        END,
+        v.placa ASC
+    `;
 
     const result = await pool.query(query, values);
-
-    console.log("?? VEHICULOS DB:", result.rows);
 
     res.json(result.rows);
 
   } catch (error) {
-    console.error("? ERROR VEHICULOS:", error);
+    console.error("ERROR VEHICULOS:", error);
     res.status(500).json({ 
       error: "Error obteniendo vehículos",
       detalle: error.message
@@ -145,8 +150,9 @@ const crearVehiculo = async (req, res) => {
   }
 };
 
+
 // =====================
-// ALERTAS VEHICULOS
+// ALERTAS VEHICULOS (SOLO ACTIVOS)
 // =====================
 const getAlertasVehiculos = async (req, res) => {
   try {
@@ -160,14 +166,15 @@ const getAlertasVehiculos = async (req, res) => {
       FROM vehiculo v
       LEFT JOIN propietario p 
         ON v.id_propietario = p.identificacion
+      WHERE v.estado = 'activo'
     `);
 
     const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0); // ?? clave
+    hoy.setHours(0, 0, 0, 0);
 
-    const limite = new Date();
+    const limite = new Date(hoy);
     limite.setDate(hoy.getDate() + 30);
-    limite.setHours(23, 59, 59, 999); // ?? clave
+    limite.setHours(23, 59, 59, 999);
 
     let alertas = [];
 
@@ -176,7 +183,6 @@ const getAlertasVehiculos = async (req, res) => {
       const revisar = (fecha, tipo) => {
         if (!fecha) return;
 
-        // ?? NORMALIZAR FECHA (SOLUCIÓN REAL)
         const f = new Date(fecha);
         f.setHours(0, 0, 0, 0);
 
@@ -204,8 +210,6 @@ const getAlertasVehiculos = async (req, res) => {
       revisar(v.vencimiento_todo_riesgo, "Todo Riesgo");
     });
 
-    console.log("?? ALERTAS GENERADAS:", alertas);
-
     res.json(alertas);
 
   } catch (error) {
@@ -213,8 +217,10 @@ const getAlertasVehiculos = async (req, res) => {
     res.status(500).json({ error: "Error obteniendo alertas" });
   }
 };
+
+
 // =====================
-// FILTRO RAPIDO
+// FILTRO RAPIDO (SOLO ACTIVOS)
 // =====================
 const getVehiculosPorEstadoAlerta = async (req, res) => {
   try {
@@ -231,12 +237,13 @@ const getVehiculosPorEstadoAlerta = async (req, res) => {
       FROM vehiculo v
       LEFT JOIN propietario p 
         ON v.id_propietario = p.identificacion
+      WHERE v.estado = 'activo'
     `);
 
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    const limite = new Date();
+    const limite = new Date(hoy);
     limite.setDate(hoy.getDate() + 30);
     limite.setHours(23, 59, 59, 999);
 
@@ -271,6 +278,7 @@ const getVehiculosPorEstadoAlerta = async (req, res) => {
     res.status(500).json({ error: "Error filtrando vehículos" });
   }
 };
+
 
 // =====================
 // ACTUALIZAR VEHICULO
