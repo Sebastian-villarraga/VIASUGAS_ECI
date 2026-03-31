@@ -1,7 +1,9 @@
 /* ========================= */
+/* LAYOUT */
+/* ========================= */
+
 .cliente-layout {
   display: block;
-  grid-template-columns: 2fr 1fr;
   gap: 20px;
 }
 
@@ -12,22 +14,95 @@
   align-items: center;
 }
 
+.cliente-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* ========================= */
+/* CARDS */
+/* ========================= */
+
 .cliente-filtros,
 .cliente-tabla,
 .cliente-side {
   background: white;
   border-radius: 12px;
   border: 1px solid #ddd;
-  padding: 15px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+/* ========================= */
+/* TABLA */
+/* ========================= */
+
+.cliente-tabla .tabla-body {
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 .cliente-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 1000px;
 }
 
-.cliente-table th,
+.cliente-tabla table.cliente-table th {
+  font-size: 13px !important;
+}
+
+.cliente-tabla table.cliente-table td {
+  font-size: 13px !important;
+}
+
+/* HEADER TABLA */
+.cliente-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #f1f3f6;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* CELDAS */
 .cliente-table td {
-  padding: 10px;
+  padding: 12px 16px;
   border-bottom: 1px solid #eee;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+/* INPUTS EN TABLA (si llegas a usarlos inline) */
+.cliente-table td input,
+.cliente-table td select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d0d5dd;
+  font-size: 12px;
+}
+
+/* ========================= */
+/* BADGES ESTADO */
+/* ========================= */
+
+.estado-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estado-badge.activo {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-badge.inactivo {
+  background: #fdecea;
+  color: #c62828;
 }

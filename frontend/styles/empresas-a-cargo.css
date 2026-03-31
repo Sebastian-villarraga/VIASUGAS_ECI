@@ -1,13 +1,27 @@
 /* ========================= */
+/* LAYOUT */
+/* ========================= */
+
 .empresa-layout {
   display: block;
-  grid-template-columns: 2fr 1fr;
   gap: 20px;
 }
 
 .empresa-header {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.empresa-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* ========================= */
+/* CARDS */
+/* ========================= */
 
 .empresa-filtros,
 .empresa-tabla,
@@ -15,22 +29,73 @@
   background: white;
   border-radius: 12px;
   border: 1px solid #ddd;
-  padding: 15px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+/* ========================= */
+/* TABLA */
+/* ========================= */
+
+.empresa-tabla .tabla-body {
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 .empresa-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 1000px;
+  font-size: 13px; /* ?? fuerza tamaño correcto */
 }
 
-.empresa-table th,
+/* HEADER TABLA */
+.empresa-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #f1f3f6;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* CELDAS */
 .empresa-table td {
-  padding: 10px;
+  padding: 12px 16px;
   border-bottom: 1px solid #eee;
+  font-size: 13px;
+  vertical-align: middle;
 }
 
-.empresa-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* INPUTS INLINE (si los usas luego) */
+.empresa-table td input,
+.empresa-table td select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d0d5dd;
+  font-size: 12px;
+}
+
+/* ========================= */
+/* BADGES ESTADO */
+/* ========================= */
+
+.estado-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estado-badge.activo {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-badge.inactivo {
+  background: #fdecea;
+  color: #c62828;
 }
