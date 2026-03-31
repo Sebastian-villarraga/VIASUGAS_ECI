@@ -41,6 +41,7 @@ const propietarioRoutes = require("./routes/propietario.routes");
 const conductorRoutes = require("./routes/conductor.routes");
 const empresaACargoRoutes = require("./routes/empresaACargo.routes");
 const clienteRoutes = require("./routes/cliente.routes");
+const ubicacionRoutes = require("./routes/ubicacion.routes");
 
 app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
@@ -50,6 +51,7 @@ app.use("/api/propietarios", propietarioRoutes);
 app.use("/api/conductores", conductorRoutes);
 app.use("/api/empresas-a-cargo", empresaACargoRoutes);
 app.use("/api/clientes", clienteRoutes);
+app.use("/api/ubicaciones", ubicacionRoutes);
 
 // =====================
 // HEALTH CHECKS

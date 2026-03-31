@@ -1,0 +1,172 @@
+.manifiesto-layout {
+  display: block;
+}
+
+.manifiesto-left {
+  width: 100%;
+}
+
+/* HEADER */
+.manifiesto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.manifiesto-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* FILTROS */
+.manifiesto-filtros {
+  margin-bottom: 20px;
+  padding: 18px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #ddd;
+}
+
+/* TABLA */
+.manifiesto-tabla {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 0;
+  width: 100%;
+}
+
+.manifiesto-tabla .tabla-body {
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* TABLE */
+.manifiesto-table {
+  width: 100%;
+  min-width: 1450px;
+  border-collapse: collapse;
+}
+
+.manifiesto-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #f1f3f6;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.manifiesto-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.manifiesto-table td input,
+.manifiesto-table td select,
+.manifiesto-table td textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d0d5dd;
+  font-size: 12px;
+}
+
+/* BADGES */
+.estado-manifiesto {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: #eef4ff;
+  color: #1e3c72;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.novedad-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.novedad-badge.badge-si {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.novedad-badge.badge-no {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* MODAL */
+.modal-manifiesto {
+  width: 900px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.form-manifiesto {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-manifiesto .form-group {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+
+.form-manifiesto .form-group label {
+  margin-bottom: 5px;
+  color: #666;
+  font-weight: 500;
+}
+
+.form-manifiesto .form-group input,
+.form-manifiesto .form-group select,
+.form-manifiesto .form-group textarea {
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid #d0d5dd;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.form-manifiesto .form-group input:focus,
+.form-manifiesto .form-group select:focus,
+.form-manifiesto .form-group textarea:focus {
+  border-color: #2a5298;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(42,82,152,0.15);
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+/* RUTA INLINE */
+.ruta-inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ruta-inline-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* BOTON GUARDAR */
+.btn-save i {
+  color: #16a34a;
+}

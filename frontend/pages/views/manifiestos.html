@@ -1,0 +1,217 @@
+<div class="manifiesto-layout">
+
+  <div class="manifiesto-left">
+
+    <!-- HEADER -->
+    <div class="manifiesto-header">
+      <h2>Manifiestos</h2>
+
+      <button class="btn-primary" id="btnAbrirModalManifiesto">
+        <i class="fas fa-plus"></i> Agregar manifiesto
+      </button>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="manifiesto-filtros">
+      <div class="filtros-row">
+
+        <div class="filtro-group">
+          <label>Año</label>
+          <select id="filtroAnio">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <div class="filtro-group">
+          <label>Mes</label>
+          <select id="filtroMes">
+            <option value="">Todos</option>
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+            <option value="4">Abril</option>
+            <option value="5">Mayo</option>
+            <option value="6">Junio</option>
+            <option value="7">Julio</option>
+            <option value="8">Agosto</option>
+            <option value="9">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+        </div>
+
+        <div class="filtro-group">
+          <label>ID Manifiesto</label>
+          <input type="text" id="filtroIdManifiesto" placeholder="Ej: VG-123-4567">
+        </div>
+
+        <div class="filtro-group">
+          <label>Fecha desde</label>
+          <input type="date" id="filtroFechaDesde">
+        </div>
+
+        <div class="filtro-group">
+          <label>Fecha hasta</label>
+          <input type="date" id="filtroFechaHasta">
+        </div>
+
+        <div class="filtro-group">
+          <label>Estado</label>
+          <select id="filtroEstado">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <div class="filtro-group">
+          <label>Cliente</label>
+          <select id="filtroCliente">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <button class="btn-limpiar" id="btnLimpiarFiltrosManifiestos">
+          Limpiar
+        </button>
+
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="manifiesto-tabla">
+      <div class="tabla-body">
+
+        <table class="manifiesto-table">
+          <thead>
+            <tr>
+              <th>ID Manifiesto</th>
+              <th>Radicado</th>
+              <th>Fecha</th>
+              <th>Cliente</th>
+              <th>Conductor</th>
+              <th>Ruta</th>
+              <th>Vehículo</th>
+              <th>Trailer</th>
+              <th>Estado</th>
+              <th>Novedades</th>
+              <th style="width: 90px;">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="manifiestosTable">
+            <tr>
+              <td colspan="11">Cargando manifiestos...</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalManifiesto" class="modal hidden">
+  <div class="modal-content modal-manifiesto">
+
+    <h3>Agregar Manifiesto</h3>
+
+    <form id="formManifiesto" class="form-grid form-manifiesto">
+
+      <div class="form-group">
+        <label>ID Manifiesto</label>
+        <input type="text" id="id_manifiesto" required>
+      </div>
+
+      <div class="form-group">
+        <label>Radicado</label>
+        <input type="number" id="radicado" required>
+      </div>
+
+      <div class="form-group">
+        <label>Fecha</label>
+        <input type="date" id="fecha" required>
+      </div>
+
+      <div class="form-group">
+        <label></label>
+      </div>
+
+      <div class="form-group">
+        <label>Departamento origen</label>
+        <select id="origen_departamento" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Ciudad origen</label>
+        <select id="origen_ciudad" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Departamento destino</label>
+        <select id="destino_departamento" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Ciudad destino</label>
+        <select id="destino_ciudad" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Cliente</label>
+        <select id="id_cliente" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Conductor</label>
+        <select id="id_conductor" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Vehículo</label>
+        <select id="id_vehiculo" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Trailer</label>
+        <select id="id_trailer" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Empresa a cargo</label>
+        <select id="id_empresa_a_cargo" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Flete</label>
+        <input type="number" id="valor_flete" step="0.01" required>
+      </div>
+
+      <div class="form-group">
+        <label>Flete porcentaje</label>
+        <input type="number" id="valor_flete_porcentaje" step="0.01" required>
+      </div>
+
+      <div class="form-group">
+        <label>Anticipo manifiesto</label>
+        <input type="number" id="anticipo_manifiesto" step="0.01" required>
+      </div>
+
+
+
+      <div class="form-group full-width">
+        <label>Observaciones</label>
+        <textarea id="observaciones" rows="3" placeholder="Comentarios relevantes del viaje"></textarea>
+      </div>
+
+      <div class="modal-actions full-width">
+        <button type="submit" class="btn-primary">Guardar</button>
+        <button type="button" id="btnCerrarModalManifiesto">Cancelar</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>

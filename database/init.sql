@@ -4,10 +4,21 @@
 
 CREATE TYPE tactivo AS ENUM ('activo', 'inactivo');
 CREATE TYPE tcuentabanco AS ENUM ('ahorros', 'corriente');
-CREATE TYPE testadoviaje AS ENUM ('pendiente', 'en_curso', 'finalizado', 'cancelado');
 CREATE TYPE tvalidacion AS ENUM ('pendiente', 'aprobado', 'rechazado');
 CREATE TYPE toperacion AS ENUM ('insert', 'update', 'delete');
 CREATE TYPE tingresoegreso AS ENUM ('ingreso', 'egreso');
+
+-- ENUMS FINALES PARA MANIFIESTO
+CREATE TYPE testadomanifiesto AS ENUM (
+  'CREADO-EN TRANSITO',
+  'ENTREGADO POR COBRAR',
+  'MANIFIESTO PAGO'
+);
+
+CREATE TYPE tentrega AS ENUM (
+  'PENDIENTES',
+  'ENTREGADOS'
+);
 
 -- =========================
 -- DOMINIOS
@@ -97,7 +108,6 @@ CREATE TABLE vehiculo (
     vencimiento_todo_riesgo DATE,
     creado TIMESTAMP,
     actualizado TIMESTAMP,
-
     FOREIGN KEY (id_propietario) REFERENCES propietario(identificacion)
 );
 
@@ -108,7 +118,6 @@ CREATE TABLE trailer (
     vencimiento_cert_fumigacion DATE,
     creado TIMESTAMP,
     actualizado TIMESTAMP,
-
     FOREIGN KEY (id_propietario) REFERENCES propietario(identificacion)
 );
 
@@ -128,14 +137,14 @@ CREATE TABLE manifiesto (
     destino_departamento VARCHAR,
     destino_ciudad VARCHAR,
 
-    estado testadoviaje,
+    estado testadomanifiesto,
 
     valor_flete moneda,
     valor_flete_porcentaje moneda,
     anticipo_manifiesto moneda,
 
-    gastos tvalidacion,
-    documentos tvalidacion,
+    gastos tentrega,
+    documentos tentrega,
 
     novedades BOOLEAN,
     observaciones VARCHAR,
@@ -159,7 +168,6 @@ CREATE TABLE factura (
     retencion_ica moneda,
     plazo_pago INT,
     creado TIMESTAMP,
-
     FOREIGN KEY (id_manifiesto) REFERENCES manifiesto(id_manifiesto)
 );
 
@@ -231,3 +239,22 @@ CREATE TABLE audit_logs (
 
     FOREIGN KEY (id_usuario) REFERENCES usuario(id)
 );
+
+CREATE TABLE ubicacion_colombia (
+    id SERIAL PRIMARY KEY,
+    codigo_departamento VARCHAR(10) NOT NULL,
+    nombre_departamento VARCHAR(100) NOT NULL,
+    codigo_municipio VARCHAR(10) NOT NULL UNIQUE,
+    nombre_municipio VARCHAR(120) NOT NULL,
+    tipo VARCHAR(50) DEFAULT 'Municipio',
+    creado TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_ubicacion_departamento
+  ON ubicacion_colombia(nombre_departamento);
+
+CREATE INDEX idx_ubicacion_codigo_departamento
+  ON ubicacion_colombia(codigo_departamento);
+
+CREATE INDEX idx_ubicacion_municipio
+  ON ubicacion_colombia(nombre_municipio);
