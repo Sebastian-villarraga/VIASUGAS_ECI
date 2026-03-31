@@ -502,9 +502,6 @@ function cerrarModalVehiculo() {
   if (modal) modal.classList.add("hidden");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  initVehiculos();
-});
 
 window.abrirModalVehiculo = abrirModalVehiculo;
 window.cerrarModalVehiculo = cerrarModalVehiculo;
