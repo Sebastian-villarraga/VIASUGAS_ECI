@@ -12,9 +12,21 @@ async function initManifiestos() {
   await llenarSelectDepartamentos("origen_departamento");
   await llenarSelectDepartamentos("destino_departamento");
 
-  await cargarManifiestos();
   initEventosManifiestos();
   initFormManifiesto();
+
+  // ?? NUEVO: aplicar filtro automático
+  aplicarFiltroFechaActual();
+
+  // ?? Cargar con filtros activos
+  await filtrarManifiestos();
+  
+  document.getElementById("btnVerEsteMes")
+  ?.addEventListener("click", aplicarFiltroEsteMes);
+  
+  document.getElementById("btnVerMesAnterior")
+  ?.addEventListener("click", aplicarFiltroMesAnterior);
+  
 }
 
 // =========================
@@ -362,6 +374,7 @@ function renderTablaManifiestos(data) {
       </td>
     </tr>
   `).join("");
+  actualizarCardsGerenciales(data);
 }
 
 function renderEstadoManifiesto(estado) {
@@ -643,4 +656,173 @@ function escapeHtml(valor) {
     .replace(/'/g, "&#039;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+function aplicarFiltroFechaActual() {
+  const inputDesde = document.getElementById("filtroFechaDesde");
+  const inputHasta = document.getElementById("filtroFechaHasta");
+
+  if (!inputDesde || !inputHasta) return;
+
+  const hoy = new Date();
+
+  const anio = hoy.getFullYear();
+  const mes = hoy.getMonth(); // 0-based
+
+  const primerDia = new Date(anio, mes, 1);
+
+  const format = (fecha) => {
+    return fecha.toISOString().split("T")[0];
+  };
+
+  inputDesde.value = format(primerDia);
+  inputHasta.value = format(hoy);
+}
+
+function actualizarCardsGerenciales(data) {
+  actualizarCardPeriodo();
+  actualizarCardEstados(data);
+}
+
+function actualizarCardPeriodo() {
+  const desde = document.getElementById("filtroFechaDesde")?.value;
+  const hasta = document.getElementById("filtroFechaHasta")?.value;
+  const anio = document.getElementById("filtroAnio")?.value;
+  const mes = document.getElementById("filtroMes")?.value;
+
+  const card = document.getElementById("cardPeriodo");
+  if (!card) return;
+
+  const meses = [
+    "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+    "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+  ];
+
+  // ?? PRIORIDAD 1: Rango exacto
+  if (desde && hasta) {
+    card.innerHTML = `
+      ${formatearFecha(desde)}
+      <br>
+      ${formatearFecha(hasta)}
+    `;
+    return;
+  }
+
+  // ?? PRIORIDAD 2: Año + Mes
+  if (anio && mes) {
+    card.textContent = `${meses[Number(mes) - 1]} ${anio}`;
+    return;
+  }
+
+  // ?? PRIORIDAD 3: Solo Año
+  if (anio) {
+    card.textContent = `Año ${anio}`;
+    return;
+  }
+
+  // ?? Default
+  card.textContent = "Todos los periodos";
+}
+
+function actualizarCardEstados(data) {
+  const card = document.getElementById("cardEstados");
+  if (!card) return;
+
+  if (!data || data.length === 0) {
+    card.textContent = "Sin datos";
+    return;
+  }
+
+  const estados = {
+    "CREADO-EN TRANSITO": 0,
+    "ENTREGADO POR COBRAR": 0,
+    "MANIFIESTO PAGO": 0
+  };
+
+  data.forEach(m => {
+    if (estados.hasOwnProperty(m.estado)) {
+      estados[m.estado]++;
+    }
+  });
+
+  card.innerHTML = `
+    Creados -En transito: <strong>${estados["CREADO-EN TRANSITO"]}</strong><br>
+    Entregados por cobrar: <strong>${estados["ENTREGADO POR COBRAR"]}</strong><br>
+    Manifiestos pagados: <strong>${estados["MANIFIESTO PAGO"]}</strong>
+  `;
+}
+
+
+function aplicarFiltroEsteMes() {
+  const inputDesde = document.getElementById("filtroFechaDesde");
+  const inputHasta = document.getElementById("filtroFechaHasta");
+  const selectAnio = document.getElementById("filtroAnio");
+  const selectMes = document.getElementById("filtroMes");
+
+  const hoy = new Date();
+  const anio = hoy.getFullYear();
+  const mes = hoy.getMonth();
+
+  const primerDia = new Date(anio, mes, 1);
+
+  const format = (fecha) => fecha.toISOString().split("T")[0];
+
+  if (inputDesde) inputDesde.value = format(primerDia);
+  if (inputHasta) inputHasta.value = format(hoy);
+
+  // Limpiar filtros de año/mes para evitar conflicto
+  if (selectAnio) selectAnio.value = "";
+  if (selectMes) selectMes.value = "";
+
+  filtrarManifiestos();
+}
+
+
+function aplicarFiltroMesAnterior() {
+  const inputDesde = document.getElementById("filtroFechaDesde");
+  const inputHasta = document.getElementById("filtroFechaHasta");
+  const selectAnio = document.getElementById("filtroAnio");
+  const selectMes = document.getElementById("filtroMes");
+
+  const hoy = new Date();
+
+  // Primer día del mes anterior
+  const primerDiaMesAnterior = new Date(
+    hoy.getFullYear(),
+    hoy.getMonth() - 1,
+    1
+  );
+
+  // Último día del mes anterior
+  const ultimoDiaMesAnterior = new Date(
+    hoy.getFullYear(),
+    hoy.getMonth(),
+    0
+  );
+
+  const format = (fecha) => fecha.toISOString().split("T")[0];
+
+  if (inputDesde) inputDesde.value = format(primerDiaMesAnterior);
+  if (inputHasta) inputHasta.value = format(ultimoDiaMesAnterior);
+
+  // Limpiar filtros de año/mes
+  if (selectAnio) selectAnio.value = "";
+  if (selectMes) selectMes.value = "";
+
+  filtrarManifiestos();
+}
+
+function formatearFechaLarga(fechaStr) {
+  if (!fechaStr) return "";
+
+  const fecha = new Date(fechaStr);
+  fecha.setHours(0, 0, 0, 0);
+
+  const opciones = {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  };
+
+  return fecha.toLocaleDateString("es-CO", opciones);
 }
