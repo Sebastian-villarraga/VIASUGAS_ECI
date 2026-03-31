@@ -2,8 +2,6 @@ let editandoManifiesto = false;
 let catalogosManifiesto = null;
 let debounceTimerManifiestos = null;
 
-
-
 // =========================
 // INIT
 // =========================
@@ -87,10 +85,6 @@ async function cargarCatalogosManifiesto() {
   llenarSelectEstados();
   llenarSelectClientes();
   llenarSelectForm();
-  llenarSelectDepartamentos("origen_departamento");
-  llenarSelectDepartamentos("destino_departamento");
-  llenarCiudadesPorDepartamento("origen_departamento", "origen_ciudad");
-  llenarCiudadesPorDepartamento("destino_departamento", "destino_ciudad");
 }
 
 function llenarAniosManifiesto() {
@@ -112,39 +106,14 @@ function llenarAniosManifiesto() {
 
 function llenarSelectEstados() {
   const filtroEstado = document.getElementById("filtroEstado");
-  const formEstado = document.getElementById("estado");
-  if (!catalogosManifiesto) return;
+  if (!catalogosManifiesto || !filtroEstado) return;
 
-  if (filtroEstado) {
-    filtroEstado.innerHTML = `
-      <option value="">Todos</option>
-      ${catalogosManifiesto.estados.map(e => `<option value="${e}">${e}</option>`).join("")}
-    `;
-  }
-
-  if (formEstado) {
-    formEstado.innerHTML = `
-      <option value="">Seleccione</option>
-      ${catalogosManifiesto.estados.map(e => `<option value="${e}">${e}</option>`).join("")}
-    `;
-  }
-
-  const gastos = document.getElementById("gastos");
-  const documentos = document.getElementById("documentos");
-
-  if (gastos) {
-    gastos.innerHTML = `
-      <option value="">Seleccione</option>
-      ${catalogosManifiesto.entregas.map(e => `<option value="${e}">${e}</option>`).join("")}
-    `;
-  }
-
-  if (documentos) {
-    documentos.innerHTML = `
-      <option value="">Seleccione</option>
-      ${catalogosManifiesto.entregas.map(e => `<option value="${e}">${e}</option>`).join("")}
-    `;
-  }
+  filtroEstado.innerHTML = `
+    <option value="">Todos</option>
+    ${catalogosManifiesto.estados.map(e => `
+      <option value="${e}">${e}</option>
+    `).join("")}
+  `;
 }
 
 function llenarSelectClientes() {
@@ -214,31 +183,85 @@ function llenarSelectForm() {
   }
 }
 
-function llenarSelectDepartamentos(idSelect) {
+// =========================
+// UBICACIONES
+// =========================
+async function llenarSelectDepartamentos(idSelect) {
   const select = document.getElementById(idSelect);
   if (!select) return;
 
-  const departamentos = Object.keys(CIUDADES_COLOMBIA).sort();
+  const data = await apiFetch("/api/ubicaciones/departamentos");
+
+  if (!data) {
+    select.innerHTML = `<option value="">Error cargando</option>`;
+    return;
+  }
 
   select.innerHTML = `
     <option value="">Seleccione</option>
-    ${departamentos.map(dep => `<option value="${dep}">${dep}</option>`).join("")}
+    ${data.map(dep => `
+      <option value="${dep.nombre_departamento}">
+        ${dep.nombre_departamento}
+      </option>
+    `).join("")}
   `;
 }
 
-function llenarCiudadesPorDepartamento(idDepartamento, idCiudad, ciudadSeleccionada = "") {
+async function llenarCiudadesPorDepartamento(idDepartamento, idCiudad, ciudadSeleccionada = "") {
   const depSelect = document.getElementById(idDepartamento);
   const ciudadSelect = document.getElementById(idCiudad);
 
   if (!depSelect || !ciudadSelect) return;
 
   const departamento = depSelect.value;
-  const ciudades = CIUDADES_COLOMBIA[departamento] || [];
+
+  if (!departamento) {
+    ciudadSelect.innerHTML = `<option value="">Seleccione</option>`;
+    return;
+  }
+
+  const data = await apiFetch(
+    `/api/ubicaciones/municipios?nombre_departamento=${encodeURIComponent(departamento)}`
+  );
+
+  if (!data) {
+    ciudadSelect.innerHTML = `<option value="">Error cargando</option>`;
+    return;
+  }
 
   ciudadSelect.innerHTML = `
     <option value="">Seleccione</option>
-    ${ciudades.map(ciudad => `
-      <option value="${ciudad}" ${ciudad === ciudadSeleccionada ? "selected" : ""}>${ciudad}</option>
+    ${data.map(item => `
+      <option value="${item.nombre_municipio}" ${item.nombre_municipio === ciudadSeleccionada ? "selected" : ""}>
+        ${item.nombre_municipio}
+      </option>
+    `).join("")}
+  `;
+}
+
+async function cargarCiudadesInline(nombreDepartamento, ciudadSelect, ciudadSeleccionada = "") {
+  if (!ciudadSelect) return;
+
+  if (!nombreDepartamento) {
+    ciudadSelect.innerHTML = `<option value="">Seleccione</option>`;
+    return;
+  }
+
+  const data = await apiFetch(
+    `/api/ubicaciones/municipios?nombre_departamento=${encodeURIComponent(nombreDepartamento)}`
+  );
+
+  if (!data) {
+    ciudadSelect.innerHTML = `<option value="">Error cargando</option>`;
+    return;
+  }
+
+  ciudadSelect.innerHTML = `
+    <option value="">Seleccione</option>
+    ${data.map(item => `
+      <option value="${item.nombre_municipio}" ${item.nombre_municipio === ciudadSeleccionada ? "selected" : ""}>
+        ${item.nombre_municipio}
+      </option>
     `).join("")}
   `;
 }
@@ -327,7 +350,7 @@ function renderTablaManifiestos(data) {
       <td>${formatearFecha(m.fecha)}</td>
       <td>${m.cliente_nombre || m.id_cliente}</td>
       <td>${m.conductor_nombre || m.id_conductor}</td>
-      <td>${m.origen_ciudad} ? ${m.destino_ciudad}</td>
+      <td>${m.origen_ciudad} -> ${m.destino_ciudad}</td>
       <td>${m.id_vehiculo}</td>
       <td>${m.id_trailer}</td>
       <td>${renderEstadoManifiesto(m.estado)}</td>
@@ -369,18 +392,14 @@ function initFormManifiesto() {
       origen_ciudad: document.getElementById("origen_ciudad").value,
       destino_departamento: document.getElementById("destino_departamento").value,
       destino_ciudad: document.getElementById("destino_ciudad").value,
-      estado: "CREADO-EN TRANSITO",
       valor_flete: document.getElementById("valor_flete").value,
       valor_flete_porcentaje: document.getElementById("valor_flete_porcentaje").value,
       anticipo_manifiesto: document.getElementById("anticipo_manifiesto").value,
-      gastos: "PENDIENTES",
-      documentos: "PENDIENTES",
       id_cliente: document.getElementById("id_cliente").value,
       id_conductor: document.getElementById("id_conductor").value,
       id_vehiculo: document.getElementById("id_vehiculo").value,
       id_trailer: document.getElementById("id_trailer").value,
       id_empresa_a_cargo: document.getElementById("id_empresa_a_cargo").value,
-      novedades: false,
       observaciones: document.getElementById("observaciones").value.trim()
     };
 
@@ -395,6 +414,8 @@ function initFormManifiesto() {
     cerrarModalManifiesto();
     form.reset();
     await cargarCatalogosManifiesto();
+    await llenarSelectDepartamentos("origen_departamento");
+    await llenarSelectDepartamentos("destino_departamento");
     await cargarManifiestos();
   });
 }
@@ -431,7 +452,7 @@ function cerrarModalManifiesto() {
 // =========================
 // EDITAR INLINE
 // =========================
-function editarManifiesto(btn, idManifiesto) {
+async function editarManifiesto(btn, idManifiesto) {
   if (editandoManifiesto) {
     showToast("Termina de editar la fila actual primero", "info");
     return;
@@ -442,6 +463,14 @@ function editarManifiesto(btn, idManifiesto) {
   const fila = btn.closest("tr");
   const d = fila.dataset;
   const celdas = fila.querySelectorAll("td");
+
+  const departamentos = await apiFetch("/api/ubicaciones/departamentos");
+
+  if (!departamentos) {
+    showToast("No se pudieron cargar los departamentos", "error");
+    editandoManifiesto = false;
+    return;
+  }
 
   celdas[1].innerHTML = `<input type="number" value="${d.radicado}">`;
   celdas[2].innerHTML = `<input type="date" value="${d.fecha}">`;
@@ -466,19 +495,29 @@ function editarManifiesto(btn, idManifiesto) {
     <div class="ruta-inline">
       <div class="ruta-inline-item">
         <select class="dep-origen-inline">
-          ${Object.keys(CIUDADES_COLOMBIA).sort().map(dep => `
-            <option value="${dep}" ${dep === d.origen_departamento ? "selected" : ""}>${dep}</option>
+          <option value="">Seleccione</option>
+          ${departamentos.map(dep => `
+            <option value="${dep.nombre_departamento}" ${dep.nombre_departamento === d.origen_departamento ? "selected" : ""}>
+              ${dep.nombre_departamento}
+            </option>
           `).join("")}
         </select>
-        <select class="ciu-origen-inline"></select>
+        <select class="ciu-origen-inline">
+          <option value="">Seleccione</option>
+        </select>
       </div>
       <div class="ruta-inline-item">
         <select class="dep-destino-inline">
-          ${Object.keys(CIUDADES_COLOMBIA).sort().map(dep => `
-            <option value="${dep}" ${dep === d.destino_departamento ? "selected" : ""}>${dep}</option>
+          <option value="">Seleccione</option>
+          ${departamentos.map(dep => `
+            <option value="${dep.nombre_departamento}" ${dep.nombre_departamento === d.destino_departamento ? "selected" : ""}>
+              ${dep.nombre_departamento}
+            </option>
           `).join("")}
         </select>
-        <select class="ciu-destino-inline"></select>
+        <select class="ciu-destino-inline">
+          <option value="">Seleccione</option>
+        </select>
       </div>
     </div>
   `;
@@ -520,28 +559,25 @@ function editarManifiesto(btn, idManifiesto) {
     </button>
   `;
 
-  // llena ciudades inline
   const depOrigen = celdas[5].querySelector(".dep-origen-inline");
   const ciuOrigen = celdas[5].querySelector(".ciu-origen-inline");
   const depDestino = celdas[5].querySelector(".dep-destino-inline");
   const ciuDestino = celdas[5].querySelector(".ciu-destino-inline");
 
-  renderCiudadesInline(depOrigen, ciuOrigen, d.origen_ciudad);
-  renderCiudadesInline(depDestino, ciuDestino, d.destino_ciudad);
+  await cargarCiudadesInline(depOrigen.value, ciuOrigen, d.origen_ciudad);
+  await cargarCiudadesInline(depDestino.value, ciuDestino, d.destino_ciudad);
 
-  depOrigen.addEventListener("change", () => renderCiudadesInline(depOrigen, ciuOrigen));
-  depDestino.addEventListener("change", () => renderCiudadesInline(depDestino, ciuDestino));
+  depOrigen.addEventListener("change", async () => {
+    await cargarCiudadesInline(depOrigen.value, ciuOrigen);
+  });
+
+  depDestino.addEventListener("change", async () => {
+    await cargarCiudadesInline(depDestino.value, ciuDestino);
+  });
 
   document.querySelectorAll(".btn-icon").forEach(b => {
     if (!b.classList.contains("btn-save")) b.disabled = true;
   });
-}
-
-function renderCiudadesInline(depSelect, ciudadSelect, ciudadSeleccionada = "") {
-  const ciudades = CIUDADES_COLOMBIA[depSelect.value] || [];
-  ciudadSelect.innerHTML = ciudades.map(c => `
-    <option value="${c}" ${c === ciudadSeleccionada ? "selected" : ""}>${c}</option>
-  `).join("");
 }
 
 async function guardarManifiesto(btn, idManifiesto) {
@@ -607,57 +643,4 @@ function escapeHtml(valor) {
     .replace(/'/g, "&#039;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-}
-
-async function llenarSelectDepartamentos(idSelect) {
-  const select = document.getElementById(idSelect);
-  if (!select) return;
-
-  const data = await apiFetch("/api/ubicaciones/departamentos");
-
-  if (!data) {
-    select.innerHTML = `<option value="">Error cargando</option>`;
-    return;
-  }
-
-  select.innerHTML = `
-    <option value="">Seleccione</option>
-    ${data.map(dep => `
-      <option value="${dep.nombre_departamento}">
-        ${dep.nombre_departamento}
-      </option>
-    `).join("")}
-  `;
-}
-
-async function llenarCiudadesPorDepartamento(idDepartamento, idCiudad, ciudadSeleccionada = "") {
-  const depSelect = document.getElementById(idDepartamento);
-  const ciudadSelect = document.getElementById(idCiudad);
-
-  if (!depSelect || !ciudadSelect) return;
-
-  const departamento = depSelect.value;
-
-  if (!departamento) {
-    ciudadSelect.innerHTML = `<option value="">Seleccione</option>`;
-    return;
-  }
-
-  const data = await apiFetch(
-    `/api/ubicaciones/municipios?nombre_departamento=${encodeURIComponent(departamento)}`
-  );
-
-  if (!data) {
-    ciudadSelect.innerHTML = `<option value="">Error cargando</option>`;
-    return;
-  }
-
-  ciudadSelect.innerHTML = `
-    <option value="">Seleccione</option>
-    ${data.map(item => `
-      <option value="${item.nombre_municipio}" ${item.nombre_municipio === ciudadSeleccionada ? "selected" : ""}>
-        ${item.nombre_municipio}
-      </option>
-    `).join("")}
-  `;
 }
