@@ -46,7 +46,6 @@
 /* TABLE */
 .manifiesto-table {
   width: 100%;
-  min-width: 1450px;
   border-collapse: collapse;
 }
 
@@ -286,4 +285,19 @@
 .multi-line {
   font-size: 13px;
   line-height: 1.5;
+}
+
+/* tabla responsive */
+.manifiesto-table th,
+.manifiesto-table td {
+  white-space: normal;   /* ?? clave */
+  word-break: break-word;
+}
+
+@media (max-width: 1200px) {
+  .manifiesto-table th,
+  .manifiesto-table td {
+    padding: 8px;
+    font-size: 12px;
+  }
 }
