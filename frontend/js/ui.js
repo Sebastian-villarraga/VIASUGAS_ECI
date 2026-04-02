@@ -30,3 +30,10 @@ function renderEstadoBadge(estado) {
 
   return `<span class="status-badge ${clase}">${estado}</span>`;
 }
+
+// =========================
+// FORMAT MONEY
+// =========================
+function format(valor) {
+  return "$" + Number(valor || 0).toLocaleString("es-CO");
+}

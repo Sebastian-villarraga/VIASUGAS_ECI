@@ -123,6 +123,7 @@ function initFormConductor() {
       cerrarModalConductor();
       form.reset();
       cargarConductores();
+      cargarAlertasConductores();
 
     } catch (error) {
       console.error(error);
@@ -292,7 +293,7 @@ async function guardarConductor(btn, id) {
     });
 
     if (!res) {
-      showToast("? Error actualizando conductor", "error");
+      showToast("Error actualizando conductor", "error");
       return;
     }
 
@@ -311,6 +312,7 @@ async function guardarConductor(btn, id) {
     console.error(error);
     showToast("Error inesperado", "error");
   }
+  
 }
 
 let debounceTimer;

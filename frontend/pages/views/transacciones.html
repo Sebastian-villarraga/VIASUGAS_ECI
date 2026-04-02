@@ -1,0 +1,83 @@
+<div class="transacciones-layout">
+
+  <!-- HEADER -->
+  <div class="transacciones-header">
+    <h2>Transacciones</h2>
+    <button id="btnNuevaTransaccion" class="btn-secundario">
+      + Nueva Transacción
+    </button>
+  </div>
+
+  <!-- CARDS -->
+  <div class="transacciones-cards">
+    <div class="card ingreso">
+      <h3>Ingresos</h3>
+      <p id="totalIngresos">$0</p>
+    </div>
+    <div class="card egreso">
+      <h3>Egresos</h3>
+      <p id="totalEgresos">$0</p>
+    </div>
+    <div class="card utilidad">
+      <h3>Utilidad</h3>
+      <p id="totalUtilidad">$0</p>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="transacciones-filtros">
+    <input type="date" id="fDesde">
+    <input type="date" id="fHasta">
+
+    <select id="fTipo"></select>
+    <select id="fBanco"></select>
+    <select id="fManifiesto"></select>
+
+    <button id="btnLimpiar">Limpiar</button>
+  </div>
+
+  <!-- TABLA -->
+  <div class="transacciones-tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Banco</th>
+          <th>Manifiesto</th>
+          <th>Valor</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody id="tablaTransacciones"></tbody>
+    </table>
+  </div>
+
+</div>
+
+
+
+<!-- MODAL -->
+<div id="modalTransaccion" class="modal hidden">
+  <div class="modal-content">
+
+    <h3>Nueva Transacción</h3>
+
+    <select id="tipo"></select>
+    <select id="banco"></select>
+
+    <div id="wrapManifiesto">
+      <select id="manifiesto"></select>
+    </div>
+
+    <div id="wrapFactura">
+      <select id="factura"></select>
+    </div>
+
+    <input type="number" id="valor" placeholder="Valor">
+    <input type="date" id="fecha">
+    <textarea id="descripcion" placeholder="Descripción"></textarea>
+
+    <button id="guardarTransaccion">Guardar</button>
+  </div>
+</div>

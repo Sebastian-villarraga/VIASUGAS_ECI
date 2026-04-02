@@ -56,6 +56,9 @@ async function loadView(view) {
       case "manifiestos":
         if (typeof initManifiestos === "function") initManifiestos();
         break;
+      case "transacciones":
+        if (typeof initTransacciones === "function") initTransacciones();
+        break;
     }
 
     setActiveMenu(view);

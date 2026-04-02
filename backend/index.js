@@ -42,6 +42,11 @@ const conductorRoutes = require("./routes/conductor.routes");
 const empresaACargoRoutes = require("./routes/empresaACargo.routes");
 const clienteRoutes = require("./routes/cliente.routes");
 const ubicacionRoutes = require("./routes/ubicacion.routes");
+const bancoRoutes = require("./routes/banco.routes");
+const facturaRoutes = require("./routes/factura.routes");
+const transaccionRoutes = require("./routes/transaccion.routes");
+const gastosConductorRoutes = require("./routes/gastosConductor.routes");
+const tipoTransaccionRoutes = require("./routes/tipoTransaccion.routes");
 
 app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
@@ -52,6 +57,11 @@ app.use("/api/conductores", conductorRoutes);
 app.use("/api/empresas-a-cargo", empresaACargoRoutes);
 app.use("/api/clientes", clienteRoutes);
 app.use("/api/ubicaciones", ubicacionRoutes);
+app.use("/api/bancos", bancoRoutes);
+app.use("/api/facturas", facturaRoutes);
+app.use("/api/transacciones", transaccionRoutes);
+app.use("/api/gastos-conductor", gastosConductorRoutes);
+app.use("/api/tipos-transaccion", tipoTransaccionRoutes);
 
 // =====================
 // HEALTH CHECKS
