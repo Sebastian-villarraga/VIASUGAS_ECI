@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="/styles/clientes.css">
   <link rel="stylesheet" href="/styles/manifiestos.css">
   <link rel="stylesheet" href="/styles/transacciones.css">
+  <link rel="stylesheet" href="/styles/gastos-conductor.css">
 </head>
 
 <body>
@@ -92,13 +93,21 @@
 
     <li class="menu-item"><a href="#"><span>Bancos</span></a></li>
     <li class="menu-item"><a href="#"><span>Categoria gastos</span></a></li>
+    
     <li class="menu-item" data-view="transacciones">
       <a href="javascript:void(0)" onclick="navigate('transacciones')">
         <i class="fas fa-money-bill-wave"></i>
         <span>&nbsp;Transacciones</span>
       </a>
     </li>
-    <li class="menu-item"><a href="#"><span>Gastos conductor</span></a></li>
+    
+    <li class="menu-item" data-view="gastos-conductor">
+      <a href="javascript:void(0)" onclick="navigate('gastos-conductor')">
+        <i class="fas fa-user-cog"></i>
+        <span>&nbsp;Gastos Conductor</span>
+      </a>
+    </li>
+    
     <li class="menu-item"><a href="#"><span>Facturas</span></a></li>
     
     <li class="menu-section">Reportes</li>
@@ -189,6 +198,7 @@
 <script src="/js/clientes.js"></script>
 <script src="/js/manifiestos.js"></script>
 <script src="/js/transacciones.js"></script>
+<script src="/js/gastos-conductor.js"></script>
 
 <div id="toast" class="toast hidden"></div>
 </body>

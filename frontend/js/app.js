@@ -59,6 +59,9 @@ async function loadView(view) {
       case "transacciones":
         if (typeof initTransacciones === "function") initTransacciones();
         break;
+      case "gastos-conductor":
+        if (typeof initGastosConductor === "function") initGastosConductor();
+        break;
     }
 
     setActiveMenu(view);

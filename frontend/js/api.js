@@ -1,4 +1,4 @@
-const API_URL = ""; // o ""
+const API_URL = ""; "http://100.50.64.39:3000"
 
 async function apiFetch(endpoint, options = {}) {
   try {

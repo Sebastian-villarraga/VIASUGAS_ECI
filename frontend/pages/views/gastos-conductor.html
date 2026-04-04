@@ -1,0 +1,136 @@
+<div class="gastos-layout">
+
+  <!-- HEADER -->
+  <div class="gastos-header">
+    <h2>Gastos de Conductor</h2>
+
+    <button id="btnNuevoGasto" class="btn-secundario">
+      + Nuevo Gasto
+    </button>
+  </div>
+
+  <!-- CARDS -->
+  <div class="gastos-cards">
+    <div class="card total">
+      <h3>Total Gastos</h3>
+      <p id="totalGastos">$0</p>
+    </div>
+
+    <div class="card cantidad">
+      <h3>Cantidad</h3>
+      <p id="totalCantidad">0</p>
+    </div>
+
+    <div class="card promedio">
+      <h3>Promedio</h3>
+      <p id="totalPromedio">$0</p>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="gastos-filtros">
+
+    <input type="date" id="fDesde">
+    <input type="date" id="fHasta">
+
+    <select id="fConductor"></select>
+    <select id="fManifiesto"></select>
+    <select id="fTipo"></select>
+
+    <button id="btnFiltrar" class="btn-principal">Filtrar</button>
+    <button id="btnLimpiar" class="btn-secundario">Limpiar</button>
+
+  </div>
+
+  <!-- TABLA -->
+  <div class="gastos-tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Conductor</th>
+          <th>Manifiesto</th>
+          <th class="text-center">Valor</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+
+      <tbody id="tablaGastos">
+        <!-- dinámico -->
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ========================= -->
+<!-- MODAL -->
+<!-- ========================= -->
+<div id="modalGasto" class="modal hidden">
+
+  <div class="modal-content">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h3>?? Registrar Gasto</h3>
+      <span class="modal-subtitle">
+        Completa la información del gasto del conductor
+      </span>
+    </div>
+
+    <!-- FORM GRID -->
+    <div class="modal-form">
+
+      <!-- CONDUCTOR -->
+      <div class="form-group">
+        <label for="id_conductor">Conductor *</label>
+        <select id="id_conductor">
+          <option value="">Seleccione conductor</option>
+        </select>
+      </div>
+
+      <!-- MANIFIESTO -->
+      <div class="form-group">
+        <label for="id_manifiesto">Manifiesto</label>
+        <select id="id_manifiesto">
+          <option value="">Seleccione manifiesto</option>
+        </select>
+      </div>
+
+      <!-- TRANSACCION -->
+      <div class="form-group">
+        <label for="id_transaccion">Tipo de gasto *</label>
+        <select id="id_transaccion">
+          <option value="">Seleccione tipo de gasto</option>
+        </select>
+      </div>
+
+      <!-- FECHA -->
+      <div class="form-group">
+        <label for="fecha">Fecha *</label>
+        <input type="date" id="fecha">
+      </div>
+
+      <!-- DESCRIPCION (FULL WIDTH) -->
+      <div class="form-group full-width">
+        <label for="descripcion">Descripción</label>
+        <textarea 
+          id="descripcion" 
+          placeholder="Ej: Pago de peaje, tanqueo, etc."
+        ></textarea>
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="modal-footer">
+      <button id="guardarGasto" class="btn-principal">
+        Guardar gasto
+      </button>
+      <button id="cerrarModal" class="btn-secundario">
+        Cancelar
+      </button>
+    </div>
+
+  </div>
+</div>
