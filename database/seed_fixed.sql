@@ -124,7 +124,7 @@ INSERT INTO banco VALUES
 
 
 -- =====================================================
--- TIPO TRANSACCION 
+-- TIPO TRANSACCION (ACTUALIZADO CON CATEGORIAS REALES)
 -- =====================================================
 
 INSERT INTO tipo_transaccion VALUES

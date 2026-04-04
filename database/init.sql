@@ -7,11 +7,7 @@ CREATE TYPE tcuentabanco AS ENUM ('ahorros', 'corriente');
 CREATE TYPE tvalidacion AS ENUM ('pendiente', 'aprobado', 'rechazado');
 CREATE TYPE toperacion AS ENUM ('insert', 'update', 'delete');
 CREATE TYPE tingresoegreso AS ENUM ('ingreso', 'egreso');
-CREATE TYPE ttipotransaccion AS ENUM (
-  'INGRESO MANIFIESTO',
-  'EGRESO MANIFIESTO',
-  'EGRESO OPERACIONAL'
-);
+
 
 -- ENUMS FINALES PARA MANIFIESTO
 CREATE TYPE testadomanifiesto AS ENUM (
@@ -190,7 +186,8 @@ CREATE TABLE tipo_transaccion (
     id VARCHAR PRIMARY KEY,
     categoria VARCHAR,
     descripcion VARCHAR,
-    tipo ttipotransaccion,
+    tipo tingresoegreso,  
+    contexto VARCHAR,     
     estado tactivo,
     creado TIMESTAMP
 );
