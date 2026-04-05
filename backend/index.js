@@ -61,7 +61,7 @@ app.use("/api/bancos", bancoRoutes);
 app.use("/api/facturas", facturaRoutes);
 app.use("/api/transacciones", transaccionRoutes);
 app.use("/api/gastos-conductor", gastosConductorRoutes);
-app.use("/api/tipos-transaccion", tipoTransaccionRoutes);
+app.use("/api/tipo-transaccion", tipoTransaccionRoutes);
 
 // =====================
 // HEALTH CHECKS

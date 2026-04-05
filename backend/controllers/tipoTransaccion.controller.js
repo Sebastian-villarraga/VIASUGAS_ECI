@@ -11,6 +11,8 @@ const TIPOS = [
 
 const ESTADOS = ["activo", "inactivo"];
 
+const CONTEXTOS = ["manifiesto", "operacional"];
+
 // =========================
 // HELPERS
 // =========================
@@ -22,12 +24,24 @@ function validarEstado(estado) {
   return ESTADOS.includes(estado);
 }
 
+// ?? MAPEAR A BD (CLAVE DEL FIX)
+function mapearTipoBD(tipo) {
+  if (tipo.includes("INGRESO")) return "ingreso";
+  return "egreso";
+}
+
+// ?? RELACIÓN AUTOMÁTICA
+function obtenerContextoDesdeTipo(tipo) {
+  if (tipo === "EGRESO OPERACIONAL") return "operacional";
+  return "manifiesto";
+}
+
 // =========================
 // GET TODOS
 // =========================
 const getTiposTransaccion = async (req, res) => {
   try {
-    const { estado, tipo } = req.query;
+    const { estado, tipo, categoria, contexto } = req.query;
 
     let query = `
       SELECT *
@@ -45,8 +59,26 @@ const getTiposTransaccion = async (req, res) => {
     }
 
     if (tipo) {
-      query += ` AND tipo = $${i}`;
-      values.push(tipo);
+      // ?? permitir buscar por ingreso/egreso o texto completo
+      if (tipo.includes("INGRESO") || tipo.includes("EGRESO")) {
+        query += ` AND tipo = $${i}`;
+        values.push(mapearTipoBD(tipo));
+      } else {
+        query += ` AND tipo = $${i}`;
+        values.push(tipo);
+      }
+      i++;
+    }
+
+    if (categoria) {
+      query += ` AND categoria ILIKE $${i}`;
+      values.push(`%${categoria}%`);
+      i++;
+    }
+
+    if (contexto) {
+      query += ` AND contexto = $${i}`;
+      values.push(contexto);
       i++;
     }
 
@@ -90,13 +122,14 @@ const getTipoTransaccionById = async (req, res) => {
 // =========================
 const createTipoTransaccion = async (req, res) => {
   try {
-    const {
-      id,
-      categoria,
-      descripcion,
-      tipo,
-      estado
-    } = req.body;
+    let { id, categoria, descripcion, tipo, estado } = req.body;
+
+    // NORMALIZAR
+    id = id?.trim();
+    categoria = categoria?.trim();
+    descripcion = descripcion?.trim();
+    tipo = tipo?.trim();
+    estado = estado?.trim();
 
     // VALIDACIONES
     if (!id || !categoria || !tipo || !estado) {
@@ -110,6 +143,9 @@ const createTipoTransaccion = async (req, res) => {
     if (!validarEstado(estado)) {
       return res.status(400).json({ error: "Estado invalido" });
     }
+
+    const tipoBD = mapearTipoBD(tipo); // ?? FIX
+    const contexto = obtenerContextoDesdeTipo(tipo);
 
     // VALIDAR DUPLICADO
     const existe = await pool.query(
@@ -127,16 +163,18 @@ const createTipoTransaccion = async (req, res) => {
         categoria,
         descripcion,
         tipo,
+        contexto,
         estado,
         creado
       )
-      VALUES ($1,$2,$3,$4,$5,NOW())
+      VALUES ($1,$2,$3,$4,$5,$6,NOW())
       RETURNING *
     `, [
       id,
       categoria,
       descripcion || null,
-      tipo,
+      tipoBD, // ?? FIX
+      contexto,
       estado
     ]);
 
@@ -155,14 +193,13 @@ const updateTipoTransaccion = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const {
-      categoria,
-      descripcion,
-      tipo,
-      estado
-    } = req.body;
+    let { categoria, descripcion, tipo, estado } = req.body;
 
-    // VALIDAR EXISTE
+    categoria = categoria?.trim();
+    descripcion = descripcion?.trim();
+    tipo = tipo?.trim();
+    estado = estado?.trim();
+
     const existe = await pool.query(
       `SELECT id FROM tipo_transaccion WHERE id = $1`,
       [id]
@@ -172,7 +209,10 @@ const updateTipoTransaccion = async (req, res) => {
       return res.status(404).json({ error: "Tipo no encontrado" });
     }
 
-    // VALIDACIONES
+    if (!categoria || !tipo || !estado) {
+      return res.status(400).json({ error: "Campos obligatorios faltantes" });
+    }
+
     if (!validarTipo(tipo)) {
       return res.status(400).json({ error: "Tipo invalido" });
     }
@@ -181,19 +221,24 @@ const updateTipoTransaccion = async (req, res) => {
       return res.status(400).json({ error: "Estado invalido" });
     }
 
+    const tipoBD = mapearTipoBD(tipo); // ?? FIX
+    const contexto = obtenerContextoDesdeTipo(tipo);
+
     const result = await pool.query(`
       UPDATE tipo_transaccion
       SET
         categoria = $1,
         descripcion = $2,
         tipo = $3,
-        estado = $4
-      WHERE id = $5
+        contexto = $4,
+        estado = $5
+      WHERE id = $6
       RETURNING *
     `, [
       categoria,
       descripcion || null,
-      tipo,
+      tipoBD, // ?? FIX
+      contexto,
       estado,
       id
     ]);

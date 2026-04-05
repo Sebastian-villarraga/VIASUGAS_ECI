@@ -1,0 +1,111 @@
+<div class="empresa-layout">
+
+  <div class="empresa-left">
+
+    <!-- HEADER -->
+    <div class="empresa-header">
+      <h2>Tipos de Transacción</h2>
+
+      <button class="btn-primary" onclick="abrirModalTipo()">
+        <i class="fas fa-plus"></i> Agregar tipo
+      </button>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="empresa-filtros">
+      <div class="filtros-row">
+
+        <div class="filtro-group">
+          <label>Categoría</label>
+          <input type="text" id="filtroCategoria">
+        </div>
+
+        <div class="filtro-group">
+          <label>Tipo</label>
+          <select id="filtroTipo">
+            <option value="">Todos</option>
+            <option value="INGRESO MANIFIESTO">Ingreso Manifiesto</option>
+            <option value="EGRESO MANIFIESTO">Egreso Manifiesto</option>
+            <option value="EGRESO OPERACIONAL">Egreso Operacional</option>
+          </select>
+        </div>
+
+        <div class="filtro-group">
+          <label>Estado</label>
+          <select id="filtroEstado">
+            <option value="">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+
+        <button class="btn-limpiar" onclick="limpiarFiltrosTipos()">
+          Limpiar
+        </button>
+
+      </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="empresa-tabla">
+      <div class="tabla-body">
+    
+        <table class="empresa-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Categoría</th>
+              <th>Descripción</th>
+              <th>Tipo</th>
+              <th>Contexto</th> 
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+    
+          <tbody id="tiposTable">
+            <tr><td colspan="7">Cargando...</td></tr> 
+          </tbody>
+    
+        </table>
+    
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalTipo" class="modal hidden">
+  <div class="modal-content">
+
+    <h3 id="modalTitulo">Agregar Tipo de Transacción</h3>
+
+    <form id="formTipo" class="form-grid">
+
+      <input id="id" placeholder="ID (ej: TT21)" required>
+      <input id="categoria" placeholder="Categoría" required>
+      <input id="descripcion" placeholder="Descripción">
+
+      <select id="tipo" required>
+        <option value="">Seleccione tipo</option>
+        <option value="INGRESO MANIFIESTO">Ingreso Manifiesto</option>
+        <option value="EGRESO MANIFIESTO">Egreso Manifiesto</option>
+        <option value="EGRESO OPERACIONAL">Egreso Operacional</option>
+      </select>
+
+      <select id="estado">
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-primary">Guardar</button>
+        <button type="button" onclick="cerrarModalTipo()">Cancelar</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
