@@ -4,7 +4,7 @@
 
     <!-- HEADER -->
     <div class="empresa-header">
-      <h2>Tipos de Transacci髇</h2>
+      <h2>Tipos de Transacci贸n</h2>
 
       <button class="btn-primary" onclick="abrirModalTipo()">
         <i class="fas fa-plus"></i> Agregar tipo
@@ -16,7 +16,7 @@
       <div class="filtros-row">
 
         <div class="filtro-group">
-          <label>Categor韆</label>
+          <label>Categor铆a</label>
           <input type="text" id="filtroCategoria">
         </div>
 
@@ -53,9 +53,8 @@
         <table class="empresa-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Categor韆</th>
-              <th>Descripci髇</th>
+              <th>Categor铆a</th>
+              <th>Descripci贸n</th>
               <th>Tipo</th>
               <th>Contexto</th> 
               <th>Estado</th>
@@ -64,7 +63,7 @@
           </thead>
     
           <tbody id="tiposTable">
-            <tr><td colspan="7">Cargando...</td></tr> 
+            <tr><td colspan="6">Cargando...</td></tr> 
           </tbody>
     
         </table>
@@ -80,13 +79,13 @@
 <div id="modalTipo" class="modal hidden">
   <div class="modal-content">
 
-    <h3 id="modalTitulo">Agregar Tipo de Transacci髇</h3>
+    <h3 id="modalTitulo">Agregar Tipo de Transacci贸n</h3>
 
     <form id="formTipo" class="form-grid">
 
       <input id="id" placeholder="ID (ej: TT21)" required>
-      <input id="categoria" placeholder="Categor韆" required>
-      <input id="descripcion" placeholder="Descripci髇">
+      <input id="categoria" placeholder="Categor铆a" required>
+      <input id="descripcion" placeholder="Descripci贸n">
 
       <select id="tipo" required>
         <option value="">Seleccione tipo</option>

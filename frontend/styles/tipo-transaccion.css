@@ -169,3 +169,8 @@
   }
 
 }
+
+.empresa-table td {
+  word-break: break-word;
+  max-width: 250px;
+}

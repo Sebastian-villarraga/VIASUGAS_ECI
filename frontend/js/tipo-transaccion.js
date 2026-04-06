@@ -28,8 +28,9 @@ async function cargarTipos() {
 function renderTablaTipos(data) {
   const tabla = document.getElementById("tiposTable");
 
+  // ?? Validación correcta (6 columnas)
   if (!data || data.length === 0) {
-    tabla.innerHTML = `<tr><td colspan="7">Sin datos</td></tr>`;
+    tabla.innerHTML = `<tr><td colspan="6">Sin datos</td></tr>`;
     return;
   }
 
@@ -38,14 +39,12 @@ function renderTablaTipos(data) {
   data.forEach(t => {
     html += `
       <tr 
-        data-id="${t.id}"
         data-categoria="${t.categoria}"
         data-descripcion="${t.descripcion || ""}"
         data-tipo="${t.tipo}"
         data-estado="${t.estado}"
         data-contexto="${t.contexto}"
       >
-        <td>${t.id}</td>
         <td>${t.categoria}</td>
         <td>${t.descripcion || "-"}</td>
         <td>${renderTipoBadge(t.tipo)}</td>
