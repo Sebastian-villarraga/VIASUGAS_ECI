@@ -20,6 +20,14 @@ function formatearFecha(fecha) {
   return `${day}/${month}/${year}`;
 }
 
+function formatearFechaInput(fecha) {
+  const year = fecha.getFullYear();
+  const month = String(fecha.getMonth() + 1).padStart(2, "0");
+  const day = String(fecha.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 // ================= FUNCION GLOBAL PARA render estado activo o inactivo
 function renderEstadoBadge(estado) {
   if (!estado) return "-";

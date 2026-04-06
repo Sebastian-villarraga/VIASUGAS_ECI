@@ -33,7 +33,24 @@ async function cargarCatalogos() {
 // TRANSACCIONES
 // =========================
 async function cargarTransacciones() {
-  const data = await apiFetch("/api/transacciones");
+
+  const params = new URLSearchParams();
+
+  const fDesde = document.getElementById("fDesde").value;
+  const fHasta = document.getElementById("fHasta").value;
+  const fTipo = document.getElementById("fTipo").value;
+  const fBanco = document.getElementById("fBanco").value;
+  const fManifiesto = document.getElementById("fManifiesto").value;
+
+  if (fDesde) params.append("fecha_desde", fDesde);
+  if (fHasta) params.append("fecha_hasta", fHasta);
+  if (fTipo) params.append("tipo", fTipo);
+  if (fBanco) params.append("id_banco", fBanco);
+  if (fManifiesto) params.append("id_manifiesto", fManifiesto);
+
+  const url = `/api/transacciones?${params.toString()}`;
+
+  const data = await apiFetch(url) || [];
 
   const tbody = document.getElementById("tablaTransacciones");
   tbody.innerHTML = "";
@@ -42,6 +59,8 @@ async function cargarTransacciones() {
   let egresos = 0;
 
   data.forEach(t => {
+
+    if (t.es_gasto_conductor) return;
 
     if (t.tipo === "INGRESO MANIFIESTO") ingresos += Number(t.valor);
     else egresos += Number(t.valor);
@@ -63,6 +82,20 @@ async function cargarTransacciones() {
   document.getElementById("totalIngresos").innerText = format(ingresos);
   document.getElementById("totalEgresos").innerText = format(egresos);
   document.getElementById("totalUtilidad").innerText = format(ingresos - egresos);
+  
+
+  
+  let textoFechas = "Sin filtro";
+  
+  if (fDesde && fHasta) {
+    textoFechas = `${formatearFecha(fDesde)} - ${formatearFecha(fHasta)}`;
+  } else if (fDesde) {
+    textoFechas = `Desde ${formatearFecha(fDesde)}`;
+  } else if (fHasta) {
+    textoFechas = `Hasta ${formatearFecha(fHasta)}`;
+  }
+  
+  document.getElementById("fechasConsultadas").innerText = textoFechas;
 }
 
 // =========================
@@ -70,19 +103,19 @@ async function cargarTransacciones() {
 // =========================
 function getBadge(t) {
 
-  if (t.es_gasto_conductor) {
-    return `<span class="badge conductor">Gasto conductor</span>`;
+  if (t.tipo === "INGRESO MANIFIESTO") {
+    return `<span class="badge ingreso">Ingreso Manifiesto</span>`;
   }
 
-  if (t.tipo === "INGRESO MANIFIESTO") {
-    return `<span class="badge ingreso">Ingreso</span>`;
+  if (t.tipo === "EGRESO MANIFIESTO") {
+    return `<span class="badge egreso">Egreso Manifiesto</span>`;
   }
 
   if (t.tipo === "EGRESO OPERACIONAL") {
-    return `<span class="badge operacional">Operacional</span>`;
+    return `<span class="badge operacional">Egreso Operacional</span>`;
   }
 
-  return `<span class="badge egreso">Egreso</span>`;
+  return `<span class="badge">Sin tipo</span>`;
 }
 
 // =========================
@@ -98,7 +131,27 @@ function eventos() {
   });
 
   // =========================
-  // CAMBIO DE TIPO
+  // FILTROS DINAMICOS
+  // =========================
+  ["fDesde","fHasta","fTipo","fBanco","fManifiesto"].forEach(id => {
+    document.getElementById(id)?.addEventListener("change", cargarTransacciones);
+  });
+
+  // =========================
+  // BOTON LIMPIAR
+  // =========================
+  document.getElementById("btnLimpiar")?.addEventListener("click", () => {
+
+    ["fDesde","fHasta","fTipo","fBanco","fManifiesto"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+
+    cargarTransacciones();
+  });
+
+  // =========================
+  // CAMBIO DE TIPO (MODAL)
   // =========================
   document.getElementById("tipo")?.addEventListener("change", (e) => {
     const tipo = e.target.value;
@@ -120,7 +173,40 @@ function eventos() {
     }
   });
 
+  // =========================
+  // ESTE MES
+  // =========================
+  document.getElementById("btnEsteMes")?.addEventListener("click", () => {
+
+    const hoy = new Date();
+
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const finMes = hoy;
+
+    document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+    document.getElementById("fHasta").value = formatearFechaInput(finMes);
+
+    cargarTransacciones();
+  });
+
+  // =========================
+  // MES ANTERIOR
+  // =========================
+  document.getElementById("btnMesAnterior")?.addEventListener("click", () => {
+
+    const hoy = new Date();
+
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    const finMes = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+
+    document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+    document.getElementById("fHasta").value = formatearFechaInput(finMes);
+
+    cargarTransacciones();
+  });
+
 }
+
 
 function llenarSelect(id, data, labelKey, valueKey) {
   const select = document.getElementById(id);

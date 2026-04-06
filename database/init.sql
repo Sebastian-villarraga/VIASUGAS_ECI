@@ -51,7 +51,7 @@ CREATE TYPE tactivo AS ENUM ('activo', 'inactivo');
 CREATE TYPE tcuentabanco AS ENUM ('ahorros', 'corriente');
 CREATE TYPE tvalidacion AS ENUM ('pendiente', 'aprobado', 'rechazado');
 CREATE TYPE toperacion AS ENUM ('insert', 'update', 'delete');
-CREATE TYPE tingresoegreso AS ENUM ('ingreso', 'egreso');
+CREATE TYPE tingresoegreso AS ENUM ('INGRESO MANIFIESTO', 'EGRESO MANIFIESTO', 'EGRESO OPERACIONAL');
 
 
 -- ENUMS FINALES PARA MANIFIESTO
@@ -231,8 +231,7 @@ CREATE TABLE tipo_transaccion (
     id VARCHAR PRIMARY KEY,
     categoria VARCHAR,
     descripcion VARCHAR,
-    tipo tingresoegreso,  
-    contexto VARCHAR,     
+    tipo tingresoegreso,     
     estado tactivo,
     creado TIMESTAMP
 );

@@ -161,13 +161,13 @@ INSERT INTO banco VALUES
 -- =====================================================
 
 INSERT INTO tipo_transaccion VALUES
-('TT1','INGRESO MANIFIESTO','Ingreso por transporte','ingreso','manifiesto','activo',NOW()),
-('TT2','EGRESO MANIFIESTO','Costo operativo viaje','egreso','manifiesto','activo',NOW()),
-('TT3','EGRESO OPERACIONAL','Gasto administrativo','egreso','operacional','activo',NOW()),
-('TT4','COMBUSTIBLE','Combustible viaje','egreso','manifiesto','activo',NOW()),
-('TT5','PEAJES','Peajes','egreso','manifiesto','activo',NOW()),
-('TT6','NOMINA','Pago nomina','egreso','operacional','activo',NOW()),
-('TT7','MANTENIMIENTO','Mantenimiento vehiculo','egreso','operacional','activo',NOW());
+('TT1','INGRESO','Ingreso por transporte','INGRESO MANIFIESTO','activo',NOW()),
+('TT2','EGRESO MANIFIESTO','Costo operativo viaje','EGRESO MANIFIESTO','activo',NOW()),
+('TT3','EGRESO OPERACIONAL','Gasto administrativo','EGRESO OPERACIONAL','activo',NOW()),
+('TT4','COMBUSTIBLE','Combustible viaje','EGRESO MANIFIESTO','activo',NOW()),
+('TT5','PEAJES','Peajes','EGRESO MANIFIESTO','activo',NOW()),
+('TT6','NOMINA','Pago nomina','EGRESO OPERACIONAL','activo',NOW()),
+('TT7','MANTENIMIENTO','Mantenimiento vehiculo','EGRESO OPERACIONAL','activo',NOW());
 
 -- =====================================================
 -- FACTURAS (RELACIONADAS A MANIFIESTOS)
