@@ -1,0 +1,106 @@
+<div class="transacciones-layout">
+
+  <!-- HEADER -->
+  <div class="transacciones-header">
+    <h2>Facturas</h2>
+    <button id="btnNuevaFactura" class="btn-secundario">
+      + Nueva Factura
+    </button>
+  </div>
+
+  <!-- CARDS -->
+  <div class="transacciones-cards">
+    <div class="card ingreso">
+      <h3>Total Facturado</h3>
+      <p id="totalFacturado">$0</p>
+    </div>
+
+    <div class="card egreso">
+      <h3>Retenciones</h3>
+      <p id="totalRetenciones">$0</p>
+    </div>
+
+    <div class="card utilidad">
+      <h3>Total Neto</h3>
+      <p id="totalNeto">$0</p>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="transacciones-filtros">
+    <input type="date" id="fDesde">
+    <input type="date" id="fHasta">
+
+    <input type="text" id="fCodigo" placeholder="Código factura">
+
+    <select id="fManifiesto">
+      <option value="">Todos los manifiestos</option>
+    </select>
+
+    <button id="btnLimpiarFacturas">Limpiar</button>
+  </div>
+
+  <!-- TABLA -->
+  <div class="transacciones-tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Manifiesto</th>
+          <th>Emisión</th>
+          <th>Vencimiento</th>
+          <th>Valor</th>
+          <th>Ret. Fuente</th>
+          <th>Ret. ICA</th>
+          <th>Neto</th>
+          <th>Estado</th>
+          <th>Acciones</th> 
+        </tr>
+      </thead>
+      <tbody id="tablaFacturas"></tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- MODAL -->
+<div id="modalFactura" class="modal hidden">
+  <div class="modal-content">
+
+    <h3>Nueva Factura</h3>
+
+    <input type="text" id="codigoFactura" placeholder="Código factura">
+
+    <select id="manifiestoFactura">
+      <option value="">Seleccione manifiesto</option>
+    </select>
+
+    <input type="date" id="fechaEmision">
+    <input type="date" id="fechaVencimiento">
+
+    <input type="number" id="valorFactura" placeholder="Valor">
+    <input type="number" id="retencionFuente" placeholder="Retención fuente">
+    <input type="number" id="retencionIca" placeholder="Retención ICA">
+
+    <input type="number" id="plazoPago" placeholder="Plazo (días)">
+
+    <button id="guardarFactura">Guardar</button>
+  </div>
+  
+<!-- MODAL CONFIRMACION -->
+<div id="modalConfirmacion" class="modal hidden">
+  <div class="modal-content confirm-modal">
+
+    <h3>Confirmar acción</h3>
+    <p id="confirmMensaje">¿Estás seguro?</p>
+
+    <div class="confirm-actions">
+      <button id="btnConfirmar" class="btn-confirmar">Aceptar</button>
+      <button id="btnCancelar" class="btn-cancelar">Cancelar</button>
+    </div>
+
+  </div>
+</div>
+
+</div>  

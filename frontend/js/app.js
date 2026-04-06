@@ -65,6 +65,9 @@ async function loadView(view) {
       case "tipo-transaccion":
         if (typeof initTiposTransaccion === "function") initTiposTransaccion();
         break;
+      case "facturas":
+        if (typeof initFacturas === "function") initFacturas();
+        break;
     }
 
     setActiveMenu(view);
