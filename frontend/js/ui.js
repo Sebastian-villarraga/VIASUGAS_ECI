@@ -37,3 +37,21 @@ function renderEstadoBadge(estado) {
 function format(valor) {
   return "$" + Number(valor || 0).toLocaleString("es-CO");
 }
+
+// =========================
+// CLOSE MODAL ON OUTSIDE CLICK
+// =========================
+document.addEventListener("click", (e) => {
+
+  // Buscar si el click fue dentro del contenido del modal
+  const isInsideContent = e.target.closest(".modal-content");
+
+  // Buscar si el click fue dentro de un modal
+  const modal = e.target.closest(".modal");
+
+  // Si el click fue en el overlay (modal pero no en el contenido)
+  if (modal && !isInsideContent) {
+    modal.classList.add("hidden");
+  }
+
+});

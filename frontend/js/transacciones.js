@@ -10,7 +10,7 @@ let catalogos = {};
 // CATALOGOS
 // =========================
 async function cargarCatalogos() {
-  catalogos.tipos = await apiFetch("/api/tipos-transaccion");
+  catalogos.tipos = await apiFetch("/api/tipo-transaccion");
   catalogos.bancos = await apiFetch("/api/bancos");
   catalogos.manifiestos = await apiFetch("/api/manifiestos");
 

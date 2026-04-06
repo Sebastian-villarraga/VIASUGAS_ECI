@@ -1,4 +1,49 @@
 -- =========================
+-- CLEAN TOTAL DB (DEV MODE)
+-- =========================
+
+-- ?? CUIDADO: ESTO BORRA TODO
+
+-- =========================
+-- DROP TABLES (orden seguro con CASCADE)
+-- =========================
+DROP TABLE IF EXISTS 
+  audit_logs,
+  gastos_conductor,
+  transaccion,
+  tipo_transaccion,
+  banco,
+  factura,
+  manifiesto,
+  trailer,
+  vehiculo,
+  conductor,
+  propietario,
+  empresa_a_cargo,
+  cliente,
+  usuario_permiso,
+  permiso,
+  usuario,
+  ubicacion_colombia
+CASCADE;
+
+-- =========================
+-- DROP ENUMS
+-- =========================
+DROP TYPE IF EXISTS testadomanifiesto CASCADE;
+DROP TYPE IF EXISTS tentrega CASCADE;
+DROP TYPE IF EXISTS tingresoegreso CASCADE;
+DROP TYPE IF EXISTS toperacion CASCADE;
+DROP TYPE IF EXISTS tvalidacion CASCADE;
+DROP TYPE IF EXISTS tcuentabanco CASCADE;
+DROP TYPE IF EXISTS tactivo CASCADE;
+
+-- =========================
+-- DROP DOMAINS
+-- =========================
+DROP DOMAIN IF EXISTS moneda CASCADE;
+
+-- =========================
 -- ENUMS 
 -- =========================
 
@@ -88,7 +133,7 @@ CREATE TABLE propietario (
 );
 
 CREATE TABLE conductor (
-    cedula INT PRIMARY KEY,
+    cedula BIGINT PRIMARY KEY,
     nombre VARCHAR,
     correo VARCHAR,
     telefono BIGINT,
@@ -124,9 +169,9 @@ CREATE TABLE trailer (
 
 CREATE TABLE manifiesto (
     id_manifiesto VARCHAR PRIMARY KEY,
-    radicado INT UNIQUE,
+    radicado BIGINT UNIQUE,
     id_cliente VARCHAR,
-    id_conductor INT,
+    id_conductor BIGINT,
     id_vehiculo VARCHAR,
     id_trailer VARCHAR,
     id_empresa_a_cargo VARCHAR,
@@ -219,7 +264,7 @@ CREATE TABLE transaccion (
 CREATE TABLE gastos_conductor (
     id VARCHAR PRIMARY KEY,
     id_transaccion VARCHAR NOT NULL,
-    id_conductor INT NOT NULL,
+    id_conductor BIGINT NOT NULL,
     id_manifiesto VARCHAR NOT NULL,
     descripcion VARCHAR,
     creado TIMESTAMP,
