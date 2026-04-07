@@ -33,12 +33,8 @@ async function cargarCatalogos() {
 
 function setearFechasPorDefecto() {
 
-  const hoy = new Date();
-
-  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-
-  document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
-  document.getElementById("fHasta").value = formatearFechaInput(hoy);
+  document.getElementById("fDesde").value = "";
+  document.getElementById("fHasta").value = "";
 
 }
 // =========================
@@ -213,7 +209,7 @@ function eventos() {
       // =========================
 
       if (!payload.id_tipo_transaccion) {
-        return showToast("Seleccione tipo de transacción", "error");
+        return showToast("Seleccione tipo de transacciÃ³n", "error");
       }
 
       if (!payload.id_banco) {
@@ -221,7 +217,7 @@ function eventos() {
       }
 
       if (!payload.valor || payload.valor <= 0) {
-        return showToast("Ingrese un valor válido", "error");
+        return showToast("Ingrese un valor vÃ¡lido", "error");
       }
 
       if (!payload.fecha_pago) {
@@ -250,7 +246,7 @@ function eventos() {
       // =========================
       // UX
       // =========================
-      showToast("Transacción creada correctamente", "success");
+      showToast("TransacciÃ³n creada correctamente", "success");
 
       limpiarFormularioTransaccion();
       document.getElementById("modalTransaccion").classList.add("hidden");
@@ -259,7 +255,7 @@ function eventos() {
 
     } catch (error) {
       console.error(error);
-      showToast("Error creando la transacción", "error");
+      showToast("Error creando la transacciÃ³n", "error");
     } finally {
       btn.disabled = false;
       btn.innerText = "Guardar";
@@ -346,7 +342,7 @@ function limpiarFormularioTransaccion() {
   document.getElementById("fecha").value = "";
   document.getElementById("descripcion").value = "";
 
-  // Ocultar dinámicos
+  // Ocultar dinï¿½micos
   document.getElementById("formFields").style.display = "none";
   document.getElementById("wrapManifiesto").style.display = "none";
 

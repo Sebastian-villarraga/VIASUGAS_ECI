@@ -28,7 +28,6 @@ async function cargarTipos() {
 function renderTablaTipos(data) {
   const tabla = document.getElementById("tiposTable");
 
-  // ?? Validación correcta (6 columnas)
   if (!data || data.length === 0) {
     tabla.innerHTML = `<tr><td colspan="6">Sin datos</td></tr>`;
     return;
@@ -43,14 +42,12 @@ function renderTablaTipos(data) {
         data-descripcion="${t.descripcion || ""}"
         data-tipo="${t.tipo}"
         data-estado="${t.estado}"
-        data-contexto="${t.contexto}"
       >
-        <td>${t.categoria}</td>
-        <td>${t.descripcion || "-"}</td>
-        <td>${renderTipoBadge(t.tipo)}</td>
-        <td>${renderContextoBadge(t.contexto)}</td>
-        <td>${renderEstadoBadge(t.estado)}</td>
-        <td>
+        <td data-label="Categoría">${t.categoria}</td>
+        <td data-label="Descripción">${t.descripcion || "-"}</td>
+        <td data-label="Tipo">${renderTipoTexto(t.tipo)}</td>
+        <td data-label="Estado">${renderEstadoBadge(t.estado)}</td>
+        <td data-label="Acciones">
           <button class="btn-icon" onclick="editarTipo(this, '${t.id}')">
             <i class="fas fa-pen"></i>
           </button>
@@ -60,6 +57,31 @@ function renderTablaTipos(data) {
   });
 
   tabla.innerHTML = html;
+}
+
+
+function renderTipoTexto(tipo) {
+  if (!tipo) return "-";
+
+  let clase = "";
+  let texto = "";
+
+  if (tipo === "INGRESO MANIFIESTO") {
+    clase = "ingreso";
+    texto = "Ingreso Manifiesto";
+  }
+
+  if (tipo === "EGRESO MANIFIESTO") {
+    clase = "egreso";
+    texto = "Egreso Manifiesto";
+  }
+
+  if (tipo === "EGRESO OPERACIONAL") {
+    clase = "operacional";
+    texto = "Egreso Operacional";
+  }
+
+  return `<span class="badge ${clase}">${texto}</span>`;
 }
 
 // ================= FILTROS
@@ -92,11 +114,16 @@ function limpiarFiltrosTipos() {
 function initFormTipo() {
   const form = document.getElementById("formTipo");
 
+  // ?? FIX CRÍTICO
+  if (!form) {
+    console.warn("formTipo no existe aún");
+    return;
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const data = {
-      id: document.getElementById("id").value,
       categoria: document.getElementById("categoria").value,
       descripcion: document.getElementById("descripcion").value,
       tipo: document.getElementById("tipo").value,
@@ -121,21 +148,22 @@ function initFormTipo() {
 // ================= EDITAR
 function editarTipo(btn, id) {
 
-  if (editandoTipo) {
+  if (window.editandoTipo) {
     showToast("Termina de editar primero", "info");
     return;
   }
 
-  editandoTipo = true;
+  window.editandoTipo = true;
 
   const fila = btn.closest("tr");
   const data = fila.dataset;
   const celdas = fila.querySelectorAll("td");
 
-  celdas[1].innerHTML = `<input value="${data.categoria}">`;
-  celdas[2].innerHTML = `<input value="${data.descripcion}">`;
+  celdas[0].innerHTML = `<input value="${data.categoria}">`;
 
-  celdas[3].innerHTML = `
+  celdas[1].innerHTML = `<input value="${data.descripcion || ""}">`;
+
+  celdas[2].innerHTML = `
     <select>
       <option value="INGRESO MANIFIESTO" ${data.tipo === "INGRESO MANIFIESTO" ? "selected" : ""}>Ingreso Manifiesto</option>
       <option value="EGRESO MANIFIESTO" ${data.tipo === "EGRESO MANIFIESTO" ? "selected" : ""}>Egreso Manifiesto</option>
@@ -143,22 +171,20 @@ function editarTipo(btn, id) {
     </select>
   `;
 
-  celdas[4].innerHTML = `<span>${data.contexto}</span>`;
-
-  celdas[5].innerHTML = `
+  celdas[3].innerHTML = `
     <select>
       <option value="activo" ${data.estado === "activo" ? "selected" : ""}>Activo</option>
       <option value="inactivo" ${data.estado === "inactivo" ? "selected" : ""}>Inactivo</option>
     </select>
   `;
 
-  celdas[6].innerHTML = `
+  celdas[4].innerHTML = `
     <button class="btn-icon btn-save" onclick="guardarTipo(this, '${id}')">
       <i class="fas fa-save"></i>
     </button>
   `;
 
-  const btnGuardar = celdas[6].querySelector("button");
+  const btnGuardar = celdas[4].querySelector("button");
 
   document.querySelectorAll(".btn-icon").forEach(b => {
     if (b !== btnGuardar) b.disabled = true;
@@ -177,20 +203,25 @@ async function guardarTipo(btn, id) {
     estado: inputs[3].value
   };
 
-  const res = await apiFetch(`/api/tipo-transaccion/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data)
-  });
+  try {
 
-  if (!res) return;
+    await apiFetch(`/api/tipo-transaccion/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data)
+    });
 
-  showToast("Tipo actualizado", "success");
+    showToast("Tipo actualizado", "success");
 
-  editandoTipo = false;
+    window.editandoTipo = false;
 
-  document.querySelectorAll(".btn-icon").forEach(b => b.disabled = false);
+    document.querySelectorAll(".btn-icon").forEach(b => b.disabled = false);
 
-  cargarTipos();
+    cargarTipos();
+
+  } catch (error) {
+    console.error(error);
+    showToast("Error actualizando", "error");
+  }
 }
 
 // ================= MODAL
@@ -234,12 +265,3 @@ function renderTipoBadge(tipo) {
   return tipo;
 }
 
-function renderContextoBadge(ctx) {
-  if (ctx === "manifiesto") {
-    return `<span class="tipo-badge ingreso">Manifiesto</span>`;
-  }
-  if (ctx === "operacional") {
-    return `<span class="tipo-badge egreso-operacional">Operacional</span>`;
-  }
-  return ctx;
-}

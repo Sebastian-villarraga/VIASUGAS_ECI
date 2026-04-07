@@ -79,21 +79,18 @@
 
     <div class="form-grid">
 
-      <div class="form-group">
-        <label>Código factura</label>
-        <input type="text" id="codigoFactura" placeholder="Ej: F001">
-      </div>
+      <!-- 🔥 ELIMINADO CODIGO FACTURA -->
 
       <div class="form-group">
         <label>Manifiesto</label>
-        <select id="manifiestoFactura">
+        <select id="manifiestoFactura" required>
           <option value="">Seleccione</option>
         </select>
       </div>
 
       <div class="form-group">
         <label>Fecha emisión</label>
-        <input type="date" id="fechaEmision">
+        <input type="date" id="fechaEmision" required>
       </div>
 
       <div class="form-group">
@@ -103,30 +100,34 @@
 
       <div class="form-group">
         <label>Valor total</label>
-        <input type="number" id="valorFactura" placeholder="$0">
+        <input type="number" id="valorFactura" placeholder="$0" min="0" required>
       </div>
 
       <div class="form-group">
         <label>Plazo (días)</label>
-        <input type="number" id="plazoPago" placeholder="Ej: 30">
+        <input type="number" id="plazoPago" placeholder="Ej: 30" min="0">
       </div>
 
       <div class="form-group">
         <label>Retención fuente</label>
-        <input type="number" id="retencionFuente" placeholder="$0">
+        <input type="number" id="retencionFuente" placeholder="$0" min="0">
       </div>
 
       <div class="form-group">
         <label>Retención ICA</label>
-        <input type="number" id="retencionIca" placeholder="$0">
+        <input type="number" id="retencionIca" placeholder="$0" min="0">
       </div>
 
     </div>
 
     <!-- BOTONES -->
     <div class="modal-actions">
-      <button type="button" id="cancelarFactura" class="btn-cancelar">Cancelar</button>
-      <button type="button" id="guardarFactura" class="btn-guardar">Guardar</button>
+      <button type="button" id="cancelarFactura" class="btn-cancelar">
+        Cancelar
+      </button>
+      <button type="button" id="guardarFactura" class="btn-guardar">
+        Guardar
+      </button>
     </div>
 
   </div>

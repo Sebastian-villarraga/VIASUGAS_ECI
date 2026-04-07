@@ -1,51 +1,70 @@
 /* ========================= */
-/* REUTILIZA EMPRESA (BASE) */
+/* BADGE  */
 /* ========================= */
 
-/* No duplicamos estilos base, solo extendemos */
-
-
-/* ========================= */
-/* BADGE TIPO TRANSACCION */
-/* ========================= */
-
-.tipo-badge {
+.badge {
   display: inline-block;
-  padding: 5px 10px;
-  border-radius: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
 
-/* INGRESO */
-.tipo-badge.ingreso {
-  background: #e3f2fd;
-  color: #1565c0;
+/* INGRESO (VERDE) */
+.badge.ingreso {
+  background: #22c55e;
+  color: white;
 }
 
-/* EGRESO MANIFIESTO */
-.tipo-badge.egreso-manifiesto {
-  background: #fff3e0;
-  color: #ef6c00;
+/* EGRESO (NARANJA) */
+.badge.egreso {
+  background: #f59e0b;
+  color: white;
 }
 
-/* EGRESO OPERACIONAL */
-.tipo-badge.egreso-operacional {
-  background: #f3e5f5;
-  color: #7b1fa2;
+/* OPERACIONAL (MORADO) */
+.badge.operacional {
+  background: #a855f7;
+  color: white;
 }
-
 
 /* ========================= */
-/* MEJORAS TABLA */
+/* LAYOUT FIX (?? IMPORTANTE) */
 /* ========================= */
 
-/* Centrar columnas específicas */
-.empresa-table td:nth-child(4), /* Tipo */
-.empresa-table td:nth-child(5), /* Estado */
-.empresa-table th:nth-child(4),
-.empresa-table th:nth-child(5) {
+.empresa-layout {
+  display: flex;
+  width: 100%;
+}
+
+.empresa-left {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+/* ========================= */
+/* TABLA */
+/* ========================= */
+
+.empresa-tabla {
+  width: 100%;
+  overflow-x: auto; /* ?? scroll horizontal */
+}
+
+.empresa-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px; /* ?? evita que se rompa */
+}
+
+/* Centrar columnas */
+.empresa-table td:nth-child(3),
+.empresa-table td:nth-child(4),
+.empresa-table th:nth-child(3),
+.empresa-table th:nth-child(4) {
   text-align: center;
 }
 
@@ -59,6 +78,12 @@
   background: #fafafa;
 }
 
+/* Ajuste texto largo */
+.empresa-table td {
+  word-break: break-word;
+  max-width: 250px;
+  padding: 10px;
+}
 
 /* ========================= */
 /* BOTONES */
@@ -80,7 +105,6 @@
   color: #2e7d32;
 }
 
-
 /* ========================= */
 /* FORM GRID (MODAL) */
 /* ========================= */
@@ -100,11 +124,10 @@
   width: 100%;
 }
 
-/* Que descripción ocupe toda la fila */
+/* descripción full */
 #descripcion {
   grid-column: span 2;
 }
-
 
 /* ========================= */
 /* MODAL */
@@ -134,13 +157,12 @@
   padding: 24px;
   border-radius: 12px;
   width: 420px;
-  max-width: 90%;
+  max-width: 95%;
 }
 
 .modal-content h3 {
   margin-bottom: 15px;
 }
-
 
 /* ========================= */
 /* ACCIONES MODAL */
@@ -153,9 +175,51 @@
   gap: 10px;
 }
 
+/* ========================= */
+/* RESPONSIVE TABLE */
+/* ========================= */
+
+@media (max-width: 900px) {
+
+  .empresa-tabla {
+    width: 100%;
+    overflow-x: auto; /* ?? scroll horizontal */
+  }
+
+  .empresa-table {
+    min-width: 700px; /* ?? evita que se rompa */
+    width: 100%;
+  }
+
+  /* ?? IMPORTANTE: mantener estructura de tabla */
+  .empresa-table thead {
+    display: table-header-group;
+  }
+
+  .empresa-table tr {
+    display: table-row;
+    margin: 0;
+    border: none;
+    padding: 0;
+    background: transparent;
+  }
+
+  .empresa-table td {
+    display: table-cell;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    max-width: 250px;
+  }
+
+  /* ? eliminar comportamiento tipo card */
+  .empresa-table td::before {
+    content: none;
+  }
+
+}
 
 /* ========================= */
-/* RESPONSIVE */
+/* FORM RESPONSIVE */
 /* ========================= */
 
 @media (max-width: 768px) {
@@ -170,7 +234,32 @@
 
 }
 
-.empresa-table td {
-  word-break: break-word;
-  max-width: 250px;
+/* ========================= */
+/* EXTRA MOBILE FIX */
+/* ========================= */
+
+@media (max-width: 600px) {
+
+  .empresa-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .empresa-filtros .filtros-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .filtro-group {
+    width: 100%;
+  }
+
+  .btn-limpiar {
+    width: 100%;
+  }
+
 }

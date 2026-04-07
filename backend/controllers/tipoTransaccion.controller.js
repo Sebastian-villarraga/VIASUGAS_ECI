@@ -11,8 +11,6 @@ const TIPOS = [
 
 const ESTADOS = ["activo", "inactivo"];
 
-const CONTEXTOS = ["manifiesto", "operacional"];
-
 // =========================
 // HELPERS
 // =========================
@@ -24,24 +22,12 @@ function validarEstado(estado) {
   return ESTADOS.includes(estado);
 }
 
-// ?? MAPEAR A BD (CLAVE DEL FIX)
-function mapearTipoBD(tipo) {
-  if (tipo.includes("INGRESO")) return "ingreso";
-  return "egreso";
-}
-
-// ?? RELACIÓN AUTOMÁTICA
-function obtenerContextoDesdeTipo(tipo) {
-  if (tipo === "EGRESO OPERACIONAL") return "operacional";
-  return "manifiesto";
-}
-
 // =========================
 // GET TODOS
 // =========================
 const getTiposTransaccion = async (req, res) => {
   try {
-    const { estado, tipo, categoria, contexto } = req.query;
+    const { estado, tipo, categoria } = req.query;
 
     let query = `
       SELECT *
@@ -53,33 +39,18 @@ const getTiposTransaccion = async (req, res) => {
     let i = 1;
 
     if (estado) {
-      query += ` AND estado = $${i}`;
+      query += ` AND estado = $${i++}`;
       values.push(estado);
-      i++;
     }
 
     if (tipo) {
-      // ?? permitir buscar por ingreso/egreso o texto completo
-      if (tipo.includes("INGRESO") || tipo.includes("EGRESO")) {
-        query += ` AND tipo = $${i}`;
-        values.push(mapearTipoBD(tipo));
-      } else {
-        query += ` AND tipo = $${i}`;
-        values.push(tipo);
-      }
-      i++;
+      query += ` AND tipo = $${i++}`;
+      values.push(tipo);
     }
 
     if (categoria) {
-      query += ` AND categoria ILIKE $${i}`;
+      query += ` AND categoria ILIKE $${i++}`;
       values.push(`%${categoria}%`);
-      i++;
-    }
-
-    if (contexto) {
-      query += ` AND contexto = $${i}`;
-      values.push(contexto);
-      i++;
     }
 
     query += ` ORDER BY categoria ASC`;
@@ -89,7 +60,7 @@ const getTiposTransaccion = async (req, res) => {
     res.json(result.rows);
 
   } catch (error) {
-    console.error("Error obteniendo tipos:", error);
+    console.error("?? Error obteniendo tipos:", error);
     res.status(500).json({ error: "Error obteniendo tipos de transaccion" });
   }
 };
@@ -113,26 +84,24 @@ const getTipoTransaccionById = async (req, res) => {
     res.json(result.rows[0]);
 
   } catch (error) {
+    console.error("?? Error obteniendo tipo:", error);
     res.status(500).json({ error: "Error obteniendo tipo de transaccion" });
   }
 };
 
 // =========================
-// CREATE
+// CREATE (AUTO ID)
 // =========================
 const createTipoTransaccion = async (req, res) => {
   try {
-    let { id, categoria, descripcion, tipo, estado } = req.body;
+    let { categoria, descripcion, tipo, estado } = req.body;
 
-    // NORMALIZAR
-    id = id?.trim();
     categoria = categoria?.trim();
-    descripcion = descripcion?.trim();
+    descripcion = descripcion?.trim() || null;
     tipo = tipo?.trim();
     estado = estado?.trim();
 
-    // VALIDACIONES
-    if (!id || !categoria || !tipo || !estado) {
+    if (!categoria || !tipo || !estado) {
       return res.status(400).json({ error: "Campos obligatorios faltantes" });
     }
 
@@ -144,44 +113,51 @@ const createTipoTransaccion = async (req, res) => {
       return res.status(400).json({ error: "Estado invalido" });
     }
 
-    const tipoBD = mapearTipoBD(tipo); // ?? FIX
-    const contexto = obtenerContextoDesdeTipo(tipo);
+    // =========================
+    // GENERAR ID TT1, TT2...
+    // =========================
+    const ultimo = await pool.query(`
+      SELECT id 
+      FROM tipo_transaccion 
+      WHERE id LIKE 'TT%' 
+      ORDER BY LENGTH(id) DESC, id DESC 
+      LIMIT 1
+    `);
 
-    // VALIDAR DUPLICADO
-    const existe = await pool.query(
-      `SELECT id FROM tipo_transaccion WHERE id = $1`,
-      [id]
-    );
+    let nuevoId = "TT1";
 
-    if (existe.rows.length > 0) {
-      return res.status(400).json({ error: "El ID ya existe" });
+    if (ultimo.rows.length > 0) {
+      const ultimoId = ultimo.rows[0].id;
+      const numero = parseInt(ultimoId.replace("TT", ""), 10);
+      nuevoId = "TT" + (numero + 1);
     }
 
+    // =========================
+    // INSERT SIN CONTEXTO
+    // =========================
     const result = await pool.query(`
       INSERT INTO tipo_transaccion (
         id,
         categoria,
         descripcion,
         tipo,
-        contexto,
         estado,
         creado
       )
-      VALUES ($1,$2,$3,$4,$5,$6,NOW())
+      VALUES ($1,$2,$3,$4,$5,NOW())
       RETURNING *
     `, [
-      id,
+      nuevoId,
       categoria,
-      descripcion || null,
-      tipoBD, // ?? FIX
-      contexto,
+      descripcion,
+      tipo,
       estado
     ]);
 
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
-    console.error("Error creando tipo:", error);
+    console.error("?? Error creando tipo:", error);
     res.status(500).json({ error: "Error creando tipo de transaccion" });
   }
 };
@@ -196,7 +172,7 @@ const updateTipoTransaccion = async (req, res) => {
     let { categoria, descripcion, tipo, estado } = req.body;
 
     categoria = categoria?.trim();
-    descripcion = descripcion?.trim();
+    descripcion = descripcion?.trim() || null;
     tipo = tipo?.trim();
     estado = estado?.trim();
 
@@ -221,24 +197,22 @@ const updateTipoTransaccion = async (req, res) => {
       return res.status(400).json({ error: "Estado invalido" });
     }
 
-    const tipoBD = mapearTipoBD(tipo); // ?? FIX
-    const contexto = obtenerContextoDesdeTipo(tipo);
-
+    // =========================
+    // UPDATE SIN CONTEXTO
+    // =========================
     const result = await pool.query(`
       UPDATE tipo_transaccion
       SET
         categoria = $1,
         descripcion = $2,
         tipo = $3,
-        contexto = $4,
-        estado = $5
-      WHERE id = $6
+        estado = $4
+      WHERE id = $5
       RETURNING *
     `, [
       categoria,
-      descripcion || null,
-      tipoBD, // ?? FIX
-      contexto,
+      descripcion,
+      tipo,
       estado,
       id
     ]);
@@ -246,7 +220,7 @@ const updateTipoTransaccion = async (req, res) => {
     res.json(result.rows[0]);
 
   } catch (error) {
-    console.error("Error actualizando tipo:", error);
+    console.error("?? Error actualizando tipo:", error);
     res.status(500).json({ error: "Error actualizando tipo de transaccion" });
   }
 };

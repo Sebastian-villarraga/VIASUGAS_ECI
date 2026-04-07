@@ -146,6 +146,11 @@
   background: #f9fafb;
 }
 
+.texto-pagada {
+  color: #22c55e; /* mismo verde */
+  font-weight: 600;
+  font-size: 13px;
+}
 /* ========================= */
 /* MODAL */
 /* ========================= */

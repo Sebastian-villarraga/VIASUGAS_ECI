@@ -38,7 +38,7 @@ async function cargarFacturas() {
   try {
     facturasData = await apiFetch("/api/facturas");
 
-    console.log("FACTURAS:", facturasData); // ?? DEBUG
+    console.log("FACTURAS:", facturasData); 
 
     if (!Array.isArray(facturasData)) {
       console.error("No llegaron datos válidos");
@@ -117,6 +117,11 @@ function renderFacturas(data) {
   const hoy = new Date().toISOString().split("T")[0];
 
   // =========================
+  // ?? FACTURAS PAGADAS (LOCAL)
+  // =========================
+  const pagadas = JSON.parse(localStorage.getItem("facturasPagadas") || "[]");
+
+  // =========================
   // ORDENAR SIN ROMPER UI
   // =========================
   const prioridadEstado = {
@@ -127,13 +132,15 @@ function renderFacturas(data) {
 
   data = [...data].sort((a, b) => {
 
-    const estadoA = a.estado ||
-      (a.fecha_vencimiento && a.fecha_vencimiento.split("T")[0] < hoy
+    const estadoA = pagadas.includes(a.codigo_factura)
+      ? "pagada"
+      : (a.fecha_vencimiento && a.fecha_vencimiento.split("T")[0] < hoy
         ? "vencida"
         : "pendiente");
 
-    const estadoB = b.estado ||
-      (b.fecha_vencimiento && b.fecha_vencimiento.split("T")[0] < hoy
+    const estadoB = pagadas.includes(b.codigo_factura)
+      ? "pagada"
+      : (b.fecha_vencimiento && b.fecha_vencimiento.split("T")[0] < hoy
         ? "vencida"
         : "pendiente");
 
@@ -156,14 +163,17 @@ function renderFacturas(data) {
 
     totalFacturado += valor;
 
-    let estado = f.estado;
+    // =========================
+    // ?? CALCULAR ESTADO REAL
+    // =========================
+    let estado;
 
-    if (!estado) {
-      if (f.fecha_vencimiento && f.fecha_vencimiento.split("T")[0] < hoy) {
-        estado = "vencida";
-      } else {
-        estado = "pendiente";
-      }
+    if (pagadas.includes(f.codigo_factura)) {
+      estado = "pagada";
+    } else if (f.fecha_vencimiento && f.fecha_vencimiento.split("T")[0] < hoy) {
+      estado = "vencida";
+    } else {
+      estado = "pendiente";
     }
 
     if (estado === "pagada") {
@@ -174,9 +184,8 @@ function renderFacturas(data) {
 
     const estadoHTML = getEstadoFactura({ ...f, estado });
 
-    // ?? IMPORTANTE: RESPETAR CLASE CSS
     const accionesHTML = (estado === "pagada")
-      ? `<span class="badge pagada">Pagada</span>`
+      ? `<span class="texto-pagada">Pagada</span>`
       : `<button type="button" class="btn-pagar" onclick="pagarFactura('${f.codigo_factura}')">Pagar</button>`;
 
     tbody.innerHTML += `
@@ -204,6 +213,7 @@ function renderFacturas(data) {
   if (totalP) totalP.innerText = format(totalPendiente);
   if (porcentaje) porcentaje.innerText = porcentajeCobro + "%";
 }
+
 // =========================
 // EVENTOS
 // =========================
@@ -260,7 +270,6 @@ function eventosFacturas() {
     try {
 
       const body = {
-        codigo_factura: document.getElementById("codigoFactura").value,
         id_manifiesto: document.getElementById("manifiestoFactura").value,
         fecha_emision: document.getElementById("fechaEmision").value,
         fecha_vencimiento: document.getElementById("fechaVencimiento").value,
@@ -270,7 +279,7 @@ function eventosFacturas() {
         plazo_pago: Number(document.getElementById("plazoPago").value)
       };
 
-      if (!body.codigo_factura || !body.id_manifiesto || !body.fecha_emision || !body.valor) {
+      if (!body.id_manifiesto || !body.fecha_emision || !body.valor) {
         alert("Completa los campos obligatorios");
         return;
       }
@@ -351,6 +360,7 @@ function getEstadoFactura(f) {
 
   const hoy = new Date().toISOString().split("T")[0];
 
+  // ?? PRIORIDAD TOTAL A PAGADA
   if (f.estado === "pagada") {
     return `<span class="badge pagada">Pagada</span>`;
   }
@@ -374,13 +384,33 @@ async function pagarFactura(codigo) {
         method: "PUT"
       });
 
-      mostrarToast("Factura marcada como pagada ?", "success");
+      // =========================
+      // ?? GUARDAR EN LOCALSTORAGE
+      // =========================
+      let pagadas = JSON.parse(localStorage.getItem("facturasPagadas") || "[]");
 
-      await cargarFacturas();
+      if (!pagadas.includes(codigo)) {
+        pagadas.push(codigo);
+        localStorage.setItem("facturasPagadas", JSON.stringify(pagadas));
+      }
+
+      // =========================
+      // ?? ACTUALIZAR DATA LOCAL
+      // =========================
+      facturasData = facturasData.map(f => {
+        if (f.codigo_factura === codigo) {
+          return { ...f, estado: "pagada" };
+        }
+        return f;
+      });
+
+      mostrarToast("Factura marcada como pagada", "success");
+
+      aplicarFiltrosFacturas();
 
     } catch (error) {
-      console.error(error);
-      mostrarToast("Error al actualizar la factura ?", "error");
+      console.error("Error pagando factura:", error);
+      mostrarToast("Error al actualizar la factura", "error");
     }
 
   });

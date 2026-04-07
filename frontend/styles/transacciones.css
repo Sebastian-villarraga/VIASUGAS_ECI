@@ -219,27 +219,61 @@
 }
 
 
-
 /* ========================= */
 /* RESPONSIVE */
 /* ========================= */
 
 @media (max-width: 900px) {
-  .transacciones-cards {
-    grid-template-columns: 1fr;
+
+  /* ?? TABLA CON SCROLL */
+  .transacciones-tabla {
+    width: 100%;
+    overflow-x: auto;
   }
 
+  .transacciones-table {
+    min-width: 900px; /* ajusta según columnas */
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  /* ?? MANTENER FORMATO TABLA */
+  .transacciones-table thead {
+    display: table-header-group;
+  }
+
+  .transacciones-table tr {
+    display: table-row;
+  }
+
+  .transacciones-table td {
+    display: table-cell;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* ? eliminar cards */
+  .transacciones-cards {
+    display: none;
+  }
+
+  /* ========================= */
+  /* FILTROS RESPONSIVE */
+  /* ========================= */
+
   .transacciones-filtros {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
 
   .transacciones-filtros input,
   .transacciones-filtros select {
     width: 100%;
   }
-}
 
+}
 
 /* =========================
    FORM LAYOUT
