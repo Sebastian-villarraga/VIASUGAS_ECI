@@ -316,3 +316,16 @@ textarea {
 .btn-primary:hover {
   background: #2f4a88;
 }
+
+.transacciones-tabla.scroll {
+  max-height: 400px; /* ?? ajusta a gusto */
+  overflow-y: auto;
+  border-radius: 10px;
+}
+
+.transacciones-tabla table thead th {
+  position: sticky;
+  top: 0;
+  background: #f9fafb;
+  z-index: 2;
+}
