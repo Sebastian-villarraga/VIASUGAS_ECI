@@ -1,5 +1,6 @@
 async function initTransacciones() {
   await cargarCatalogos();
+  setearFechasPorDefecto();
   await cargarTransacciones();
   eventos();
 }
@@ -29,6 +30,17 @@ async function cargarCatalogos() {
   llenarSelect("fManifiesto", catalogos.manifiestos, "id_manifiesto", "id_manifiesto");
 }
 
+
+function setearFechasPorDefecto() {
+
+  const hoy = new Date();
+
+  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+  document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+  document.getElementById("fHasta").value = formatearFechaInput(hoy);
+
+}
 // =========================
 // TRANSACCIONES
 // =========================

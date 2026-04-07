@@ -206,7 +206,7 @@ CREATE TABLE manifiesto (
 
 CREATE TABLE factura (
     codigo_factura VARCHAR PRIMARY KEY,
-    id_manifiesto VARCHAR,
+    id_manifiesto VARCHAR UNIQUE,
     fecha_emision DATE,
     fecha_vencimiento DATE,
     valor moneda,

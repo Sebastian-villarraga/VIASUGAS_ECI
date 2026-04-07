@@ -1,4 +1,13 @@
-const API_URL = ""; "http://100.50.64.39:3000"
+// =========================
+// CONFIG
+// =========================
+
+// ?? IMPORTANTE: mismo servidor ? usar ruta relativa
+const API_URL = "";
+
+// =========================
+// FETCH GLOBAL
+// =========================
 
 async function apiFetch(endpoint, options = {}) {
   try {
@@ -12,26 +21,41 @@ async function apiFetch(endpoint, options = {}) {
       ...options,
     });
 
-    if (!res.ok) {
-      const text = await res.text();
-
-      // ?? IMPORTANTE: usa toast global
-      if (typeof showToast === "function") {
-        showToast(text || "Error en la API", "error");
-      }
-
-      return null;
+    // ?? intentar parsear respuesta
+    let data = {};
+    try {
+      data = await res.json();
+    } catch {
+      // puede no venir JSON
     }
 
-    return await res.json();
+    // =========================
+    // ERROR HANDLING ??
+    // =========================
+    if (!res.ok) {
+      const message = data.error || "Error en la API";
+
+      // mostrar toast SOLO aquí (centralizado)
+      if (typeof showToast === "function") {
+        showToast(message, "error");
+      }
+
+      throw new Error(message);
+    }
+
+    return data;
 
   } catch (err) {
     console.error("API ERROR:", err);
 
+    // ?? evitar doble toast
     if (typeof showToast === "function") {
-      showToast("Error de conexión con el servidor", "error");
+      showToast(
+        err.message || "Error de conexión con el servidor",
+        "error"
+      );
     }
 
-    return null;
+    throw err; // ?? CLAVE
   }
 }

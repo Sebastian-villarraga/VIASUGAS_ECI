@@ -66,6 +66,7 @@ const getManifiestos = async (req, res) => {
     let query = `
       SELECT
         m.id_manifiesto,
+        f.codigo_factura AS id_factura, -- ?? NUEVO
         m.radicado,
         TO_CHAR(m.fecha, 'YYYY-MM-DD') AS fecha,
         m.origen_departamento,
@@ -89,6 +90,7 @@ const getManifiestos = async (req, res) => {
         m.id_empresa_a_cargo,
         e.nombre AS empresa_a_cargo_nombre
       FROM manifiesto m
+      LEFT JOIN factura f ON f.id_manifiesto = m.id_manifiesto -- ?? CLAVE
       INNER JOIN cliente c ON m.id_cliente = c.nit
       INNER JOIN conductor co ON m.id_conductor = co.cedula
       INNER JOIN vehiculo v ON m.id_vehiculo = v.placa
@@ -142,7 +144,6 @@ const getManifiestos = async (req, res) => {
       index++;
     }
 
-    // ?? ORDEN + LIMITE DURO
     query += `
       ORDER BY m.fecha DESC, m.radicado DESC
       LIMIT 200
@@ -169,10 +170,12 @@ const getManifiestoById = async (req, res) => {
       `
       SELECT
         m.*,
+        f.codigo_factura AS id_factura, -- ?? NUEVO
         c.nombre AS cliente_nombre,
         co.nombre AS conductor_nombre,
         e.nombre AS empresa_a_cargo_nombre
       FROM manifiesto m
+      LEFT JOIN factura f ON f.id_manifiesto = m.id_manifiesto -- ?? CLAVE
       INNER JOIN cliente c ON m.id_cliente = c.nit
       INNER JOIN conductor co ON m.id_conductor = co.cedula
       INNER JOIN empresa_a_cargo e ON m.id_empresa_a_cargo = e.nit

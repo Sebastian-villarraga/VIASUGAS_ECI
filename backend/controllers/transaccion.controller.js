@@ -125,10 +125,12 @@ const createTransaccion = async (req, res) => {
     // REGLAS DE NEGOCIO
     // =========================
 
-    // INGRESO ? requiere factura
-    if (tipo === "INGRESO MANIFIESTO" && !id_factura) {
+
+    // ?? INGRESO MANIFIESTO
+    // SOLO exige manifiesto, NO factura
+    if (tipo === "INGRESO MANIFIESTO" && !id_manifiesto) {
       return res.status(400).json({
-        error: "Ingreso requiere factura"
+        error: "Ingreso requiere manifiesto"
       });
     }
 
