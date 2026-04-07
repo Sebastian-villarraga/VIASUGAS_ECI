@@ -3,7 +3,7 @@ const pool = require("../config/db");
 // =========================
 // GET FACTURAS
 // =========================
-const getFacturas = async (_req, res) => {
+const getFacturas = async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT 
@@ -16,7 +16,6 @@ const getFacturas = async (_req, res) => {
         f.retencion_ica,
         f.plazo_pago,
         f.creado,
-        f.estado,
         c.nombre AS cliente_nombre
       FROM factura f
       LEFT JOIN manifiesto m 
@@ -26,18 +25,36 @@ const getFacturas = async (_req, res) => {
       ORDER BY f.fecha_emision DESC
     `);
 
-    res.json(result.rows);
+    const hoy = new Date().toISOString().split("T")[0];
+
+    // ?? calculamos estado dinámicamente
+    const data = result.rows.map(f => {
+      let estado = "pendiente";
+
+      if (f.fecha_vencimiento && f.fecha_vencimiento < hoy) {
+        estado = "vencida";
+      }
+
+      // ? opcional: si quieres lógica futura de pago real, se agrega aquí
+
+      return {
+        ...f,
+        estado
+      };
+    });
+
+    return res.json(data);
 
   } catch (error) {
-    console.error("Error getFacturas:", error);
-    res.status(500).json({ error: "Error obteniendo facturas" });
+    console.error("? Error getFacturas:", error);
+    return res.status(500).json({ error: "Error obteniendo facturas" });
   }
 };
 
 // =========================
 // GET MANIFIESTOS
 // =========================
-const getManifiestos = async (_req, res) => {
+const getManifiestos = async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT 
@@ -49,11 +66,11 @@ const getManifiestos = async (_req, res) => {
       ORDER BY m.id_manifiesto DESC
     `);
 
-    res.json(result.rows);
+    return res.json(result.rows);
 
   } catch (error) {
-    console.error("Error getManifiestos:", error);
-    res.status(500).json({ error: "Error obteniendo manifiestos" });
+    console.error("? Error getManifiestos:", error);
+    return res.status(500).json({ error: "Error obteniendo manifiestos" });
   }
 };
 
@@ -68,16 +85,17 @@ const createFactura = async (req, res) => {
       fecha_emision,
       fecha_vencimiento,
       valor,
-      retencion_fuente,
-      retencion_ica,
-      plazo_pago
+      retencion_fuente = 0,
+      retencion_ica = 0,
+      plazo_pago = 0
     } = req.body;
 
     if (!codigo_factura || !id_manifiesto || !fecha_emision || !valor) {
       return res.status(400).json({ error: "Campos obligatorios faltantes" });
     }
 
-    const query = `
+    const result = await pool.query(
+      `
       INSERT INTO factura (
         codigo_factura,
         id_manifiesto,
@@ -87,72 +105,60 @@ const createFactura = async (req, res) => {
         retencion_fuente,
         retencion_ica,
         plazo_pago,
-        estado,
         creado
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'pendiente',NOW())
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW())
       RETURNING *
-    `;
+      `,
+      [
+        codigo_factura,
+        id_manifiesto,
+        fecha_emision,
+        fecha_vencimiento,
+        valor,
+        retencion_fuente,
+        retencion_ica,
+        plazo_pago
+      ]
+    );
 
-    const result = await pool.query(query, [
-      codigo_factura,
-      id_manifiesto,
-      fecha_emision,
-      fecha_vencimiento,
-      valor,
-      retencion_fuente,
-      retencion_ica,
-      plazo_pago
-    ]);
-
-    res.status(201).json(result.rows[0]);
+    return res.status(201).json(result.rows[0]);
 
   } catch (error) {
-    console.error("Error createFactura:", error);
-    res.status(500).json({ error: "Error creando factura" });
+    console.error("? Error createFactura:", error);
+    return res.status(500).json({ error: "Error creando factura" });
   }
 };
 
 // =========================
-// MARCAR COMO PAGADA ??
+// PAGAR FACTURA (SIMULADO)
 // =========================
 const pagarFactura = async (req, res) => {
   try {
     const { codigo } = req.params;
 
-    // ?? VALIDACIÓN (evita undefined)
     if (!codigo) {
       return res.status(400).json({ error: "Código de factura requerido" });
     }
 
-    const result = await pool.query(
-      `
-      UPDATE factura
-      SET estado = 'pagada'
-      WHERE codigo_factura = $1
-      RETURNING *
-      `,
-      [codigo]
-    );
-
-    if (!result || result.rows.length === 0) {
-      return res.status(404).json({ error: "Factura no encontrada" });
-    }
-
-    res.json(result.rows[0]);
+    // ?? ya no se guarda en DB ? solo respuesta simulada
+    return res.json({
+      codigo_factura: codigo,
+      estado: "pagada"
+    });
 
   } catch (error) {
-    console.error("Error pagarFactura:", error);
-    res.status(500).json({ error: "Error actualizando factura" });
+    console.error("? Error pagarFactura:", error);
+    return res.status(500).json({ error: "Error procesando pago" });
   }
 };
 
 // =========================
-// EXPORTS
+// EXPORTS 
 // =========================
-module.exports = { 
-  getFacturas, 
-  createFactura, 
+module.exports = {
+  getFacturas,
+  createFactura,
   getManifiestos,
-  pagarFactura   // ?? NUEVO
+  pagarFactura
 };

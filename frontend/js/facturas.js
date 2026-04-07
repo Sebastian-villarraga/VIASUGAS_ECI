@@ -59,7 +59,12 @@ function aplicarFiltrosFacturas() {
 
   const desde = document.getElementById("fDesde")?.value || "";
   const hasta = document.getElementById("fHasta")?.value || "";
-  const codigo = document.getElementById("fCodigo")?.value?.toLowerCase() || "";
+
+  const codigoInput = document.getElementById("fCodigo");
+  const codigo = codigoInput && codigoInput.value
+    ? codigoInput.value.toLowerCase()
+    : "";
+
   const manifiesto = document.getElementById("fManifiesto")?.value || "";
 
   let filtradas = facturasData.filter(f => {
@@ -69,7 +74,7 @@ function aplicarFiltrosFacturas() {
     if (desde && fecha < desde) return false;
     if (hasta && fecha > hasta) return false;
 
-    if (codigo && !f.codigo_factura?.toLowerCase().includes(codigo)) return false;
+    if (codigo && !(f.codigo_factura || "").toLowerCase().includes(codigo)) return false;
 
     if (manifiesto && f.id_manifiesto !== manifiesto) return false;
 
@@ -91,16 +96,30 @@ function renderFacturas(data) {
     return;
   }
 
+  // ?? DEFINIR AQUÍ (ANTES DE USARLOS)
+  const totalF = document.getElementById("totalFacturado");
+  const totalC = document.getElementById("totalCobrado");
+  const totalP = document.getElementById("totalPendiente");
+  const porcentaje = document.getElementById("porcentajeCobro");
+
   tbody.innerHTML = "";
 
-  // ?? FIX: colspan correcto (ahora tienes 10 columnas)
   if (!data || data.length === 0) {
     tbody.innerHTML = `<tr><td colspan="10">Sin datos</td></tr>`;
+    
+    if (totalF) totalF.innerText = "$0";
+    if (totalC) totalC.innerText = "$0";
+    if (totalP) totalP.innerText = "$0";
+    if (porcentaje) porcentaje.innerText = "0%";
+
     return;
   }
 
   let totalFacturado = 0;
-  let totalRetenciones = 0;
+  let totalCobrado = 0;
+  let totalPendiente = 0;
+
+  const hoy = new Date().toISOString().split("T")[0];
 
   data.forEach(f => {
 
@@ -110,15 +129,27 @@ function renderFacturas(data) {
     const neto = valor - retFuente - retIca;
 
     totalFacturado += valor;
-    totalRetenciones += (retFuente + retIca);
 
-    // ?? DEBUG (puedes borrarlo luego)
-    // console.log("Factura render:", f);
+    let estado = f.estado;
 
-    const estadoHTML = getEstadoFactura(f);
+    if (!estado) {
+      if (f.fecha_vencimiento && f.fecha_vencimiento.split("T")[0] < hoy) {
+        estado = "vencida";
+      } else {
+        estado = "pendiente";
+      }
+    }
 
-    const accionesHTML = (f.estado === "pagada")
-      ? `<span style="color:#27ae60;font-weight:600;">? Pagada</span>`
+    if (estado === "pagada") {
+      totalCobrado += neto;
+    } else {
+      totalPendiente += neto;
+    }
+
+    const estadoHTML = getEstadoFactura({ ...f, estado });
+
+    const accionesHTML = (estado === "pagada")
+      ? `<span style="color:#27ae60;font-weight:600;">Pagada</span>`
       : `<button class="btn-pagar" onclick="pagarFactura('${f.codigo_factura}')">Pagar</button>`;
 
     tbody.innerHTML += `
@@ -137,56 +168,53 @@ function renderFacturas(data) {
     `;
   });
 
-  // ?? VALIDAR que existan antes de asignar
-  const totalF = document.getElementById("totalFacturado");
-  const totalR = document.getElementById("totalRetenciones");
-  const totalN = document.getElementById("totalNeto");
+  const porcentajeCobro = totalFacturado > 0
+    ? ((totalCobrado / totalFacturado) * 100).toFixed(1)
+    : 0;
 
   if (totalF) totalF.innerText = format(totalFacturado);
-  if (totalR) totalR.innerText = format(totalRetenciones);
-  if (totalN) totalN.innerText = format(totalFacturado - totalRetenciones);
+  if (totalC) totalC.innerText = format(totalCobrado);
+  if (totalP) totalP.innerText = format(totalPendiente);
+  if (porcentaje) porcentaje.innerText = porcentajeCobro + "%";
 }
-
 // =========================
 // EVENTOS
 // =========================
 function eventosFacturas() {
 
+  // ?? EVITAR DUPLICAR EVENTOS (CLAVE EN SPA)
+  if (window._eventosFacturasInit) return;
+  window._eventosFacturasInit = true;
+
+  const modal = document.getElementById("modalFactura");
+
   // =========================
   // ABRIR MODAL
   // =========================
   document.getElementById("btnNuevaFactura")?.addEventListener("click", () => {
-    document.getElementById("modalFactura").classList.remove("hidden");
+    modal.classList.remove("hidden");
   });
 
   // =========================
-  // GUARDAR FACTURA
+  // CERRAR MODAL (BOTON CANCELAR)
   // =========================
-  document.getElementById("guardarFactura")?.addEventListener("click", async () => {
+  document.getElementById("cancelarFactura")?.addEventListener("click", () => {
+    cerrarModalFactura();
+  });
 
-    const body = {
-      codigo_factura: document.getElementById("codigoFactura").value,
-      id_manifiesto: document.getElementById("manifiestoFactura").value,
-      fecha_emision: document.getElementById("fechaEmision").value,
-      fecha_vencimiento: document.getElementById("fechaVencimiento").value,
-      valor: Number(document.getElementById("valorFactura").value),
-      retencion_fuente: Number(document.getElementById("retencionFuente").value),
-      retencion_ica: Number(document.getElementById("retencionIca").value),
-      plazo_pago: Number(document.getElementById("plazoPago").value)
-    };
-
-    if (!body.codigo_factura || !body.id_manifiesto || !body.fecha_emision || !body.valor) {
-      alert("Completa los campos obligatorios");
-      return;
+  // =========================
+  // CERRAR MODAL (CLICK FUERA)
+  // =========================
+  modal?.addEventListener("click", (e) => {
+    if (e.target.id === "modalFactura") {
+      cerrarModalFactura();
     }
+  });
 
-    await apiFetch("/api/facturas", {
-      method: "POST",
-      body: JSON.stringify(body)
-    });
+  function cerrarModalFactura() {
+    modal.classList.add("hidden");
 
-    document.getElementById("modalFactura").classList.add("hidden");
-
+    // limpiar formulario
     document.getElementById("codigoFactura").value = "";
     document.getElementById("manifiestoFactura").value = "";
     document.getElementById("fechaEmision").value = "";
@@ -195,8 +223,43 @@ function eventosFacturas() {
     document.getElementById("retencionFuente").value = "";
     document.getElementById("retencionIca").value = "";
     document.getElementById("plazoPago").value = "";
+  }
 
-    await cargarFacturas();
+  // =========================
+  // GUARDAR FACTURA
+  // =========================
+  document.getElementById("guardarFactura")?.addEventListener("click", async () => {
+
+    try {
+
+      const body = {
+        codigo_factura: document.getElementById("codigoFactura").value,
+        id_manifiesto: document.getElementById("manifiestoFactura").value,
+        fecha_emision: document.getElementById("fechaEmision").value,
+        fecha_vencimiento: document.getElementById("fechaVencimiento").value,
+        valor: Number(document.getElementById("valorFactura").value),
+        retencion_fuente: Number(document.getElementById("retencionFuente").value),
+        retencion_ica: Number(document.getElementById("retencionIca").value),
+        plazo_pago: Number(document.getElementById("plazoPago").value)
+      };
+
+      if (!body.codigo_factura || !body.id_manifiesto || !body.fecha_emision || !body.valor) {
+        alert("Completa los campos obligatorios");
+        return;
+      }
+
+      await apiFetch("/api/facturas", {
+        method: "POST",
+        body: JSON.stringify(body)
+      });
+
+      cerrarModalFactura();
+      await cargarFacturas();
+
+    } catch (error) {
+      console.error("Error guardando factura:", error);
+      alert("Error al guardar la factura");
+    }
   });
 
   // =========================
@@ -207,7 +270,7 @@ function eventosFacturas() {
   });
 
   // =========================
-  // LIMPIAR
+  // LIMPIAR FILTROS
   // =========================
   document.getElementById("btnLimpiarFacturas")?.addEventListener("click", () => {
 
@@ -220,15 +283,13 @@ function eventosFacturas() {
   });
 
   // =========================
-  // ?? EVENTOS MODAL (FIX DEFINITIVO)
+  // MODAL CONFIRMACION
   // =========================
   document.addEventListener("click", (e) => {
 
     if (e.target.id === "btnConfirmar") {
-      console.log("CONFIRMAR CLICK");
 
       if (confirmCallback) confirmCallback();
-
       cerrarConfirmacion();
     }
 
@@ -331,12 +392,3 @@ function cerrarConfirmacion() {
   confirmCallback = null;
 }
 
-// eventos confirmación
-document.getElementById("btnConfirmar")?.addEventListener("click", () => {
-  if (confirmCallback) confirmCallback();
-  cerrarConfirmacion();
-});
-
-document.getElementById("btnCancelar")?.addEventListener("click", () => {
-  cerrarConfirmacion();
-});

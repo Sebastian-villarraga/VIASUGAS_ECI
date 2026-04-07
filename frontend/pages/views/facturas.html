@@ -10,20 +10,27 @@
 
   <!-- CARDS -->
   <div class="transacciones-cards">
+
     <div class="card ingreso">
       <h3>Total Facturado</h3>
       <p id="totalFacturado">$0</p>
     </div>
-
-    <div class="card egreso">
-      <h3>Retenciones</h3>
-      <p id="totalRetenciones">$0</p>
+  
+    <div class="card cobrado">
+      <h3>Total Cobrado</h3>
+      <p id="totalCobrado">$0</p>
     </div>
-
-    <div class="card utilidad">
-      <h3>Total Neto</h3>
-      <p id="totalNeto">$0</p>
+  
+    <div class="card pendiente">
+      <h3>Cartera</h3>
+      <p id="totalPendiente">$0</p>
     </div>
+  
+    <div class="card porcentaje">
+      <h3>% Cobro</h3>
+      <p id="porcentajeCobro">0%</p>
+    </div>
+  
   </div>
 
   <!-- FILTROS -->
@@ -64,31 +71,68 @@
 </div>
 
 
-<!-- MODAL -->
+<!-- MODAL FACTURA -->
 <div id="modalFactura" class="modal hidden">
-  <div class="modal-content">
+  <div class="modal-content modal-factura">
 
     <h3>Nueva Factura</h3>
 
-    <input type="text" id="codigoFactura" placeholder="Código factura">
+    <div class="form-grid">
 
-    <select id="manifiestoFactura">
-      <option value="">Seleccione manifiesto</option>
-    </select>
+      <div class="form-group">
+        <label>Código factura</label>
+        <input type="text" id="codigoFactura" placeholder="Ej: F001">
+      </div>
 
-    <input type="date" id="fechaEmision">
-    <input type="date" id="fechaVencimiento">
+      <div class="form-group">
+        <label>Manifiesto</label>
+        <select id="manifiestoFactura">
+          <option value="">Seleccione</option>
+        </select>
+      </div>
 
-    <input type="number" id="valorFactura" placeholder="Valor">
-    <input type="number" id="retencionFuente" placeholder="Retención fuente">
-    <input type="number" id="retencionIca" placeholder="Retención ICA">
+      <div class="form-group">
+        <label>Fecha emisión</label>
+        <input type="date" id="fechaEmision">
+      </div>
 
-    <input type="number" id="plazoPago" placeholder="Plazo (días)">
+      <div class="form-group">
+        <label>Fecha vencimiento</label>
+        <input type="date" id="fechaVencimiento">
+      </div>
 
-    <button id="guardarFactura">Guardar</button>
+      <div class="form-group">
+        <label>Valor total</label>
+        <input type="number" id="valorFactura" placeholder="$0">
+      </div>
+
+      <div class="form-group">
+        <label>Plazo (días)</label>
+        <input type="number" id="plazoPago" placeholder="Ej: 30">
+      </div>
+
+      <div class="form-group">
+        <label>Retención fuente</label>
+        <input type="number" id="retencionFuente" placeholder="$0">
+      </div>
+
+      <div class="form-group">
+        <label>Retención ICA</label>
+        <input type="number" id="retencionIca" placeholder="$0">
+      </div>
+
+    </div>
+
+    <!-- BOTONES -->
+    <div class="modal-actions">
+      <button type="button" id="cancelarFactura" class="btn-cancelar">Cancelar</button>
+      <button type="button" id="guardarFactura" class="btn-guardar">Guardar</button>
+    </div>
+
   </div>
-  
-<!-- MODAL CONFIRMACION -->
+</div>
+
+<!-- ✅ MODAL CONFIRMACION -->
 <div id="modalConfirmacion" class="modal hidden">
   <div class="modal-content confirm-modal">
 
