@@ -96,7 +96,6 @@ function renderFacturas(data) {
     return;
   }
 
-  // ?? DEFINIR AQUÍ (ANTES DE USARLOS)
   const totalF = document.getElementById("totalFacturado");
   const totalC = document.getElementById("totalCobrado");
   const totalP = document.getElementById("totalPendiente");
@@ -115,12 +114,39 @@ function renderFacturas(data) {
     return;
   }
 
+  const hoy = new Date().toISOString().split("T")[0];
+
+  // =========================
+  // ORDENAR SIN ROMPER UI
+  // =========================
+  const prioridadEstado = {
+    "vencida": 1,
+    "pendiente": 2,
+    "pagada": 3
+  };
+
+  data = [...data].sort((a, b) => {
+
+    const estadoA = a.estado ||
+      (a.fecha_vencimiento && a.fecha_vencimiento.split("T")[0] < hoy
+        ? "vencida"
+        : "pendiente");
+
+    const estadoB = b.estado ||
+      (b.fecha_vencimiento && b.fecha_vencimiento.split("T")[0] < hoy
+        ? "vencida"
+        : "pendiente");
+
+    return prioridadEstado[estadoA] - prioridadEstado[estadoB];
+  });
+
   let totalFacturado = 0;
   let totalCobrado = 0;
   let totalPendiente = 0;
 
-  const hoy = new Date().toISOString().split("T")[0];
-
+  // =========================
+  // RENDER
+  // =========================
   data.forEach(f => {
 
     const valor = Number(f.valor || 0);
@@ -148,9 +174,10 @@ function renderFacturas(data) {
 
     const estadoHTML = getEstadoFactura({ ...f, estado });
 
+    // ?? IMPORTANTE: RESPETAR CLASE CSS
     const accionesHTML = (estado === "pagada")
-      ? `<span style="color:#27ae60;font-weight:600;">Pagada</span>`
-      : `<button class="btn-pagar" onclick="pagarFactura('${f.codigo_factura}')">Pagar</button>`;
+      ? `<span class="badge pagada">Pagada</span>`
+      : `<button type="button" class="btn-pagar" onclick="pagarFactura('${f.codigo_factura}')">Pagar</button>`;
 
     tbody.innerHTML += `
       <tr>

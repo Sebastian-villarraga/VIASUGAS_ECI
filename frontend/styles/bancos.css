@@ -1,0 +1,166 @@
+/* ========================= */
+/* LAYOUT */
+/* ========================= */
+.banco-layout {
+  display: block;
+}
+
+.banco-left {
+  width: 100%;
+}
+
+/* ========================= */
+/* HEADER */
+/* ========================= */
+.banco-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.banco-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* ========================= */
+/* FILTROS */
+/* ========================= */
+.banco-filtros {
+  margin-bottom: 20px;
+  padding: 18px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #ddd;
+}
+
+/* ========================= */
+/* TABLA */
+/* ========================= */
+.banco-tabla {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  width: 100%;
+}
+
+.tabla-body {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* ========================= */
+/* TABLE */
+/* ========================= */
+.banco-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.banco-table th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #f1f3f6;
+  font-size: 13px;
+}
+
+.banco-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+/* ========================= */
+/* INPUTS INLINE (EDICIÓN) */
+/* ========================= */
+.banco-table input,
+.banco-table select {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* ========================= */
+/* FORM GRID */
+/* ========================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* ========================= */
+/* BOTONES MODAL ?? */
+/* ========================= */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  min-width: 120px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+/* ========================= */
+/* CANCELAR (FORZADO) ?? */
+/* ========================= */
+.modal .btn-cancel {
+  background: #e74c3c !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  filter: none !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hover cancelar */
+.modal .btn-cancel:hover {
+  background: #c0392b !important;
+}
+
+/* ========================= */
+/* GUARDAR */
+/* ========================= */
+.modal .btn-primary {
+  background: #2f5597 !important;
+  color: #ffffff !important;
+}
+
+/* Hover guardar */
+.modal .btn-primary:hover {
+  background: #24457a !important;
+}
+
+/* ========================= */
+/* EFECTO GENERAL */
+/* ========================= */
+.modal-actions button:hover {
+  transform: translateY(-1px);
+}

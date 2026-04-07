@@ -41,12 +41,11 @@ const getBancoById = async (req, res) => {
 };
 
 // =========================
-// CREATE
+// CREATE (ID AUTO BN#)
 // =========================
 const createBanco = async (req, res) => {
   try {
-    const {
-      id,
+    let {
       nombre_banco,
       numero_cuenta,
       tipo_cuenta,
@@ -54,37 +53,71 @@ const createBanco = async (req, res) => {
       identificacion
     } = req.body;
 
-    if (!id || !nombre_banco || !numero_cuenta || !tipo_cuenta) {
+    console.log("?? BODY ORIGINAL:", req.body);
+
+    // =========================
+    // NORMALIZAR DATOS ??
+    // =========================
+    nombre_banco = nombre_banco?.trim();
+    numero_cuenta = numero_cuenta?.trim();
+    tipo_cuenta = tipo_cuenta?.toLowerCase().trim();
+    nombre_titular = nombre_titular?.trim() || null;
+    identificacion = identificacion?.trim() || null;
+
+    console.log("?? BODY LIMPIO:", {
+      nombre_banco,
+      numero_cuenta,
+      tipo_cuenta
+    });
+
+    // =========================
+    // VALIDACIONES
+    // =========================
+    if (!nombre_banco || !numero_cuenta || !tipo_cuenta) {
       return res.status(400).json({ error: "Campos obligatorios faltantes" });
     }
 
-    const query = `
+    if (!["ahorros", "corriente"].includes(tipo_cuenta)) {
+      return res.status(400).json({ error: "Tipo de cuenta inválido" });
+    }
+
+    // =========================
+    // GENERAR ID
+    // =========================
+    const newId = "BN" + Date.now();
+
+    // =========================
+    // INSERT ?? (SAFE ENUM)
+    // =========================
+    const result = await pool.query(`
       INSERT INTO banco (
         id,
+        nombre_titular,
+        identificacion,
         nombre_banco,
         numero_cuenta,
         tipo_cuenta,
-        nombre_titular,
-        identificacion,
         creado
       )
       VALUES ($1,$2,$3,$4,$5,$6,NOW())
       RETURNING *
-    `;
-
-    const result = await pool.query(query, [
-      id,
+    `, [
+      newId,
+      nombre_titular,
+      identificacion,
       nombre_banco,
       numero_cuenta,
-      tipo_cuenta,
-      nombre_titular,
-      identificacion
+      tipo_cuenta // ?? SIN CAST ::tcuentabanco
     ]);
 
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
-    res.status(500).json({ error: "Error creando banco" });
+    console.error("?? ERROR SQL REAL:", error);
+    res.status(500).json({
+      error: "Error creando banco",
+      detalle: error.message
+    });
   }
 };
 
@@ -103,29 +136,38 @@ const updateBanco = async (req, res) => {
       identificacion
     } = req.body;
 
+    if (!nombre_banco || !numero_cuenta || !tipo_cuenta) {
+      return res.status(400).json({ error: "Campos obligatorios faltantes" });
+    }
+
     const result = await pool.query(`
       UPDATE banco
       SET
-        nombre_banco = $1,
-        numero_cuenta = $2,
-        tipo_cuenta = $3,
-        nombre_titular = $4,
-        identificacion = $5
+        nombre_titular = $1,
+        identificacion = $2,
+        nombre_banco = $3,
+        numero_cuenta = $4,
+        tipo_cuenta = $5::tcuentabanco
       WHERE id = $6
       RETURNING *
     `, [
+      nombre_titular || null,
+      identificacion || null,
       nombre_banco,
       numero_cuenta,
       tipo_cuenta,
-      nombre_titular,
-      identificacion,
       id
     ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Banco no encontrado" });
+    }
 
     res.json(result.rows[0]);
 
   } catch (error) {
-    res.status(500).json({ error: "Error actualizando banco" });
+    console.error("?? ERROR UPDATE:", error);
+    res.status(500).json({ error: error.message });
   }
 };
 
