@@ -49,6 +49,7 @@
         <tr>
           <th>Fecha</th>
           <th>Tipo</th>
+          <th>Categoria</th>
           <th>Banco</th>
           <th>Manifiesto</th>
           <th>Valor</th>
@@ -69,21 +70,43 @@
 
     <h3>Nueva Transacción</h3>
 
-    <select id="tipo"></select>
-    <select id="banco"></select>
-
-    <div id="wrapManifiesto">
-      <select id="manifiesto"></select>
+    <div class="form-group">
+      <label>Tipo de transacción</label>
+      <select id="tipo"></select>
     </div>
 
-    <div id="wrapFactura">
-      <select id="factura"></select>
+    <div id="formFields" class="form-grid">
+    
+      <div id="wrapManifiesto" class="form-group">
+        <label>Manifiesto</label>
+        <select id="manifiesto"></select>
+      </div>
+
+      <div class="form-group">
+        <label>Banco</label>
+        <select id="banco"></select>
+      </div>
+
+      
+
+      <div class="form-group">
+        <label>Valor</label>
+        <input type="number" id="valor" placeholder="Valor">
+      </div>
+
+      <div class="form-group">
+        <label>Fecha de pago</label>
+        <input type="date" id="fecha">
+      </div>
+
+      <div class="form-group full">
+        <label>Descripción</label>
+        <textarea id="descripcion"></textarea>
+      </div>
+
     </div>
 
-    <input type="number" id="valor" placeholder="Valor">
-    <input type="date" id="fecha">
-    <textarea id="descripcion" placeholder="Descripción"></textarea>
+    <button id="guardarTransaccion" class="btn-primary">Guardar</button>
 
-    <button id="guardarTransaccion">Guardar</button>
   </div>
 </div>

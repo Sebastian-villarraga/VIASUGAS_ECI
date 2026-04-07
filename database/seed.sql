@@ -161,13 +161,34 @@ INSERT INTO banco VALUES
 -- =====================================================
 
 INSERT INTO tipo_transaccion VALUES
-('TT1','INGRESO','Ingreso por transporte','INGRESO MANIFIESTO','activo',NOW()),
-('TT2','EGRESO MANIFIESTO','Costo operativo viaje','EGRESO MANIFIESTO','activo',NOW()),
-('TT3','EGRESO OPERACIONAL','Gasto administrativo','EGRESO OPERACIONAL','activo',NOW()),
-('TT4','COMBUSTIBLE','Combustible viaje','EGRESO MANIFIESTO','activo',NOW()),
-('TT5','PEAJES','Peajes','EGRESO MANIFIESTO','activo',NOW()),
-('TT6','NOMINA','Pago nomina','EGRESO OPERACIONAL','activo',NOW()),
-('TT7','MANTENIMIENTO','Mantenimiento vehiculo','EGRESO OPERACIONAL','activo',NOW());
+
+-- ================= INGRESOS =================
+
+
+('TT3','ANTICIPO RECIBIDO','Anticipo recibido del cliente','INGRESO MANIFIESTO','activo',NOW()),
+('TT4','SALDOS','Pago final del cliente','INGRESO MANIFIESTO','activo',NOW()),
+('TT5','PORCENTAJES','Ingreso por porcentaje','INGRESO MANIFIESTO','activo',NOW()),
+
+-- ================= EGRESOS MANIFIESTO =================
+('TT1','CARGUE','Ingreso por cargue','EGRESO MANIFIESTO','activo',NOW()),
+('TT2','DESCARGUE','Ingreso por descargue','EGRESO MANIFIESTO','activo',NOW()),
+('TT6','COMBUSTIBLE','Combustible del viaje','EGRESO MANIFIESTO','activo',NOW()),
+('TT7','PEAJES','Pago de peajes','EGRESO MANIFIESTO','activo',NOW()),
+('TT8','ANTICIPO ENVIADO','Anticipo al conductor','EGRESO MANIFIESTO','activo',NOW()),
+('TT9','COMISIONES','Pago de comisiones','EGRESO MANIFIESTO','activo',NOW()),
+('TT10','EXTRA','Gastos adicionales del viaje','EGRESO MANIFIESTO','activo',NOW()),
+
+-- ================= EGRESOS OPERACIONALES =================
+('TT11','NOMINA','Pago de nomina','EGRESO OPERACIONAL','activo',NOW()),
+('TT12','TALLER','Mantenimiento vehicular','EGRESO OPERACIONAL','activo',NOW()),
+('TT13','SERVICIOS','Servicios generales','EGRESO OPERACIONAL','activo',NOW()),
+('TT14','CREDITOS','Pago de creditos','EGRESO OPERACIONAL','activo',NOW()),
+('TT15','PRESTAMO','Pago de prestamos','EGRESO OPERACIONAL','activo',NOW()),
+('TT16','POLIZAS','Seguros y polizas','EGRESO OPERACIONAL','activo',NOW()),
+('TT17','SEGURIDAD','Gastos de seguridad','EGRESO OPERACIONAL','activo',NOW()),
+('TT18','GRAVAMEN','Impuestos financieros','EGRESO OPERACIONAL','activo',NOW()),
+('TT19','PAGO CESANTIAS','Pago de cesantias','EGRESO OPERACIONAL','activo',NOW()),
+('TT20','LIQUIDACIONES','Liquidaciones laborales','EGRESO OPERACIONAL','activo',NOW());
 
 -- =====================================================
 -- FACTURAS (RELACIONADAS A MANIFIESTOS)
@@ -191,31 +212,36 @@ INSERT INTO factura VALUES
 
 INSERT INTO transaccion VALUES
 
--- INGRESOS (con factura)
-('TR101','B1','TT1','ABC123','T1001','MF-1011','F101',5200000,'2026-01-05','Ingreso viaje MF-1011',NOW()),
-('TR102','B2','TT1','DEF456','T1002','MF-1012','F102',6100000,'2026-01-10','Ingreso viaje MF-1012',NOW()),
-('TR103','B3','TT1','GHI789','T1003','MF-1013','F103',7200000,'2026-01-20','Ingreso viaje MF-1013',NOW()),
-('TR104','B4','TT1','JKL321','T1004','MF-1014','F104',8300000,'2026-02-05','Ingreso viaje MF-1014',NOW()),
-('TR105','B5','TT1','MNO654','T1005','MF-1015','F105',9100000,'2026-02-10','Ingreso viaje MF-1015',NOW()),
+-- ================= INGRESOS =================
+('TR101','B1','TT4','ABC123','T1001','MF-1011','F101',5200000,'2026-01-05','Saldo viaje MF-1011',NOW()),
+('TR102','B2','TT4','DEF456','T1002','MF-1012','F102',6100000,'2026-01-10','Saldo viaje MF-1012',NOW()),
+('TR103','B3','TT4','GHI789','T1003','MF-1013','F103',7200000,'2026-01-20','Saldo viaje MF-1013',NOW()),
+('TR104','B4','TT4','JKL321','T1004','MF-1014','F104',8300000,'2026-02-05','Saldo viaje MF-1014',NOW()),
+('TR105','B5','TT4','MNO654','T1005','MF-1015','F105',9100000,'2026-02-10','Saldo viaje MF-1015',NOW()),
 
--- EGRESOS MANIFIESTO
-('TR106','B1','TT4','ABC123','T1001','MF-1011',NULL,300000,'2026-01-04','Combustible',NOW()),
-('TR107','B2','TT5','DEF456','T1002','MF-1012',NULL,200000,'2026-01-09','Peajes',NOW()),
-('TR108','B3','TT4','GHI789','T1003','MF-1013',NULL,350000,'2026-01-18','Combustible',NOW()),
-('TR109','B4','TT5','JKL321','T1004','MF-1014',NULL,250000,'2026-02-04','Peajes',NOW()),
-('TR110','B5','TT4','MNO654','T1005','MF-1015',NULL,400000,'2026-02-08','Combustible',NOW()),
+-- ================= EGRESOS MANIFIESTO =================
+('TR106','B1','TT6','ABC123','T1001','MF-1011',NULL,300000,'2026-01-04','Combustible viaje',NOW()),
+('TR107','B2','TT7','DEF456','T1002','MF-1012',NULL,200000,'2026-01-09','Peajes viaje',NOW()),
+('TR108','B3','TT6','GHI789','T1003','MF-1013',NULL,350000,'2026-01-18','Combustible viaje',NOW()),
+('TR109','B4','TT7','JKL321','T1004','MF-1014',NULL,250000,'2026-02-04','Peajes viaje',NOW()),
+('TR110','B5','TT6','MNO654','T1005','MF-1015',NULL,400000,'2026-02-08','Combustible viaje',NOW()),
 
--- EGRESOS OPERACIONALES
-('TR111','B6','TT3',NULL,NULL,NULL,NULL,800000,'2026-02-15','Gasto administrativo',NOW()),
-('TR112','B7','TT6',NULL,NULL,NULL,NULL,1200000,'2026-03-01','Nomina',NOW()),
-('TR113','B1','TT7',NULL,NULL,NULL,NULL,500000,'2026-03-10','Mantenimiento',NOW());
+-- ================= ANTICIPOS =================
+('TR114','B1','TT8','ABC123','T1001','MF-1011',NULL,500000,'2026-01-03','Anticipo conductor',NOW()),
+('TR115','B2','TT8','DEF456','T1002','MF-1012',NULL,600000,'2026-01-07','Anticipo conductor',NOW()),
+
+-- ================= EGRESOS OPERACIONALES =================
+('TR111','B6','TT11',NULL,NULL,NULL,NULL,800000,'2026-02-15','Nomina',NOW()),
+('TR112','B7','TT12',NULL,NULL,NULL,NULL,1200000,'2026-03-01','Mantenimiento',NOW()),
+('TR113','B1','TT13',NULL,NULL,NULL,NULL,500000,'2026-03-10','Servicios',NOW());
 
 -- =====================================================
 -- GASTOS CONDUCTOR
 -- =====================================================
 
 INSERT INTO gastos_conductor VALUES
-('GC101','TR107',10000000001,'MF-1011','Peaje conductor',NOW()),
-('GC102','TR108',10000000002,'MF-1012','Combustible conductor',NOW()),
-('GC103','TR109',10000000003,'MF-1013','Peaje conductor',NOW()),
-('GC104','TR110',10000000004,'MF-1014','Combustible conductor',NOW());
+('GC101','TR107',10000000001,'MF-1012','Peaje conductor',NOW()),
+('GC102','TR108',10000000002,'MF-1013','Combustible conductor',NOW()),
+('GC103','TR109',10000000003,'MF-1014','Peaje conductor',NOW()),
+('GC104','TR110',10000000004,'MF-1015','Combustible conductor',NOW()),
+('GC105','TR114',10000000001,'MF-1011','Anticipo conductor',NOW());

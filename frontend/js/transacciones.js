@@ -71,6 +71,7 @@ async function cargarTransacciones() {
       <tr>
         <td>${formatearFecha(t.fecha_pago?.split("T")[0])}</td>
         <td>${badge}</td>
+        <td>${t.categoria || "-"}</td> <!-- ?? NUEVA -->
         <td>${t.nombre_banco || ""}</td>
         <td>${t.id_manifiesto || "-"}</td>
         <td>$${Number(t.valor).toLocaleString()}</td>
@@ -124,13 +125,6 @@ function getBadge(t) {
 function eventos() {
 
   // =========================
-  // ABRIR MODAL
-  // =========================
-  document.getElementById("btnNuevaTransaccion")?.addEventListener("click", () => {
-    document.getElementById("modalTransaccion").classList.remove("hidden");
-  });
-
-  // =========================
   // FILTROS DINAMICOS
   // =========================
   ["fDesde","fHasta","fTipo","fBanco","fManifiesto"].forEach(id => {
@@ -148,29 +142,128 @@ function eventos() {
     });
 
     cargarTransacciones();
+    showToast("Filtros limpiados", "info");
   });
 
   // =========================
   // CAMBIO DE TIPO (MODAL)
   // =========================
   document.getElementById("tipo")?.addEventListener("change", (e) => {
-    const tipo = e.target.value;
 
+    const selectedOption = e.target.selectedOptions[0];
+    const tipo = selectedOption.dataset.tipo;
+
+    const formFields = document.getElementById("formFields");
     const wrapManifiesto = document.getElementById("wrapManifiesto");
-    const wrapFactura = document.getElementById("wrapFactura");
 
-    if (tipo === "EGRESO OPERACIONAL") {
-      wrapManifiesto.style.display = "none";
-      wrapFactura.style.display = "none";
-    } else {
+    if (!tipo) return;
+
+    formFields.style.display = "block";
+    wrapManifiesto.style.display = "none";
+
+    if (
+      tipo === "INGRESO MANIFIESTO" ||
+      tipo === "EGRESO MANIFIESTO"
+    ) {
       wrapManifiesto.style.display = "block";
-
-      if (tipo === "INGRESO MANIFIESTO") {
-        wrapFactura.style.display = "block";
-      } else {
-        wrapFactura.style.display = "none";
-      }
     }
+
+  });
+
+  // =========================
+  // GUARDAR ??
+  // =========================
+  document.getElementById("guardarTransaccion")?.addEventListener("click", async () => {
+
+    const btn = document.getElementById("guardarTransaccion");
+
+    try {
+
+      btn.disabled = true;
+      btn.innerText = "Guardando...";
+
+      const tipoSelect = document.getElementById("tipo");
+      const selectedOption = tipoSelect.selectedOptions[0];
+      const tipo = selectedOption?.dataset.tipo;
+
+      const payload = {
+        id: "TR" + Date.now(),
+        id_banco: document.getElementById("banco").value,
+        id_tipo_transaccion: tipoSelect.value,
+        id_manifiesto: document.getElementById("manifiesto")?.value || null,
+        valor: Number(document.getElementById("valor").value),
+        fecha_pago: document.getElementById("fecha").value,
+        descripcion: document.getElementById("descripcion").value
+      };
+
+      // =========================
+      // VALIDACIONES
+      // =========================
+
+      if (!payload.id_tipo_transaccion) {
+        return showToast("Seleccione tipo de transacción", "error");
+      }
+
+      if (!payload.id_banco) {
+        return showToast("Seleccione banco", "error");
+      }
+
+      if (!payload.valor || payload.valor <= 0) {
+        return showToast("Ingrese un valor válido", "error");
+      }
+
+      if (!payload.fecha_pago) {
+        return showToast("Seleccione fecha de pago", "error");
+      }
+
+      if (
+        (tipo === "INGRESO MANIFIESTO" || tipo === "EGRESO MANIFIESTO") &&
+        !payload.id_manifiesto
+      ) {
+        return showToast("Seleccione manifiesto", "error");
+      }
+
+      if (tipo === "EGRESO OPERACIONAL") {
+        payload.id_manifiesto = null;
+      }
+
+      // =========================
+      // API
+      // =========================
+      await apiFetch("/api/transacciones", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      // =========================
+      // UX
+      // =========================
+      showToast("Transacción creada correctamente", "success");
+
+      limpiarFormularioTransaccion();
+      document.getElementById("modalTransaccion").classList.add("hidden");
+
+      cargarTransacciones();
+
+    } catch (error) {
+      console.error(error);
+      showToast("Error creando la transacción", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "Guardar";
+    }
+
+  });
+
+  // =========================
+  // ABRIR MODAL + RESET
+  // =========================
+  document.getElementById("btnNuevaTransaccion")?.addEventListener("click", () => {
+  
+    limpiarFormularioTransaccion();
+  
+    document.getElementById("modalTransaccion").classList.remove("hidden");
+  
   });
 
   // =========================
@@ -219,7 +312,30 @@ function llenarSelect(id, data, labelKey, valueKey) {
     const option = document.createElement("option");
     option.value = item[valueKey];
     option.textContent = item[labelKey];
+
+    // ?? ESTA ES LA CLAVE QUE TE FALTABA
+    if (item.tipo) {
+      option.dataset.tipo = item.tipo;
+    }
+
     select.appendChild(option);
   });
 }
 
+function limpiarFormularioTransaccion() {
+
+  // Limpiar selects
+  document.getElementById("tipo").value = "";
+  document.getElementById("banco").value = "";
+  document.getElementById("manifiesto").value = "";
+
+  // Limpiar inputs
+  document.getElementById("valor").value = "";
+  document.getElementById("fecha").value = "";
+  document.getElementById("descripcion").value = "";
+
+  // Ocultar dinámicos
+  document.getElementById("formFields").style.display = "none";
+  document.getElementById("wrapManifiesto").style.display = "none";
+
+}
