@@ -551,10 +551,80 @@ const getCatalogosManifiesto = async (_req, res) => {
   }
 };
 
+// =========================
+// DETALLE COMPLETO MANIFIESTO
+// =========================
+async function obtenerDetalleManifiesto(req, res) {
+  try {
+    const { id } = req.params;
+
+    // =========================
+    // MANIFIESTO
+    // =========================
+    const resultManifiesto = await pool.query(`
+      SELECT m.*, c.nombre AS cliente_nombre
+      FROM manifiesto m
+      LEFT JOIN cliente c ON m.id_cliente = c.nit
+      WHERE m.id_manifiesto = $1
+    `, [id]);
+
+    if (resultManifiesto.rows.length === 0) {
+      return res.status(404).json({ error: "Manifiesto no encontrado" });
+    }
+
+    const manifiesto = resultManifiesto.rows[0];
+
+    // =========================
+    // GASTOS CONDUCTOR (JOIN CON TRANSACCION ??)
+    // =========================
+    const resultGastos = await pool.query(`
+      SELECT 
+        g.*,
+        t.valor
+      FROM gastos_conductor g
+      LEFT JOIN transaccion t ON g.id_transaccion = t.id
+      WHERE g.id_manifiesto = $1
+    `, [id]);
+
+    // =========================
+    // TRANSACCIONES
+    // =========================
+    const resultTransacciones = await pool.query(`
+      SELECT 
+        t.*,
+        tt.tipo
+      FROM transaccion t
+      LEFT JOIN tipo_transaccion tt ON t.id_tipo_transaccion = tt.id
+      WHERE t.id_manifiesto = $1
+    `, [id]);
+
+    // =========================
+    // FACTURA
+    // =========================
+    const resultFactura = await pool.query(`
+      SELECT *
+      FROM factura
+      WHERE id_manifiesto = $1
+    `, [id]);
+
+    return res.json({
+      manifiesto,
+      gastos: resultGastos.rows,
+      transacciones: resultTransacciones.rows,
+      factura: resultFactura.rows[0] || null
+    });
+
+  } catch (error) {
+    console.error("Error detalle manifiesto:", error);
+    res.status(500).json({ error: error.message }); // ?? clave para debug
+  }
+}
+
 module.exports = {
   getManifiestos,
   getManifiestoById,
   createManifiesto,
   updateManifiesto,
-  getCatalogosManifiesto
+  getCatalogosManifiesto,
+  obtenerDetalleManifiesto
 };

@@ -6,7 +6,8 @@ const {
   getManifiestoById,
   createManifiesto,
   updateManifiesto,
-  getCatalogosManifiesto
+  getCatalogosManifiesto,
+  obtenerDetalleManifiesto
 } = require("../controllers/manifiesto.controller");
 
 // =========================================
@@ -15,6 +16,7 @@ const {
 router.get("/", getManifiestos);
 router.get("/catalogos", getCatalogosManifiesto);
 router.get("/:id_manifiesto", getManifiestoById);
+router.get("/:id/detalle", obtenerDetalleManifiesto);
 
 // =========================================
 // POST

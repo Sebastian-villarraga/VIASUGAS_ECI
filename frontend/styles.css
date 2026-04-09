@@ -325,3 +325,41 @@ body:not(.login-body) {
 .topbar-right img {
   max-height: 40px;
 }
+
+/* ========================= */
+/* BOTONES BASE (FIX GLOBAL) */
+/* ========================= */
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+/* BASE UNIFICADA */
+.btn-primary,
+.btn-secundario {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  height: 42px;
+  padding: 0 18px;
+
+  font-size: 14px;
+  border-radius: 8px;
+
+  line-height: normal !important;
+}
+
+/* PRIMARY */
+.btn-primary {
+  background: #2a5298;
+  color: white;
+}
+
+/* SECUNDARIO */
+.btn-secundario {
+  background: #e74c3c;
+  color: white;
+}

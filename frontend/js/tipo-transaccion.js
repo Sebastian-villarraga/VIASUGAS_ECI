@@ -1,4 +1,5 @@
 let editandoTipo = false;
+let categoriasExistentes = [];
 
 // ================= INIT
 function initTiposTransaccion() {
@@ -13,6 +14,11 @@ function initTiposTransaccion() {
 
   document.getElementById("filtroEstado")
     .addEventListener("change", aplicarFiltrosTipos);
+    
+  const inputCategoria = document.getElementById("categoria");
+  if (inputCategoria) {
+    inputCategoria.addEventListener("input", validarCategoriaDuplicada);
+  }
 }
 
 // ================= CARGAR
@@ -21,6 +27,9 @@ async function cargarTipos() {
   console.log("?? cargando tipos...");
 
   const data = await apiFetch("/api/tipo-transaccion");
+
+  categoriasExistentes = data.map(t => t.categoria.toLowerCase());
+
   renderTablaTipos(data);
 }
 
@@ -119,7 +128,6 @@ function limpiarFiltrosTipos() {
 function initFormTipo() {
   const form = document.getElementById("formTipo");
 
-  // ?? FIX CRÍTICO
   if (!form) {
     console.warn("formTipo no existe aún");
     return;
@@ -127,6 +135,11 @@ function initFormTipo() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    
+    if (validarCategoriaDuplicada()) {
+      showToast("La categoría ya existe", "error");
+      return;
+    }
 
     const data = {
       categoria: document.getElementById("categoria").value,
@@ -271,3 +284,21 @@ function renderTipoBadge(tipo) {
   return tipo;
 }
 
+
+function validarCategoriaDuplicada() {
+  const input = document.getElementById("categoria");
+  const valor = input.value.trim().toLowerCase();
+
+  if (!valor) {
+    input.classList.remove("input-error");
+    return false;
+  }
+
+  if (categoriasExistentes.includes(valor)) {
+    input.classList.add("input-error");
+    return true;
+  } else {
+    input.classList.remove("input-error");
+    return false;
+  }
+}

@@ -301,3 +301,255 @@
     font-size: 12px;
   }
 }
+
+/* ========================= */
+/* MODAL DETALLE MANIFIESTO */
+/* ========================= */
+
+/* ?? CLAVE: override del modal global */
+.modal-content.modal-detalle-manifiesto {
+  width: 95vw !important;      /* ?? ocupa casi toda la pantalla */
+  max-width: 1400px !important; /* ?? límite grande real */
+  height: auto;
+  max-height: 92vh;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  border-radius: 20px;
+  padding: 30px 35px;
+}
+
+/* HEADER */
+.detalle-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.detalle-header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.btn-cerrar {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* CONTENEDOR */
+.detalle-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* CARD BASE */
+.detalle-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.06),
+    0 4px 10px rgba(0,0,0,0.04);
+}
+
+/* TITULOS */
+.detalle-card h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 8px;
+  letter-spacing: 0.6px;
+}
+
+.detalle-card small {
+  display: block;
+  color: #9ca3af;
+  margin-bottom: 14px;
+}
+
+/* CARD PRINCIPAL */
+.detalle-main {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.detalle-main p {
+  font-size: 22px;
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+/* ?? GRID CORREGIDO */
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* ?? fuerza 3 columnas */
+  gap: 25px;
+  width: 100%;
+}
+
+/* ?? evita que colapse */
+.detalle-grid > .detalle-card {
+  min-width: 0;
+}
+
+/* LISTA */
+.detalle-list {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ITEM */
+.detalle-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+/* TOTAL */
+.detalle-total {
+  margin-top: 14px;
+  font-weight: 800;
+  text-align: right;
+  font-size: 14px;
+}
+
+/* RESUMEN */
+.detalle-resumen {
+  text-align: center;
+  padding: 30px;
+}
+
+.detalle-resumen p {
+  font-size: 20px;
+  font-weight: 900;
+  margin-top: 10px;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 1100px) {
+  .detalle-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .detalle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* ========================= */
+/* ESTILO FINANCIERO */
+/* ========================= */
+
+/* COLORES POR TIPO */
+.valor-ingreso {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.valor-egreso {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.valor-gasto {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+/* TOTALES */
+.total-ingreso {
+  color: #16a34a;
+}
+
+.total-egreso {
+  color: #dc2626;
+}
+
+.total-neutral {
+  color: #111827;
+}
+
+/* RESUMEN FINAL */
+.resumen-positivo {
+  color: #16a34a;
+}
+
+.resumen-negativo {
+  color: #dc2626;
+}
+
+.resumen-cero {
+  color: #374151;
+}
+
+/* DESTACAR NUMEROS */
+.detalle-total span {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* MEJOR ESPACIADO ITEMS */
+.detalle-item span:last-child {
+  font-weight: 700;
+}
+
+
+/* ========================= */
+/* INFO MANIFIESTO GRID */
+/* ========================= */
+
+.detalle-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 15px;
+  text-align: left;
+}
+
+.detalle-info-item {
+  background: #f9fafb;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.detalle-info-item span {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 3px;
+}
+
+.detalle-info-item strong {
+  font-size: 13px;
+  color: #111827;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .detalle-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .detalle-info-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -72,6 +72,11 @@ function initEventosManifiestos() {
     ?.addEventListener("change", async () => {
       await llenarCiudadesPorDepartamento("destino_departamento", "destino_ciudad");
     });
+  document.getElementById("cerrarDetalleManifiesto")
+  ?.addEventListener("click", () => {
+    document.getElementById("modalDetalleManifiesto")
+      ?.classList.add("hidden");
+  });
 }
 
 function aplicarFiltrosManifiestos() {
@@ -367,13 +372,22 @@ function renderTablaManifiestos(data) {
       <td>${m.id_trailer}</td>
       <td>${renderEstadoManifiesto(m.estado)}</td>
       <td>${renderNovedadBadge(m.novedades)}</td>
+
+      <!-- ? NUEVA COLUMNA ACCIONES -->
       <td>
+        <!-- ?? VER DETALLE -->
+        <button class="btn-icon" onclick="verDetalleManifiesto('${m.id_manifiesto}')">
+          <i class="fas fa-eye"></i>
+        </button>
+
+        <!-- ?? EDITAR -->
         <button class="btn-icon" onclick="editarManifiesto(this, '${m.id_manifiesto.replace(/'/g, "\\'")}')">
           <i class="fas fa-pen"></i>
         </button>
       </td>
     </tr>
   `).join("");
+
   actualizarCardsGerenciales(data);
 }
 
@@ -830,4 +844,235 @@ function formatearFechaLarga(fechaStr) {
   };
 
   return fecha.toLocaleDateString("es-CO", opciones);
+}
+
+
+
+// =========================
+// VER DETALLE MANIFIESTO 
+// =========================
+async function verDetalleManifiesto(id) {
+  try {
+    // =========================
+    // ABRIR MODAL
+    // =========================
+    const modal = document.getElementById("modalDetalleManifiesto");
+    modal?.classList.remove("hidden");
+
+    // =========================
+    // TRAER DATA (ENDPOINT NUEVO)
+    // =========================
+    const data = await apiFetch(`/api/manifiestos/${id}/detalle`);
+
+    const manifiesto = data.manifiesto;
+    const gastosFiltrados = data.gastos || [];
+    const transacciones = data.transacciones || [];
+    const factura = data.factura;
+
+    // =========================
+    // INFO GENERAL
+    // =========================
+    const contInfo = document.getElementById("detalleInfoManifiesto");
+
+contInfo.innerHTML = `
+  <div class="detalle-info-item">
+    <span>ID</span>
+    <strong>${manifiesto.id_manifiesto}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Cliente</span>
+    <strong>${manifiesto.cliente_nombre || "-"}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Fecha</span>
+    <strong>${manifiesto.fecha || "-"}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Ruta</span>
+    <strong>${manifiesto.origen_ciudad} ? ${manifiesto.destino_ciudad}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Vehículo</span>
+    <strong>${manifiesto.id_vehiculo}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Trailer</span>
+    <strong>${manifiesto.id_trailer}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Conductor</span>
+    <strong>${manifiesto.id_conductor}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Estado</span>
+    <strong>${manifiesto.estado}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Valor Flete</span>
+    <strong>$${Number(manifiesto.valor_flete || 0).toLocaleString()}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>% Flete</span>
+    <strong>$${Number(manifiesto.valor_flete_porcentaje || 0).toLocaleString()}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Anticipo</span>
+    <strong>$${Number(manifiesto.anticipo_manifiesto || 0).toLocaleString()}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Empresa a cargo</span>
+    <strong>${manifiesto.id_empresa_a_cargo}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Novedades</span>
+    <strong>${manifiesto.novedades ? "Sí" : "No"}</strong>
+  </div>
+
+  <div class="detalle-info-item">
+    <span>Observaciones</span>
+    <strong>${manifiesto.observaciones || "-"}</strong>
+  </div>
+`;
+
+    // =========================
+    // GASTOS CONDUCTOR
+    // =========================
+    const contGastos = document.getElementById("detalleGastos");
+    contGastos.innerHTML = "";
+
+    let totalGastos = 0;
+
+    gastosFiltrados.forEach(g => {
+      const valor = Number(g.valor || 0);
+      totalGastos += valor;
+
+      contGastos.innerHTML += `
+        <div class="detalle-item">
+          <span>${g.descripcion || "-"}</span>
+          <span class="valor-gasto">-$${valor.toLocaleString()}</span>
+        </div>
+      `;
+    });
+
+    if (gastosFiltrados.length === 0) {
+      contGastos.innerHTML = "<p>Sin gastos</p>";
+    }
+
+    document.getElementById("totalGastosDetalle").innerHTML =
+      `<span class="total-egreso">$${totalGastos.toLocaleString()}</span>`;
+
+    // =========================
+    // TRANSACCIONES
+    // =========================
+    const contTrans = document.getElementById("detalleTransacciones");
+    contTrans.innerHTML = "";
+
+    let totalIngresos = 0;
+    let totalEgresos = 0;
+
+    transacciones.forEach(t => {
+      const valor = Number(t.valor || 0);
+
+      let clase = "";
+      let signo = "";
+
+      if (t.tipo === "INGRESO MANIFIESTO") {
+        totalIngresos += valor;
+        clase = "valor-ingreso";
+        signo = "+";
+      } else if (t.tipo === "EGRESO MANIFIESTO") {
+        totalEgresos += valor;
+        clase = "valor-egreso";
+        signo = "-";
+      } else {
+        return;
+      }
+
+      contTrans.innerHTML += `
+        <div class="detalle-item">
+          <span>${t.tipo}</span>
+          <span class="${clase}">${signo}$${valor.toLocaleString()}</span>
+        </div>
+      `;
+    });
+
+    if (transacciones.length === 0) {
+      contTrans.innerHTML = "<p>Sin transacciones</p>";
+    }
+
+    const utilidad = totalIngresos - totalEgresos;
+
+    document.getElementById("totalTransaccionesDetalle").innerHTML =
+      `<span class="${utilidad >= 0 ? "total-ingreso" : "total-egreso"}">
+        $${utilidad.toLocaleString()}
+      </span>`;
+
+    // =========================
+    // FACTURA
+    // =========================
+    const contFactura = document.getElementById("detalleFactura");
+    contFactura.innerHTML = "";
+
+    let totalFactura = 0;
+
+    if (factura) {
+      const valor = Number(factura.valor || 0);
+      const ret =
+        Number(factura.retencion_fuente || 0) +
+        Number(factura.retencion_ica || 0);
+
+      const neto = valor - ret;
+      totalFactura = neto;
+
+      contFactura.innerHTML = `
+        <div class="detalle-item">
+          <span>Factura: ${factura.codigo_factura}</span>
+          <span class="valor-ingreso">$${neto.toLocaleString()}</span>
+        </div>
+      `;
+    } else {
+      contFactura.innerHTML = "<p>Sin factura</p>";
+    }
+
+    document.getElementById("totalFacturaDetalle").innerHTML =
+      `<span class="total-ingreso">$${totalFactura.toLocaleString()}</span>`;
+
+    // =========================
+    // RESUMEN FINAL
+    // =========================
+    const balance = totalFactura - totalGastos;
+
+    let texto = "";
+    let clase = "";
+
+    if (balance > 0) {
+      texto = `UTILIDAD: $${balance.toLocaleString()}`;
+      clase = "resumen-positivo";
+    } else if (balance < 0) {
+      texto = `PÉRDIDA: $${Math.abs(balance).toLocaleString()}`;
+      clase = "resumen-negativo";
+    } else {
+      texto = "PUNTO DE EQUILIBRIO";
+      clase = "resumen-cero";
+    }
+
+    document.getElementById("resumenDetalle").innerHTML =
+      `<span class="${clase}">${texto}</span>`;
+
+  } catch (error) {
+    console.error("Error detalle manifiesto:", error);
+    alert("Error cargando detalle");
+  }
 }

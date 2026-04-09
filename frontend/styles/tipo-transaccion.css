@@ -268,3 +268,46 @@
   }
 
 }
+
+
+/* ========================= */
+/* FIX MODAL BOTONES */
+/* ========================= */
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.modal-actions button {
+  height: 42px;
+  min-height: 42px;
+  display: inline-flex !important; 
+  align-items: center;
+  justify-content: center;
+  line-height: normal !important; 
+  padding: 0 18px !important;
+}
+
+.modal-actions .btn-primary {
+  order: 1;
+}
+
+.modal-actions .btn-secundario {
+  order: 2;
+  background: #e74c3c !important;
+  color: white !important;
+  border: none !important;
+  opacity: 1 !important;
+}
+
+/* ========================= */
+/* INPUT ERROR */
+/* ========================= */
+
+.input-error {
+  border: 2px solid #e74c3c !important;
+  background: #fff5f5;
+}

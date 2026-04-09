@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   getTransacciones,
-  createTransaccion
+  createTransaccion,
 } = require("../controllers/transaccion.controller");
 
 // =========================

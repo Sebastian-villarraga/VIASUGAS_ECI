@@ -260,3 +260,96 @@
 
   </div>
 </div>
+
+
+
+<!-- ========================= -->
+<!-- MODAL DETALLE MANIFIESTO -->
+<!-- ========================= -->
+<div id="modalDetalleManifiesto" class="modal hidden">
+  <div class="modal-content modal-detalle-manifiesto">
+
+    <!-- HEADER -->
+    <div class="detalle-header">
+      <h3>Detalle del Manifiesto</h3>
+      <button id="cerrarDetalleManifiesto" class="btn-cerrar">?</button>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="detalle-container">
+
+      <!-- ========================= -->
+      <!-- INFO GENERAL -->
+      <!-- ========================= -->
+      <div class="detalle-card detalle-main">
+        <h4>TODA LA INFORMACIÓN DEL MANIFIESTO</h4>
+
+        <div id="detalleInfoManifiesto" class="detalle-info-grid">
+          <p>-</p>
+        </div>
+      </div>
+
+      <!-- ========================= -->
+      <!-- CARDS PRINCIPALES -->
+      <!-- ========================= -->
+      <div class="detalle-grid">
+
+        <!-- GASTOS CONDUCTOR -->
+        <div class="detalle-card">
+          <h4>GASTOS DE CONDUCTOR</h4>
+          <small>(Tipo: GASTO CONDUCTOR)</small>
+
+          <div id="detalleGastos" class="detalle-list">
+            <p>-</p>
+          </div>
+
+          <div class="detalle-total">
+            TOTAL: <span id="totalGastosDetalle">0</span>
+          </div>
+        </div>
+
+        <!-- TRANSACCIONES -->
+        <div class="detalle-card">
+          <h4>TRANSACCIONES</h4>
+          <small>(INGRESO / EGRESO MANIFIESTO)</small>
+
+          <div id="detalleTransacciones" class="detalle-list">
+            <p>-</p>
+          </div>
+
+          <div class="detalle-total">
+            TOTAL: <span id="totalTransaccionesDetalle">0</span>
+          </div>
+        </div>
+
+        <!-- FACTURA -->
+        <div class="detalle-card">
+          <h4>FACTURA</h4>
+          <small>(Información asociada)</small>
+
+          <div id="detalleFactura" class="detalle-list">
+            <p>-</p>
+          </div>
+
+          <div class="detalle-total">
+            TOTAL: <span id="totalFacturaDetalle">0</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================= -->
+      <!-- RESUMEN FINAL -->
+      <!-- ========================= -->
+      <div class="detalle-card detalle-resumen">
+        <h4>RESUMEN GENERAL</h4>
+
+        <p id="resumenDetalle">
+          -
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
