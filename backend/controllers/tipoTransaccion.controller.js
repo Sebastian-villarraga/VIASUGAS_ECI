@@ -6,7 +6,8 @@ const pool = require("../config/db");
 const TIPOS = [
   "INGRESO MANIFIESTO",
   "EGRESO MANIFIESTO",
-  "EGRESO OPERACIONAL"
+  "EGRESO OPERACIONAL",
+  "GASTO CONDUCTOR"
 ];
 
 const ESTADOS = ["activo", "inactivo"];

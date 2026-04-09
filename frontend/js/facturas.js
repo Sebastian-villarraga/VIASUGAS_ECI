@@ -38,7 +38,10 @@ async function cargarFacturas() {
   try {
     facturasData = await apiFetch("/api/facturas");
 
-    console.log("FACTURAS:", facturasData); 
+    const transacciones = await apiFetch("/api/transacciones");
+    window._transaccionesFacturas = transacciones || [];
+
+    console.log("FACTURAS:", facturasData);
 
     if (!Array.isArray(facturasData)) {
       console.error("No llegaron datos válidos");
@@ -52,6 +55,7 @@ async function cargarFacturas() {
     facturasData = [];
   }
 }
+
 // =========================
 // FILTRAR + RENDER
 // =========================
@@ -104,7 +108,7 @@ function renderFacturas(data) {
   tbody.innerHTML = "";
 
   if (!data || data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10">Sin datos</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9">Sin datos</td></tr>`;
     
     if (totalF) totalF.innerText = "$0";
     if (totalC) totalC.innerText = "$0";
@@ -116,44 +120,10 @@ function renderFacturas(data) {
 
   const hoy = new Date().toISOString().split("T")[0];
 
-  // =========================
-  // ?? FACTURAS PAGADAS (LOCAL)
-  // =========================
-  const pagadas = JSON.parse(localStorage.getItem("facturasPagadas") || "[]");
-
-  // =========================
-  // ORDENAR SIN ROMPER UI
-  // =========================
-  const prioridadEstado = {
-    "vencida": 1,
-    "pendiente": 2,
-    "pagada": 3
-  };
-
-  data = [...data].sort((a, b) => {
-
-    const estadoA = pagadas.includes(a.codigo_factura)
-      ? "pagada"
-      : (a.fecha_vencimiento && a.fecha_vencimiento.split("T")[0] < hoy
-        ? "vencida"
-        : "pendiente");
-
-    const estadoB = pagadas.includes(b.codigo_factura)
-      ? "pagada"
-      : (b.fecha_vencimiento && b.fecha_vencimiento.split("T")[0] < hoy
-        ? "vencida"
-        : "pendiente");
-
-    return prioridadEstado[estadoA] - prioridadEstado[estadoB];
-  });
-
   let totalFacturado = 0;
   let totalCobrado = 0;
   let totalPendiente = 0;
 
-  // =========================
-  // RENDER
-  // =========================
   data.forEach(f => {
 
     const valor = Number(f.valor || 0);
@@ -164,29 +134,36 @@ function renderFacturas(data) {
     totalFacturado += valor;
 
     // =========================
-    // ?? CALCULAR ESTADO REAL
+    // ?? PAGOS REALES DESDE TRANSACCIONES
+    // =========================
+    const pagos = (window._transaccionesFacturas || [])
+      .filter(t =>
+        t.id_factura === f.codigo_factura &&
+        t.tipo === "INGRESO MANIFIESTO"
+      )
+      .reduce((sum, t) => sum + Number(t.valor || 0), 0);
+
+    const saldo = neto - pagos;
+
+    // =========================
+    // ESTADO REAL
     // =========================
     let estado;
 
-    if (pagadas.includes(f.codigo_factura)) {
+    if (saldo <= 0) {
       estado = "pagada";
-    } else if (f.fecha_vencimiento && f.fecha_vencimiento.split("T")[0] < hoy) {
-      estado = "vencida";
-    } else {
-      estado = "pendiente";
-    }
-
-    if (estado === "pagada") {
       totalCobrado += neto;
     } else {
-      totalPendiente += neto;
+      totalPendiente += saldo;
+
+      if (f.fecha_vencimiento && f.fecha_vencimiento.split("T")[0] < hoy) {
+        estado = "vencida";
+      } else {
+        estado = "pendiente";
+      }
     }
 
     const estadoHTML = getEstadoFactura({ ...f, estado });
-
-    const accionesHTML = (estado === "pagada")
-      ? `<span class="texto-pagada">Pagada</span>`
-      : `<button type="button" class="btn-pagar" onclick="pagarFactura('${f.codigo_factura}')">Pagar</button>`;
 
     tbody.innerHTML += `
       <tr>
@@ -198,8 +175,8 @@ function renderFacturas(data) {
         <td>$${retFuente.toLocaleString()}</td>
         <td>$${retIca.toLocaleString()}</td>
         <td>$${neto.toLocaleString()}</td>
+        <td>$${saldo.toLocaleString()}</td>
         <td>${estadoHTML}</td>
-        <td>${accionesHTML}</td>
       </tr>
     `;
   });
@@ -370,50 +347,6 @@ function getEstadoFactura(f) {
   }
 
   return `<span class="badge pendiente">Pendiente</span>`;
-}
-
-// =========================
-// BOTON FACTURA PAGA
-// =========================
-async function pagarFactura(codigo) {
-
-  abrirConfirmacion("¿Marcar esta factura como pagada?", async () => {
-
-    try {
-      await apiFetch(`/api/facturas/${codigo}/pagar`, {
-        method: "PUT"
-      });
-
-      // =========================
-      // ?? GUARDAR EN LOCALSTORAGE
-      // =========================
-      let pagadas = JSON.parse(localStorage.getItem("facturasPagadas") || "[]");
-
-      if (!pagadas.includes(codigo)) {
-        pagadas.push(codigo);
-        localStorage.setItem("facturasPagadas", JSON.stringify(pagadas));
-      }
-
-      // =========================
-      // ?? ACTUALIZAR DATA LOCAL
-      // =========================
-      facturasData = facturasData.map(f => {
-        if (f.codigo_factura === codigo) {
-          return { ...f, estado: "pagada" };
-        }
-        return f;
-      });
-
-      mostrarToast("Factura marcada como pagada", "success");
-
-      aplicarFiltrosFacturas();
-
-    } catch (error) {
-      console.error("Error pagando factura:", error);
-      mostrarToast("Error al actualizar la factura", "error");
-    }
-
-  });
 }
 
 // =========================

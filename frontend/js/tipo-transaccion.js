@@ -81,6 +81,11 @@ function renderTipoTexto(tipo) {
     texto = "Egreso Operacional";
   }
 
+  if (tipo === "GASTO CONDUCTOR") {
+    clase = "conductor";
+    texto = "Gasto Conductor";
+  }
+
   return `<span class="badge ${clase}">${texto}</span>`;
 }
 
@@ -168,6 +173,7 @@ function editarTipo(btn, id) {
       <option value="INGRESO MANIFIESTO" ${data.tipo === "INGRESO MANIFIESTO" ? "selected" : ""}>Ingreso Manifiesto</option>
       <option value="EGRESO MANIFIESTO" ${data.tipo === "EGRESO MANIFIESTO" ? "selected" : ""}>Egreso Manifiesto</option>
       <option value="EGRESO OPERACIONAL" ${data.tipo === "EGRESO OPERACIONAL" ? "selected" : ""}>Egreso Operacional</option>
+      <option value="GASTO CONDUCTOR" ${data.tipo === "GASTO CONDUCTOR" ? "selected" : ""}>Gasto Conductor</option>
     </select>
   `;
 

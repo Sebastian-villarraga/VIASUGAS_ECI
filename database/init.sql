@@ -51,7 +51,7 @@ CREATE TYPE tactivo AS ENUM ('activo', 'inactivo');
 CREATE TYPE tcuentabanco AS ENUM ('ahorros', 'corriente');
 CREATE TYPE tvalidacion AS ENUM ('pendiente', 'aprobado', 'rechazado');
 CREATE TYPE toperacion AS ENUM ('insert', 'update', 'delete');
-CREATE TYPE tingresoegreso AS ENUM ('INGRESO MANIFIESTO', 'EGRESO MANIFIESTO', 'EGRESO OPERACIONAL');
+CREATE TYPE tingresoegreso AS ENUM ('INGRESO MANIFIESTO', 'EGRESO MANIFIESTO', 'EGRESO OPERACIONAL', 'GASTO CONDUCTOR');
 
 
 -- ENUMS FINALES PARA MANIFIESTO
@@ -169,7 +169,7 @@ CREATE TABLE trailer (
 
 CREATE TABLE manifiesto (
     id_manifiesto VARCHAR PRIMARY KEY,
-    radicado BIGINT UNIQUE,
+    radicado BIGINT,
     id_cliente VARCHAR,
     id_conductor BIGINT,
     id_vehiculo VARCHAR,

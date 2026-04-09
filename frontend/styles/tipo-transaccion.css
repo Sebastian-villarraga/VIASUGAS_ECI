@@ -30,7 +30,7 @@
 }
 
 /* ========================= */
-/* LAYOUT FIX (?? IMPORTANTE) */
+/* LAYOUT (FIX PRINCIPAL) */
 /* ========================= */
 
 .empresa-layout {
@@ -38,11 +38,54 @@
   width: 100%;
 }
 
+/* ?? CAMBIO CLAVE: quitar centrado */
 .empresa-left {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px;
+  padding: 20px 25px;
+}
+
+/* ========================= */
+/* HEADER */
+/* ========================= */
+
+.empresa-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* ========================= */
+/* FILTROS */
+/* ========================= */
+
+.empresa-filtros {
+  background: #f8f9fb;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.filtros-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filtro-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filtro-group input,
+.filtro-group select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d0d5dd;
+  font-size: 13px;
+  min-width: 160px;
 }
 
 /* ========================= */
@@ -51,16 +94,30 @@
 
 .empresa-tabla {
   width: 100%;
-  overflow-x: auto; /* ?? scroll horizontal */
+  overflow-x: auto;
 }
 
 .empresa-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px; /* ?? evita que se rompa */
+  min-width: 900px;
 }
 
-/* Centrar columnas */
+.empresa-table th {
+  text-align: left;
+  padding: 12px;
+  background: #f1f3f6;
+  font-size: 13px;
+}
+
+.empresa-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+/* Centrar columnas específicas */
 .empresa-table td:nth-child(3),
 .empresa-table td:nth-child(4),
 .empresa-table th:nth-child(3),
@@ -68,21 +125,14 @@
   text-align: center;
 }
 
-/* Acciones centradas */
+/* Acciones */
 .empresa-table td:last-child {
   text-align: center;
 }
 
-/* Hover fila */
+/* Hover */
 .empresa-table tbody tr:hover {
   background: #fafafa;
-}
-
-/* Ajuste texto largo */
-.empresa-table td {
-  word-break: break-word;
-  max-width: 250px;
-  padding: 10px;
 }
 
 /* ========================= */
@@ -176,51 +226,16 @@
 }
 
 /* ========================= */
-/* RESPONSIVE TABLE */
+/* RESPONSIVE */
 /* ========================= */
 
 @media (max-width: 900px) {
 
-  .empresa-tabla {
-    width: 100%;
-    overflow-x: auto; /* ?? scroll horizontal */
-  }
-
   .empresa-table {
-    min-width: 700px; /* ?? evita que se rompa */
-    width: 100%;
-  }
-
-  /* ?? IMPORTANTE: mantener estructura de tabla */
-  .empresa-table thead {
-    display: table-header-group;
-  }
-
-  .empresa-table tr {
-    display: table-row;
-    margin: 0;
-    border: none;
-    padding: 0;
-    background: transparent;
-  }
-
-  .empresa-table td {
-    display: table-cell;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    max-width: 250px;
-  }
-
-  /* ? eliminar comportamiento tipo card */
-  .empresa-table td::before {
-    content: none;
+    min-width: 700px;
   }
 
 }
-
-/* ========================= */
-/* FORM RESPONSIVE */
-/* ========================= */
 
 @media (max-width: 768px) {
 
@@ -234,31 +249,21 @@
 
 }
 
-/* ========================= */
-/* EXTRA MOBILE FIX */
-/* ========================= */
-
 @media (max-width: 600px) {
 
   .empresa-header {
-    display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
 
-  .empresa-filtros .filtros-row {
-    display: flex;
+  .filtros-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
   }
 
-  .filtro-group {
-    width: 100%;
-  }
-
-  .btn-limpiar {
+  .filtro-group input,
+  .filtro-group select {
     width: 100%;
   }
 
