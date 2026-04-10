@@ -17,8 +17,23 @@ function initEmpresas() {
 
 // ================= CARGAR
 async function cargarEmpresas() {
-  const data = await apiFetch("/api/empresas-a-cargo");
-  renderTablaEmpresas(data);
+  try {
+    const data = await apiFetch("/api/empresas-a-cargo");
+
+    if (!data) {
+      renderTablaEmpresas([]);
+      return;
+    }
+
+    // ?? GUARDAR DATA GLOBAL (para validar duplicados)
+    window.empresasData = data;
+
+    renderTablaEmpresas(data);
+
+  } catch (error) {
+    console.error("Error cargando empresas:", error);
+    renderTablaEmpresas([]);
+  }
 }
 
 // ================= RENDER
@@ -30,28 +45,37 @@ function renderTablaEmpresas(data) {
     return;
   }
 
-  tabla.innerHTML = data.map(e => `
-    <tr 
-      data-nit="${e.nit}"
-      data-nombre="${e.nombre}"
-      data-correo="${e.correo || ""}"
-      data-telefono="${e.telefono || ""}"
-      data-direccion="${e.direccion || ""}"
-      data-estado="${e.estado}"
-    >
-      <td>${e.nit}</td>
-      <td>${e.nombre}</td>
-      <td>${e.correo || "-"}</td>
-      <td>${e.telefono || "-"}</td>
-      <td>${e.direccion || "-"}</td>
-      <td>${renderEstadoBadge(e.estado)}</td>
-      <td>
-        <button class="btn-icon" onclick="editarEmpresa(this, '${e.nit}')">
-          <i class="fas fa-pen"></i>
-        </button>
-      </td>
-    </tr>
-  `).join("");
+  tabla.innerHTML = data.map(e => {
+
+    const estado = (e.estado || "").toLowerCase().trim();
+
+    return `
+      <tr 
+        data-nit="${e.nit}"
+        data-nombre="${e.nombre}"
+        data-correo="${e.correo || ""}"
+        data-telefono="${e.telefono || ""}"
+        data-direccion="${e.direccion || ""}"
+        data-estado="${estado}"
+      >
+        <td>${e.nit}</td>
+        <td>${e.nombre}</td>
+        <td>${e.correo || "-"}</td>
+        <td>${e.telefono || "-"}</td>
+        <td>${e.direccion || "-"}</td>
+        <td>
+          <span class="estado-badge ${estado}">
+            ${estado === "activo" ? "Activo" : "Inactivo"}
+          </span>
+        </td>
+        <td>
+          <button class="btn-icon" onclick="editarEmpresa(this, '${e.nit}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 // ================= FILTROS
@@ -83,31 +107,186 @@ function limpiarFiltrosEmpresas() {
 // ================= FORM
 function initFormEmpresa() {
   const form = document.getElementById("formEmpresa");
+  if (!form) return;
+
+  const inputNit = document.getElementById("nit");
+  const inputNombre = document.getElementById("nombre");
+  const inputCorreo = document.getElementById("correo");
+  const inputTelefono = document.getElementById("telefono");
+  const selectDireccion = document.getElementById("direccion");
+
+  // =========================
+  // ?? CARGAR DIRECCIONES (ARREGLO)
+  // =========================
+  const ubicaciones = [
+    { dep: "Antioquia", ciudad: "Medellín" },
+    { dep: "Antioquia", ciudad: "Bello" },
+    { dep: "Cundinamarca", ciudad: "Bogotá" },
+    { dep: "Cundinamarca", ciudad: "Soacha" },
+    { dep: "Valle del Cauca", ciudad: "Cali" },
+    { dep: "Valle del Cauca", ciudad: "Palmira" },
+    { dep: "Atlántico", ciudad: "Barranquilla" },
+    { dep: "Santander", ciudad: "Bucaramanga" }
+  ];
+
+  function cargarDirecciones() {
+    if (!selectDireccion) return;
+
+    selectDireccion.innerHTML = `<option value="">Seleccione</option>`;
+
+    ubicaciones.forEach(u => {
+      const option = document.createElement("option");
+      option.value = u.ciudad;
+      option.textContent = `${u.ciudad} (${u.dep})`;
+      selectDireccion.appendChild(option);
+    });
+  }
+
+  cargarDirecciones();
+
+  // =========================
+  // HELPERS
+  // =========================
+  const marcarError = (el) => el.classList.add("error");
+  const limpiarError = (el) => el.classList.remove("error");
+
+  // =========================
+  // VALIDACIONES
+  // =========================
+
+  inputNit.addEventListener("input", () => {
+    inputNit.value = inputNit.value.replace(/\D/g, "");
+    inputNit.value ? limpiarError(inputNit) : marcarError(inputNit);
+  });
+
+  inputNombre.addEventListener("input", () => {
+    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+    inputNombre.value.trim() ? limpiarError(inputNombre) : marcarError(inputNombre);
+  });
+
+  inputTelefono.addEventListener("input", () => {
+    inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 10);
+
+    if (!inputTelefono.value || inputTelefono.value.length === 10) {
+      limpiarError(inputTelefono);
+    } else {
+      marcarError(inputTelefono);
+    }
+  });
+
+  inputCorreo.addEventListener("input", () => {
+    const val = inputCorreo.value.trim();
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!val || regex.test(val)) {
+      limpiarError(inputCorreo);
+    } else {
+      marcarError(inputCorreo);
+    }
+  });
+
+  selectDireccion.addEventListener("change", () => {
+    selectDireccion.value ? limpiarError(selectDireccion) : marcarError(selectDireccion);
+  });
+
+  // =========================
+  // VALIDAR DUPLICADOS
+  // =========================
+
+  function existeEmpresa(nit, nombre) {
+    if (!window.empresasData) return false;
+
+    return window.empresasData.some(e =>
+      e.nit === nit ||
+      e.nombre.toLowerCase().trim() === nombre.toLowerCase().trim()
+    );
+  }
+
+  // =========================
+  // SUBMIT
+  // =========================
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const nit = inputNit.value.trim();
+    const nombre = inputNombre.value.trim();
+    const correo = inputCorreo.value.trim();
+    const telefono = inputTelefono.value.trim();
+    const direccion = selectDireccion.value;
+    const estado = document.getElementById("estado").value;
+
+    let hayError = false;
+
+    if (!nit) {
+      marcarError(inputNit);
+      hayError = true;
+    }
+
+    if (!nombre) {
+      marcarError(inputNombre);
+      hayError = true;
+    }
+
+    if (!direccion) {
+      marcarError(selectDireccion);
+      hayError = true;
+    }
+
+    if (telefono && telefono.length !== 10) {
+      marcarError(inputTelefono);
+      hayError = true;
+    }
+
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (correo && !regexCorreo.test(correo)) {
+      marcarError(inputCorreo);
+      hayError = true;
+    }
+
+    // ?? DUPLICADOS
+    if (existeEmpresa(nit, nombre)) {
+      marcarError(inputNit);
+      marcarError(inputNombre);
+      showToast("La empresa ya existe (NIT o Nombre)", "error");
+      return;
+    }
+
+    if (hayError) {
+      showToast("Corrige los campos marcados", "warning");
+      return;
+    }
+
     const data = {
-      nit: document.getElementById("nit").value,
-      nombre: document.getElementById("nombre").value,
-      correo: document.getElementById("correo").value,
-      telefono: document.getElementById("telefono").value,
-      direccion: document.getElementById("direccion").value,
-      estado: document.getElementById("estado").value
+      nit,
+      nombre,
+      correo,
+      telefono,
+      direccion,
+      estado
     };
 
-    const res = await apiFetch("/api/empresas-a-cargo", {
-      method: "POST",
-      body: JSON.stringify(data)
-    });
+    try {
+      const res = await apiFetch("/api/empresas-a-cargo", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
 
-    if (!res) return;
+      if (!res) {
+        showToast("Error creando empresa", "error");
+        return;
+      }
 
-    showToast("Empresa creada correctamente", "success");
+      showToast("Empresa creada correctamente", "success");
 
-    cerrarModalEmpresa();
-    form.reset();
-    cargarEmpresas();
+      cerrarModalEmpresa();
+      form.reset();
+      cargarEmpresas();
+
+    } catch (error) {
+      console.error(error);
+      showToast("Error inesperado", "error");
+    }
   });
 }
 
