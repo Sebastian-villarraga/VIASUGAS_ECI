@@ -149,61 +149,117 @@
 </div>
 
 <!-- ========================= -->
+<!-- TOPBAR -->
+<!-- ========================= -->
+<div class="topbar">
+  <div class="topbar-left">
+    <img src="/assets/images/Fondo-Azul.png" class="logo-main">
+  </div>
+
+  <div class="topbar-right">
+    <div class="profile">
+      <i class="fas fa-user"></i>
+      <span id="userName">Usuario</span>
+    </div>
+    |
+    <button class="logout-btn" onclick="logout()">Salir</button>
+  </div>
+</div>
+
+
+<!-- ========================= -->
 <!-- CONTENT -->
 <!-- ========================= -->
 <div class="content">
 
-  <!-- TOPBAR -->
-  <div class="topbar">
-
-    <!-- 🔥 LOGO AHORA A LA IZQUIERDA -->
-    <div class="topbar-left">
-      <img src="/assets/images/Fondo-Azul.png" class="logo-main">
-    </div>
-
-    
-
-    <div class="topbar-right">
-      <div class="profile">
-        <i class="fas fa-user"></i>
-        <span id="userName">Usuario</span>
-      </div>
-|
-      <button class="logout-btn" onclick="logout()">Salir</button>
-    </div>
-
-  </div>
-
   <!-- SPA -->
-  <div class="main-content" id="app-content">
-  
-   
-  
-  
-    <div class="home-container">
-    
-      <!-- LOGO -->
-      <div class="home-logo">
-        <img src="/assets/images/Fondo-Blanco.png" alt="Viasugas">
+  <div id="app-content">
+
+    <!-- ========================= -->
+    <!-- HOME PRO -->
+    <!-- ========================= -->
+
+    <!-- HERO -->
+    <section class="home-hero">
+      <div class="overlay"></div>
+      <div class="hero-content">
+        <h1>VIASUGAS</h1>
+        <h2>Transporte de carga inteligente</h2>
+        <p>Control total de tu operación logística y financiera</p>
       </div>
-    
-      <!-- MENSAJE -->
-      <div class="home-content">
-        <h1>Bienvenido a Viasugas</h1>
-        <p>
-          Tu centro de control para la gestión de transporte de carga.  
-          Administra vehículos, monitorea operaciones y toma decisiones con claridad.
-        </p>
-    
-        
+    </section>
+
+    <!-- VALOR -->
+    <section class="home-section dark">
+      <h2 class="section-title">Un aliado estratégico para tu negocio</h2>
+
+      <div class="features">
+        <div class="feature">
+          <i class="fas fa-award"></i>
+          <h3>Experiencia</h3>
+        </div>
+        <div class="feature">
+          <i class="fas fa-shield-alt"></i>
+          <h3>Seguridad</h3>
+        </div>
+        <div class="feature">
+          <i class="fas fa-map-marker-alt"></i>
+          <h3>Rastreo</h3>
+        </div>
+        <div class="feature">
+          <i class="fas fa-handshake"></i>
+          <h3>Respaldo</h3>
+        </div>
       </div>
-    
-    </div>
-    
-  
-  
-  
-  
+    </section>
+
+    <!-- ALIADOS -->
+    <section class="home-section">
+      <h2 class="section-title">Empresas que confían en nosotros</h2>
+
+      <div class="aliados">
+        <img src="/assets/images/Post4.jpg">
+        <img src="/assets/images/Post5.jpg">
+        <img src="/assets/images/Post3.jpg">
+      </div>
+    </section>
+
+    <!-- SEGURIDAD -->
+    <section class="home-banner seguridad">
+      <div class="overlay"></div>
+      <div class="banner-content">
+        <h2>La carga siempre segura</h2>
+        <p>Aseguramos vehículos, carga y operación</p>
+      </div>
+    </section>
+
+    <!-- GPS -->
+    <section class="home-banner gps">
+      <div class="overlay"></div>
+      <div class="banner-content">
+        <h2>Monitoreo en tiempo real</h2>
+        <div class="gps-features">
+          <span>Pulsador de emergencia</span>
+          <span>Verificación por audio</span>
+          <span>Gestión de rutas</span>
+          <span>Informes</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TALENTO -->
+    <section class="home-banner talento">
+      <div class="overlay"></div>
+      <div class="banner-content">
+        <h2>Talento humano</h2>
+        <div class="gps-features">
+          <span>Selección</span>
+          <span>Capacitación</span>
+          <span>Seguridad</span>
+        </div>
+      </div>
+    </section>
+
   </div>
 
 </div>

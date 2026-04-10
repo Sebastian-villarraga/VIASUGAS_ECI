@@ -121,11 +121,12 @@
 .content {
   margin-top: 60px;
   margin-left: 40px;
-  width: 100%;
+  width: calc(100% - 40px);
+  transition: margin-left 0.3s ease;
+  overflow-x: hidden; 
 }
 
-/* CUANDO EXPANDE */
 .sidebar:hover ~ .content {
   margin-left: 150px;
-  width: 100%;
+  width: calc(100% - 150px); 
 }

@@ -892,7 +892,7 @@ contInfo.innerHTML = `
 
   <div class="detalle-info-item">
     <span>Ruta</span>
-    <strong>${manifiesto.origen_ciudad} ? ${manifiesto.destino_ciudad}</strong>
+    <strong>${manifiesto.origen_ciudad} - ${manifiesto.destino_ciudad}</strong>
   </div>
 
   <div class="detalle-info-item">

@@ -9,7 +9,7 @@
 }
 
 html, body {
-  height: 100%;
+  height: auto;
 }
 
 /* ========================= */
@@ -17,7 +17,12 @@ html, body {
 /* ========================= */
 body {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+}
+
+#app-content {
+  width: 100%;
 }
 
 /* ========================= */
