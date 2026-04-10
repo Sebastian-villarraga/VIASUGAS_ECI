@@ -8,7 +8,7 @@ function initPropietarios() {
   cargarPropietarios();
   initFormPropietario();
 
-  // ?? listeners dinámicos
+  // ?? listeners dinÃ¡micos
   document.getElementById("filtroNombre")
     .addEventListener("input", aplicarFiltrosPropietarios);
 
@@ -103,14 +103,103 @@ function initFormPropietario() {
 
   if (!form) return;
 
+  const inputId = document.getElementById("identificacion");
+  const inputNombre = document.getElementById("nombre");
+  const inputCorreo = document.getElementById("correo");
+  const inputTelefono = document.getElementById("telefono");
+
+  // =========================
+  // VALIDACIONES EN TIEMPO REAL
+  // =========================
+
+  // ?? SOLO NÃšMEROS (ID)
+  inputId.addEventListener("input", () => {
+    inputId.value = inputId.value.replace(/\D/g, "");
+
+    if (!inputId.value) {
+      inputId.style.border = "1px solid #dc3545";
+    } else {
+      inputId.style.border = "1px solid #ccc";
+    }
+  });
+
+  // ?? SOLO LETRAS (NOMBRE)
+  inputNombre.addEventListener("input", () => {
+    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+
+    if (!inputNombre.value.trim()) {
+      inputNombre.style.border = "1px solid #dc3545";
+    } else {
+      inputNombre.style.border = "1px solid #ccc";
+    }
+  });
+
+  // ?? TELÃ‰FONO ? SOLO NÃšMEROS Y 10 DÃGITOS
+  inputTelefono.addEventListener("input", () => {
+    inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 10);
+
+    if (inputTelefono.value.length !== 10) {
+      inputTelefono.style.border = "1px solid #dc3545";
+    } else {
+      inputTelefono.style.border = "1px solid #ccc";
+    }
+  });
+
+  // ?? CORREO (OBLIGATORIO)
+  inputCorreo.addEventListener("input", () => {
+    if (!inputCorreo.value.trim()) {
+      inputCorreo.style.border = "1px solid #dc3545";
+    } else {
+      inputCorreo.style.border = "1px solid #ccc";
+    }
+  });
+
+  // =========================
+  // SUBMIT
+  // =========================
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const identificacion = inputId.value.trim();
+    const nombre = inputNombre.value.trim();
+    const correo = inputCorreo.value.trim();
+    const telefono = inputTelefono.value.trim();
+
+    let hayError = false;
+
+    // ?? VALIDACIONES FINALES
+
+    if (!identificacion) {
+      inputId.style.border = "1px solid #dc3545";
+      hayError = true;
+    }
+
+    if (!nombre) {
+      inputNombre.style.border = "1px solid #dc3545";
+      hayError = true;
+    }
+
+    if (!correo) {
+      inputCorreo.style.border = "1px solid #dc3545";
+      hayError = true;
+    }
+
+    if (telefono.length !== 10) {
+      inputTelefono.style.border = "1px solid #dc3545";
+      hayError = true;
+    }
+
+    if (hayError) {
+      mostrarToast("Completa correctamente los campos obligatorios", "warning");
+      return;
+    }
+
     const data = {
-      identificacion: document.getElementById("identificacion").value,
-      nombre: document.getElementById("nombre").value,
-      correo: document.getElementById("correo").value,
-      telefono: document.getElementById("telefono").value
+      identificacion,
+      nombre,
+      correo,
+      telefono
     };
 
     try {
@@ -120,11 +209,11 @@ function initFormPropietario() {
       });
 
       if (!res) {
-        showToast("Error creando propietario", "error");
+        mostrarToast("Error creando propietario", "error");
         return;
       }
 
-      showToast("? Propietario creado correctamente", "success");
+      mostrarToast("Propietario creado correctamente", "success");
 
       cerrarModalPropietario();
       form.reset();
@@ -132,7 +221,7 @@ function initFormPropietario() {
 
     } catch (error) {
       console.error("Error creando propietario:", error);
-      showToast("Error inesperado al crear propietario", "error");
+      mostrarToast("Error inesperado al crear propietario", "error");
     }
   });
 }
@@ -170,7 +259,7 @@ function editarPropietario(btn, id) {
   celdas[2].innerHTML = `<input value="${data.correo}">`;
   celdas[3].innerHTML = `<input value="${data.telefono}">`;
 
-  // botón guardar
+  // botÃ³n guardar
   celdas[4].innerHTML = `
     <button class="btn-icon btn-save" onclick="guardarPropietario(this, '${id}')">
       <i class="fas fa-save"></i>

@@ -91,19 +91,160 @@ function limpiarFiltrosConductores() {
 // ================= FORM
 function initFormConductor() {
   const form = document.getElementById("formConductor");
+  if (!form) return;
+
+  const inputCedula = document.getElementById("cedula");
+  const inputNombre = document.getElementById("nombre");
+  const inputCorreo = document.getElementById("correo");
+  const inputTelefono = document.getElementById("telefono");
+
+  const inputLicencia = document.getElementById("licencia");
+  const inputAlimentos = document.getElementById("alimentos");
+  const inputSustancias = document.getElementById("sustancias");
+
+  const inputsFecha = [inputLicencia, inputAlimentos, inputSustancias];
+
+  // =========================
+  // HELPERS VISUALES
+  // =========================
+
+  function marcarError(input) {
+    input.style.border = "1px solid #dc3545";
+  }
+
+  function limpiarError(input) {
+    input.style.border = "1px solid #ccc";
+  }
+
+  // =========================
+  // VALIDACIONES EN TIEMPO REAL
+  // =========================
+
+  // CÉDULA
+  inputCedula.addEventListener("input", () => {
+    inputCedula.value = inputCedula.value.replace(/\D/g, "");
+    inputCedula.value ? limpiarError(inputCedula) : marcarError(inputCedula);
+  });
+
+  // NOMBRE
+  inputNombre.addEventListener("input", () => {
+    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+    inputNombre.value.trim() ? limpiarError(inputNombre) : marcarError(inputNombre);
+  });
+
+  // TELÉFONO
+  inputTelefono.addEventListener("input", () => {
+    inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 10);
+    inputTelefono.value.length === 10 ? limpiarError(inputTelefono) : marcarError(inputTelefono);
+  });
+
+  // CORREO
+  inputCorreo.addEventListener("input", () => {
+    const correo = inputCorreo.value.trim();
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!correo || regex.test(correo)) {
+      limpiarError(inputCorreo);
+    } else {
+      marcarError(inputCorreo);
+    }
+  });
+
+  // FECHAS (?? MEJORA VISUAL CLAVE)
+  inputsFecha.forEach(input => {
+    input.addEventListener("change", () => {
+      if (input.value) {
+        limpiarError(input);
+      } else {
+        marcarError(input);
+      }
+    });
+
+    // cuando enfoca ? mejora visual
+    input.addEventListener("focus", () => {
+      input.style.outline = "none";
+      input.style.border = "1px solid #2a5298";
+    });
+
+    // cuando sale ? vuelve a normal
+    input.addEventListener("blur", () => {
+      if (!input.value) {
+        marcarError(input);
+      } else {
+        limpiarError(input);
+      }
+    });
+  });
+
+  // =========================
+  // SUBMIT
+  // =========================
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const cedula = inputCedula.value.trim();
+    const nombre = inputNombre.value.trim();
+    const correo = inputCorreo.value.trim();
+    const telefono = inputTelefono.value.trim();
+
+    const licencia = inputLicencia.value;
+    const alimentos = inputAlimentos.value;
+    const sustancias = inputSustancias.value;
+    const estado = document.getElementById("estado").value;
+
+    let hayError = false;
+
+    if (!cedula) {
+      marcarError(inputCedula);
+      hayError = true;
+    }
+
+    if (!nombre) {
+      marcarError(inputNombre);
+      hayError = true;
+    }
+
+    if (telefono && telefono.length !== 10) {
+      marcarError(inputTelefono);
+      hayError = true;
+    }
+
+    if (!licencia) {
+      marcarError(inputLicencia);
+      hayError = true;
+    }
+
+    if (!alimentos) {
+      marcarError(inputAlimentos);
+      hayError = true;
+    }
+
+    if (!sustancias) {
+      marcarError(inputSustancias);
+      hayError = true;
+    }
+
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (correo && !regexCorreo.test(correo)) {
+      marcarError(inputCorreo);
+      hayError = true;
+    }
+
+    if (hayError) {
+      showToast("Corrige los campos marcados", "warning");
+      return;
+    }
+
     const data = {
-      cedula: document.getElementById("cedula").value,
-      nombre: document.getElementById("nombre").value,
-      correo: document.getElementById("correo").value,
-      telefono: document.getElementById("telefono").value,
-      estado: document.getElementById("estado").value,
-      vencimiento_licencia: document.getElementById("licencia").value,
-      vencimiento_manip_alimentos: document.getElementById("alimentos").value,
-      vencimiento_sustancia_peligrosa: document.getElementById("sustancias").value
+      cedula,
+      nombre,
+      correo,
+      telefono,
+      estado,
+      vencimiento_licencia: licencia,
+      vencimiento_manip_alimentos: alimentos,
+      vencimiento_sustancia_peligrosa: sustancias
     };
 
     try {
@@ -112,13 +253,12 @@ function initFormConductor() {
         body: JSON.stringify(data)
       });
 
-      // ?? VALIDACIÓN CLAVE
       if (!res) {
-        showToast("? No se pudo crear el conductor", "error");
+        showToast("No se pudo crear el conductor", "error");
         return;
       }
 
-      showToast("? Conductor creado correctamente", "success");
+      showToast("Conductor creado correctamente", "success");
 
       cerrarModalConductor();
       form.reset();

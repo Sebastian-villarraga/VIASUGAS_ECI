@@ -96,31 +96,58 @@
 
     <h3>Agregar Conductor</h3>
 
-    <form id="formConductor" class="form-grid">
+    <form id="formConductor">
 
-      <input id="cedula" placeholder="Cédula" required>
-      <input id="nombre" placeholder="Nombre" required>
-      <input id="correo" placeholder="Correo">
-      <input id="telefono" placeholder="Teléfono">
+      <div class="form-group">
+        <label>Cédula</label>
+        <input type="text" id="cedula" required>
+      </div>
 
-      <label>Licencia</label>
-      <input type="date" id="licencia" required>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="nombre" required>
+      </div>
 
-      <label>Manipulación alimentos</label>
-      <input type="date" id="alimentos" required>
+      <div class="form-group">
+        <label>Correo</label>
+        <input type="text" id="correo">
+      </div>
 
-      <label>Sustancias peligrosas</label>
-      <input type="date" id="sustancias" required>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="text" id="telefono">
+      </div>
 
-      <select id="estado">
-        <option value="activo">Activo</option>
-        <option value="inactivo">Inactivo</option>
-      </select>
+      <div class="form-group full">
+        <label>Licencia</label>
+        <input type="date" id="licencia" required>
+      </div>
+
+      <div class="form-group full">
+        <label>Manipulación alimentos</label>
+        <input type="date" id="alimentos" required>
+      </div>
+
+      <div class="form-group full">
+        <label>Sustancias peligrosas</label>
+        <input type="date" id="sustancias" required>
+      </div>
+
+      <div class="form-group full">
+        <label>Estado</label>
+        <select id="estado">
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </div>
 
       <div class="modal-actions">
-        <button type="submit" class="btn-primary">Guardar</button>
-        <button type="button" onclick="cerrarModalConductor()">
+        <button type="button" onclick="cerrarModalConductor()" class="btn-secondary">
           Cancelar
+        </button>
+
+        <button type="submit" class="btn-primary">
+          Guardar
         </button>
       </div>
 
