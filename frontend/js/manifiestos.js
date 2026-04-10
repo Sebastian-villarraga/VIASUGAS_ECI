@@ -411,14 +411,28 @@ function initFormManifiesto() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const selectOrigen = document.getElementById("origen_ciudad");
+    const selectDestino = document.getElementById("destino_ciudad");
+
+    const origenCiudad = selectOrigen.value;
+    const destinoCiudad = selectDestino.value;
+
+    const origenDepartamento =
+      selectOrigen.selectedOptions[0]?.dataset.departamento || "";
+
+    const destinoDepartamento =
+      selectDestino.selectedOptions[0]?.dataset.departamento || "";
+
     const data = {
       id_manifiesto: document.getElementById("id_manifiesto").value.trim(),
       radicado: document.getElementById("radicado").value.trim(),
       fecha: document.getElementById("fecha").value,
-      origen_departamento: document.getElementById("origen_departamento").value,
-      origen_ciudad: document.getElementById("origen_ciudad").value,
-      destino_departamento: document.getElementById("destino_departamento").value,
-      destino_ciudad: document.getElementById("destino_ciudad").value,
+
+      origen_departamento: origenDepartamento,
+      origen_ciudad: origenCiudad,
+      destino_departamento: destinoDepartamento,
+      destino_ciudad: destinoCiudad,
+
       valor_flete: document.getElementById("valor_flete").value,
       valor_flete_porcentaje: document.getElementById("valor_flete_porcentaje").value,
       anticipo_manifiesto: document.getElementById("anticipo_manifiesto").value,
@@ -440,11 +454,39 @@ function initFormManifiesto() {
     showToast("Manifiesto creado correctamente", "success");
     cerrarModalManifiesto();
     form.reset();
+
     await cargarCatalogosManifiesto();
-    await llenarSelectDepartamentos("origen_departamento");
-    await llenarSelectDepartamentos("destino_departamento");
     await cargarManifiestos();
   });
+}
+
+// =========================
+// CARGAR CIUDADES MODAL
+// =========================
+async function cargarCiudadesModal() {
+  const selectOrigen = document.getElementById("origen_ciudad");
+  const selectDestino = document.getElementById("destino_ciudad");
+
+  const ciudades = await apiFetch("/api/ubicaciones/municipios");
+
+  if (!ciudades) {
+    showToast("Error cargando ciudades", "error");
+    return;
+  }
+
+  const opciones = ciudades.map(c => `
+    <option value="${c.nombre_municipio}" data-departamento="${c.nombre_departamento}">
+      ${c.nombre_municipio} (${c.nombre_departamento})
+    </option>
+  `).join("");
+
+  if (selectOrigen) {
+    selectOrigen.innerHTML = `<option value="">Seleccione</option>` + opciones;
+  }
+
+  if (selectDestino) {
+    selectDestino.innerHTML = `<option value="">Seleccione</option>` + opciones;
+  }
 }
 
 // =========================
@@ -453,17 +495,9 @@ function initFormManifiesto() {
 function abrirModalManifiesto() {
   document.getElementById("modalManifiesto")?.classList.remove("hidden");
 
-  const origenCiudad = document.getElementById("origen_ciudad");
-  const destinoCiudad = document.getElementById("destino_ciudad");
-
-  if (origenCiudad) {
-    origenCiudad.innerHTML = `<option value="">Seleccione</option>`;
-  }
-
-  if (destinoCiudad) {
-    destinoCiudad.innerHTML = `<option value="">Seleccione</option>`;
-  }
+  cargarCiudadesModal();
 }
+
 
 function cerrarModalManifiesto() {
   document.getElementById("modalManifiesto")?.classList.add("hidden");

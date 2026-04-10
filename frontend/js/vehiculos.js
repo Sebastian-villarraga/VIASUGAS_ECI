@@ -12,7 +12,7 @@ function initVehiculos() {
 }
 
 // =========================
-// CONTROL EDICI�N
+// CONTROL EDICIÓN
 // =========================
 let editando = false;
 
@@ -146,7 +146,7 @@ function editarVehiculo(btn, placa) {
     </select>
   `;
 
-  // BOT�N GUARDAR
+  // BOTÓN GUARDAR
   celdas[6].innerHTML = `
     <button class="btn-icon guardar" onclick="guardarEdicion(this, '${placa}')">
       <i class="fas fa-save"></i>
@@ -239,7 +239,7 @@ function mostrarToast(mensaje, tipo = "success") {
 
   toast.textContent = mensaje;
 
-  // colores seg�n tipo
+  // colores según tipo
   toast.style.background =
     tipo === "error" ? "#dc3545" :
     tipo === "warning" ? "#ffc107" :
@@ -421,6 +421,24 @@ function initFormVehiculo() {
   const form = document.getElementById("formVehiculo");
   if (!form) return;
 
+  const inputPlaca = document.getElementById("placa");
+
+  // ?? VALIDACIÓN EN TIEMPO REAL
+  if (inputPlaca) {
+    inputPlaca.addEventListener("input", () => {
+      let valor = inputPlaca.value.toUpperCase();
+      inputPlaca.value = valor;
+
+      const regexPlaca = /^[A-Z]{3}[0-9]{3}$/;
+
+      if (!valor || regexPlaca.test(valor)) {
+        inputPlaca.style.border = "1px solid #ccc";
+      } else {
+        inputPlaca.style.border = "1px solid #dc3545";
+      }
+    });
+  }
+
   // Evitar duplicar listeners
   if (form._handlerVehiculo) {
     form.removeEventListener("submit", form._handlerVehiculo);
@@ -429,32 +447,45 @@ function initFormVehiculo() {
   const handler = async (e) => {
     e.preventDefault();
 
-    const placa = document.getElementById("placa")?.value.trim().toUpperCase();
-    const propietario = document.getElementById("propietario")?.value; // ?? ahora es IDENTIFICACION
+    let placa = inputPlaca?.value.trim().toUpperCase();
+
+    const propietario = document.getElementById("propietario")?.value;
     const soat = document.getElementById("soat")?.value;
     const tecno = document.getElementById("tecno")?.value;
     const todoRiesgo = document.getElementById("todoRiesgo")?.value;
     const estado = document.getElementById("estado")?.value;
 
+    const regexPlaca = /^[A-Z]{3}[0-9]{3}$/;
+
     // =========================
     // VALIDACIONES
     // =========================
     if (!placa) {
-      alert("La placa es obligatoria");
+      inputPlaca.style.border = "1px solid #dc3545";
+      mostrarToast("La placa es obligatoria", "error");
       return;
     }
 
+    if (!regexPlaca.test(placa)) {
+      inputPlaca.style.border = "1px solid #dc3545";
+      mostrarToast("Formato inválido (Ej: ABC123)", "error");
+      return;
+    }
+
+    // ?? OK ? limpiar error visual
+    inputPlaca.style.border = "1px solid #ccc";
+
     if (!propietario) {
-      alert("Debe seleccionar un propietario");
+      mostrarToast("Debe seleccionar un propietario", "warning");
       return;
     }
 
     // =========================
-    // PAYLOAD CORRECTO
+    // PAYLOAD
     // =========================
     const data = {
       placa,
-      propietario, // ?? es la identificaci�n real (FK)
+      propietario,
       vencimiento_soat: soat || null,
       vencimiento_tecno: tecno || null,
       vencimiento_todo_riesgo: todoRiesgo || null,
@@ -469,19 +500,23 @@ function initFormVehiculo() {
 
       if (!res) return;
 
+      // ?? AQUÍ ESTÁ EL CAMBIO CLAVE
+      mostrarToast("Vehículo creado correctamente", "success");
+
       cerrarModalVehiculo();
       form.reset();
       cargarVehiculos();
+      cargarAlertasVehiculos();
 
     } catch (error) {
-      console.error("Error creando veh�culo:", error);
+      console.error("Error creando vehículo:", error);
+      mostrarToast("Error al crear vehículo", "error");
     }
   };
 
   form._handlerVehiculo = handler;
   form.addEventListener("submit", handler);
 }
-
 // =========================
 // MODAL
 // =========================
