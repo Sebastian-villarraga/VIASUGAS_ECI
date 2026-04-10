@@ -7,14 +7,12 @@ const getTrailers = async (req, res) => {
   try {
     const { placa, propietario, estado } = req.query;
 
-    console.log("QUERY PARAMS:", req.query);
-
     let query = `
       SELECT 
         t.placa,
         COALESCE(p.nombre, '-') AS propietario,
         t.vencimiento_cert_fumigacion,
-        t.estado
+        t.estado::text AS estado
       FROM trailer t
       LEFT JOIN propietario p 
         ON t.id_propietario = p.identificacion
@@ -37,22 +35,19 @@ const getTrailers = async (req, res) => {
     }
 
     if (estado && estado.trim() !== "") {
-      query += ` AND LOWER(t.estado::text) = $${index}`;
+      query += ` AND t.estado::text = $${index}`;
       values.push(estado.trim().toLowerCase());
       index++;
     }
 
     query += `
-        ORDER BY 
-          CASE 
-            WHEN t.estado = 'activo' THEN 0
-            ELSE 1
-          END,
-          t.placa ASC
-      `;
-
-    console.log("QUERY FINAL:", query);
-    console.log("VALUES:", values);
+      ORDER BY 
+        CASE 
+          WHEN t.estado::text = 'activo' THEN 0
+          ELSE 1
+        END,
+        t.placa ASC
+    `;
 
     const result = await pool.query(query, values);
 
@@ -127,11 +122,13 @@ const crearTrailer = async (req, res) => {
       RETURNING *
     `;
 
+    const estadoNormalizado = (estado || "activo").toString().toLowerCase().trim();
+
     const values = [
       placa.toUpperCase(),
       propietario,
       vencimiento_cert_fumigacion || null,
-      estado || "activo"
+      estadoNormalizado
     ];
 
     const result = await pool.query(insertQuery, values);
@@ -292,6 +289,8 @@ const actualizarTrailer = async (req, res) => {
       });
     }
 
+    const estadoNormalizado = (estado || "activo").toString().toLowerCase().trim();
+
     await pool.query(`
       UPDATE trailer SET
         id_propietario = $1,
@@ -301,7 +300,7 @@ const actualizarTrailer = async (req, res) => {
     `, [
       propietario,
       vencimiento_cert_fumigacion || null,
-      estado || "activo",
+      estadoNormalizado,
       placa
     ]);
 

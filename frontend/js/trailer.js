@@ -10,7 +10,7 @@ function initTrailers() {
 }
 
 // =========================
-// CONTROL EDICI�N
+// CONTROL EDICIÓN
 // =========================
 let editandoTrailer = false;
 
@@ -131,19 +131,31 @@ function renderTablaTrailer(data) {
 
   tabla.innerHTML = data.map(t => {
 
-    const estadoClass = t.estado === "activo"
-      ? "badge-activo"
-      : "badge-inactivo";
+    const estado = (t.estado || "").toLowerCase().trim();
+
+    const esActivo = estado === "activo";
+
+    const estadoClass = esActivo ? "badge-activo" : "badge-inactivo";
+    const estadoTexto = esActivo ? "Activo" : "Inactivo";
 
     return `
       <tr>
-        <td>${t.placa}</td>
+        <td>${t.placa || "-"}</td>
         <td>${t.propietario || "-"}</td>
         <td>${formatearFecha(t.vencimiento_cert_fumigacion)}</td>
 
         <td>
-          <span class="badge ${estadoClass}">
-            ${t.estado}
+          <span class="${estadoClass}" style="
+            padding:4px 10px;
+            border-radius:12px;
+            font-size:12px;
+            font-weight:500;
+            display:inline-block;
+            ${esActivo 
+              ? 'background:#d1f5e0; color:#1a7f4b;' 
+              : 'background:#ffd6d6; color:#b42318;'}
+          ">
+            ${estadoTexto}
           </span>
         </td>
 
@@ -201,7 +213,7 @@ function editarTrailer(btn, placa) {
     </select>
   `;
 
-  // BOT�N GUARDAR
+  // BOTÓN GUARDAR
   celdas[4].innerHTML = `
     <button type="button" class="btn-icon btn-save" onclick="guardarEdicionTrailer(this, '${placa}')">
       <i class="fas fa-save"></i>
@@ -254,7 +266,7 @@ async function guardarEdicionTrailer(btn, placa) {
   const estado = fila.querySelector("td:nth-child(4) select")?.value;
 
   const data = {
-    propietario: propietario, // ?? FK correcta (identificaci�n)
+    propietario: propietario, // ?? FK correcta (identificación)
     vencimiento_cert_fumigacion: fecha || null,
     estado: estado
   };
@@ -303,6 +315,26 @@ function initFormTrailer() {
   const form = document.getElementById("formTrailer");
   if (!form) return;
 
+  const inputPlaca = document.getElementById("placaTrailer");
+
+  // 🔥 NUEVO REGEX: 1 letra + 5 números
+  const regexPlaca = /^[A-Z]{1}[0-9]{5}$/;
+
+  // 🔥 VALIDACIÓN EN TIEMPO REAL
+  if (inputPlaca) {
+    inputPlaca.addEventListener("input", () => {
+      let valor = inputPlaca.value.toUpperCase();
+      inputPlaca.value = valor;
+
+      if (!valor || regexPlaca.test(valor)) {
+        inputPlaca.style.border = "1px solid #ccc";
+      } else {
+        inputPlaca.style.border = "1px solid #dc3545";
+      }
+    });
+  }
+
+  // Evitar duplicar listeners
   if (form._handlerTrailer) {
     form.removeEventListener("submit", form._handlerTrailer);
   }
@@ -310,24 +342,41 @@ function initFormTrailer() {
   const handler = async (e) => {
     e.preventDefault();
 
-    const placa = document.getElementById("placaTrailer")?.value.trim().toUpperCase();
+    let placa = inputPlaca?.value.trim().toUpperCase();
+
     const propietario = document.getElementById("propietarioTrailer")?.value;
     const fumigacion = document.getElementById("fumigacion")?.value;
     const estado = document.getElementById("estadoTrailer")?.value;
 
+    // =========================
+    // VALIDACIONES
+    // =========================
     if (!placa) {
-      alert("La placa del trailer es obligatoria");
+      inputPlaca.style.border = "1px solid #dc3545";
+      mostrarToast("La placa es obligatoria", "error");
       return;
     }
+
+    if (!regexPlaca.test(placa)) {
+      inputPlaca.style.border = "1px solid #dc3545";
+      mostrarToast("Formato inválido (Ej: T12345)", "error");
+      return;
+    }
+
+    // ✅ limpiar error visual
+    inputPlaca.style.border = "1px solid #ccc";
 
     if (!propietario) {
-      alert("Debe seleccionar un propietario");
+      mostrarToast("Debe seleccionar un propietario", "warning");
       return;
     }
 
+    // =========================
+    // PAYLOAD
+    // =========================
     const data = {
       placa,
-      propietario, // ?? ahora es identificacion
+      propietario,
       vencimiento_fumigacion: fumigacion || null,
       estado: estado || "activo"
     };
@@ -340,12 +389,17 @@ function initFormTrailer() {
 
       if (!res) return;
 
+      // 🔥 TOAST ÉXITO
+      mostrarToast("Trailer creado correctamente", "success");
+
       cerrarModalTrailer();
       form.reset();
       cargarTrailers();
+      cargarAlertas();
 
     } catch (error) {
       console.error("Error creando trailer:", error);
+      mostrarToast("Error al crear trailer", "error");
     }
   };
 
@@ -359,15 +413,20 @@ function initFormTrailer() {
 function formatearFecha(fecha) {
   if (!fecha) return "-";
 
-  const f = new Date(fecha);
+  try {
+    const f = new Date(fecha);
 
-  if (isNaN(f)) return "-";
+    if (isNaN(f.getTime())) return "-";
 
-  const dia = String(f.getDate()).padStart(2, "0");
-  const mes = String(f.getMonth() + 1).padStart(2, "0");
-  const anio = f.getFullYear();
+    const dia = String(f.getDate()).padStart(2, "0");
+    const mes = String(f.getMonth() + 1).padStart(2, "0");
+    const anio = f.getFullYear();
 
-  return `${dia}/${mes}/${anio}`;
+    return `${dia}/${mes}/${anio}`;
+
+  } catch (e) {
+    return "-";
+  }
 }
 
 // =========================
