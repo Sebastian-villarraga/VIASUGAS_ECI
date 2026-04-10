@@ -30,28 +30,37 @@ function renderTablaClientes(data) {
     return;
   }
 
-  tabla.innerHTML = data.map(c => `
-    <tr 
-      data-nit="${c.nit}"
-      data-nombre="${c.nombre}"
-      data-correo="${c.correo || ""}"
-      data-telefono="${c.telefono || ""}"
-      data-direccion="${c.direccion || ""}"
-      data-estado="${c.estado}"
-    >
-      <td>${c.nit}</td>
-      <td>${c.nombre}</td>
-      <td>${c.correo || "-"}</td>
-      <td>${c.telefono || "-"}</td>
-      <td>${c.direccion || "-"}</td>
-      <td>${renderEstadoBadge(c.estado)}</td>
-      <td>
-        <button class="btn-icon" onclick="editarCliente(this, '${c.nit}')">
-          <i class="fas fa-pen"></i>
-        </button>
-      </td>
-    </tr>
-  `).join("");
+  tabla.innerHTML = data.map(c => {
+
+    const estado = (c.estado || "").toLowerCase().trim();
+
+    return `
+      <tr 
+        data-nit="${c.nit}"
+        data-nombre="${c.nombre}"
+        data-correo="${c.correo || ""}"
+        data-telefono="${c.telefono || ""}"
+        data-direccion="${c.direccion || ""}"
+        data-estado="${estado}"
+      >
+        <td>${c.nit}</td>
+        <td>${c.nombre}</td>
+        <td>${c.correo || "-"}</td>
+        <td>${c.telefono || "-"}</td>
+        <td>${c.direccion || "-"}</td>
+        <td>
+          <span class="estado-badge ${estado}">
+            ${estado === "activo" ? "Activo" : "Inactivo"}
+          </span>
+        </td>
+        <td>
+          <button class="btn-icon" onclick="editarCliente(this, '${c.nit}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 // ================= FILTROS
@@ -83,31 +92,171 @@ function limpiarFiltrosClientes() {
 // ================= FORM
 function initFormCliente() {
   const form = document.getElementById("formCliente");
+  if (!form) return;
+
+  const inputNit = document.getElementById("nit");
+  const inputNombre = document.getElementById("nombre");
+  const inputCorreo = document.getElementById("correo");
+  const inputTelefono = document.getElementById("telefono");
+  const selectDireccion = document.getElementById("direccion");
+
+  // =========================
+  // DATOS (puedes mover esto a archivo aparte luego)
+  // =========================
+  const ubicaciones = [
+    { dep: "Antioquia", ciudad: "Medellín" },
+    { dep: "Antioquia", ciudad: "Bello" },
+    { dep: "Cundinamarca", ciudad: "Bogotá" },
+    { dep: "Cundinamarca", ciudad: "Soacha" },
+    { dep: "Valle del Cauca", ciudad: "Cali" },
+    { dep: "Valle del Cauca", ciudad: "Palmira" },
+    { dep: "Atlántico", ciudad: "Barranquilla" },
+    { dep: "Santander", ciudad: "Bucaramanga" }
+  ];
+
+  // =========================
+  // CARGAR SELECT DIRECCIÓN
+  // =========================
+  function cargarDirecciones() {
+    selectDireccion.innerHTML = `<option value="">Seleccione</option>`;
+
+    ubicaciones.forEach(u => {
+      const option = document.createElement("option");
+
+      // 🔥 lo que se guarda
+      option.value = u.ciudad;
+
+      // 🔥 lo que ve el usuario
+      option.textContent = `${u.ciudad} (${u.dep})`;
+
+      selectDireccion.appendChild(option);
+    });
+  }
+
+  cargarDirecciones();
+
+  // =========================
+  // HELPERS
+  // =========================
+  const marcarError = (el) => el.classList.add("error");
+  const limpiarError = (el) => el.classList.remove("error");
+
+  // =========================
+  // VALIDACIONES
+  // =========================
+
+  inputNit.addEventListener("input", () => {
+    inputNit.value = inputNit.value.replace(/\D/g, "");
+    inputNit.value ? limpiarError(inputNit) : marcarError(inputNit);
+  });
+
+  inputNombre.addEventListener("input", () => {
+    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+    inputNombre.value.trim() ? limpiarError(inputNombre) : marcarError(inputNombre);
+  });
+
+  inputTelefono.addEventListener("input", () => {
+    inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 10);
+
+    if (!inputTelefono.value || inputTelefono.value.length === 10) {
+      limpiarError(inputTelefono);
+    } else {
+      marcarError(inputTelefono);
+    }
+  });
+
+  inputCorreo.addEventListener("input", () => {
+    const val = inputCorreo.value.trim();
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!val || regex.test(val)) {
+      limpiarError(inputCorreo);
+    } else {
+      marcarError(inputCorreo);
+    }
+  });
+
+  selectDireccion.addEventListener("change", () => {
+    selectDireccion.value ? limpiarError(selectDireccion) : marcarError(selectDireccion);
+  });
+
+  // =========================
+  // SUBMIT
+  // =========================
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const nit = inputNit.value.trim();
+    const nombre = inputNombre.value.trim();
+    const correo = inputCorreo.value.trim();
+    const telefono = inputTelefono.value.trim();
+    const direccion = selectDireccion.value;
+    const estado = document.getElementById("estado").value;
+
+    let hayError = false;
+
+    if (!nit) {
+      marcarError(inputNit);
+      hayError = true;
+    }
+
+    if (!nombre) {
+      marcarError(inputNombre);
+      hayError = true;
+    }
+
+    if (!direccion) {
+      marcarError(selectDireccion);
+      hayError = true;
+    }
+
+    if (telefono && telefono.length !== 10) {
+      marcarError(inputTelefono);
+      hayError = true;
+    }
+
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (correo && !regexCorreo.test(correo)) {
+      marcarError(inputCorreo);
+      hayError = true;
+    }
+
+    if (hayError) {
+      showToast("Corrige los campos marcados", "warning");
+      return;
+    }
+
     const data = {
-      nit: document.getElementById("nit").value,
-      nombre: document.getElementById("nombre").value,
-      correo: document.getElementById("correo").value,
-      telefono: document.getElementById("telefono").value,
-      direccion: document.getElementById("direccion").value,
-      estado: document.getElementById("estado").value
+      nit,
+      nombre,
+      correo,
+      telefono,
+      direccion, // 🔥 solo ciudad
+      estado
     };
 
-    const res = await apiFetch("/api/clientes", {
-      method: "POST",
-      body: JSON.stringify(data)
-    });
+    try {
+      const res = await apiFetch("/api/clientes", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
 
-    if (!res) return;
+      if (!res) {
+        showToast("Error creando cliente", "error");
+        return;
+      }
 
-    showToast("Cliente creado correctamente", "success");
+      showToast("Cliente creado correctamente", "success");
 
-    cerrarModalCliente();
-    form.reset();
-    cargarClientes();
+      cerrarModalCliente();
+      form.reset();
+      cargarClientes();
+
+    } catch (error) {
+      console.error(error);
+      showToast("Error inesperado", "error");
+    }
   });
 }
 
