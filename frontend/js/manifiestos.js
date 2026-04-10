@@ -491,90 +491,150 @@ async function editarManifiesto(btn, idManifiesto) {
   const d = fila.dataset;
   const celdas = fila.querySelectorAll("td");
 
-  const departamentos = await apiFetch("/api/ubicaciones/departamentos");
+  // ?? INPUT FULL WIDTH
+  const styleInput = `
+    style="
+      display:block;
+      width:100%;
+      min-width:0;
+      box-sizing:border-box;
+      padding:6px 8px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      font-size:12px;
+    "
+  `;
 
-  if (!departamentos) {
-    showToast("No se pudieron cargar los departamentos", "error");
-    editandoManifiesto = false;
-    return;
-  }
+  // ?? SELECT FULL WIDTH (CLAVE)
+  const styleSelect = `
+    style="
+      display:block;
+      width:100%;
+      min-width:0;
+      box-sizing:border-box;
+      padding:6px 8px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      font-size:12px;
+    "
+  `;
 
-  celdas[1].innerHTML = `<input type="number" value="${d.radicado}">`;
-  celdas[2].innerHTML = `<input type="date" value="${d.fecha}">`;
+  // =========================
+  // CAMPOS BASICOS
+  // =========================
+  celdas[1].innerHTML = `<input type="number" value="${d.radicado}" ${styleInput}>`;
+  celdas[2].innerHTML = `<input type="date" value="${d.fecha}" ${styleInput}>`;
 
   celdas[3].innerHTML = `
-    <select>
+    <select ${styleSelect}>
       ${catalogosManifiesto.clientes.map(c => `
-        <option value="${c.nit}" ${c.nit === d.id_cliente ? "selected" : ""}>${c.nombre} - ${c.nit}</option>
+        <option value="${c.nit}" ${c.nit === d.id_cliente ? "selected" : ""}>
+          ${c.nombre} - ${c.nit}
+        </option>
       `).join("")}
     </select>
   `;
 
   celdas[4].innerHTML = `
-    <select>
+    <select ${styleSelect}>
       ${catalogosManifiesto.conductores.map(c => `
-        <option value="${c.cedula}" ${String(c.cedula) === String(d.id_conductor) ? "selected" : ""}>${c.nombre} - ${c.cedula}</option>
+        <option value="${c.cedula}" ${String(c.cedula) === String(d.id_conductor) ? "selected" : ""}>
+          ${c.nombre} - ${c.cedula}
+        </option>
       `).join("")}
     </select>
   `;
 
+  // =========================
+  // ?? RUTA VERTICAL FULL WIDTH
+  // =========================
   celdas[5].innerHTML = `
-    <div class="ruta-inline">
-      <div class="ruta-inline-item">
-        <select class="dep-origen-inline">
-          <option value="">Seleccione</option>
-          ${departamentos.map(dep => `
-            <option value="${dep.nombre_departamento}" ${dep.nombre_departamento === d.origen_departamento ? "selected" : ""}>
-              ${dep.nombre_departamento}
-            </option>
-          `).join("")}
-        </select>
-        <select class="ciu-origen-inline">
+    <div style="display:flex; flex-direction:column; gap:6px; width:100%; min-width:0;">
+
+      <div style="width:100%; min-width:0;">
+        <span style="font-size:10px; color:#6b7280;">Origen</span>
+        <select class="ciudad-origen" ${styleSelect}>
           <option value="">Seleccione</option>
         </select>
       </div>
-      <div class="ruta-inline-item">
-        <select class="dep-destino-inline">
-          <option value="">Seleccione</option>
-          ${departamentos.map(dep => `
-            <option value="${dep.nombre_departamento}" ${dep.nombre_departamento === d.destino_departamento ? "selected" : ""}>
-              ${dep.nombre_departamento}
-            </option>
-          `).join("")}
-        </select>
-        <select class="ciu-destino-inline">
+
+      <div style="width:100%; min-width:0;">
+        <span style="font-size:10px; color:#6b7280;">Destino</span>
+        <select class="ciudad-destino" ${styleSelect}>
           <option value="">Seleccione</option>
         </select>
       </div>
+
     </div>
   `;
 
+  const selectOrigen = celdas[5].querySelector(".ciudad-origen");
+  const selectDestino = celdas[5].querySelector(".ciudad-destino");
+
+  const ciudades = await apiFetch("/api/ubicaciones/municipios");
+
+  if (!ciudades) {
+    showToast("Error cargando ciudades", "error");
+    return;
+  }
+
+  selectOrigen.innerHTML = `
+    <option value="">Seleccione</option>
+    ${ciudades.map(c => `
+      <option value="${c.nombre_municipio}"
+        data-departamento="${c.nombre_departamento}"
+        ${c.nombre_municipio === d.origen_ciudad ? "selected" : ""}>
+        ${c.nombre_municipio} (${c.nombre_departamento})
+      </option>
+    `).join("")}
+  `;
+
+  selectDestino.innerHTML = `
+    <option value="">Seleccione</option>
+    ${ciudades.map(c => `
+      <option value="${c.nombre_municipio}"
+        data-departamento="${c.nombre_departamento}"
+        ${c.nombre_municipio === d.destino_ciudad ? "selected" : ""}>
+        ${c.nombre_municipio} (${c.nombre_departamento})
+      </option>
+    `).join("")}
+  `;
+
+  // =========================
+  // RESTO
+  // =========================
   celdas[6].innerHTML = `
-    <select>
+    <select ${styleSelect}>
       ${catalogosManifiesto.vehiculos.map(v => `
-        <option value="${v.placa}" ${v.placa === d.id_vehiculo ? "selected" : ""}>${v.placa}</option>
+        <option value="${v.placa}" ${v.placa === d.id_vehiculo ? "selected" : ""}>
+          ${v.placa}
+        </option>
       `).join("")}
     </select>
   `;
 
   celdas[7].innerHTML = `
-    <select>
+    <select ${styleSelect}>
       ${catalogosManifiesto.trailers.map(t => `
-        <option value="${t.placa}" ${t.placa === d.id_trailer ? "selected" : ""}>${t.placa}</option>
+        <option value="${t.placa}" ${t.placa === d.id_trailer ? "selected" : ""}>
+          ${t.placa}
+        </option>
       `).join("")}
     </select>
   `;
 
   celdas[8].innerHTML = `
-    <select>
+    <select ${styleSelect}>
       ${catalogosManifiesto.estados.map(e => `
-        <option value="${e}" ${e === d.estado ? "selected" : ""}>${e}</option>
+        <option value="${e}" ${e === d.estado ? "selected" : ""}>
+          ${e}
+        </option>
       `).join("")}
     </select>
   `;
 
   celdas[9].innerHTML = `
-    <select>
+    <select ${styleSelect}>
       <option value="true" ${d.novedades === "true" ? "selected" : ""}>Sí</option>
       <option value="false" ${d.novedades === "false" ? "selected" : ""}>No</option>
     </select>
@@ -586,27 +646,13 @@ async function editarManifiesto(btn, idManifiesto) {
     </button>
   `;
 
-  const depOrigen = celdas[5].querySelector(".dep-origen-inline");
-  const ciuOrigen = celdas[5].querySelector(".ciu-origen-inline");
-  const depDestino = celdas[5].querySelector(".dep-destino-inline");
-  const ciuDestino = celdas[5].querySelector(".ciu-destino-inline");
-
-  await cargarCiudadesInline(depOrigen.value, ciuOrigen, d.origen_ciudad);
-  await cargarCiudadesInline(depDestino.value, ciuDestino, d.destino_ciudad);
-
-  depOrigen.addEventListener("change", async () => {
-    await cargarCiudadesInline(depOrigen.value, ciuOrigen);
-  });
-
-  depDestino.addEventListener("change", async () => {
-    await cargarCiudadesInline(depDestino.value, ciuDestino);
-  });
-
   document.querySelectorAll(".btn-icon").forEach(b => {
     if (!b.classList.contains("btn-save")) b.disabled = true;
   });
 }
-
+// =========================
+// GUARDAR
+// =========================
 async function guardarManifiesto(btn, idManifiesto) {
   const fila = btn.closest("tr");
   const d = fila.dataset;
@@ -616,10 +662,17 @@ async function guardarManifiesto(btn, idManifiesto) {
   const fecha = celdas[2].querySelector("input").value;
   const idCliente = celdas[3].querySelector("select").value;
   const idConductor = celdas[4].querySelector("select").value;
-  const depOrigen = celdas[5].querySelector(".dep-origen-inline").value;
-  const ciuOrigen = celdas[5].querySelector(".ciu-origen-inline").value;
-  const depDestino = celdas[5].querySelector(".dep-destino-inline").value;
-  const ciuDestino = celdas[5].querySelector(".ciu-destino-inline").value;
+
+  // ?? NUEVO: ciudades + departamento automático
+  const selectOrigen = celdas[5].querySelector(".ciudad-origen");
+  const selectDestino = celdas[5].querySelector(".ciudad-destino");
+
+  const origenCiudad = selectOrigen.value;
+  const destinoCiudad = selectDestino.value;
+
+  const origenDepartamento = selectOrigen.selectedOptions[0]?.dataset.departamento || "";
+  const destinoDepartamento = selectDestino.selectedOptions[0]?.dataset.departamento || "";
+
   const idVehiculo = celdas[6].querySelector("select").value;
   const idTrailer = celdas[7].querySelector("select").value;
   const estado = celdas[8].querySelector("select").value;
@@ -628,10 +681,10 @@ async function guardarManifiesto(btn, idManifiesto) {
   const payload = {
     radicado,
     fecha,
-    origen_departamento: depOrigen,
-    origen_ciudad: ciuOrigen,
-    destino_departamento: depDestino,
-    destino_ciudad: ciuDestino,
+    origen_departamento: origenDepartamento,
+    origen_ciudad: origenCiudad,
+    destino_departamento: destinoDepartamento,
+    destino_ciudad: destinoCiudad,
     estado,
     valor_flete: d.valor_flete,
     valor_flete_porcentaje: d.valor_flete_porcentaje,
@@ -656,10 +709,11 @@ async function guardarManifiesto(btn, idManifiesto) {
 
   showToast("Manifiesto actualizado", "success");
   editandoManifiesto = false;
+
   document.querySelectorAll(".btn-icon").forEach(b => b.disabled = false);
+
   await cargarManifiestos();
   aplicarFiltroEsteMes();
-  
 }
 
 // =========================
