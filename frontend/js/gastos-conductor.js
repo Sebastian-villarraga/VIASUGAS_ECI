@@ -13,17 +13,16 @@ async function gc_cargarCatalogos() {
   try {
     gc_catalogos.conductores = await apiFetch("/api/conductores") || [];
     gc_catalogos.manifiestos = await apiFetch("/api/manifiestos") || [];
-    gc_catalogos.transacciones = await apiFetch("/api/transacciones") || [];
+    gc_catalogos.tipos = await apiFetch("/api/tipo-transaccion?tipo=GASTO CONDUCTOR") || [];
 
-    // ?? FILTROS
+    // FILTROS
     gc_llenarSelect("fConductor", gc_catalogos.conductores, "nombre", "cedula");
     gc_llenarSelect("fManifiesto", gc_catalogos.manifiestos, "id_manifiesto", "id_manifiesto");
-    gc_llenarSelect("fTipo", gc_catalogos.transacciones, "categoria", "id");
+    gc_llenarSelect("fTipo", gc_catalogos.tipos, "categoria", "id");
 
-    // ?? MODAL
-    gc_llenarSelect("id_conductor", gc_catalogos.conductores, "nombre", "cedula");
+    // MODAL
     gc_llenarSelect("id_manifiesto", gc_catalogos.manifiestos, "id_manifiesto", "id_manifiesto");
-    gc_llenarSelect("id_transaccion", gc_catalogos.transacciones, "categoria", "id");
+    gc_llenarSelect("tipo_transaccion", gc_catalogos.tipos, "categoria", "id");
 
   } catch (error) {
     console.error("Error cargando catálogos:", error);
@@ -39,7 +38,7 @@ async function gc_cargarGastos() {
   const tbody = document.getElementById("tablaGastos");
   if (!tbody) return;
 
-  // ?? FILTROS
+  // FILTROS
   const fDesde = document.getElementById("fDesde")?.value;
   const fHasta = document.getElementById("fHasta")?.value;
   const fConductor = document.getElementById("fConductor")?.value;
@@ -52,7 +51,9 @@ async function gc_cargarGastos() {
   if (fHasta) filtrados = filtrados.filter(g => new Date(g.creado) <= new Date(fHasta));
   if (fConductor) filtrados = filtrados.filter(g => g.id_conductor == fConductor);
   if (fManifiesto) filtrados = filtrados.filter(g => g.id_manifiesto == fManifiesto);
-  if (fTipo) filtrados = filtrados.filter(g => g.id_transaccion == fTipo);
+
+  // ?? AHORA FILTRA POR TIPO DE TRANSACCIÓN
+  if (fTipo) filtrados = filtrados.filter(g => g.tipo_transaccion_id == fTipo);
 
   tbody.innerHTML = "";
 
@@ -91,14 +92,15 @@ function gc_eventos() {
   document.getElementById("guardarGasto")?.addEventListener("click", async () => {
 
     const body = {
-      id_transaccion: document.getElementById("id_transaccion").value,
-      id_conductor: document.getElementById("id_conductor").value,
+      tipo_transaccion: document.getElementById("tipo_transaccion").value,
+      valor: document.getElementById("valor").value,
       id_manifiesto: document.getElementById("id_manifiesto").value,
       descripcion: document.getElementById("descripcion").value,
       fecha: document.getElementById("fecha").value
     };
 
-    if (!body.id_conductor || !body.id_transaccion) {
+    // ?? VALIDACIÓN CORREGIDA
+    if (!body.tipo_transaccion || !body.id_manifiesto || !body.valor) {
       alert("Completa los campos obligatorios");
       return;
     }
@@ -126,6 +128,22 @@ function gc_eventos() {
 
     gc_cargarGastos();
   });
+  
+  
+  document.getElementById("id_manifiesto")?.addEventListener("change", (e) => {
+    const id = e.target.value;
+  
+    const manifiesto = gc_catalogos.manifiestos.find(
+      m => m.id_manifiesto == id
+    );
+  
+    if (manifiesto) {
+      document.getElementById("conductor_nombre").value =
+        manifiesto.conductor_nombre || manifiesto.id_conductor || "";
+    } else {
+      document.getElementById("conductor_nombre").value = "";
+    }
+  });
 }
 
 // =========================
@@ -141,9 +159,8 @@ function gc_llenarSelect(id, data, labelKey, valueKey) {
     const option = document.createElement("option");
     option.value = item[valueKey];
 
-    // ?? MEJORA PARA TRANSACCIONES
-    if (id === "id_transaccion" || id === "fTipo") {
-      option.textContent = `${item.categoria} (${item.contexto})`;
+    if (id === "tipo_transaccion" || id === "fTipo") {
+      option.textContent = `${item.categoria}`;
     } else {
       option.textContent = item[labelKey];
     }
@@ -153,11 +170,12 @@ function gc_llenarSelect(id, data, labelKey, valueKey) {
 }
 
 function gc_limpiarFormulario() {
-  document.getElementById("id_conductor").value = "";
+  document.getElementById("tipo_transaccion").value = "";
+  document.getElementById("valor").value = "";
   document.getElementById("id_manifiesto").value = "";
-  document.getElementById("id_transaccion").value = "";
   document.getElementById("descripcion").value = "";
   document.getElementById("fecha").value = "";
+  document.getElementById("conductor_nombre").value = "";
 }
 
 function gc_formatearFecha(fecha) {

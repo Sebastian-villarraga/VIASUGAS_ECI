@@ -29,17 +29,45 @@
   </div>
 
   <!-- FILTROS -->
+
   <div class="transacciones-filtros">
-    <input type="date" id="fDesde">
-    <input type="date" id="fHasta">
-
-    <select id="fTipo"></select>
-    <select id="fBanco"></select>
-    <select id="fManifiesto"></select>
-
-    <button id="btnEsteMes" class="btn-secundario">Ver este mes</button>
-    <button id="btnMesAnterior" class="btn-secundario">Ver mes anterior</button>
-    <button id="btnLimpiar">Limpiar</button>
+  
+    
+  
+    <div class="filtros-row">
+  
+      <button id="btnEsteMes" class="btn-secundario">Ver este mes</button>
+      <button id="btnMesAnterior" class="btn-secundario">Ver mes anterior</button>
+  
+      <div class="filtro-group">
+        <label>Desde</label>
+        <input type="date" id="fDesde">
+      </div>
+  
+      <div class="filtro-group">
+        <label>Hasta</label>
+        <input type="date" id="fHasta">
+      </div>
+  
+      <div class="filtro-group">
+        <label>Categoria transacción</label>
+        <select id="fTipo"></select>
+      </div>
+  
+      <div class="filtro-group">
+        <label>Banco</label>
+        <select id="fBanco"></select>
+      </div>
+  
+      <div class="filtro-group">
+        <label>Manifiesto</label>
+        <select id="fManifiesto"></select>
+      </div>
+  
+      <button id="btnLimpiar" class="btn-limpiar">Limpiar</button>
+  
+    </div>
+  
   </div>
 
   <!-- TABLA -->

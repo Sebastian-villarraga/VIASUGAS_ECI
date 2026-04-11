@@ -238,7 +238,7 @@ CREATE TABLE tipo_transaccion (
 
 CREATE TABLE transaccion (
     id VARCHAR PRIMARY KEY,
-    id_banco VARCHAR,
+    id_banco VARCHAR NULL,
     id_tipo_transaccion VARCHAR,
 
     id_vehiculo VARCHAR,

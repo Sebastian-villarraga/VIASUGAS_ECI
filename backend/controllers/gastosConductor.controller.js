@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { randomUUID } = require("crypto");
 
 // =========================
 // GET
@@ -31,45 +32,104 @@ const getGastosConductor = async (_req, res) => {
 // POST
 // =========================
 const createGastoConductor = async (req, res) => {
+  const client = await pool.connect();
+
   try {
     const {
-      id_transaccion,
-      id_conductor,
+      tipo_transaccion,
+      valor,
       id_manifiesto,
       descripcion,
       fecha
     } = req.body;
 
-    // ?? VALIDACIÓN
-    if (!id_transaccion || !id_conductor) {
+    if (!tipo_transaccion || !id_manifiesto || !valor) {
       return res.status(400).json({
-        error: "id_transaccion y id_conductor son obligatorios"
+        error: "tipo_transaccion, valor e id_manifiesto son obligatorios"
       });
     }
 
-    const result = await pool.query(`
+    await client.query("BEGIN");
+
+    // =========================
+    // 1. OBTENER CONDUCTOR
+    // =========================
+    const resultManifiesto = await client.query(`
+      SELECT id_conductor
+      FROM manifiesto
+      WHERE id_manifiesto = $1
+    `, [id_manifiesto]);
+
+    if (resultManifiesto.rows.length === 0) {
+      throw new Error("Manifiesto no encontrado");
+    }
+
+    const id_conductor = resultManifiesto.rows[0].id_conductor;
+
+    // =========================
+    // 2. CREAR TRANSACCION
+    // =========================
+    const id_transaccion = randomUUID();
+
+    const id_banco_default = null; // ?? ajusta si quieres
+
+    await client.query(`
+      INSERT INTO transaccion (
+        id,
+        id_banco,
+        id_tipo_transaccion,
+        id_manifiesto,
+        valor,
+        fecha_pago,
+        descripcion,
+        creado
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+    `, [
+      id_transaccion,
+      id_banco_default,
+      tipo_transaccion,
+      id_manifiesto,
+      valor,
+      fecha || new Date(),
+      descripcion || "Gasto conductor"
+    ]);
+
+    // =========================
+    // 3. CREAR GASTO
+    // =========================
+    const id_gasto = randomUUID();
+
+    const gastoResult = await client.query(`
       INSERT INTO gastos_conductor (
+        id,
         id_transaccion,
         id_conductor,
         id_manifiesto,
         descripcion,
         creado
       )
-      VALUES ($1, $2, $3, $4, $5)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `, [
+      id_gasto,
       id_transaccion,
       id_conductor,
-      id_manifiesto || null,
+      id_manifiesto,
       descripcion || "",
       fecha || new Date()
     ]);
 
-    res.status(201).json(result.rows[0]);
+    await client.query("COMMIT");
+
+    res.status(201).json(gastoResult.rows[0]);
 
   } catch (error) {
-    console.error("? Error creando gasto:", error);
-    res.status(500).json({ error: "Error creando gasto conductor" });
+    await client.query("ROLLBACK");
+    console.error("Error creando gasto:", error);
+    res.status(500).json({ error: error.message });
+  } finally {
+    client.release();
   }
 };
 
