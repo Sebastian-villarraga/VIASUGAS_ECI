@@ -13,7 +13,9 @@ Permite administrar:
 * Conductores
 * Empresas a Cargo (Terceros)
 * Manifiestos (viajes)
-* Alertas de vencimientos
+* Transacciones financieras
+* Facturación
+* Gastos de conductor
 
 La aplicación sigue una arquitectura **fullstack desacoplada**, con enfoque en escalabilidad tipo SaaS.
 
@@ -47,337 +49,349 @@ Frontend (SPA)  <-->  Backend (Express API)  <-->  PostgreSQL
 
 * PostgreSQL
 * Relaciones con claves foráneas
-* Tipos ENUM
+* Tipos ENUM (ingreso/egreso)
 * Modelo normalizado
 
 ---
 
-## Estructura del Proyecto
+## ?? CAMBIOS IMPLEMENTADOS EN ESTA SESIÓN (DETALLADO)
+
+---
+
+# ?? Módulo: Gastos de Conductor (REFACTOR TOTAL)
+
+## Problema original
+
+El modelo anterior obligaba a:
 
 ```
-frontend/
-  js/
-    api.js
-    app.js
-    vehiculos.js
-    propietarios.js
-    conductores.js
-    empresas-a-cargo.js
-    ui.js
+Crear Transacción ? Luego crear Gasto
+```
 
-  styles/
-    vehiculo.css
-    conductores.css
-    propietarios.css
-    empresas-a-cargo.css
-    global.css
+Esto generaba:
 
-  pages/views/
-    vehiculos.html
-    propietarios.html
-    conductores.html
-    empresas-a-cargo.html
+* Dependencia innecesaria
+* Errores de integridad (`id_transaccion`)
+* Flujo poco natural
+* Complejidad en frontend
 
-backend/
-  controllers/
-    vehiculo.controller.js
-    propietario.controller.js
-    conductor.controller.js
-    empresaACargo.controller.js
+---
 
-  routes/
-    vehiculo.routes.js
-    propietario.routes.js
-    conductor.routes.js
-    empresaACargo.routes.js
+## Nueva arquitectura implementada
 
-  config/
-    db.js
+### Nuevo flujo:
 
-  index.js
+```
+Crear Gasto ? automáticamente crea ? Transacción
 ```
 
 ---
 
-## API Backend
+## Backend (cambio crítico)
 
-### Conductores
+Archivo:
 
-* GET `/api/conductores`
-* POST `/api/conductores`
-* PUT `/api/conductores/:cedula`
-* GET `/api/conductores/alertas`
+```
+gastosConductor.controller.js
+```
 
-Filtros:
+### Lógica nueva:
 
-* nombre
-* cedula
-* estado
-
----
-
-### Propietarios
-
-* GET `/api/propietarios`
-* POST `/api/propietarios`
-* PUT `/api/propietarios/:identificacion`
-
-Filtros:
-
-* nombre
-* identificacion
+1. Se inicia transacción SQL (`BEGIN`)
+2. Se crea la transacción financiera
+3. Se crea el gasto asociado
+4. Se hace `COMMIT`
 
 ---
 
-### Vehículos
+## Problemas solucionados
 
-* GET `/api/vehiculos`
-* GET `/api/vehiculos/alertas`
-* GET `/api/vehiculos/filtro-alertas`
-* POST `/api/vehiculos`
-* PUT `/api/vehiculos/:placa`
-
-Filtros:
-
-* placa
-* propietario
-* estado
+* ? `null value in column id_transaccion`
+* ? dependencia manual de transacciones
+* ? errores de sincronización
+* ? duplicidad lógica frontend/backend
 
 ---
 
-### Empresas a Cargo (Terceros)
+## Base de datos
 
-Nuevo módulo implementado.
+### Cambio importante
 
-* GET `/api/empresas-a-cargo`
-* GET `/api/empresas-a-cargo/:nit`
-* POST `/api/empresas-a-cargo`
-* PUT `/api/empresas-a-cargo/:nit`
+```sql
+ALTER TABLE transaccion
+ALTER COLUMN id_banco DROP NOT NULL;
+```
 
-Filtros:
-
-* nit
-* nombre
-* estado
-
-Relación con manifiestos:
-
-* Se usa `nit` como identificador (FK)
+? Ahora los gastos de conductor **no requieren banco**
 
 ---
 
-## Frontend (SPA)
+# ?? Módulo: Transacciones (CORREGIDO Y LIMPIO)
 
-### Router (`app.js`)
+---
 
-* Navegación sin recarga
-* Carga dinámica de vistas
-* Inicialización por módulo:
+## Problemas detectados
 
-```js
-initVehiculos()
-initPropietarios()
-initConductores()
-initEmpresas()
+* Error 500 al usar tipo **GASTO CONDUCTOR**
+* Problemas con ENUM
+* Mezcla incorrecta de tipos
+
+---
+
+## Soluciones
+
+? Validación correcta de `tipo_transaccion`
+? Ajuste de ENUM
+? Separación clara de categorías
+
+---
+
+## Regla nueva
+
+Las transacciones tipo:
+
+```
+GASTO CONDUCTOR
+```
+
+? NO aparecen en el módulo de transacciones
+? SOLO viven en el módulo de gastos
+
+---
+
+# ?? Módulo: Detalle de Manifiesto (MEJORADO)
+
+---
+
+## Cambios clave
+
+### 1. Datos enriquecidos
+
+Ahora incluye:
+
+? Cliente completo
+? Conductor completo
+? Empresa completa
+? Transacciones con tipo
+? Gastos con su transacción completa
+
+---
+
+### 2. Lógica corregida
+
+? Se excluyen transacciones tipo `GASTO CONDUCTOR`
+? Se integran dentro de `gastos`
+
+---
+
+### 3. Estructura final
+
+```json
+{
+  "manifiesto": {},
+  "gastos": [],
+  "transacciones": [],
+  "factura": {}
+}
 ```
 
 ---
 
-### Navegación
+# ?? Módulo NUEVO: Registro de Conductor
 
-Se usa:
+---
 
-```js
-navigate("nombre-vista")
+## Objetivo
+
+Permitir que el conductor registre gastos directamente sobre sus viajes.
+
+---
+
+## UX implementada
+
+### Layout
+
+```
+[ IZQUIERDA ] ? Formulario
+[ DERECHA ]   ? Tabla de gastos
+```
+
+---
+
+## Flujo
+
+1. Ingresa cédula
+2. Se cargan manifiestos
+3. Selecciona manifiesto
+4. Se habilita formulario
+5. Registra gasto
+6. Se actualiza tabla automáticamente
+
+---
+
+## Endpoints nuevos
+
+```
+GET  /api/registro-conductor/manifiestos/:cedula
+GET  /api/registro-conductor/gastos?manifiesto=ID
+POST /api/gastos-conductor
+```
+
+---
+
+## Frontend nuevo
+
+Archivos:
+
+```
+registro-conductor.html
+registro-conductor.js
+registro-conductor.css
+```
+
+---
+
+## Namespacing (CRÍTICO)
+
+Se implementó prefijo:
+
+```
+rc-
 ```
 
 Ejemplo:
 
-```js
-navigate("empresas-a-cargo")
+```
+rc-cedula
+rc-manifiesto
+rc-tipo
+rc-valor
+rc-tabla
 ```
 
+? evita conflictos globales
+? permite escalabilidad
+
 ---
 
-### Problema resuelto importante
+## CSS encapsulado
 
-Se corrigió error:
+Todo el módulo usa:
 
 ```
-Unexpected token '<'
+#rc-container
 ```
 
-Causa:
-
-* rutas mal conectadas en el sidebar
-
-Solución:
-
-* uso correcto de `navigate()`
-* alineación entre router y vistas
+? no rompe otros módulos
 
 ---
 
-## API Client (`api.js`)
+## Problemas solucionados
 
-* Manejo centralizado de fetch
-* Headers automáticos
-* Manejo de errores con toast
-* Uso de rutas relativas:
-
-```js
-const API_URL = "";
-```
-
-Esto permite trabajar en mismo dominio sin problemas de entorno.
+* ? rutas 404
+* ? controllers mal exportados
+* ? IDs duplicados
+* ? errores null en JS
+* ? estilos globales rompiendo UI
 
 ---
 
-## UI Global (`ui.js`)
-
-Incluye:
-
-* Toast global (success, error, info)
-* Helpers reutilizables:
-
-  * `renderEstadoBadge()`
-  * `formatDate()`
+# ?? MEJORAS VISUALES
 
 ---
 
-## Estandarización de Layout (IMPORTANTE)
+## Estandarización
 
-Se implementó un nuevo patrón visual consistente:
-
-### Antes
-
-* Layout en 2 columnas (grid)
-* Botón en panel derecho
-
-### Ahora
-
-* Layout de 1 sola columna
-* Botón alineado con el título (header)
-
-Ejemplo:
-
-```html
-<div class="modulo-header">
-  <h2>Título</h2>
-  <button>Agregar</button>
-</div>
-```
+? uso de cards
+? jerarquía tipográfica
+? inputs modernos
+? botones consistentes
 
 ---
 
-## CSS Modular por Módulo
+## Tablas
 
-Cada módulo tiene su propio CSS:
-
-* conductores.css
-* propietarios.css
-* empresas-a-cargo.css
-
-Beneficios:
-
-* desacople total
-* mantenibilidad
-* escalabilidad
-* evita conflictos entre módulos
+? separación de header
+? mejor padding
+? valores formateados
+? estado vacío
 
 ---
 
-## Módulo Empresas a Cargo
+## Layout
 
-### Funcionalidades
-
-* Listado
-* Filtros dinámicos
-* Creación con modal
-* Edición inline
-* Estados visuales
-
-### UI
-
-* Layout consistente con otros módulos
-* Tabla full width
-* Sin columna derecha
-* Header con acción principal
+? grid balanceado
+? espaciado consistente
+? diseño tipo SaaS
 
 ---
 
-## Filtros Dinámicos
-
-Todos los módulos usan:
-
-* input ? filtro automático
-* debounce (300ms)
-* sin botón obligatorio
+# ?? ERRORES IMPORTANTES RESUELTOS
 
 ---
 
-## Manejo de Fechas
+## Backend
 
-Problema resuelto:
-
-* desfase por timezone
-
-Solución:
-
-* backend retorna `YYYY-MM-DD`
-* frontend evita `new Date()`
+* `argument handler must be a function`
+* `Cannot find module 'uuid'`
+* `null value in column id`
+* `invalid input value for enum`
+* `500 Internal Server Error`
 
 ---
 
-## Estados Visuales
+## Frontend
 
-Sistema global reutilizable:
-
-* Activo
-* Inactivo
-
-Representados como badges.
+* `Cannot read properties of null`
+* rutas API incorrectas
+* eventos mal inicializados
+* formularios no renderizados
 
 ---
 
-## UX Implementada
-
-* Filtros en tiempo real
-* Edición inline
-* Feedback inmediato (toast)
-* Layout limpio tipo dashboard
-* Tablas con scroll interno
+# ?? DECISIONES DE ARQUITECTURA IMPORTANTES
 
 ---
 
-## Datos de Prueba
+## 1. Separación de dominios
 
-Incluye:
-
-* datos mixtos
-* activos / inactivos
-* casos reales simulados
+* Transacciones ? financiero global
+* Gastos conductor ? operación del viaje
 
 ---
 
-## Limitaciones actuales
+## 2. Flujo natural
 
-* autenticación en modo desarrollo
-* sin roles/permisos
-* sin paginación
-* validaciones backend básicas
+El usuario crea un gasto
+NO una transacción
 
 ---
 
-## Roadmap
+## 3. Backend como orquestador
 
-* integración completa con manifiestos
-* select dinámico de empresas
-* paginación
-* autenticación JWT real
-* roles y permisos
-* auditoría
-* dashboard avanzado
+? el backend maneja la lógica
+? el frontend solo envía datos
+
+---
+
+## 4. Encapsulación total por módulo
+
+? CSS aislado
+? IDs únicos
+? JS independiente
+
+---
+
+# ?? ESTADO ACTUAL
+
+---
+
+? CRUD completo de gastos conductor
+? Registro autónomo por conductor
+? Integración con manifiestos
+? Transacciones automáticas
+? UI consistente
+? Arquitectura escalable
 
 ---
 
