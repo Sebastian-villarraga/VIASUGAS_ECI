@@ -5,29 +5,37 @@ let manifiestoActual = null;
 // INIT
 // =========================
 async function initRegistroConductor() {
+
+  // ?? validar vista correcta (SPA safe)
+  if (!document.querySelector("#rc-container")) {
+    return;
+  }
+
   await cargarTipos();
-  eventos();
+  eventosRegistroConductor();
 }
 
 // =========================
 // EVENTOS
 // =========================
-function eventos() {
+function eventosRegistroConductor() {
 
-  // BUSCAR CONDUCTOR
   const inputCedula = document.getElementById("rc-cedula");
   const selectManifiesto = document.getElementById("rc-manifiesto");
   const form = document.getElementById("rc-form");
+  const btnGuardar = document.getElementById("rc-guardar");
 
-  if (!inputCedula || !selectManifiesto) {
-    console.error("? Elementos no encontrados en DOM");
+  // ?? seguridad DOM
+  if (!inputCedula || !selectManifiesto || !form || !btnGuardar) {
     return;
   }
 
+  // =========================
+  // BUSCAR CONDUCTOR
+  // =========================
   inputCedula.addEventListener("blur", async (e) => {
 
     const cedula = e.target.value?.trim();
-
     if (!cedula) return;
 
     try {
@@ -55,7 +63,9 @@ function eventos() {
     }
   });
 
+  // =========================
   // SELECCIONAR MANIFIESTO
+  // =========================
   selectManifiesto.addEventListener("change", async (e) => {
 
     manifiestoActual = e.target.value;
@@ -66,19 +76,19 @@ function eventos() {
       return;
     }
 
-    // ?? mostrar formulario
+    // mostrar form
     form.classList.remove("rc-hidden");
 
     await cargarGastos();
   });
 
-  // GUARDAR
-  const btnGuardar = document.getElementById("rc-guardar");
-
+  // =========================
+  // GUARDAR GASTO
+  // =========================
   btnGuardar.addEventListener("click", async () => {
 
-    const tipo = document.getElementById("rc-tipo").value;
-    const valor = document.getElementById("rc-valor").value;
+    const tipo = document.getElementById("rc-tipo")?.value;
+    const valor = document.getElementById("rc-valor")?.value;
 
     if (!tipo || !valor) {
       alert("Completa tipo y valor");
@@ -89,8 +99,8 @@ function eventos() {
       tipo_transaccion: tipo,
       valor,
       id_manifiesto: manifiestoActual,
-      descripcion: document.getElementById("rc-descripcion").value,
-      fecha: document.getElementById("rc-fecha").value
+      descripcion: document.getElementById("rc-descripcion")?.value,
+      fecha: document.getElementById("rc-fecha")?.value
     };
 
     try {
@@ -116,7 +126,6 @@ async function cargarTipos() {
     const tipos = await apiFetch("/api/tipo-transaccion?tipo=GASTO CONDUCTOR");
 
     const select = document.getElementById("rc-tipo");
-
     if (!select) return;
 
     select.innerHTML = `<option value="">Seleccione</option>`;
@@ -145,7 +154,6 @@ async function cargarGastos() {
     );
 
     const tbody = document.getElementById("rc-body");
-
     if (!tbody) return;
 
     tbody.innerHTML = "";
@@ -178,8 +186,11 @@ async function cargarGastos() {
 // UTILS
 // =========================
 function limpiarForm() {
-  document.getElementById("rc-valor").value = "";
-  document.getElementById("rc-descripcion").value = "";
+  const valor = document.getElementById("rc-valor");
+  const descripcion = document.getElementById("rc-descripcion");
+
+  if (valor) valor.value = "";
+  if (descripcion) descripcion.value = "";
 }
 
 function limpiarTabla() {

@@ -3,18 +3,20 @@ let categoriasExistentes = [];
 
 // ================= INIT
 function initTiposTransaccion() {
-  cargarTipos();
+  console.log("Entre a INIT");
+
+  cargarTiposTransaccion();
   initFormTipo();
 
   document.getElementById("filtroCategoria")
-    .addEventListener("input", aplicarFiltrosTipos);
+    ?.addEventListener("input", aplicarFiltrosTipos);
 
   document.getElementById("filtroTipo")
-    .addEventListener("change", aplicarFiltrosTipos);
+    ?.addEventListener("change", aplicarFiltrosTipos);
 
   document.getElementById("filtroEstado")
-    .addEventListener("change", aplicarFiltrosTipos);
-    
+    ?.addEventListener("change", aplicarFiltrosTipos);
+
   const inputCategoria = document.getElementById("categoria");
   if (inputCategoria) {
     inputCategoria.addEventListener("input", validarCategoriaDuplicada);
@@ -22,15 +24,50 @@ function initTiposTransaccion() {
 }
 
 // ================= CARGAR
-async function cargarTipos() {
+async function cargarTiposTransaccion() {
 
   console.log("?? cargando tipos...");
 
-  const data = await apiFetch("/api/tipo-transaccion");
+  const tabla = document.getElementById("tiposTable");
 
-  categoriasExistentes = data.map(t => t.categoria.toLowerCase());
+  if (!tabla) {
+    console.warn("? tabla no existe");
+    return;
+  }
 
-  renderTablaTipos(data);
+  // ?? estado loading
+  tabla.innerHTML = `
+    <tr>
+      <td colspan="5">Cargando...</td>
+    </tr>
+  `;
+
+  try {
+
+    const data = await apiFetch("/api/tipo-transaccion");
+
+    console.log("DATA:", data);
+
+    if (!data || !Array.isArray(data)) {
+      throw new Error("Respuesta inválida");
+    }
+
+    categoriasExistentes = data.map(t => t.categoria.toLowerCase());
+
+    renderTablaTipos(data);
+
+  } catch (error) {
+
+    console.error("?? Error cargando tipos:", error);
+
+    tabla.innerHTML = `
+      <tr>
+        <td colspan="5" style="color:red;">
+          Error cargando datos
+        </td>
+      </tr>
+    `;
+  }
 }
 
 // ================= RENDER
@@ -121,7 +158,7 @@ function limpiarFiltrosTipos() {
   document.getElementById("filtroTipo").value = "";
   document.getElementById("filtroEstado").value = "";
 
-  cargarTipos();
+  cargarTiposTransaccion();
 }
 
 // ================= FORM
@@ -159,7 +196,7 @@ function initFormTipo() {
 
     cerrarModalTipo();
     form.reset();
-    cargarTipos();
+    cargarTiposTransaccion();
   });
 }
 
@@ -235,7 +272,7 @@ async function guardarTipo(btn, id) {
 
     document.querySelectorAll(".btn-icon").forEach(b => b.disabled = false);
 
-    cargarTipos();
+    cargarTiposTransaccion();
 
   } catch (error) {
     console.error(error);

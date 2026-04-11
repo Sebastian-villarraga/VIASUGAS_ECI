@@ -19,6 +19,9 @@ async function loadView(view) {
     const html = await res.text();
 
     container.innerHTML = html;
+    
+    // ?? fuerza render antes del init
+    await new Promise(r => requestAnimationFrame(r));
 
     // =========================
     // INIT POR VISTA
@@ -68,6 +71,7 @@ async function loadView(view) {
       case "tipo-transaccion":
         if (typeof initTiposTransaccion === "function") initTiposTransaccion();
         break;
+      
       case "facturas":
         if (typeof initFacturas === "function") initFacturas();
         break;
