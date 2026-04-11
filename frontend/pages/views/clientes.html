@@ -51,8 +51,8 @@
               <th>NIT</th>
               <th>Nombre</th>
               <th>Correo</th>
-              <th>TelÈfono</th>
-              <th>DirecciÛn</th>
+              <th>Tel√®fono</th>
+              <th>Direcci√≤n</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -77,22 +77,49 @@
 
     <h3>Agregar Cliente</h3>
 
-    <form id="formCliente" class="form-grid">
+    <form id="formCliente">
 
-      <input id="nit" placeholder="NIT" required>
-      <input id="nombre" placeholder="Nombre" required>
-      <input id="correo" placeholder="Correo">
-      <input id="telefono" placeholder="TelÈfono">
-      <input id="direccion" placeholder="DirecciÛn">
+      <div class="form-group">
+        <label>NIT</label>
+        <input type="text" id="nit" required>
+      </div>
 
-      <select id="estado">
-        <option value="activo">Activo</option>
-        <option value="inactivo">Inactivo</option>
-      </select>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="nombre" required>
+      </div>
+
+      <div class="form-group">
+        <label>Correo</label>
+        <input type="text" id="correo">
+      </div>
+
+      <div class="form-group">
+        <label>Tel√®fono</label>
+        <input type="text" id="telefono">
+      </div>
+
+      <div class="form-group full">
+        <label>Direcci√≤n</label>
+        <select id="direccion"></select>
+      </div>
+
+      <div class="form-group full">
+        <label>Estado</label>
+        <select id="estado">
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </div>
 
       <div class="modal-actions">
-        <button type="submit" class="btn-primary">Guardar</button>
-        <button type="button" onclick="cerrarModalCliente()">Cancelar</button>
+        <button type="button" onclick="cerrarModalCliente()" class="btn-secondary">
+          Cancelar
+        </button>
+
+        <button type="submit" class="btn-primary">
+          Guardar
+        </button>
       </div>
 
     </form>

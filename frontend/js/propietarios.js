@@ -24,6 +24,9 @@ async function cargarPropietarios() {
 
   const data = await apiFetch("/api/propietarios");
 
+  // ðŸ”¥ AGREGAR ESTO
+  window.propietariosData = data;
+
   renderTablaPropietarios(data);
 }
 
@@ -109,50 +112,51 @@ function initFormPropietario() {
   const inputTelefono = document.getElementById("telefono");
 
   // =========================
+  // HELPERS
+  // =========================
+  const marcarError = (el) => el.style.border = "1px solid #dc3545";
+  const limpiarError = (el) => el.style.border = "1px solid #ccc";
+
+  // =========================
   // VALIDACIONES EN TIEMPO REAL
   // =========================
 
-  // ?? SOLO NÃšMEROS (ID)
   inputId.addEventListener("input", () => {
     inputId.value = inputId.value.replace(/\D/g, "");
-
-    if (!inputId.value) {
-      inputId.style.border = "1px solid #dc3545";
-    } else {
-      inputId.style.border = "1px solid #ccc";
-    }
+    inputId.value ? limpiarError(inputId) : marcarError(inputId);
   });
 
-  // ?? SOLO LETRAS (NOMBRE)
   inputNombre.addEventListener("input", () => {
-    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
-
-    if (!inputNombre.value.trim()) {
-      inputNombre.style.border = "1px solid #dc3545";
-    } else {
-      inputNombre.style.border = "1px solid #ccc";
-    }
+    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZÃ¡Ã©Ã­Ã³ÃºÃÃ‰ÃÃ“ÃšÃ±Ã‘\s]/g, "");
+    inputNombre.value.trim() ? limpiarError(inputNombre) : marcarError(inputNombre);
   });
 
-  // ?? TELÃ‰FONO ? SOLO NÃšMEROS Y 10 DÃGITOS
   inputTelefono.addEventListener("input", () => {
     inputTelefono.value = inputTelefono.value.replace(/\D/g, "").slice(0, 10);
 
     if (inputTelefono.value.length !== 10) {
-      inputTelefono.style.border = "1px solid #dc3545";
+      marcarError(inputTelefono);
     } else {
-      inputTelefono.style.border = "1px solid #ccc";
+      limpiarError(inputTelefono);
     }
   });
 
-  // ?? CORREO (OBLIGATORIO)
   inputCorreo.addEventListener("input", () => {
-    if (!inputCorreo.value.trim()) {
-      inputCorreo.style.border = "1px solid #dc3545";
-    } else {
-      inputCorreo.style.border = "1px solid #ccc";
-    }
+    inputCorreo.value.trim() ? limpiarError(inputCorreo) : marcarError(inputCorreo);
   });
+
+  // =========================
+  // VALIDAR DUPLICADOS
+  // =========================
+
+  function existePropietario(id, nombre) {
+    if (!window.propietariosData) return false;
+
+    return window.propietariosData.some(p =>
+      p.identificacion === id ||
+      p.nombre.toLowerCase().trim() === nombre.toLowerCase().trim()
+    );
+  }
 
   // =========================
   // SUBMIT
@@ -168,26 +172,32 @@ function initFormPropietario() {
 
     let hayError = false;
 
-    // ?? VALIDACIONES FINALES
-
     if (!identificacion) {
-      inputId.style.border = "1px solid #dc3545";
+      marcarError(inputId);
       hayError = true;
     }
 
     if (!nombre) {
-      inputNombre.style.border = "1px solid #dc3545";
+      marcarError(inputNombre);
       hayError = true;
     }
 
     if (!correo) {
-      inputCorreo.style.border = "1px solid #dc3545";
+      marcarError(inputCorreo);
       hayError = true;
     }
 
     if (telefono.length !== 10) {
-      inputTelefono.style.border = "1px solid #dc3545";
+      marcarError(inputTelefono);
       hayError = true;
+    }
+
+    // ðŸ”¥ VALIDACIÃ“N DUPLICADOS
+    if (existePropietario(identificacion, nombre)) {
+      marcarError(inputId);
+      marcarError(inputNombre);
+      mostrarToast("El propietario ya existe (ID o Nombre)", "error");
+      return;
     }
 
     if (hayError) {
