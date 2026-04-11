@@ -1,0 +1,194 @@
+#rc-container {
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  color: #1f2937;
+}
+
+/* CONTENEDOR GENERAL */
+#rc-container {
+  padding: 15px;
+}
+
+/* GRID */
+#rc-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 20px;
+}
+
+/* CARDS */
+#rc-left-card,
+#rc-right-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+/* TITULO */
+#rc-title {
+  margin-bottom: 15px;
+}
+
+/* CAMPOS */
+.rc-field {
+  margin-bottom: 12px;
+}
+
+.rc-field label {
+  font-size: 13px;
+  color: #666;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* INPUTS */
+#rc-container input,
+#rc-container select,
+#rc-container textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* BOTON */
+#rc-guardar {
+  width: 100%;
+  margin-top: 10px;
+  background: #2f5aa8;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#rc-guardar:hover {
+  background: #244a8a;
+}
+
+/* TABLA */
+#rc-tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#rc-tabla th {
+  text-align: left;
+  font-size: 13px;
+  color: #666;
+  padding-bottom: 8px;
+}
+
+#rc-tabla td {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* HIDDEN */
+.rc-hidden {
+  display: none;
+}
+
+#rc-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+#rc-right-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 18px;
+}
+
+#rc-left-card,
+#rc-right-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.rc-field {
+  margin-bottom: 16px;
+}
+
+.rc-field label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 6px;
+  display: block;
+}
+
+#rc-container input,
+#rc-container select,
+#rc-container textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+#rc-container input:focus,
+#rc-container select:focus,
+#rc-container textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+}
+
+#rc-guardar {
+  margin-top: 14px;
+  padding: 11px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#rc-guardar:hover {
+  background: #1d4ed8;
+}
+
+#rc-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px; /* ?? separación del título */
+}
+
+#rc-tabla thead {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+#rc-tabla th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  padding-bottom: 10px;
+}
+
+#rc-tabla td {
+  padding: 12px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.rc-valor {
+  font-weight: 600;
+  color: #16a34a;
+}
+
+#rc-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+}

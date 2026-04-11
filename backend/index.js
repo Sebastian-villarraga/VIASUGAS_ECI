@@ -47,6 +47,8 @@ const facturaRoutes = require("./routes/factura.routes");
 const transaccionRoutes = require("./routes/transaccion.routes");
 const gastosConductorRoutes = require("./routes/gastosConductor.routes");
 const tipoTransaccionRoutes = require("./routes/tipoTransaccion.routes");
+const registroConductorRoutes = require("./routes/registroConductor.routes");
+
 
 app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
@@ -62,6 +64,7 @@ app.use("/api/facturas", facturaRoutes);
 app.use("/api/transacciones", transaccionRoutes);
 app.use("/api/gastos-conductor", gastosConductorRoutes);
 app.use("/api/tipo-transaccion", tipoTransaccionRoutes);
+app.use("/api/registro-conductor", registroConductorRoutes);
 
 // =====================
 // HEALTH CHECKS

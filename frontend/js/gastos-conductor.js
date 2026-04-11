@@ -195,3 +195,5 @@ function gc_calcularTotales(data) {
   document.getElementById("totalCantidad").textContent = cantidad;
   document.getElementById("totalPromedio").textContent = `$${Math.round(promedio).toLocaleString()}`;
 }
+
+
