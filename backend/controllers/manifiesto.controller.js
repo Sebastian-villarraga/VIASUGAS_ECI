@@ -551,6 +551,7 @@ const getCatalogosManifiesto = async (_req, res) => {
   }
 };
 
+
 // =========================
 // DETALLE COMPLETO MANIFIESTO
 // =========================
@@ -558,13 +559,38 @@ async function obtenerDetalleManifiesto(req, res) {
   try {
     const { id } = req.params;
 
-    // =========================
-    // MANIFIESTO
-    // =========================
     const resultManifiesto = await pool.query(`
-      SELECT m.*, c.nombre AS cliente_nombre
+      SELECT
+        m.*,
+
+        -- CLIENTE
+        c.nombre AS cliente_nombre,
+
+        -- CONDUCTOR COMPLETO
+        co.cedula AS conductor_cedula,
+        co.nombre AS conductor_nombre,
+        co.correo AS conductor_correo,
+        co.telefono AS conductor_telefono,
+        co.estado AS conductor_estado,
+        co.vencimiento_licencia AS conductor_vencimiento_licencia,
+        co.vencimiento_manip_alimentos AS conductor_vencimiento_manip_alimentos,
+        co.vencimiento_sustancia_peligrosa AS conductor_vencimiento_sustancia_peligrosa,
+
+        -- EMPRESA A CARGO COMPLETA
+        e.nit AS empresa_nit,
+        e.nombre AS empresa_nombre,
+        e.correo AS empresa_correo,
+        e.telefono AS empresa_telefono,
+        e.direccion AS empresa_direccion,
+        e.estado AS empresa_estado
+
       FROM manifiesto m
-      LEFT JOIN cliente c ON m.id_cliente = c.nit
+      LEFT JOIN cliente c
+        ON m.id_cliente = c.nit
+      LEFT JOIN conductor co
+        ON m.id_conductor = co.cedula
+      LEFT JOIN empresa_a_cargo e
+        ON m.id_empresa_a_cargo = e.nit
       WHERE m.id_manifiesto = $1
     `, [id]);
 
@@ -574,33 +600,58 @@ async function obtenerDetalleManifiesto(req, res) {
 
     const manifiesto = resultManifiesto.rows[0];
 
-    // =========================
-    // GASTOS CONDUCTOR (JOIN CON TRANSACCION ??)
-    // =========================
     const resultGastos = await pool.query(`
-      SELECT 
+      SELECT
         g.*,
-        t.valor
+
+        -- TRANSACCION
+        t.id AS transaccion_id,
+        t.id_banco AS transaccion_id_banco,
+        t.id_tipo_transaccion AS transaccion_id_tipo_transaccion,
+        t.id_vehiculo AS transaccion_id_vehiculo,
+        t.id_trailer AS transaccion_id_trailer,
+        t.id_manifiesto AS transaccion_id_manifiesto,
+        t.id_factura AS transaccion_id_factura,
+        t.valor AS transaccion_valor,
+        t.fecha_pago AS transaccion_fecha_pago,
+        t.descripcion AS transaccion_descripcion,
+        t.creado AS transaccion_creado,
+
+        -- TIPO TRANSACCION COMPLETO
+        tt.id AS tipo_transaccion_id,
+        tt.categoria AS tipo_transaccion_categoria,
+        tt.descripcion AS tipo_transaccion_descripcion,
+        tt.tipo AS tipo_transaccion_tipo,
+        tt.estado AS tipo_transaccion_estado,
+        tt.creado AS tipo_transaccion_creado
+
       FROM gastos_conductor g
-      LEFT JOIN transaccion t ON g.id_transaccion = t.id
+      LEFT JOIN transaccion t
+        ON g.id_transaccion = t.id
+      LEFT JOIN tipo_transaccion tt
+        ON t.id_tipo_transaccion = tt.id
       WHERE g.id_manifiesto = $1
     `, [id]);
 
-    // =========================
-    // TRANSACCIONES
-    // =========================
     const resultTransacciones = await pool.query(`
-      SELECT 
+      SELECT
         t.*,
-        tt.tipo
+
+        -- TIPO TRANSACCION COMPLETO
+        tt.id AS tipo_transaccion_id,
+        tt.categoria AS tipo_transaccion_categoria,
+        tt.descripcion AS tipo_transaccion_descripcion,
+        tt.tipo AS tipo_transaccion_tipo,
+        tt.estado AS tipo_transaccion_estado,
+        tt.creado AS tipo_transaccion_creado
+
       FROM transaccion t
-      LEFT JOIN tipo_transaccion tt ON t.id_tipo_transaccion = tt.id
+      LEFT JOIN tipo_transaccion tt
+        ON t.id_tipo_transaccion = tt.id
       WHERE t.id_manifiesto = $1
+        AND (tt.tipo IS NULL OR tt.tipo <> 'GASTO CONDUCTOR')
     `, [id]);
 
-    // =========================
-    // FACTURA
-    // =========================
     const resultFactura = await pool.query(`
       SELECT *
       FROM factura
@@ -613,10 +664,9 @@ async function obtenerDetalleManifiesto(req, res) {
       transacciones: resultTransacciones.rows,
       factura: resultFactura.rows[0] || null
     });
-
   } catch (error) {
     console.error("Error detalle manifiesto:", error);
-    res.status(500).json({ error: error.message }); // ?? clave para debug
+    return res.status(500).json({ error: error.message });
   }
 }
 

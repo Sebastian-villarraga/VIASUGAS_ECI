@@ -292,8 +292,6 @@ async function cargarManifiestos() {
 }
 
 async function filtrarManifiestos() {
-  const anio = document.getElementById("filtroAnio")?.value || "";
-  const mes = document.getElementById("filtroMes")?.value || "";
   const idManifiesto = document.getElementById("filtroIdManifiesto")?.value.trim() || "";
   const fechaDesde = document.getElementById("filtroFechaDesde")?.value || "";
   const fechaHasta = document.getElementById("filtroFechaHasta")?.value || "";
@@ -302,8 +300,6 @@ async function filtrarManifiestos() {
 
   const params = new URLSearchParams();
 
-  if (anio) params.append("anio", anio);
-  if (mes) params.append("mes", mes);
   if (idManifiesto) params.append("id_manifiesto", idManifiesto);
   if (fechaDesde) params.append("fecha_desde", fechaDesde);
   if (fechaHasta) params.append("fecha_hasta", fechaHasta);
@@ -316,8 +312,6 @@ async function filtrarManifiestos() {
 }
 
 function limpiarFiltrosManifiestos() {
-  document.getElementById("filtroAnio").value = "";
-  document.getElementById("filtroMes").value = "";
   document.getElementById("filtroIdManifiesto").value = "";
   document.getElementById("filtroFechaDesde").value = "";
   document.getElementById("filtroFechaHasta").value = "";
@@ -397,7 +391,7 @@ function renderEstadoManifiesto(estado) {
 
 function renderNovedadBadge(valor) {
   const clase = valor ? "badge-si" : "badge-no";
-  const texto = valor ? "Sí" : "No";
+  const texto = valor ? "Si" : "No";
   return `<span class="novedad-badge ${clase}">${texto}</span>`;
 }
 
@@ -669,7 +663,7 @@ async function editarManifiesto(btn, idManifiesto) {
 
   celdas[9].innerHTML = `
     <select ${styleSelect}>
-      <option value="true" ${d.novedades === "true" ? "selected" : ""}>Sí</option>
+      <option value="true" ${d.novedades === "true" ? "selected" : ""}>Si</option>
       <option value="false" ${d.novedades === "false" ? "selected" : ""}>No</option>
     </select>
   `;
@@ -953,7 +947,7 @@ async function verDetalleManifiesto(id) {
     const data = await apiFetch(`/api/manifiestos/${id}/detalle`);
 
     const manifiesto = data.manifiesto;
-    const gastosFiltrados = data.gastos || [];
+    const gastosConductor = data.gastos || [];
     const transacciones = data.transacciones || [];
     const factura = data.factura;
 
@@ -970,18 +964,24 @@ contInfo.innerHTML = `
 
   <div class="detalle-info-item">
     <span>Cliente</span>
-    <strong>${manifiesto.cliente_nombre || "-"}</strong>
+    <strong>${manifiesto.cliente_nombre || "-"}, NIT: ${manifiesto.id_cliente}</strong>
   </div>
 
   <div class="detalle-info-item">
     <span>Fecha</span>
-    <strong>${manifiesto.fecha || "-"}</strong>
+    <strong>${formatearFecha(manifiesto.fecha) || "-"}</strong>
   </div>
 
   <div class="detalle-info-item">
-    <span>Ruta</span>
-    <strong>${manifiesto.origen_ciudad} - ${manifiesto.destino_ciudad}</strong>
+    <span>Origen</span>
+    <strong>${manifiesto.origen_ciudad},   ${manifiesto.origen_departamento}</strong>
   </div>
+  
+  <div class="detalle-info-item">
+    <span>Destino</span>
+    <strong>${manifiesto.destino_ciudad},   ${manifiesto.destino_departamento}</strong>
+  </div>
+
 
   <div class="detalle-info-item">
     <span>Vehículo</span>
@@ -995,7 +995,7 @@ contInfo.innerHTML = `
 
   <div class="detalle-info-item">
     <span>Conductor</span>
-    <strong>${manifiesto.id_conductor}</strong>
+    <strong>${manifiesto.conductor_nombre}</strong>
   </div>
 
   <div class="detalle-info-item">
@@ -1009,7 +1009,7 @@ contInfo.innerHTML = `
   </div>
 
   <div class="detalle-info-item">
-    <span>% Flete</span>
+    <span>Porcentaje Flete</span>
     <strong>$${Number(manifiesto.valor_flete_porcentaje || 0).toLocaleString()}</strong>
   </div>
 
@@ -1020,18 +1020,31 @@ contInfo.innerHTML = `
 
   <div class="detalle-info-item">
     <span>Empresa a cargo</span>
-    <strong>${manifiesto.id_empresa_a_cargo}</strong>
+    <strong>${manifiesto.empresa_nombre}, Nit: ${manifiesto.empresa_nit}</strong>
+  </div>
+
+  
+  <div class="detalle-info-item">
+    <span>Docs. gastos</span>
+    <strong>${manifiesto.gastos}</strong>
   </div>
 
   <div class="detalle-info-item">
-    <span>Novedades</span>
-    <strong>${manifiesto.novedades ? "Sí" : "No"}</strong>
+    <span>Documentos</span>
+    <strong>${manifiesto.documentos}</strong>
   </div>
+  
+  <div class="detalle-info-item">
+    <span>Novedades</span>
+    <strong>${manifiesto.novedades ? "Si" : "No"}</strong>
+  </div>
+
 
   <div class="detalle-info-item">
     <span>Observaciones</span>
     <strong>${manifiesto.observaciones || "-"}</strong>
   </div>
+  
 `;
 
     // =========================
@@ -1042,19 +1055,19 @@ contInfo.innerHTML = `
 
     let totalGastos = 0;
 
-    gastosFiltrados.forEach(g => {
-      const valor = Number(g.valor || 0);
+    gastosConductor.forEach(g => {
+      const valor = Number(g.transaccion_valor || 0);
       totalGastos += valor;
 
       contGastos.innerHTML += `
         <div class="detalle-item">
-          <span>${g.descripcion || "-"}</span>
+          <span>${g.tipo_transaccion_categoria || "-"}</span>
           <span class="valor-gasto">-$${valor.toLocaleString()}</span>
         </div>
       `;
     });
 
-    if (gastosFiltrados.length === 0) {
+    if (gastosConductor.length === 0) {
       contGastos.innerHTML = "<p>Sin gastos</p>";
     }
 
@@ -1076,11 +1089,11 @@ contInfo.innerHTML = `
       let clase = "";
       let signo = "";
 
-      if (t.tipo === "INGRESO MANIFIESTO") {
+      if (t.tipo_transaccion_tipo === "INGRESO MANIFIESTO") {
         totalIngresos += valor;
         clase = "valor-ingreso";
         signo = "+";
-      } else if (t.tipo === "EGRESO MANIFIESTO") {
+      } else if (t.tipo_transaccion_tipo === "EGRESO MANIFIESTO") {
         totalEgresos += valor;
         clase = "valor-egreso";
         signo = "-";
@@ -1090,7 +1103,7 @@ contInfo.innerHTML = `
 
       contTrans.innerHTML += `
         <div class="detalle-item">
-          <span>${t.tipo}</span>
+          <span>${t.tipo_transaccion_categoria}</span>
           <span class="${clase}">${signo}$${valor.toLocaleString()}</span>
         </div>
       `;
@@ -1140,7 +1153,7 @@ contInfo.innerHTML = `
     // =========================
     // RESUMEN FINAL
     // =========================
-    const balance = totalFactura - totalGastos;
+    const balance = totalFactura - utilidad;
 
     let texto = "";
     let clase = "";

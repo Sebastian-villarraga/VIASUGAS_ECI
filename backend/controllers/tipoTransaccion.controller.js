@@ -121,7 +121,7 @@ const createTipoTransaccion = async (req, res) => {
       SELECT id 
       FROM tipo_transaccion 
       WHERE id LIKE 'TT%' 
-      ORDER BY LENGTH(id) DESC, id DESC 
+      ORDER BY CAST(SUBSTRING(id FROM 3) AS INT) DESC
       LIMIT 1
     `);
 
@@ -132,7 +132,14 @@ const createTipoTransaccion = async (req, res) => {
       const numero = parseInt(ultimoId.replace("TT", ""), 10);
       nuevoId = "TT" + (numero + 1);
     }
-
+    const existeCategoria = await pool.query(
+      `SELECT id FROM tipo_transaccion WHERE LOWER(categoria) = LOWER($1)`,
+      [categoria]
+    );
+    
+    if (existeCategoria.rows.length > 0) {
+      return res.status(400).json({ error: "La categoría ya existe" });
+    }
     // =========================
     // INSERT SIN CONTEXTO
     // =========================
@@ -174,9 +181,9 @@ const updateTipoTransaccion = async (req, res) => {
 
     categoria = categoria?.trim();
     descripcion = descripcion?.trim() || null;
-    tipo = tipo?.trim();
+    tipo = tipo?.trim().toUpperCase();
     estado = estado?.trim();
-
+    console.log("TIPO RECIBIDO:", tipo);
     const existe = await pool.query(
       `SELECT id FROM tipo_transaccion WHERE id = $1`,
       [id]
@@ -191,6 +198,7 @@ const updateTipoTransaccion = async (req, res) => {
     }
 
     if (!validarTipo(tipo)) {
+      console.log("TIPO INVALIDO:", tipo);
       return res.status(400).json({ error: "Tipo invalido" });
     }
 

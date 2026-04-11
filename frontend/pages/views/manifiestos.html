@@ -16,36 +16,20 @@
       <div class="filtros-row">
 
         <div class="filtro-group">
-          <label>Año</label>
-          <select id="filtroAnio">
-            <option value="">Todos</option>
-          </select>
-        </div>
-
-        <div class="filtro-group">
-          <label>Mes</label>
-          <select id="filtroMes">
-            <option value="">Todos</option>
-            <option value="1">Enero</option>
-            <option value="2">Febrero</option>
-            <option value="3">Marzo</option>
-            <option value="4">Abril</option>
-            <option value="5">Mayo</option>
-            <option value="6">Junio</option>
-            <option value="7">Julio</option>
-            <option value="8">Agosto</option>
-            <option value="9">Septiembre</option>
-            <option value="10">Octubre</option>
-            <option value="11">Noviembre</option>
-            <option value="12">Diciembre</option>
-          </select>
-        </div>
-
-        <div class="filtro-group">
           <label>ID Manifiesto</label>
-          <input type="text" id="filtroIdManifiesto" placeholder="Ej: VG-123-4567">
+          <input type="text" id="filtroIdManifiesto" placeholder="Ej: MF-123-4567">
         </div>
+  
+      
+        <button class="btn-secundario" id="btnVerEsteMes">
+          Ver este mes
+        </button>
+        
+        <button class="btn-secundario" id="btnVerMesAnterior">
+          Ver mes anterior
+        </button>
 
+        
         <div class="filtro-group">
           <label>Fecha desde</label>
           <input type="date" id="filtroFechaDesde">
@@ -70,13 +54,7 @@
           </select>
         </div>
 
-        <button class="btn-secundario" id="btnVerEsteMes">
-          Ver este mes
-        </button>
         
-        <button class="btn-secundario" id="btnVerMesAnterior">
-          Ver mes anterior
-        </button>
         
         <button class="btn-limpiar" id="btnLimpiarFiltrosManifiestos">
           Limpiar
@@ -262,7 +240,7 @@
     <!-- HEADER -->
     <div class="detalle-header">
       <h3>Detalle del Manifiesto</h3>
-      <button id="cerrarDetalleManifiesto" class="btn-cerrar">?</button>
+      
     </div>
 
     <!-- CONTENIDO -->
@@ -272,7 +250,7 @@
       <!-- INFO GENERAL -->
       <!-- ========================= -->
       <div class="detalle-card detalle-main">
-        <h4>TODA LA INFORMACION DEL MANIFIESTO</h4>
+        <h4>MANIFIESTO</h4>
 
         <div id="detalleInfoManifiesto" class="detalle-info-grid">
           <p>-</p>
@@ -287,7 +265,6 @@
         <!-- GASTOS CONDUCTOR -->
         <div class="detalle-card">
           <h4>GASTOS DE CONDUCTOR</h4>
-          <small>(Tipo: GASTO CONDUCTOR)</small>
 
           <div id="detalleGastos" class="detalle-list">
             <p>-</p>
@@ -301,7 +278,6 @@
         <!-- TRANSACCIONES -->
         <div class="detalle-card">
           <h4>TRANSACCIONES</h4>
-          <small>(INGRESO / EGRESO MANIFIESTO)</small>
 
           <div id="detalleTransacciones" class="detalle-list">
             <p>-</p>
@@ -315,7 +291,6 @@
         <!-- FACTURA -->
         <div class="detalle-card">
           <h4>FACTURA</h4>
-          <small>(Información asociada)</small>
 
           <div id="detalleFactura" class="detalle-list">
             <p>-</p>

@@ -97,7 +97,6 @@
 /* ========================= */
 
 .home-section {
-  padding: 40px 20px; 
   text-align: center;
   background: #f4f6f9;
   color: #1e3c72;
@@ -105,8 +104,7 @@
 
 .home-section.dark {
   background: #1e3c72;
-  color: white;
-  padding: 40px 20px; 
+  color: white; 
 }
 
 .section-title {

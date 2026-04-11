@@ -13,13 +13,13 @@
 
 /* INGRESO (VERDE) */
 .badge.ingreso {
-  background: #22c55e;
+  background: #B1F2C0;
   color: white;
 }
 
 /* EGRESO (NARANJA) */
 .badge.egreso {
-  background: #f59e0b;
+  background: #EDC8B4;
   color: white;
 }
 
