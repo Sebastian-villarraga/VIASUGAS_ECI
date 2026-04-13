@@ -16,14 +16,21 @@ async function cargarCatalogos() {
   catalogos.manifiestos = await apiFetch("/api/manifiestos");
 
   // =========================
+  // 🔥 FILTRAR GASTO CONDUCTOR
+  // =========================
+  const tiposFiltrados = catalogos.tipos.filter(t =>
+    t.tipo !== "GASTO CONDUCTOR"
+  );
+
+  // =========================
   // MODAL
   // =========================
-  llenarSelect("tipo", catalogos.tipos, "categoria", "id");
+  llenarSelect("tipo", tiposFiltrados, "categoria", "id");
   llenarSelect("banco", catalogos.bancos, "nombre_banco", "id");
   llenarSelect("manifiesto", catalogos.manifiestos, "id_manifiesto", "id_manifiesto");
 
   // =========================
-  // FILTROS
+  // FILTROS (AQUÍ SÍ VAN TODOS)
   // =========================
   llenarSelect("fTipo", catalogos.tipos, "categoria", "tipo");
   llenarSelect("fBanco", catalogos.bancos, "nombre_banco", "id");
@@ -133,6 +140,34 @@ function getBadge(t) {
 function eventos() {
 
   // =========================
+  // 🔥 INPUT VALOR (FORMATO MONEDA)
+  // =========================
+  const inputValor = document.getElementById("valor");
+
+  if (inputValor) {
+    inputValor.type = "text"; // 🔥 cambiar a texto para controlar formato
+
+    inputValor.addEventListener("input", (e) => {
+
+      let valor = e.target.value;
+
+      // ❌ eliminar todo lo que no sea número
+      valor = valor.replace(/\D/g, "");
+
+      // evitar vacío
+      if (!valor) {
+        e.target.value = "";
+        return;
+      }
+
+      // 🔥 formatear con miles
+      const numero = Number(valor);
+      e.target.value = numero.toLocaleString("es-CO");
+
+    });
+  }
+
+  // =========================
   // FILTROS DINAMICOS
   // =========================
   ["fDesde","fHasta","fTipo","fBanco","fManifiesto"].forEach(id => {
@@ -179,7 +214,7 @@ function eventos() {
   });
 
   // =========================
-  // GUARDAR ??
+  // GUARDAR
   // =========================
   document.getElementById("guardarTransaccion")?.addEventListener("click", async () => {
 
@@ -194,12 +229,15 @@ function eventos() {
       const selectedOption = tipoSelect.selectedOptions[0];
       const tipo = selectedOption?.dataset.tipo;
 
+      // 🔥 LIMPIAR FORMATO (quitar comas antes de enviar)
+      const valorLimpio = document.getElementById("valor").value.replace(/\D/g, "");
+
       const payload = {
         id: "TR" + Date.now(),
         id_banco: document.getElementById("banco").value,
         id_tipo_transaccion: tipoSelect.value,
         id_manifiesto: document.getElementById("manifiesto")?.value || null,
-        valor: Number(document.getElementById("valor").value),
+        valor: Number(valorLimpio),
         fecha_pago: document.getElementById("fecha").value,
         descripcion: document.getElementById("descripcion").value
       };
@@ -243,9 +281,6 @@ function eventos() {
         body: JSON.stringify(payload)
       });
 
-      // =========================
-      // UX
-      // =========================
       showToast("Transacción creada correctamente", "success");
 
       limpiarFormularioTransaccion();
@@ -264,14 +299,13 @@ function eventos() {
   });
 
   // =========================
-  // ABRIR MODAL + RESET
+  // ABRIR MODAL
   // =========================
   document.getElementById("btnNuevaTransaccion")?.addEventListener("click", () => {
-  
+
     limpiarFormularioTransaccion();
-  
     document.getElementById("modalTransaccion").classList.remove("hidden");
-  
+
   });
 
   // =========================
