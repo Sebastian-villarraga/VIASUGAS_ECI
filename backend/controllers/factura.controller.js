@@ -87,12 +87,43 @@ const createFactura = async (req, res) => {
       plazo_pago = 0
     } = req.body;
 
+    // =========================
+    // VALIDACIONES BASE
+    // =========================
     if (!id_manifiesto || !fecha_emision || !valor) {
-      return res.status(400).json({ error: "Campos obligatorios faltantes" });
+      return res.status(400).json({
+        error: "Campos obligatorios faltantes"
+      });
+    }
+
+    // ?? NORMALIZAR NUMEROS (SUPER IMPORTANTE)
+    valor = Number(valor) || 0;
+    retencion_fuente = Number(retencion_fuente) || 0;
+    retencion_ica = Number(retencion_ica) || 0;
+    plazo_pago = Number(plazo_pago) || 0;
+
+    if (valor <= 0) {
+      return res.status(400).json({
+        error: "El valor debe ser mayor a 0"
+      });
     }
 
     // =========================
-    // GENERAR CODIGO F1, F2...
+    // VALIDAR DUPLICADO (ANTES DEL INSERT)
+    // =========================
+    const existe = await pool.query(
+      `SELECT 1 FROM factura WHERE id_manifiesto = $1`,
+      [id_manifiesto]
+    );
+
+    if (existe.rows.length > 0) {
+      return res.status(400).json({
+        error: "Ya existe una factura para este manifiesto"
+      });
+    }
+
+    // =========================
+    // GENERAR CODIGO
     // =========================
     const ultimo = await pool.query(`
       SELECT codigo_factura
@@ -105,11 +136,16 @@ const createFactura = async (req, res) => {
     let nuevoCodigo = "F1";
 
     if (ultimo.rows.length > 0) {
-      const ultimoId = ultimo.rows[0].codigo_factura;
-      const numero = parseInt(ultimoId.replace("F", ""), 10);
+      const numero = parseInt(
+        ultimo.rows[0].codigo_factura.replace("F", ""),
+        10
+      );
       nuevoCodigo = "F" + (numero + 1);
     }
 
+    // =========================
+    // INSERT
+    // =========================
     const result = await pool.query(
       `
       INSERT INTO factura (
@@ -141,8 +177,19 @@ const createFactura = async (req, res) => {
     return res.status(201).json(result.rows[0]);
 
   } catch (error) {
-    console.error("?? Error createFactura:", error);
-    return res.status(500).json({ error: "Error creando factura" });
+
+    // ?? MANEJO ESPECÍFICO DE UNIQUE (POR SI FALLA LA VALIDACIÓN PREVIA)
+    if (error.code === "23505") {
+      return res.status(400).json({
+        error: "Ya existe una factura para este manifiesto"
+      });
+    }
+
+    console.error("? Error createFactura:", error);
+
+    return res.status(500).json({
+      error: "Error creando factura"
+    });
   }
 };
 

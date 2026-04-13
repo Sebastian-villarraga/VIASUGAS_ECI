@@ -250,6 +250,47 @@
 .badge.pagada { background: #27ae60; }
 .badge.vencida { background: #e74c3c; }
 
+
+.select-search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-search-input {
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.select-search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 180px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  z-index: 999;
+}
+
+.select-option {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.select-option:hover {
+  background: #f1f5f9;
+}
+
+.no-results {
+  padding: 10px;
+  color: #888;
+  text-align: center;
+}
+
 /* ========================= */
 /* RESPONSIVE */
 /* ========================= */
