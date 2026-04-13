@@ -11,10 +11,7 @@ let catalogosFacturas = {};
 // =========================
 async function cargarCatalogosFacturas() {
 
-  // ?? traer manifiestos
   const manifiestos = await apiFetch("/api/facturas/manifiestos");
-
-  // ?? traer facturas actuales
   const facturas = await apiFetch("/api/facturas");
 
   // ?? IDs ya usados
@@ -22,21 +19,19 @@ async function cargarCatalogosFacturas() {
     (facturas || []).map(f => f.id_manifiesto)
   );
 
-  // ?? FILTRAR SOLO LOS DISPONIBLES
-  const disponibles = (manifiestos || []).filter(m => !usados.has(m.id_manifiesto));
-
-  catalogosFacturas.manifiestos = disponibles;
+  catalogosFacturas.manifiestos = manifiestos;
 
   // =========================
-  // MODAL (SOLO DISPONIBLES)
+  // MODAL (CON DESHABILITADOS)
   // =========================
   llenarSelectManifiesto(
     "manifiestoFactura",
-    disponibles
+    manifiestos,
+    usados // ?? nuevo parámetro
   );
 
   // =========================
-  // FILTROS (TODOS)
+  // FILTROS (NORMAL)
   // =========================
   llenarSelectManifiesto(
     "fManifiesto",
@@ -373,14 +368,13 @@ function eventosFacturas() {
 // =========================
 // SELECT MANIFIESTO BONITO
 // =========================
-function llenarSelectManifiesto(id, data) {
+function llenarSelectManifiesto(id, data, usados = new Set()) {
   const select = document.getElementById(id);
   if (!select) return;
 
-  // ?? evitar duplicar si ya fue reemplazado
+  // ?? evitar duplicar
   if (select.parentNode.classList.contains("select-search-wrapper")) return;
 
-  // ?? crear wrapper
   const wrapper = document.createElement("div");
   wrapper.classList.add("select-search-wrapper");
 
@@ -395,12 +389,10 @@ function llenarSelectManifiesto(id, data) {
   wrapper.appendChild(input);
   wrapper.appendChild(dropdown);
 
-  // ?? reemplazar select por el buscador
   select.parentNode.replaceChild(wrapper, select);
 
-  // ?? valor seleccionado REAL
   let valorSeleccionado = "";
-  wrapper._value = ""; // ?? clave para usar desde fuera
+  wrapper._value = "";
 
   function renderOpciones(filtro = "") {
     dropdown.innerHTML = "";
@@ -416,16 +408,34 @@ function llenarSelectManifiesto(id, data) {
     }
 
     filtrados.forEach(m => {
+
+      const yaUsado = usados.has(m.id_manifiesto);
+
       const option = document.createElement("div");
       option.classList.add("select-option");
-      option.textContent = `${m.id_manifiesto} - ${m.cliente_nombre || ""}`;
+
+      // ?? TEXTO CON ESTADO
+      option.textContent = `${m.id_manifiesto} - ${m.cliente_nombre || ""}${
+        yaUsado ? " (Ya facturado)" : ""
+      }`;
+
+      // ?? ESTILO VISUAL
+      if (yaUsado) {
+        option.style.opacity = "0.5";
+        option.style.cursor = "not-allowed";
+      }
 
       option.addEventListener("click", () => {
+
+        // ?? BLOQUEAR SELECCIÓN
+        if (yaUsado) {
+          showToast("Este manifiesto ya tiene factura", "warning");
+          return;
+        }
+
         input.value = option.textContent;
 
         valorSeleccionado = m.id_manifiesto;
-
-        // ?? ESTA LÍNEA SOLUCIONA TODO
         wrapper._value = m.id_manifiesto;
 
         dropdown.innerHTML = "";
@@ -435,24 +445,20 @@ function llenarSelectManifiesto(id, data) {
     });
   }
 
-  // ?? escribir para buscar
   input.addEventListener("input", (e) => {
     renderOpciones(e.target.value);
   });
 
-  // ?? focus abre lista
   input.addEventListener("focus", () => {
     renderOpciones(input.value);
   });
 
-  // ?? click fuera cierra
   document.addEventListener("click", (e) => {
     if (!wrapper.contains(e.target)) {
       dropdown.innerHTML = "";
     }
   });
 
-  // ?? método accesible (por si lo usas)
   wrapper.getValue = () => valorSeleccionado;
 }
 
