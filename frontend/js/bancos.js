@@ -7,6 +7,7 @@ function initBancos() {
   cargarBancos();
   initFormBanco();
   aplicarRestriccionesInputsBanco();
+  llenarSelectBanco();
 
   document.getElementById("filtroBanco")
     ?.addEventListener("input", aplicarFiltrosBancos);
@@ -22,6 +23,8 @@ async function cargarBancos() {
   const tabla = document.getElementById("bancosTable");
 
   const data = await apiFetch("/api/bancos");
+
+  window.bancosData = data;
 
   renderTablaBancos(data);
 }
@@ -111,26 +114,74 @@ function initFormBanco() {
 
   if (!form) return;
 
+  const inputBanco = document.getElementById("nombre_banco");
+  const inputCuenta = document.getElementById("numero_cuenta");
+
+  // =========================
+  // ?? LISTA DE BANCOS (TIPO TRANSACCIONES)
+  // =========================
+  const bancosCatalogo = [
+    "Bancolombia",
+    "Banco de Bogotá",
+    "Davivienda",
+    "BBVA",
+    "Banco Popular",
+    "Banco Caja Social",
+    "Scotiabank Colpatria",
+    "Banco Agrario"
+  ];
+
+  // ?? AUTOCOMPLETE SIMPLE
+  inputBanco.addEventListener("input", () => {
+    const valor = inputBanco.value.toLowerCase();
+
+    const sugerencias = bancosCatalogo.filter(b =>
+      b.toLowerCase().includes(valor)
+    );
+
+    // puedes luego conectar esto a un dropdown visual si quieres
+  });
+
+  // =========================
+  // VALIDAR DUPLICADOS
+  // =========================
+  function cuentaDuplicada(numero) {
+    if (!window.bancosData) return false;
+
+    return window.bancosData.some(b =>
+      b.numero_cuenta === numero
+    );
+  }
+
+  // =========================
+  // SUBMIT
+  // =========================
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     try {
-      const nombre_banco = document.getElementById("nombre_banco").value.trim();
-      const numero_cuenta = document.getElementById("numero_cuenta").value.trim();
+      const nombre_banco = inputBanco.value.trim();
+      const numero_cuenta = inputCuenta.value.trim();
       let tipo_cuenta = document.getElementById("tipo_cuenta").value;
       const nombre_titular = document.getElementById("nombre_titular").value.trim();
       const identificacion = document.getElementById("identificacion").value.trim();
 
-      console.log("VALORES CRUDOS:", {
-        nombre_banco,
-        numero_cuenta,
-        tipo_cuenta
-      });
-
+      // =========================
       // VALIDACIONES
+      // =========================
+
       if (!nombre_banco || !numero_cuenta) {
         showToast("Nombre banco y número de cuenta son obligatorios", "error");
         return;
+      }
+
+      // ?? DUPLICADO
+      if (cuentaDuplicada(numero_cuenta)) {
+        inputCuenta.style.border = "1px solid #dc3545";
+        showToast("La cuenta ya existe", "error");
+        return;
+      } else {
+        inputCuenta.style.border = "1px solid #ccc";
       }
 
       if (!tipo_cuenta) {
@@ -138,7 +189,6 @@ function initFormBanco() {
         return;
       }
 
-      // ?? NORMALIZAR EXACTAMENTE COMO LO ESPERA POSTGRES
       tipo_cuenta = tipo_cuenta.toLowerCase().trim();
 
       if (!["ahorros", "corriente"].includes(tipo_cuenta)) {
@@ -153,8 +203,6 @@ function initFormBanco() {
         nombre_titular: nombre_titular || null,
         identificacion: identificacion || null
       };
-
-      console.log("DATA FINAL:", data);
 
       const res = await apiFetch("/api/bancos", {
         method: "POST",
@@ -319,4 +367,31 @@ function aplicarRestriccionesInputsBanco() {
 
   document.getElementById("nombre_titular")
     ?.addEventListener("input", soloLetras);
+}
+
+
+
+
+function llenarSelectBanco() {
+  const select = document.getElementById("nombre_banco");
+
+  const bancos = [
+    "Bancolombia",
+    "Banco de BogotÃ¡",
+    "Davivienda",
+    "BBVA",
+    "Banco Popular",
+    "Banco Caja Social",
+    "Scotiabank Colpatria",
+    "Banco Agrario"
+  ];
+
+  select.innerHTML = `<option value="">Seleccione</option>`;
+
+  bancos.forEach(b => {
+    const option = document.createElement("option");
+    option.value = b;
+    option.textContent = b;
+    select.appendChild(option);
+  });
 }
