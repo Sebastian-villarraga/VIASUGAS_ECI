@@ -79,7 +79,7 @@
 <div id="modalTipo" class="modal hidden">
   <div class="modal-content">
 
-    <h3 id="modalTitulo">Agregar Tipo de Transacción</h3>
+    <h3 id="modalTitulo">Agregar Categoria de gastos</h3>
 
     <form id="formTipo" class="form-grid">
 
@@ -102,7 +102,7 @@
       </div>
 
       <!-- DESCRIPCION -->
-      <div class="form-group full">
+      <div class="form-group full-width">
         <label>Descripción</label>
         <input id="descripcion" placeholder="Detalle opcional">
       </div>
@@ -116,10 +116,11 @@
         </select>
       </div>
 
-      <!-- ACCIONES -->
-      <div class="modal-actions">
-        <button type="submit" class="btn-primary">Guardar</button>
-        <button type="button" class="btn-secundario" onclick="cerrarModalTipo()">Cancelar</button>
+      <!-- BOTÓN FULL WIDTH 🔥 -->
+      <div class="modal-footer full-width">
+        <button type="submit" class="btn-principal full-width">
+          Guardar
+        </button>
       </div>
 
     </form>

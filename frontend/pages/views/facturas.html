@@ -79,8 +79,7 @@
 
     <div class="form-grid">
 
-      <!-- 🔥 ELIMINADO CODIGO FACTURA -->
-
+      <!-- MANIFIESTO -->
       <div class="form-group">
         <label>Manifiesto</label>
         <select id="manifiestoFactura" required>
@@ -88,44 +87,71 @@
         </select>
       </div>
 
+      <!-- FECHA EMISIÓN -->
       <div class="form-group">
         <label>Fecha emisión</label>
         <input type="date" id="fechaEmision" required>
       </div>
 
+      <!-- FECHA VENCIMIENTO -->
       <div class="form-group">
         <label>Fecha vencimiento</label>
         <input type="date" id="fechaVencimiento">
       </div>
 
+      <!-- VALOR TOTAL -->
       <div class="form-group">
         <label>Valor total</label>
-        <input type="number" id="valorFactura" placeholder="$0" min="0" required>
+        <input 
+          type="text" 
+          id="valorFactura" 
+          placeholder="$0"
+          inputmode="numeric"
+          autocomplete="off"
+          required
+        >
       </div>
 
+      <!-- PLAZO -->
       <div class="form-group">
         <label>Plazo (días)</label>
-        <input type="number" id="plazoPago" placeholder="Ej: 30" min="0">
+        <input 
+          type="number" 
+          id="plazoPago" 
+          placeholder="Ej: 30" 
+          min="0"
+        >
       </div>
 
+      <!-- RETENCIÓN FUENTE -->
       <div class="form-group">
         <label>Retención fuente</label>
-        <input type="number" id="retencionFuente" placeholder="$0" min="0">
+        <input 
+          type="text" 
+          id="retencionFuente" 
+          placeholder="$0"
+          inputmode="numeric"
+          autocomplete="off"
+        >
       </div>
 
+      <!-- RETENCIÓN ICA -->
       <div class="form-group">
         <label>Retención ICA</label>
-        <input type="number" id="retencionIca" placeholder="$0" min="0">
+        <input 
+          type="text" 
+          id="retencionIca" 
+          placeholder="$0"
+          inputmode="numeric"
+          autocomplete="off"
+        >
       </div>
 
     </div>
 
-    <!-- BOTONES -->
-    <div class="modal-actions">
-      <button type="button" id="cancelarFactura" class="btn-cancelar">
-        Cancelar
-      </button>
-      <button type="button" id="guardarFactura" class="btn-guardar">
+    <!-- BOTÓN FULL WIDTH 🔥 -->
+    <div class="modal-footer">
+      <button type="button" id="guardarFactura" class="btn-principal full-width">
         Guardar
       </button>
     </div>
@@ -133,19 +159,18 @@
   </div>
 </div>
 
-<!-- ✅ MODAL CONFIRMACION -->
+<!-- MODAL CONFIRMACION -->
 <div id="modalConfirmacion" class="modal hidden">
   <div class="modal-content confirm-modal">
 
     <h3>Confirmar acción</h3>
     <p id="confirmMensaje">¿Estás seguro?</p>
 
-    <div class="confirm-actions">
-      <button id="btnConfirmar" class="btn-confirmar">Aceptar</button>
-      <button id="btnCancelar" class="btn-cancelar">Cancelar</button>
+    <div class="modal-footer">
+      <button id="btnConfirmar" class="btn-principal full-width">
+        Aceptar
+      </button>
     </div>
 
   </div>
 </div>
-
-</div>  

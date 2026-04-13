@@ -196,11 +196,40 @@ function renderFacturas(data) {
 // =========================
 function eventosFacturas() {
 
-  // ?? EVITAR DUPLICAR EVENTOS (CLAVE EN SPA)
   if (window._eventosFacturasInit) return;
   window._eventosFacturasInit = true;
 
   const modal = document.getElementById("modalFactura");
+
+  // =========================
+  // ?? FORMATO DINERO (3 CAMPOS)
+  // =========================
+  function aplicarFormatoMoneda(input) {
+
+    if (!input) return;
+
+    input.addEventListener("input", (e) => {
+
+      let valor = e.target.value;
+
+      // ?? solo números
+      let limpio = valor.replace(/\D/g, "");
+
+      if (!limpio) {
+        e.target.value = "";
+        return;
+      }
+
+      // ?? FORMATEO SIN Number (clave para evitar límite)
+      let formateado = limpio.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+      e.target.value = formateado;
+    });
+  }
+
+  aplicarFormatoMoneda(document.getElementById("valorFactura"));
+  aplicarFormatoMoneda(document.getElementById("retencionFuente"));
+  aplicarFormatoMoneda(document.getElementById("retencionIca"));
 
   // =========================
   // ABRIR MODAL
@@ -210,15 +239,12 @@ function eventosFacturas() {
   });
 
   // =========================
-  // CERRAR MODAL (BOTON CANCELAR)
+  // CERRAR MODAL
   // =========================
   document.getElementById("cancelarFactura")?.addEventListener("click", () => {
     cerrarModalFactura();
   });
 
-  // =========================
-  // CERRAR MODAL (CLICK FUERA)
-  // =========================
   modal?.addEventListener("click", (e) => {
     if (e.target.id === "modalFactura") {
       cerrarModalFactura();
@@ -228,7 +254,6 @@ function eventosFacturas() {
   function cerrarModalFactura() {
     modal.classList.add("hidden");
 
-    // limpiar formulario
     document.getElementById("codigoFactura").value = "";
     document.getElementById("manifiestoFactura").value = "";
     document.getElementById("fechaEmision").value = "";
@@ -246,13 +271,20 @@ function eventosFacturas() {
 
     try {
 
+      const valorInput = document.getElementById("valorFactura");
+      const fuenteInput = document.getElementById("retencionFuente");
+      const icaInput = document.getElementById("retencionIca");
+
       const body = {
         id_manifiesto: document.getElementById("manifiestoFactura").value,
         fecha_emision: document.getElementById("fechaEmision").value,
         fecha_vencimiento: document.getElementById("fechaVencimiento").value,
-        valor: Number(document.getElementById("valorFactura").value),
-        retencion_fuente: Number(document.getElementById("retencionFuente").value),
-        retencion_ica: Number(document.getElementById("retencionIca").value),
+
+        // ?? limpiar formato
+        valor: Number(valorInput.value.replace(/\D/g, "")),
+        retencion_fuente: Number(fuenteInput.value.replace(/\D/g, "")),
+        retencion_ica: Number(icaInput.value.replace(/\D/g, "")),
+
         plazo_pago: Number(document.getElementById("plazoPago").value)
       };
 
@@ -282,9 +314,6 @@ function eventosFacturas() {
     document.getElementById(id)?.addEventListener("input", aplicarFiltrosFacturas);
   });
 
-  // =========================
-  // LIMPIAR FILTROS
-  // =========================
   document.getElementById("btnLimpiarFacturas")?.addEventListener("click", () => {
 
     document.getElementById("fDesde").value = "";
@@ -295,13 +324,9 @@ function eventosFacturas() {
     aplicarFiltrosFacturas();
   });
 
-  // =========================
-  // MODAL CONFIRMACION
-  // =========================
   document.addEventListener("click", (e) => {
 
     if (e.target.id === "btnConfirmar") {
-
       if (confirmCallback) confirmCallback();
       cerrarConfirmacion();
     }
@@ -309,7 +334,6 @@ function eventosFacturas() {
     if (e.target.id === "btnCancelar") {
       cerrarConfirmacion();
     }
-
   });
 }
 

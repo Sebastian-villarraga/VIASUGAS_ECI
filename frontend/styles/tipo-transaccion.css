@@ -218,11 +218,29 @@
 /* ACCIONES MODAL */
 /* ========================= */
 
-.modal-actions {
+.modal-footer {
   grid-column: span 2;
+  display: block;
+  margin-top: 15px;
+}
+
+.modal-footer .full-width {
+  width: 100%;
+}
+
+.modal-footer .btn-principal {
+  width: 100%;
+  height: 45px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+
+  background: #2a5298;
+  color: white;
+
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ========================= */
