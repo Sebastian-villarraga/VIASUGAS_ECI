@@ -274,26 +274,24 @@ function eventosFacturas() {
   document.getElementById("guardarFactura")?.addEventListener("click", async () => {
 
     try {
-
+  
       const valorInput = document.getElementById("valorFactura");
       const fuenteInput = document.getElementById("retencionFuente");
       const icaInput = document.getElementById("retencionIca");
-
+  
       const wrapper = document.querySelector("#modalFactura .select-search-wrapper");
-
-      // ?? VALOR SEGURO DEL SELECT BUSCADOR
+  
       const id_manifiesto = wrapper && wrapper._value ? wrapper._value : "";
-
-      // ?? LIMPIAR NUMEROS BIEN
+  
       const limpiarNumero = (val) => {
         if (!val) return 0;
         return Number(val.replace(/\./g, "").replace(/\D/g, "")) || 0;
       };
-
+  
       const valor = limpiarNumero(valorInput.value);
       const retencion_fuente = limpiarNumero(fuenteInput.value);
       const retencion_ica = limpiarNumero(icaInput.value);
-
+  
       const body = {
         id_manifiesto,
         fecha_emision: document.getElementById("fechaEmision").value,
@@ -303,49 +301,42 @@ function eventosFacturas() {
         retencion_ica,
         plazo_pago: Number(document.getElementById("plazoPago").value) || 0
       };
-
-      console.log("BODY LIMPIO:", body);
-
-      // =========================
-      // VALIDACIONES ??
-      // =========================
+  
       if (!body.id_manifiesto) {
-        alert("Selecciona un manifiesto válido");
+        showToast("Selecciona un manifiesto válido", "warning");
         return;
       }
-
+  
       if (!body.fecha_emision) {
-        alert("La fecha de emisión es obligatoria");
+        showToast("La fecha de emisión es obligatoria", "warning");
         return;
       }
-
+  
       if (!body.valor || body.valor <= 0) {
-        alert("El valor debe ser mayor a 0");
+        showToast("El valor debe ser mayor a 0", "warning");
         return;
       }
-
-      // =========================
-      // API
-      // =========================
+  
       await apiFetch("/api/facturas", {
         method: "POST",
         body: JSON.stringify(body)
       });
-
+  
+      showToast("Factura creada correctamente", "success");
+  
       cerrarModalFactura();
       await cargarFacturas();
-
+  
     } catch (error) {
-
+  
       console.error("Error guardando factura:", error);
-
-      // ?? MANEJO DE DUPLICADO (CLAVE)
-      if (error.message?.includes("Ya existe una factura")) {
-        alert("?? Este manifiesto ya tiene una factura");
+  
+      if (error.message?.includes("factura")) {
+        showToast("Este manifiesto ya tiene una factura", "error");
         return;
       }
-
-      alert("Error al guardar la factura");
+  
+      showToast("Error al guardar la factura", "error");
     }
   });
 

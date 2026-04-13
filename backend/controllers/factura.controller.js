@@ -87,16 +87,12 @@ const createFactura = async (req, res) => {
       plazo_pago = 0
     } = req.body;
 
-    // =========================
-    // VALIDACIONES BASE
-    // =========================
     if (!id_manifiesto || !fecha_emision || !valor) {
       return res.status(400).json({
         error: "Campos obligatorios faltantes"
       });
     }
 
-    // ?? NORMALIZAR NUMEROS (SUPER IMPORTANTE)
     valor = Number(valor) || 0;
     retencion_fuente = Number(retencion_fuente) || 0;
     retencion_ica = Number(retencion_ica) || 0;
@@ -108,9 +104,7 @@ const createFactura = async (req, res) => {
       });
     }
 
-    // =========================
-    // VALIDAR DUPLICADO (ANTES DEL INSERT)
-    // =========================
+    // ?? VALIDACIÓN PREVIA
     const existe = await pool.query(
       `SELECT 1 FROM factura WHERE id_manifiesto = $1`,
       [id_manifiesto]
@@ -122,9 +116,6 @@ const createFactura = async (req, res) => {
       });
     }
 
-    // =========================
-    // GENERAR CODIGO
-    // =========================
     const ultimo = await pool.query(`
       SELECT codigo_factura
       FROM factura
@@ -143,9 +134,6 @@ const createFactura = async (req, res) => {
       nuevoCodigo = "F" + (numero + 1);
     }
 
-    // =========================
-    // INSERT
-    // =========================
     const result = await pool.query(
       `
       INSERT INTO factura (
@@ -178,7 +166,7 @@ const createFactura = async (req, res) => {
 
   } catch (error) {
 
-    // ?? MANEJO ESPECÍFICO DE UNIQUE (POR SI FALLA LA VALIDACIÓN PREVIA)
+    // ?? MANEJO LIMPIO (NO LOGEAR ESTE ERROR)
     if (error.code === "23505") {
       return res.status(400).json({
         error: "Ya existe una factura para este manifiesto"
