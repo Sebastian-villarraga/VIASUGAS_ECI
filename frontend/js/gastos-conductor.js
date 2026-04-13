@@ -35,10 +35,11 @@ async function gc_cargarCatalogos() {
 async function gc_cargarGastos() {
   const data = await apiFetch("/api/gastos-conductor") || [];
 
+  window.gc_data = data;
+
   const tbody = document.getElementById("tablaGastos");
   if (!tbody) return;
 
-  // FILTROS
   const fDesde = document.getElementById("fDesde")?.value;
   const fHasta = document.getElementById("fHasta")?.value;
   const fConductor = document.getElementById("fConductor")?.value;
@@ -51,20 +52,29 @@ async function gc_cargarGastos() {
   if (fHasta) filtrados = filtrados.filter(g => new Date(g.creado) <= new Date(fHasta));
   if (fConductor) filtrados = filtrados.filter(g => g.id_conductor == fConductor);
   if (fManifiesto) filtrados = filtrados.filter(g => g.id_manifiesto == fManifiesto);
-
-  // ?? AHORA FILTRA POR TIPO DE TRANSACCIÓN
   if (fTipo) filtrados = filtrados.filter(g => g.tipo_transaccion_id == fTipo);
 
   tbody.innerHTML = "";
 
   filtrados.forEach(g => {
     tbody.innerHTML += `
-      <tr>
+      <tr 
+        data-id="${g.id}"
+        data-manifiesto="${g.id_manifiesto}"
+        data-valor="${g.valor}"
+        data-descripcion="${g.descripcion || ""}"
+      >
         <td>${gc_formatearFecha(g.creado)}</td>
         <td>${g.conductor_nombre || ""}</td>
         <td>${g.id_manifiesto || ""}</td>
         <td class="text-center">$${Number(g.valor || 0).toLocaleString()}</td>
         <td>${g.descripcion || ""}</td>
+
+        <td class="text-center">
+          <button class="btn-icon" onclick="gc_editarGasto(this, '${g.id}')">
+            <i class="fas fa-pen"></i>
+          </button>
+        </td>
       </tr>
     `;
   });
@@ -72,36 +82,180 @@ async function gc_cargarGastos() {
   gc_calcularTotales(filtrados);
 }
 
+
+// =========================
+// EDITAR GASTOS
+// =========================
+function gc_editarGasto(btn, id) {
+
+  if (window.gc_editando) {
+    showToast("Termina de editar primero", "info");
+    return;
+  }
+
+  window.gc_editando = true;
+
+  const fila = btn.closest("tr");
+  const data = fila.dataset;
+  const celdas = fila.querySelectorAll("td");
+
+  // MANIFIESTO
+  celdas[2].innerHTML = `
+    <select id="editManifiesto">
+      ${gc_catalogos.manifiestos.map(m => `
+        <option value="${m.id_manifiesto}" ${m.id_manifiesto == data.manifiesto ? "selected" : ""}>
+          ${m.id_manifiesto}
+        </option>
+      `).join("")}
+    </select>
+  `;
+
+  // VALOR
+  celdas[3].innerHTML = `
+    <input type="text" id="editValor" value="${Number(data.valor).toLocaleString()}">
+  `;
+
+  // DESCRIPCIÓN + TIPO
+  celdas[4].innerHTML = `
+    <select id="editTipo">
+      ${gc_catalogos.tipos.map(t => `
+        <option value="${t.id}">
+          ${t.categoria}
+        </option>
+      `).join("")}
+    </select>
+
+    <input type="text" id="editDescripcion" value="${data.descripcion}">
+  `;
+
+  // ACCIONES
+  celdas[5].innerHTML = `
+    <button class="btn-icon btn-save" onclick="gc_guardarGasto(this, '${id}')">
+      <i class="fas fa-save"></i>
+    </button>
+  `;
+
+  const btnGuardar = celdas[5].querySelector("button");
+
+  document.querySelectorAll(".btn-icon").forEach(b => {
+    if (b !== btnGuardar) b.disabled = true;
+  });
+}
+
+
+// =========================
+// GUARDAR GASTOS
+// =========================
+async function gc_guardarGasto(btn, id) {
+
+  const fila = btn.closest("tr");
+
+  const manifiesto = fila.querySelector("#editManifiesto").value;
+  const valorRaw = fila.querySelector("#editValor").value.replace(/\D/g, "");
+  const descripcion = fila.querySelector("#editDescripcion").value;
+  const tipo_transaccion = fila.querySelector("#editTipo").value;
+
+  const data = {
+    id,
+    tipo_transaccion, // ?? CLAVE
+    id_manifiesto: manifiesto,
+    valor: Number(valorRaw),
+    descripcion
+  };
+
+  try {
+
+    await apiFetch("/api/gastos-conductor", {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+
+    showToast("Gasto actualizado", "success");
+
+    window.gc_editando = false;
+
+    document.querySelectorAll(".btn-icon").forEach(b => b.disabled = false);
+
+    gc_cargarGastos();
+
+  } catch (error) {
+    console.error(error);
+    showToast("Error actualizando gasto", "error");
+  }
+}
+
 // =========================
 // EVENTOS
 // =========================
 function gc_eventos() {
 
+  // =========================
+  // FORMATO VALOR EN VIVO ?? (FIX REAL)
+  // =========================
+  const inputValor = document.getElementById("valor");
+
+  if (inputValor) {
+
+    // ?? MUY IMPORTANTE
+    inputValor.type = "text";
+
+    inputValor.addEventListener("input", (e) => {
+
+      let cursorPos = e.target.selectionStart;
+
+      let valor = e.target.value;
+
+      // limpiar todo excepto números
+      let limpio = valor.replace(/\D/g, "");
+
+      if (!limpio) {
+        e.target.value = "";
+        return;
+      }
+
+      // formatear con puntos
+      let formateado = limpio.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+      e.target.value = formateado;
+
+      // ?? RESTAURAR CURSOR (CLAVE)
+      let nuevaPos = formateado.length - (limpio.length - cursorPos);
+      e.target.setSelectionRange(nuevaPos, nuevaPos);
+    });
+  }
+
+  // =========================
   // ABRIR MODAL
+  // =========================
   document.getElementById("btnNuevoGasto")?.addEventListener("click", () => {
     gc_limpiarFormulario();
     document.getElementById("modalGasto").classList.remove("hidden");
   });
 
+  // =========================
   // CERRAR MODAL
+  // =========================
   document.getElementById("cerrarModal")?.addEventListener("click", () => {
     document.getElementById("modalGasto").classList.add("hidden");
   });
 
+  // =========================
   // GUARDAR
+  // =========================
   document.getElementById("guardarGasto")?.addEventListener("click", async () => {
+
+    const valorInput = document.getElementById("valor");
 
     const body = {
       tipo_transaccion: document.getElementById("tipo_transaccion").value,
-      valor: document.getElementById("valor").value,
+      valor: Number(valorInput.value.replace(/\D/g, "")),
       id_manifiesto: document.getElementById("id_manifiesto").value,
       descripcion: document.getElementById("descripcion").value,
       fecha: document.getElementById("fecha").value
     };
 
-    // ?? VALIDACIÓN CORREGIDA
     if (!body.tipo_transaccion || !body.id_manifiesto || !body.valor) {
-      alert("Completa los campos obligatorios");
+      showToast("Completa los campos obligatorios", "warning");
       return;
     }
 
@@ -110,39 +264,11 @@ function gc_eventos() {
       body: JSON.stringify(body)
     });
 
+    showToast("Gasto creado correctamente", "success");
+
     document.getElementById("modalGasto").classList.add("hidden");
 
     await gc_cargarGastos();
-  });
-
-  // FILTRAR
-  document.getElementById("btnFiltrar")?.addEventListener("click", gc_cargarGastos);
-
-  // LIMPIAR FILTROS
-  document.getElementById("btnLimpiar")?.addEventListener("click", () => {
-    document.getElementById("fDesde").value = "";
-    document.getElementById("fHasta").value = "";
-    document.getElementById("fConductor").value = "";
-    document.getElementById("fManifiesto").value = "";
-    document.getElementById("fTipo").value = "";
-
-    gc_cargarGastos();
-  });
-  
-  
-  document.getElementById("id_manifiesto")?.addEventListener("change", (e) => {
-    const id = e.target.value;
-  
-    const manifiesto = gc_catalogos.manifiestos.find(
-      m => m.id_manifiesto == id
-    );
-  
-    if (manifiesto) {
-      document.getElementById("conductor_nombre").value =
-        manifiesto.conductor_nombre || manifiesto.id_conductor || "";
-    } else {
-      document.getElementById("conductor_nombre").value = "";
-    }
   });
 }
 

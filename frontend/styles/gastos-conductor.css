@@ -1,4 +1,3 @@
-
 /* ========================= */
 /* LAYOUT */
 /* ========================= */
@@ -298,26 +297,12 @@
     width: 100%;
     overflow-x: auto;
   }
-
-  .gastos-table {
-    width: 100%;
-    min-width: 900px;
-    border-collapse: collapse;
+  
+  .gastos-tabla {
+  width: 100%;
+  overflow-x: auto;
   }
 
-  .gastos-table thead {
-    display: table-header-group;
-  }
-
-  .gastos-table tr {
-    display: table-row;
-  }
-
-  .gastos-table td {
-    display: table-cell;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-  }
 
   /* ========================= */
   /* ?? FILTROS */
@@ -336,6 +321,66 @@
     width: 100%;
   }
 
+}
+
+
+/* ========================= */
+/* FIX TABLA SCROLL DESKTOP */
+/* ========================= */
+
+.gastos-tabla {
+  overflow-x: auto; /* ?? clave */
+  width: 100%;
+}
+
+.gastos-tabla table {
+  min-width: 950px; /* ?? evita que se corte */
+  width: 100%;
+}
+
+/* COLUMNA ACCIONES */
+.gastos-tabla th:last-child,
+.gastos-tabla td:last-child {
+  text-align: center;
+  width: 80px;
+}
+
+
+/* ========================= */
+/* BOTONES MODAL PRO */
+/* ========================= */
+
+.modal-footer button {
+  min-width: 120px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* GUARDAR (AZUL) */
+.modal-footer .btn-principal {
+  background: #2a5298;
+  color: white;
+}
+
+.modal-footer .btn-principal:hover {
+  background: #1e3c72;
+  transform: translateY(-1px);
+}
+
+/* CANCELAR (ROJO) */
+.modal-footer .btn-secundario {
+  background: #e74c3c;
+  color: white;
+}
+
+.modal-footer .btn-secundario:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
 }
 
 /* ========================= */

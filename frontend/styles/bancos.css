@@ -110,19 +110,28 @@
 /* ========================= */
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: flex-end; /* derecha */
+  align-items: center;      /* ?? alinea verticalmente */
+  gap: 12px;
   margin-top: 20px;
 }
 
 .modal-actions button {
-  min-width: 120px;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 8px;
+  width: 140px;
+  height: 42px;            /* ?? misma altura exacta */
+  display: flex;           /* ?? centra contenido */
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 500;
   border: none;
   cursor: pointer;
+}
+
+/* ORDEN VISUAL BONITO */
+.modal-actions {
+  align-items: center;
 }
 
 /* ========================= */
