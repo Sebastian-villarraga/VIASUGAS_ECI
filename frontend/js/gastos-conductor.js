@@ -49,11 +49,29 @@ async function gc_cargarGastos() {
 
   let filtrados = data;
 
-  if (fDesde) filtrados = filtrados.filter(g => new Date(g.creado) >= new Date(fDesde));
-  if (fHasta) filtrados = filtrados.filter(g => new Date(g.creado) <= new Date(fHasta));
+  function normalizarFecha(fecha) {
+    const d = new Date(fecha);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+  
+  if (fDesde) {
+    const desde = fromInputToYYYYMMDD(fDesde);
+  
+    filtrados = filtrados.filter(g =>
+      toYYYYMMDD(g.creado) >= desde
+    );
+  }
+  
+  if (fHasta) {
+    const hasta = fromInputToYYYYMMDD(fHasta);
+  
+    filtrados = filtrados.filter(g =>
+      toYYYYMMDD(g.creado) <= hasta
+    );
+  }
+
   if (fConductor) filtrados = filtrados.filter(g => g.id_conductor == fConductor);
   if (fManifiesto) filtrados = filtrados.filter(g => g.id_manifiesto == fManifiesto);
-  if (fTipo) filtrados = filtrados.filter(g => g.tipo_transaccion_id == fTipo);
 
   tbody.innerHTML = "";
 
@@ -83,6 +101,14 @@ async function gc_cargarGastos() {
   gc_calcularTotales(filtrados);
 }
 
+function parseFechaInput(fechaStr) {
+  if (!fechaStr) return null;
+
+  const [dia, mes, anio] = fechaStr.split("/");
+
+  // ?? IMPORTANTE: usar Date sin timezone
+  return new Date(Number(anio), Number(mes) - 1, Number(dia), 0, 0, 0, 0);
+}
 
 // =========================
 // EDITAR GASTOS
@@ -373,6 +399,31 @@ function gc_formatearFecha(fechaISO) {
   const year = fecha.getUTCFullYear();
 
   return `${day}/${month}/${year}`;
+}
+
+function toYYYYMMDD(fecha) {
+  const d = new Date(fecha);
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function fromInputToYYYYMMDD(fechaStr) {
+  if (!fechaStr) return null;
+
+  // ?? CASO 1: ya viene en formato yyyy-mm-dd
+  if (fechaStr.includes("-")) {
+    return fechaStr;
+  }
+
+  // ?? CASO 2: viene en formato dd/mm/yyyy
+  if (fechaStr.includes("/")) {
+    const [dia, mes, anio] = fechaStr.split("/");
+    return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+  }
+
+  return null;
 }
 
 // =========================
