@@ -78,6 +78,7 @@ const getManifiestos = async (req, res) => {
 const createFactura = async (req, res) => {
   try {
     let {
+      codigo_factura,
       id_manifiesto,
       fecha_emision,
       fecha_vencimiento,
@@ -86,6 +87,15 @@ const createFactura = async (req, res) => {
       retencion_ica = 0,
       plazo_pago = 0
     } = req.body;
+
+    // =========================
+    // VALIDACIONES
+    // =========================
+    if (!codigo_factura) {
+      return res.status(400).json({
+        error: "El código de factura es obligatorio"
+      });
+    }
 
     if (!id_manifiesto || !fecha_emision || !valor) {
       return res.status(400).json({
@@ -104,7 +114,9 @@ const createFactura = async (req, res) => {
       });
     }
 
-    // ?? VALIDACIÓN PREVIA
+    // =========================
+    // VALIDAR MANIFIESTO UNICO
+    // =========================
     const existe = await pool.query(
       `SELECT 1 FROM factura WHERE id_manifiesto = $1`,
       [id_manifiesto]
@@ -116,24 +128,9 @@ const createFactura = async (req, res) => {
       });
     }
 
-    const ultimo = await pool.query(`
-      SELECT codigo_factura
-      FROM factura
-      WHERE codigo_factura LIKE 'F%'
-      ORDER BY LENGTH(codigo_factura) DESC, codigo_factura DESC
-      LIMIT 1
-    `);
-
-    let nuevoCodigo = "F1";
-
-    if (ultimo.rows.length > 0) {
-      const numero = parseInt(
-        ultimo.rows[0].codigo_factura.replace("F", ""),
-        10
-      );
-      nuevoCodigo = "F" + (numero + 1);
-    }
-
+    // =========================
+    // INSERT REAL (SIN AUTOGENERAR)
+    // =========================
     const result = await pool.query(
       `
       INSERT INTO factura (
@@ -151,7 +148,7 @@ const createFactura = async (req, res) => {
       RETURNING *
       `,
       [
-        nuevoCodigo,
+        codigo_factura,
         id_manifiesto,
         fecha_emision,
         fecha_vencimiento,
@@ -166,14 +163,14 @@ const createFactura = async (req, res) => {
 
   } catch (error) {
 
-    // ?? MANEJO LIMPIO (NO LOGEAR ESTE ERROR)
+    // UNIQUE codigo_factura
     if (error.code === "23505") {
       return res.status(400).json({
-        error: "Ya existe una factura para este manifiesto"
+        error: "Ya existe una factura con ese código"
       });
     }
 
-    console.error("? Error createFactura:", error);
+    console.error("?? Error createFactura:", error);
 
     return res.status(500).json({
       error: "Error creando factura"

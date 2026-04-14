@@ -148,7 +148,7 @@ function renderFacturas(data) {
     // =========================
     const pagos = (window._transaccionesFacturas || [])
       .filter(t =>
-        t.id_factura === f.codigo_factura &&
+        t.id_manifiesto === f.id_manifiesto &&
         t.tipo === "INGRESO MANIFIESTO"
       )
       .reduce((sum, t) => sum + Number(t.valor || 0), 0);
@@ -212,7 +212,7 @@ function eventosFacturas() {
   const modal = document.getElementById("modalFactura");
 
   // =========================
-  // FORMATO DINERO ?? FIX
+  // FORMATO DINERO
   // =========================
   function aplicarFormatoMoneda(input) {
     if (!input) return;
@@ -252,6 +252,7 @@ function eventosFacturas() {
   function cerrarModalFactura() {
     modal.classList.add("hidden");
 
+    document.getElementById("codigoFactura").value = ""; // ?? NUEVO
     document.getElementById("fechaEmision").value = "";
     document.getElementById("fechaVencimiento").value = "";
     document.getElementById("valorFactura").value = "";
@@ -259,7 +260,7 @@ function eventosFacturas() {
     document.getElementById("retencionIca").value = "";
     document.getElementById("plazoPago").value = "";
 
-    // ?? limpiar buscador
+    // limpiar select custom
     const wrapper = document.querySelector("#modalFactura .select-search-wrapper");
     if (wrapper) {
       const input = wrapper.querySelector("input");
@@ -269,30 +270,32 @@ function eventosFacturas() {
   }
 
   // =========================
-  // GUARDAR FACTURA ?? FIX REAL
+  // GUARDAR FACTURA (CON ID DIAN)
   // =========================
   document.getElementById("guardarFactura")?.addEventListener("click", async () => {
 
     try {
-  
+
+      const codigo_factura = document.getElementById("codigoFactura").value.trim(); // ?? NUEVO
+
       const valorInput = document.getElementById("valorFactura");
       const fuenteInput = document.getElementById("retencionFuente");
       const icaInput = document.getElementById("retencionIca");
-  
+
       const wrapper = document.querySelector("#modalFactura .select-search-wrapper");
-  
       const id_manifiesto = wrapper && wrapper._value ? wrapper._value : "";
-  
+
       const limpiarNumero = (val) => {
         if (!val) return 0;
         return Number(val.replace(/\./g, "").replace(/\D/g, "")) || 0;
       };
-  
+
       const valor = limpiarNumero(valorInput.value);
       const retencion_fuente = limpiarNumero(fuenteInput.value);
       const retencion_ica = limpiarNumero(icaInput.value);
-  
+
       const body = {
+        codigo_factura, // ?? NUEVO
         id_manifiesto,
         fecha_emision: document.getElementById("fechaEmision").value,
         fecha_vencimiento: document.getElementById("fechaVencimiento").value,
@@ -301,41 +304,52 @@ function eventosFacturas() {
         retencion_ica,
         plazo_pago: Number(document.getElementById("plazoPago").value) || 0
       };
-  
+
+      // =========================
+      // VALIDACIONES
+      // =========================
+      if (!codigo_factura) {
+        showToast("El ID de factura es obligatorio", "warning");
+        return;
+      }
+
       if (!body.id_manifiesto) {
         showToast("Selecciona un manifiesto válido", "warning");
         return;
       }
-  
+
       if (!body.fecha_emision) {
         showToast("La fecha de emisión es obligatoria", "warning");
         return;
       }
-  
+
       if (!body.valor || body.valor <= 0) {
         showToast("El valor debe ser mayor a 0", "warning");
         return;
       }
-  
+
+      // =========================
+      // API
+      // =========================
       await apiFetch("/api/facturas", {
         method: "POST",
         body: JSON.stringify(body)
       });
-  
+
       showToast("Factura creada correctamente", "success");
-  
+
       cerrarModalFactura();
       await cargarFacturas();
-  
+
     } catch (error) {
-  
+
       console.error("Error guardando factura:", error);
-  
+
       if (error.message?.includes("factura")) {
         showToast("Este manifiesto ya tiene una factura", "error");
         return;
       }
-  
+
       showToast("Error al guardar la factura", "error");
     }
   });
@@ -352,51 +366,50 @@ function eventosFacturas() {
     document.getElementById("fDesde").value = "";
     document.getElementById("fHasta").value = "";
     document.getElementById("fCodigo").value = "";
-  
-    // ?? limpiar select buscador (custom)
+
     const wrapper = document.querySelector(".transacciones-filtros .select-search-wrapper");
-  
+
     if (wrapper) {
       const input = wrapper.querySelector("input");
       if (input) input.value = "";
       wrapper._value = "";
     }
-  
+
     aplicarFiltrosFacturas();
   });
-  
+
   // =========================
   // ESTE MES
   // =========================
   document.getElementById("btnEsteMesFacturas")?.addEventListener("click", () => {
     const hoy = new Date();
-  
+
     const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
     const finMes = new Date(hoy);
-  
+
     document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
     document.getElementById("fHasta").value = formatearFechaInput(finMes);
-  
+
     aplicarFiltrosFacturas();
   });
-  
+
   // =========================
   // MES ANTERIOR
   // =========================
   document.getElementById("btnMesAnteriorFacturas")?.addEventListener("click", () => {
     const hoy = new Date();
-  
+
     const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
     const finMes = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
-  
+
     document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
     document.getElementById("fHasta").value = formatearFechaInput(finMes);
-  
+
     aplicarFiltrosFacturas();
   });
-    
-  
+
 }
+
 
 // =========================
 // SELECT MANIFIESTO BONITO
