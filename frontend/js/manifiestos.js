@@ -1158,7 +1158,7 @@ contInfo.innerHTML = `
     // =========================
     // RESUMEN FINAL
     // =========================
-    const balance = totalFactura - utilidad;
+    const balance = utilidad;
 
     let texto = "";
     let clase = "";

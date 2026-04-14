@@ -105,8 +105,8 @@ INSERT INTO banco VALUES
 -- =====================================================
 
 INSERT INTO tipo_transaccion VALUES
-('TT1','COMBUSTIBLE','Gasto combustible','EGRESO MANIFIESTO','activo',NOW()),
-('TT2','PEAJES','Gasto peajes','EGRESO MANIFIESTO','activo',NOW()),
+('TT1','COMBUSTIBLE','Gasto combustible','GASTO CONDUCTOR','activo',NOW()),
+('TT2','PEAJES','Gasto peajes','GASTO CONDUCTOR','activo',NOW()),
 ('TT3','ANTICIPO','Anticipo conductor','EGRESO MANIFIESTO','activo',NOW()),
 ('TT4','PAGO CLIENTE','Ingreso cliente','INGRESO MANIFIESTO','activo',NOW()),
 ('TT5','NOMINA','Pago nomina','EGRESO OPERACIONAL','activo',NOW());
@@ -125,10 +125,10 @@ INSERT INTO transaccion VALUES
 ('TRX3','BAN1','TT2','HGT678','T78452','MF1002',NULL,200000,'2026-04-02','Peajes viaje',NOW()),
 
 -- INGRESO CON FACTURA
-('TRX4','BAN1','TT4','HGT678','T78452','MF1002','FAC1002',7000000,'2026-04-05','Pago cliente MF1002',NOW()),
+('TRX4','BAN1','TT4','HGT678','T78452','MF1002','FAC1002',6580000,'2026-04-05','Pago cliente MF1002',NOW()),
 
 -- INGRESO MANIFIESTO PAGADO
-('TRX5','BAN1','TT4','JGV196','T68945','MF1003','FAC1003',6000000,'2026-04-06','Pago cliente MF1003',NOW()),
+('TRX5','BAN1','TT4','JGV196','T68945','MF1003','FAC1003',5640000,'2026-04-06','Pago cliente MF1003',NOW()),
 
 -- GASTO OPERACIONAL
 ('TRX6','BAN1','TT5',NULL,NULL,NULL,NULL,2000000,'2026-04-07','Pago nomina',NOW());
