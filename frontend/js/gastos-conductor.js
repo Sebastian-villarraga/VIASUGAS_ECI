@@ -355,6 +355,22 @@ function gc_eventos() {
     gc_cargarGastos();
   });
   
+  
+  // =========================
+  // AUTOCARGAR CONDUCTOR
+  // =========================
+  document.getElementById("id_manifiesto")?.addEventListener("change", (e) => {
+  
+    const id = e.target.value;
+  
+    const manifiesto = gc_catalogos.manifiestos.find(m => m.id_manifiesto == id);
+  
+    document.getElementById("conductor_nombre").value = 
+      manifiesto?.conductor_nombre || "-";
+  
+  });
+  
+  
 }
 
 // =========================
