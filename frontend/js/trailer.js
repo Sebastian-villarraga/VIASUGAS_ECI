@@ -142,7 +142,8 @@ function renderTablaTrailer(data) {
       <tr>
         <td>${t.placa || "-"}</td>
         <td>${t.propietario || "-"}</td>
-        <td>${formatearFecha(t.vencimiento_cert_fumigacion)}</td>
+        <td>${formatearFechaDesdeUTC(t.vencimiento_cert_fumigacion)}</td>
+        <td>${formatearFechaDesdeUTC(t.vencimiento_cert_sanidad)}</td>
 
         <td>
           <span class="${estadoClass}" style="
@@ -187,42 +188,46 @@ function editarTrailer(btn, placa) {
   const valores = {
     placa: celdas[0].innerText.trim(),
     propietario: celdas[1].innerText.trim(),
-    fecha: celdas[2].innerText.trim(),
-    estado: celdas[3].innerText.trim().toLowerCase()
+    fechaFumigacion: celdas[2].innerText.trim(),
+    fechaSanidad: celdas[3].innerText.trim(),
+    estado: celdas[4].innerText.trim().toLowerCase()
   };
 
-  // ?? placa (no editable)
+  // 🔹 PLACA (no editable)
   celdas[0].innerHTML = `<input value="${valores.placa}" disabled>`;
 
-  // ?? PROPIETARIO COMO SELECT
+  // 🔹 PROPIETARIO
   celdas[1].innerHTML = `<select class="select-propietario-trailer"></select>`;
-
   const selectProp = celdas[1].querySelector("select");
   cargarPropietariosEnSelectTrailer(selectProp, valores.propietario);
 
-  // FECHA
+  // 🔹 FUMIGACIÓN
   celdas[2].innerHTML = `
-    <input type="date" value="${formatoInputSeguro(valores.fecha)}">
+    <input type="date" value="${formatoInputSeguro(valores.fechaFumigacion)}">
   `;
 
-  // ESTADO
+  // 🔹 SANIDAD (NUEVO)
   celdas[3].innerHTML = `
+    <input type="date" value="${formatoInputSeguro(valores.fechaSanidad)}">
+  `;
+
+  // 🔹 ESTADO (OJO: ahora es columna 4)
+  celdas[4].innerHTML = `
     <select>
       <option value="activo" ${valores.estado === "activo" ? "selected" : ""}>Activo</option>
       <option value="inactivo" ${valores.estado === "inactivo" ? "selected" : ""}>Inactivo</option>
     </select>
   `;
 
-  // BOTÓN GUARDAR
-  celdas[4].innerHTML = `
+  // 🔹 BOTÓN GUARDAR (columna 5)
+  celdas[5].innerHTML = `
     <button type="button" class="btn-icon btn-save" onclick="guardarEdicionTrailer(this, '${placa}')">
       <i class="fas fa-save"></i>
     </button>
   `;
 
-  const btnGuardar = celdas[4].querySelector("button");
+  const btnGuardar = celdas[5].querySelector("button");
 
-  // ?? deshabilitar otros botones
   document.querySelectorAll(".btn-icon").forEach(b => {
     if (b !== btnGuardar) b.disabled = true;
   });
@@ -259,16 +264,18 @@ async function cargarPropietariosEnSelectTrailer(select, seleccionado) {
 // GUARDAR EDICION TRAILER
 // =========================
 async function guardarEdicionTrailer(btn, placa) {
+
   const fila = btn.closest("tr");
 
   const propietario = fila.querySelector(".select-propietario-trailer")?.value;
-  const fecha = fila.querySelector("input[type='date']")?.value;
-  const estado = fila.querySelector("td:nth-child(4) select")?.value;
+  const inputs = fila.querySelectorAll("input[type='date']");
+  const estado = fila.querySelector("td:nth-child(5) select")?.value;
 
   const data = {
-    propietario: propietario, // ?? FK correcta (identificación)
-    vencimiento_cert_fumigacion: fecha || null,
-    estado: estado
+    propietario,
+    vencimiento_cert_fumigacion: inputs[0]?.value || null,
+    vencimiento_cert_sanidad: inputs[1]?.value || null,
+    estado
   };
 
   try {
@@ -277,7 +284,6 @@ async function guardarEdicionTrailer(btn, placa) {
       body: JSON.stringify(data)
     });
 
-    // ?? TOAST (si ya lo implementaste)
     mostrarToast("Trailer actualizado correctamente");
 
     editandoTrailer = false;
@@ -294,6 +300,7 @@ async function guardarEdicionTrailer(btn, placa) {
     mostrarToast("Error al guardar", "error");
   }
 }
+
 // =========================
 // FORMATO FECHA INPUT
 // =========================
@@ -346,6 +353,7 @@ function initFormTrailer() {
 
     const propietario = document.getElementById("propietarioTrailer")?.value;
     const fumigacion = document.getElementById("fumigacion")?.value;
+    const sanidad = document.getElementById("sanidad")?.value;
     const estado = document.getElementById("estadoTrailer")?.value;
 
     // =========================
@@ -377,7 +385,8 @@ function initFormTrailer() {
     const data = {
       placa,
       propietario,
-      vencimiento_fumigacion: fumigacion || null,
+      vencimiento_cert_fumigacion: fumigacion || null, // 👈 nombre correcto
+      vencimiento_cert_sanidad: sanidad || null,       // 👈 nuevo campo
       estado: estado || "activo"
     };
 

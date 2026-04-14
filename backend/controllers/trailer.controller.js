@@ -12,6 +12,7 @@ const getTrailers = async (req, res) => {
         t.placa,
         COALESCE(p.nombre, '-') AS propietario,
         t.vencimiento_cert_fumigacion,
+        t.vencimiento_cert_sanidad,
         t.estado::text AS estado
       FROM trailer t
       LEFT JOIN propietario p 
@@ -71,6 +72,7 @@ const crearTrailer = async (req, res) => {
       placa,
       propietario, // ?? ahora es IDENTIFICACION real
       vencimiento_cert_fumigacion,
+      vencimiento_cert_sanidad,
       estado
     } = req.body;
 
@@ -116,9 +118,10 @@ const crearTrailer = async (req, res) => {
         placa,
         id_propietario,
         vencimiento_cert_fumigacion,
+        vencimiento_cert_sanidad,
         estado
       )
-      VALUES ($1, $2, $3, $4)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `;
 
@@ -128,6 +131,7 @@ const crearTrailer = async (req, res) => {
       placa.toUpperCase(),
       propietario,
       vencimiento_cert_fumigacion || null,
+      vencimiento_cert_sanidad || null,
       estadoNormalizado
     ];
 
@@ -154,7 +158,8 @@ const getAlertasTrailers = async (req, res) => {
       SELECT 
         t.placa,
         COALESCE(p.nombre, '-') AS propietario,
-        t.vencimiento_cert_fumigacion
+        t.vencimiento_cert_fumigacion,
+        t.vencimiento_cert_sanidad
       FROM trailer t
       LEFT JOIN propietario p 
         ON t.id_propietario = p.identificacion
@@ -195,6 +200,32 @@ const getAlertasTrailers = async (req, res) => {
           fecha: t.vencimiento_cert_fumigacion
         });
       }
+      
+      
+      // SANIDAD
+      if (t.vencimiento_cert_sanidad) {
+        const f = new Date(t.vencimiento_cert_sanidad);
+        f.setHours(0,0,0,0);
+        if (f < hoy) {
+          alertas.push({
+            placa: t.placa,
+            propietario: t.propietario,
+            tipo: "Sanidad", // ??
+            estado: "vencido",
+            fecha: t.vencimiento_cert_sanidad
+          });
+        } else if (f <= limite) {
+          alertas.push({
+            placa: t.placa,
+            propietario: t.propietario,
+            tipo: "Sanidad",
+            estado: "proximo",
+            fecha: t.vencimiento_cert_sanidad
+          });
+        }
+      }
+      
+      
 
     });
 
@@ -218,6 +249,7 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
         t.placa,
         COALESCE(p.nombre, '-') AS propietario,
         t.vencimiento_cert_fumigacion,
+        t.vencimiento_cert_sanidad,
         t.estado
       FROM trailer t
       LEFT JOIN propietario p 
@@ -234,20 +266,30 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
 
     const filtrados = result.rows.filter(t => {
 
-      if (!t.vencimiento_cert_fumigacion) return false;
+      // ?? juntar todas las fechas disponibles
+      const fechas = [
+        t.vencimiento_cert_fumigacion,
+        t.vencimiento_cert_sanidad
+      ].filter(Boolean);
 
-      const fecha = new Date(t.vencimiento_cert_fumigacion);
-      fecha.setHours(0, 0, 0, 0);
+      // si no tiene ninguna fecha ? no aplica
+      if (fechas.length === 0) return false;
 
-      if (tipo === "vencido") {
-        return fecha < hoy;
-      }
+      // ?? evaluar si ALGUNA cumple la condición
+      return fechas.some(f => {
+        const fecha = new Date(f);
+        fecha.setHours(0, 0, 0, 0);
 
-      if (tipo === "proximo") {
-        return fecha >= hoy && fecha <= limite;
-      }
+        if (tipo === "vencido") {
+          return fecha < hoy;
+        }
 
-      return false;
+        if (tipo === "proximo") {
+          return fecha >= hoy && fecha <= limite;
+        }
+
+        return false;
+      });
     });
 
     res.json(filtrados);
@@ -268,6 +310,7 @@ const actualizarTrailer = async (req, res) => {
     const {
       propietario,
       vencimiento_cert_fumigacion,
+      vencimiento_cert_sanidad, // ?? AGREGAR ESTO
       estado
     } = req.body;
 
@@ -295,11 +338,13 @@ const actualizarTrailer = async (req, res) => {
       UPDATE trailer SET
         id_propietario = $1,
         vencimiento_cert_fumigacion = $2,
-        estado = $3
-      WHERE placa = $4
+        vencimiento_cert_sanidad = $3,
+        estado = $4
+      WHERE placa = $5
     `, [
       propietario,
       vencimiento_cert_fumigacion || null,
+      vencimiento_cert_sanidad || null,
       estadoNormalizado,
       placa
     ]);

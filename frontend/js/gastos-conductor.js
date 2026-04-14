@@ -1,5 +1,6 @@
 async function initGastosConductor() {
   await gc_cargarCatalogos();
+  gc_setearFechasMesActual(); // ?? nuevo
   await gc_cargarGastos();
   gc_eventos();
 }
@@ -270,6 +271,64 @@ function gc_eventos() {
 
     await gc_cargarGastos();
   });
+  
+    // =========================
+  // FILTROS DINAMICOS
+  // =========================
+  ["fDesde", "fHasta", "fConductor", "fManifiesto", "fTipo"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+  
+    el.addEventListener("change", gc_cargarGastos);
+    el.addEventListener("input", gc_cargarGastos);
+  });
+  
+  // =========================
+  // LIMPIAR FILTROS
+  // =========================
+  document.getElementById("btnLimpiar")?.addEventListener("click", () => {
+  
+    ["fDesde", "fHasta", "fConductor", "fManifiesto", "fTipo"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    showToast("Filtros limpiados", "info");
+    gc_cargarGastos(); // ?? recargar tabla
+  });
+  
+  
+  // =========================
+  // ESTE MES
+  // =========================
+  document.getElementById("btnEsteMes")?.addEventListener("click", () => {
+  
+    const hoy = new Date();
+  
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const finMes = new Date(hoy);
+  
+    document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+    document.getElementById("fHasta").value = formatearFechaInput(finMes);
+  
+    gc_cargarGastos();
+  });
+  
+  // =========================
+  // MES ANTERIOR
+  // =========================
+  document.getElementById("btnMesAnterior")?.addEventListener("click", () => {
+  
+    const hoy = new Date();
+  
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    const finMes = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+  
+    document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+    document.getElementById("fHasta").value = formatearFechaInput(finMes);
+  
+    gc_cargarGastos();
+  });
+  
 }
 
 // =========================
@@ -304,9 +363,16 @@ function gc_limpiarFormulario() {
   document.getElementById("conductor_nombre").value = "";
 }
 
-function gc_formatearFecha(fecha) {
-  if (!fecha) return "";
-  return new Date(fecha).toLocaleDateString("es-CO");
+function gc_formatearFecha(fechaISO) {
+  if (!fechaISO) return "";
+
+  const fecha = new Date(fechaISO);
+
+  const day = String(fecha.getUTCDate()).padStart(2, "0");
+  const month = String(fecha.getUTCMonth() + 1).padStart(2, "0");
+  const year = fecha.getUTCFullYear();
+
+  return `${day}/${month}/${year}`;
 }
 
 // =========================
@@ -322,4 +388,12 @@ function gc_calcularTotales(data) {
   document.getElementById("totalPromedio").textContent = `$${Math.round(promedio).toLocaleString()}`;
 }
 
+function gc_setearFechasMesActual() {
+  const hoy = new Date();
 
+  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const finMes = new Date(hoy);
+
+  document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+  document.getElementById("fHasta").value = formatearFechaInput(finMes);
+}

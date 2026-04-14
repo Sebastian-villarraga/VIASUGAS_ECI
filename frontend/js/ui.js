@@ -63,3 +63,37 @@ document.addEventListener("click", (e) => {
   }
 
 });
+
+function formatearFechaDesdeUTC(fechaISO) {
+  if (!fechaISO) return "-";
+
+  const fecha = new Date(fechaISO);
+
+  const year = fecha.getUTCFullYear();
+  const month = String(fecha.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(fecha.getUTCDate()).padStart(2, "0");
+
+  return `${day}/${month}/${year}`;
+}
+
+function formatearFechaSafe(fechaStr) {
+  if (!fechaStr) return "-";
+
+  // ?? Forzar que SIEMPRE sea string YYYY-MM-DD
+  if (fechaStr.includes("T")) {
+    fechaStr = fechaStr.split("T")[0];
+  }
+
+  const [year, month, day] = fechaStr.split("-");
+
+  return `${day}/${month}/${year}`;
+}
+
+function formatearFechaInputToDisplay(fechaStr) {
+  if (!fechaStr) return "-";
+
+  // ?? trabajar SOLO con string (evita timezone)
+  const [year, month, day] = fechaStr.split("-");
+
+  return `${day}/${month}/${year}`;
+}

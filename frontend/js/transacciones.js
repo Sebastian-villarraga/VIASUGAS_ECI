@@ -1,6 +1,6 @@
 async function initTransacciones() {
   await cargarCatalogos();
-  setearFechasPorDefecto();
+  setearFechasMesActual(); 
   await cargarTransacciones();
   eventos();
 }
@@ -84,9 +84,9 @@ async function cargarTransacciones() {
 
     tbody.innerHTML += `
       <tr>
-        <td>${formatearFecha(t.fecha_pago?.split("T")[0])}</td>
+        <td>${formatearFechaDesdeUTC(t.fecha_pago)}</td>
         <td>${badge}</td>
-        <td>${t.categoria || "-"}</td> <!-- ?? NUEVA -->
+        <td>${t.categoria || "-"}</td>
         <td>${t.nombre_banco || ""}</td>
         <td>${t.id_manifiesto || "-"}</td>
         <td>$${Number(t.valor).toLocaleString()}</td>
@@ -98,19 +98,20 @@ async function cargarTransacciones() {
   document.getElementById("totalIngresos").innerText = format(ingresos);
   document.getElementById("totalEgresos").innerText = format(egresos);
   document.getElementById("totalUtilidad").innerText = format(ingresos - egresos);
-  
 
-  
+  // =========================
+  // 🔥 FIX DEFINITIVO CARD
+  // =========================
   let textoFechas = "Sin filtro";
-  
+
   if (fDesde && fHasta) {
-    textoFechas = `${formatearFecha(fDesde)} - ${formatearFecha(fHasta)}`;
+    textoFechas = `${formatearFechaInputToDisplay(fDesde)} - ${formatearFechaInputToDisplay(fHasta)}`;
   } else if (fDesde) {
-    textoFechas = `Desde ${formatearFecha(fDesde)}`;
+    textoFechas = `Desde ${formatearFechaInputToDisplay(fDesde)}`;
   } else if (fHasta) {
-    textoFechas = `Hasta ${formatearFecha(fHasta)}`;
+    textoFechas = `Hasta ${formatearFechaInputToDisplay(fHasta)}`;
   }
-  
+
   document.getElementById("fechasConsultadas").innerText = textoFechas;
 }
 
@@ -321,6 +322,7 @@ function eventos() {
     document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
     document.getElementById("fHasta").value = formatearFechaInput(finMes);
 
+
     cargarTransacciones();
   });
 
@@ -380,4 +382,15 @@ function limpiarFormularioTransaccion() {
   document.getElementById("formFields").style.display = "none";
   document.getElementById("wrapManifiesto").style.display = "none";
 
+}
+
+
+function setearFechasMesActual() {
+  const hoy = new Date();
+
+  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const finMes = new Date(hoy);
+
+  document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+  document.getElementById("fHasta").value = formatearFechaInput(finMes);
 }

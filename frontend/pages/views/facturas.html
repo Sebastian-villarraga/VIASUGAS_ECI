@@ -34,17 +34,35 @@
   </div>
 
   <!-- FILTROS -->
-  <div class="transacciones-filtros">
-    <input type="date" id="fDesde">
-    <input type="date" id="fHasta">
-
-    <input type="text" id="fCodigo" placeholder="Código factura">
-
-    <select id="fManifiesto">
-      <option value="">Todos los manifiestos</option>
-    </select>
-
+  <div class="transacciones-filtros facturas-filtros">
+  
+    <button id="btnEsteMesFacturas" class="facturas-btn-rango">Ver este mes</button>
+    <button id="btnMesAnteriorFacturas" class="facturas-btn-rango">Ver mes anterior</button>
+  
+    <div class="facturas-filtro-group">
+      <label>Desde</label>
+      <input type="date" id="fDesde">
+    </div>
+  
+    <div class="facturas-filtro-group">
+      <label>Hasta</label>
+      <input type="date" id="fHasta">
+    </div>
+  
+    <div class="facturas-filtro-group">
+      <label>Código factura</label>
+      <input type="text" id="fCodigo" placeholder="Ej: F101">
+    </div>
+  
+    <div class="facturas-filtro-group">
+      <label>Manifiesto</label>
+      <select id="fManifiesto">
+        <option value="">Todos</option>
+      </select>
+    </div>
+  
     <button id="btnLimpiarFacturas">Limpiar</button>
+  
   </div>
 
   <!-- TABLA -->

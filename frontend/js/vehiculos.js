@@ -96,9 +96,9 @@ function renderTabla(data) {
         <td>${v.placa}</td>
         <td>${v.propietario || "-"}</td>
 
-        <td>${todo ? formatearFecha(todo) : "-"}</td>
-        <td>${soat ? formatearFecha(soat) : "-"}</td>
-        <td>${tecno ? formatearFecha(tecno) : "-"}</td>
+        <td>${todo ? formatearFechaDesdeUTC(todo) : "-"}</td>
+        <td>${soat ? formatearFechaDesdeUTC(soat) : "-"}</td>
+        <td>${tecno ? formatearFechaDesdeUTC(tecno) : "-"}</td>
 
         <td>${renderEstadoBadge(v.estado)}</td>
 
@@ -225,7 +225,7 @@ async function guardarEdicion(btn, placa) {
     cargarAlertasVehiculos();
 
   } catch (error) {
-    console.error("Error actualizando vehículo:", error);
+    console.error("Error actualizando vehï¿½culo:", error);
     alert("Error al guardar los cambios");
   }
 }
@@ -260,12 +260,7 @@ function mostrarToast(mensaje, tipo = "success") {
 // FORMATO FECHA (DISPLAY)
 // =========================
 function formatearFecha(fecha) {
-  if (!fecha) return "-";
-
-  const clean = fecha.split("T")[0];
-  const [year, month, day] = clean.split("-");
-
-  return `${day}/${month}/${year}`;
+  return formatearFechaDesdeUTC(fecha);
 }
 
 // =========================
@@ -409,7 +404,7 @@ function renderAlertas(data) {
           <strong>${a.propietario || "Sin nombre"} - ${a.placa}</strong>
         </div>
         <div>${a.tipo || "-"}</div>
-        <div class="alerta-fecha">${a.fecha ? formatearFecha(a.fecha) : "-"}</div>
+        <div class="alerta-fecha">${a.fecha ? formatearFechaDesdeUTC(a.fecha) : "-"}</div>
       </li>
     `;
   }).join("");

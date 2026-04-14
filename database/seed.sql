@@ -102,17 +102,17 @@ INSERT INTO vehiculo VALUES
 INSERT INTO trailer VALUES
 
 -- ================= VENCIDOS (2) =================
-('T1001','10123456789','activo','2025-12-01',NOW(),NULL),
-('T1002','10234567890','activo','2025-11-15',NOW(),NULL),
+('T1001','10123456789','activo','2025-12-01','2025-11-01',NOW(),NULL),
+('T1002','10234567890','activo','2025-11-15','2025-11-01',NOW(),NULL),
 
 -- ================= PROXIMOS A VENCER (2) =================
-('T1003','10345678901','activo',CURRENT_DATE + INTERVAL '10 days',NOW(),NULL),
-('T1004','10456789012','activo',CURRENT_DATE + INTERVAL '18 days',NOW(),NULL),
+('T1003','10345678901','activo',CURRENT_DATE + INTERVAL '10 days','2025-11-01',NOW(),NULL),
+('T1004','10456789012','activo',CURRENT_DATE + INTERVAL '18 days','2025-11-01',NOW(),NULL),
 
 -- ================= VIGENTES (3) =================
-('T1005','10567890123','activo','2026-08-01',NOW(),NULL),
-('T1006','67926539-9','activo','2026-09-01',NOW(),NULL),
-('T1007','80034567-1','activo','2026-10-01',NOW(),NULL);
+('T1005','10567890123','activo','2026-08-01','2025-11-01',NOW(),NULL),
+('T1006','67926539-9','activo','2026-09-01','2025-11-01',NOW(),NULL),
+('T1007','80034567-1','activo','2026-10-01','2025-11-01',NOW(),NULL);
 
 -- =====================================================
 -- MANIFIESTOS (15)

@@ -46,9 +46,9 @@ function renderTablaConductores(data) {
     >
       <td>${c.cedula}</td>
       <td>${c.nombre}</td>
-      <td>${formatearFecha(c.vencimiento_licencia)}</td>
-      <td>${formatearFecha(c.vencimiento_manip_alimentos)}</td>
-      <td>${formatearFecha(c.vencimiento_sustancia_peligrosa)}</td>
+      <td>${formatearFechaDesdeUTC(c.vencimiento_licencia)}</td>
+      <td>${formatearFechaDesdeUTC(c.vencimiento_manip_alimentos)}</td>
+      <td>${formatearFechaDesdeUTC(c.vencimiento_sustancia_peligrosa)}</td>
       <td>${renderEstadoBadge(c.estado)}</td>
       <td>
         <button class="btn-icon" onclick="editarConductor(this, ${c.cedula})">
@@ -351,7 +351,7 @@ function renderAlerta(a) {
         ${a.tipo}
       </div>
       <div class="alert-date">
-        ${formatearFecha(a.fecha)}
+        ${formatearFechaDesdeUTC(a.fecha)}
       </div>
     </div>
   `;

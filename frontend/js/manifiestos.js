@@ -29,6 +29,10 @@ async function initManifiestos() {
   
 }
 
+function safe(value) {
+  return value === null || value === undefined || value === "" ? "-" : value;
+}
+
 // =========================
 // EVENTOS
 // =========================
@@ -337,7 +341,7 @@ function renderTablaManifiestos(data) {
     <tr
       data-id_manifiesto="${escapeHtml(m.id_manifiesto)}"
       data-radicado="${m.radicado}"
-      data-fecha="${m.fecha || ""}"
+      data-fecha="${m.fecha ? m.fecha.split("T")[0] : ""}"
       data-origen_departamento="${escapeHtml(m.origen_departamento || "")}"
       data-origen_ciudad="${escapeHtml(m.origen_ciudad || "")}"
       data-destino_departamento="${escapeHtml(m.destino_departamento || "")}"
@@ -350,31 +354,27 @@ function renderTablaManifiestos(data) {
       data-documentos="${escapeHtml(m.documentos || "")}"
       data-id_cliente="${escapeHtml(m.id_cliente || "")}"
       data-id_conductor="${m.id_conductor || ""}"
-      data-id_vehiculo="${escapeHtml(m.id_vehiculo || "")}"
-      data-id_trailer="${escapeHtml(m.id_trailer || "")}"
+      data-id_vehiculo="${m.id_vehiculo || ""}"
+      data-id_trailer="${m.id_trailer || ""}"
       data-id_empresa_a_cargo="${escapeHtml(m.id_empresa_a_cargo || "")}"
       data-novedades="${m.novedades}"
       data-observaciones="${escapeHtml(m.observaciones || "")}"
     >
       <td>${m.id_manifiesto}</td>
-      <td>${m.radicado}</td>
-      <td>${formatearFecha(m.fecha)}</td>
-      <td>${m.cliente_nombre || m.id_cliente}</td>
+      <td>${safe(m.radicado)}</td>
+      <td>${m.fecha ? formatearFechaSafe(m.fecha) : "-"}</td>
+      <td>${safe(m.cliente_nombre) || safe(m.id_cliente)}</td>
       <td>${m.conductor_nombre || m.id_conductor}</td>
       <td>${m.origen_ciudad} -> ${m.destino_ciudad}</td>
       <td>${m.id_vehiculo}</td>
       <td>${m.id_trailer}</td>
       <td>${renderEstadoManifiesto(m.estado)}</td>
       <td>${renderNovedadBadge(m.novedades)}</td>
-
-      <!-- ? NUEVA COLUMNA ACCIONES -->
       <td>
-        <!-- ?? VER DETALLE -->
         <button class="btn-icon" onclick="verDetalleManifiesto('${m.id_manifiesto}')">
           <i class="fas fa-eye"></i>
         </button>
-
-        <!-- ?? EDITAR -->
+  
         <button class="btn-icon" onclick="editarManifiesto(this, '${m.id_manifiesto.replace(/'/g, "\\'")}')">
           <i class="fas fa-pen"></i>
         </button>
@@ -961,10 +961,15 @@ contInfo.innerHTML = `
     <span>ID</span>
     <strong>${manifiesto.id_manifiesto}</strong>
   </div>
+  
+  <div class="detalle-info-item">
+    <span>Radicado</span>
+    <strong>${safe(manifiesto.radicado)}</strong>
+  </div>
 
   <div class="detalle-info-item">
     <span>Cliente</span>
-    <strong>${manifiesto.cliente_nombre || "-"}, NIT: ${manifiesto.id_cliente}</strong>
+    <strong>${safe(manifiesto.cliente_nombre) || "-"}, NIT: ${safe(manifiesto.id_cliente)}</strong>
   </div>
 
   <div class="detalle-info-item">

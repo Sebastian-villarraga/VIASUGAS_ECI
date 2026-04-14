@@ -1,5 +1,6 @@
 async function initFacturas() {
   await cargarCatalogosFacturas();
+  aplicarFiltroEsteMesFacturas();
   await cargarFacturas();
   eventosFacturas();
 }
@@ -51,7 +52,6 @@ async function cargarFacturas() {
     const transacciones = await apiFetch("/api/transacciones");
     window._transaccionesFacturas = transacciones || [];
 
-    console.log("FACTURAS:", facturasData);
 
     if (!Array.isArray(facturasData)) {
       console.error("No llegaron datos válidos");
@@ -179,8 +179,8 @@ function renderFacturas(data) {
       <tr>
         <td>${f.codigo_factura || "-"}</td>
         <td>${f.id_manifiesto || "-"} - ${f.cliente_nombre || ""}</td>
-        <td>${f.fecha_emision ? formatearFecha(f.fecha_emision.split("T")[0]) : "-"}</td>
-        <td>${f.fecha_vencimiento ? formatearFecha(f.fecha_vencimiento.split("T")[0]) : "-"}</td>
+        <td>${f.fecha_emision ? formatearFechaDesdeUTC(f.fecha_emision) : "-"}</td>
+        <td>${f.fecha_vencimiento ? formatearFechaDesdeUTC(f.fecha_vencimiento) : "-"}</td>
         <td>$${valor.toLocaleString()}</td>
         <td>$${retFuente.toLocaleString()}</td>
         <td>$${retIca.toLocaleString()}</td>
@@ -348,12 +348,54 @@ function eventosFacturas() {
   });
 
   document.getElementById("btnLimpiarFacturas")?.addEventListener("click", () => {
+  
     document.getElementById("fDesde").value = "";
     document.getElementById("fHasta").value = "";
     document.getElementById("fCodigo").value = "";
-    document.getElementById("fManifiesto").value = "";
+  
+    // ?? limpiar select buscador (custom)
+    const wrapper = document.querySelector(".transacciones-filtros .select-search-wrapper");
+  
+    if (wrapper) {
+      const input = wrapper.querySelector("input");
+      if (input) input.value = "";
+      wrapper._value = "";
+    }
+  
     aplicarFiltrosFacturas();
   });
+  
+  // =========================
+  // ESTE MES
+  // =========================
+  document.getElementById("btnEsteMesFacturas")?.addEventListener("click", () => {
+    const hoy = new Date();
+  
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const finMes = new Date(hoy);
+  
+    document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+    document.getElementById("fHasta").value = formatearFechaInput(finMes);
+  
+    aplicarFiltrosFacturas();
+  });
+  
+  // =========================
+  // MES ANTERIOR
+  // =========================
+  document.getElementById("btnMesAnteriorFacturas")?.addEventListener("click", () => {
+    const hoy = new Date();
+  
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    const finMes = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+  
+    document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+    document.getElementById("fHasta").value = formatearFechaInput(finMes);
+  
+    aplicarFiltrosFacturas();
+  });
+    
+  
 }
 
 // =========================
@@ -492,7 +534,6 @@ function abrirConfirmacion(mensaje, callback) {
 
   confirmCallback = callback;
 
-  console.log("Modal abierto"); 
 }
 
 function cerrarConfirmacion() {
@@ -505,3 +546,12 @@ function cerrarConfirmacion() {
   confirmCallback = null;
 }
 
+function aplicarFiltroEsteMesFacturas() {
+  const hoy = new Date();
+
+  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const finMes = new Date(hoy);
+
+  document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
+  document.getElementById("fHasta").value = formatearFechaInput(finMes);
+}

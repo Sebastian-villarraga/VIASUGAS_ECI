@@ -420,3 +420,18 @@
   }
 
 }
+
+/* ========================= */
+/* ESTILO PARA FILTROS */
+/* ========================= */
+.filtro-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filtro-group label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}

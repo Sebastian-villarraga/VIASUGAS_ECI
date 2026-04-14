@@ -162,6 +162,7 @@ CREATE TABLE trailer (
     id_propietario VARCHAR,
     estado tactivo,
     vencimiento_cert_fumigacion DATE,
+    vencimiento_cert_sanidad DATE,
     creado TIMESTAMP,
     actualizado TIMESTAMP,
     FOREIGN KEY (id_propietario) REFERENCES propietario(identificacion)

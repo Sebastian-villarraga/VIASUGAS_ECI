@@ -32,16 +32,30 @@ async function validarRelaciones({
   id_empresa_a_cargo
 }) {
   const queries = [
-    pool.query(`SELECT nit FROM cliente WHERE nit = $1`, [id_cliente]),
-    pool.query(`SELECT cedula FROM conductor WHERE cedula = $1`, [id_conductor]),
-    pool.query(`SELECT placa FROM vehiculo WHERE placa = $1`, [id_vehiculo]),
-    pool.query(`SELECT placa FROM trailer WHERE placa = $1`, [id_trailer]),
-    pool.query(`SELECT nit FROM empresa_a_cargo WHERE nit = $1`, [id_empresa_a_cargo]),
+    id_cliente
+      ? pool.query(`SELECT nit FROM cliente WHERE nit = $1`, [id_cliente])
+      : Promise.resolve({ rows: [{ nit: null }] }),
+
+    id_conductor
+      ? pool.query(`SELECT cedula FROM conductor WHERE cedula = $1`, [id_conductor])
+      : Promise.resolve({ rows: [] }),
+
+    id_vehiculo
+      ? pool.query(`SELECT placa FROM vehiculo WHERE placa = $1`, [id_vehiculo])
+      : Promise.resolve({ rows: [] }),
+
+    id_trailer
+      ? pool.query(`SELECT placa FROM trailer WHERE placa = $1`, [id_trailer])
+      : Promise.resolve({ rows: [] }),
+
+    id_empresa_a_cargo
+      ? pool.query(`SELECT nit FROM empresa_a_cargo WHERE nit = $1`, [id_empresa_a_cargo])
+      : Promise.resolve({ rows: [] }),
   ];
 
   const [cliente, conductor, vehiculo, trailer, empresa] = await Promise.all(queries);
 
-  if (cliente.rows.length === 0) throw new Error("Cliente no encontrado");
+  if (id_cliente && cliente.rows.length === 0) throw new Error("Cliente no encontrado");
   if (conductor.rows.length === 0) throw new Error("Conductor no encontrado");
   if (vehiculo.rows.length === 0) throw new Error("Vehículo no encontrado");
   if (trailer.rows.length === 0) throw new Error("Trailer no encontrado");
@@ -91,7 +105,7 @@ const getManifiestos = async (req, res) => {
         e.nombre AS empresa_a_cargo_nombre
       FROM manifiesto m
       LEFT JOIN factura f ON f.id_manifiesto = m.id_manifiesto -- ?? CLAVE
-      INNER JOIN cliente c ON m.id_cliente = c.nit
+      LEFT JOIN cliente c ON m.id_cliente = c.nit
       INNER JOIN conductor co ON m.id_conductor = co.cedula
       INNER JOIN vehiculo v ON m.id_vehiculo = v.placa
       INNER JOIN trailer t ON m.id_trailer = t.placa
@@ -176,7 +190,7 @@ const getManifiestoById = async (req, res) => {
         e.nombre AS empresa_a_cargo_nombre
       FROM manifiesto m
       LEFT JOIN factura f ON f.id_manifiesto = m.id_manifiesto -- ?? CLAVE
-      INNER JOIN cliente c ON m.id_cliente = c.nit
+      LEFT JOIN cliente c ON m.id_cliente = c.nit
       INNER JOIN conductor co ON m.id_conductor = co.cedula
       INNER JOIN empresa_a_cargo e ON m.id_empresa_a_cargo = e.nit
       WHERE m.id_manifiesto = $1
@@ -220,7 +234,6 @@ const createManifiesto = async (req, res) => {
       observaciones
     } = req.body;
 
-    // Valores por defecto al crear
     const estado = "CREADO-EN TRANSITO";
     const gastos = "PENDIENTES";
     const documentos = "PENDIENTES";
@@ -228,23 +241,20 @@ const createManifiesto = async (req, res) => {
 
     if (
       !id_manifiesto ||
-      !radicado ||
       !fecha ||
       !origen_departamento ||
       !origen_ciudad ||
       !destino_departamento ||
       !destino_ciudad ||
-      valor_flete === undefined ||
-      valor_flete_porcentaje === undefined ||
-      anticipo_manifiesto === undefined ||
-      !id_cliente ||
+      valor_flete === undefined || valor_flete === null || valor_flete === "" ||
+      anticipo_manifiesto === undefined || anticipo_manifiesto === null || anticipo_manifiesto === "" ||
       !id_conductor ||
       !id_vehiculo ||
       !id_trailer ||
       !id_empresa_a_cargo
     ) {
       return res.status(400).json({
-        error: "Todos los campos obligatorios del manifiesto deben estar completos"
+        error: "Campos obligatorios incompletos"
       });
     }
 
@@ -265,17 +275,19 @@ const createManifiesto = async (req, res) => {
       return res.status(400).json({ error: "El ID de manifiesto ya existe" });
     }
 
-    const existeRadicado = await pool.query(
-      `SELECT radicado FROM manifiesto WHERE radicado = $1`,
-      [radicado]
-    );
+    if (radicado) {
+      const existeRadicado = await pool.query(
+        `SELECT radicado FROM manifiesto WHERE radicado = $1`,
+        [Number(radicado)]
+      );
 
-    if (existeRadicado.rows.length > 0) {
-      return res.status(400).json({ error: "El radicado ya existe" });
+      if (existeRadicado.rows.length > 0) {
+        return res.status(400).json({ error: "El radicado ya existe" });
+      }
     }
 
     await validarRelaciones({
-      id_cliente,
+      id_cliente: id_cliente || null,
       id_conductor,
       id_vehiculo,
       id_trailer,
@@ -314,8 +326,8 @@ const createManifiesto = async (req, res) => {
 
     const values = [
       id_manifiesto,
-      Number(radicado),
-      id_cliente,
+      radicado && radicado !== "" ? Number(radicado) : null,
+      id_cliente || null,
       Number(id_conductor),
       id_vehiculo,
       id_trailer,
@@ -354,6 +366,8 @@ const createManifiesto = async (req, res) => {
     res.status(500).json({ error: "Error creando manifiesto" });
   }
 };
+
+
 
 // =========================================
 // ACTUALIZAR MANIFIESTO
@@ -476,7 +490,7 @@ const updateManifiesto = async (req, res) => {
     const values = [
       Number(radicado),
       id_cliente,
-      Number(id_conductor),
+      id_conductor ? Number(id_conductor) : null,
       id_vehiculo,
       id_trailer,
       id_empresa_a_cargo,

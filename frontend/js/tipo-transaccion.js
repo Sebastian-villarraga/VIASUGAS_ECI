@@ -3,7 +3,7 @@ let categoriasExistentes = [];
 
 // ================= INIT
 function initTiposTransaccion() {
-  console.log("Entre a INIT");
+
 
   cargarTiposTransaccion();
   initFormTipo();
@@ -26,7 +26,7 @@ function initTiposTransaccion() {
 // ================= CARGAR
 async function cargarTiposTransaccion() {
 
-  console.log("?? cargando tipos...");
+
 
   const tabla = document.getElementById("tiposTable");
 
@@ -46,7 +46,7 @@ async function cargarTiposTransaccion() {
 
     const data = await apiFetch("/api/tipo-transaccion");
 
-    console.log("DATA:", data);
+
 
     if (!data || !Array.isArray(data)) {
       throw new Error("Respuesta inválida");

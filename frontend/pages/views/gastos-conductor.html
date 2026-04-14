@@ -29,17 +29,36 @@
 
   <!-- FILTROS -->
   <div class="gastos-filtros">
-
-    <input type="date" id="fDesde">
-    <input type="date" id="fHasta">
-
-    <select id="fConductor"></select>
-    <select id="fManifiesto"></select>
-    <select id="fTipo"></select>
-
-    <button id="btnFiltrar" class="btn-principal">Filtrar</button>
+    <button id="btnEsteMes" class="btn-secundario">Ver este mes</button>
+    <button id="btnMesAnterior" class="btn-secundario">Ver mes anterior</button>
+  
+    <div class="filtro-group">
+      <label>Desde</label>
+      <input type="date" id="fDesde">
+    </div>
+  
+    <div class="filtro-group">
+      <label>Hasta</label>
+      <input type="date" id="fHasta">
+    </div>
+  
+    <div class="filtro-group">
+      <label>Conductor</label>
+      <select id="fConductor"></select>
+    </div>
+  
+    <div class="filtro-group">
+      <label>Manifiesto</label>
+      <select id="fManifiesto"></select>
+    </div>
+  
+    <div class="filtro-group">
+      <label>Tipo de gasto</label>
+      <select id="fTipo"></select>
+    </div>
+  
     <button id="btnLimpiar" class="btn-secundario">Limpiar</button>
-
+  
   </div>
 
   <!-- TABLA -->
