@@ -1,113 +1,104 @@
-<h1>Dashboard</h1>
-      <p class="subtitle">
-        Bienvenido de nuevo. Aquí verás el resumen de tus operaciones.
-      </p>
+<div class="dashboard-layout">
 
-      <!-- GRID -->
-      <div class="dashboard-grid">
+  <!-- ========================= -->
+  <!-- HEADER -->
+  <!-- ========================= -->
+  <div class="dashboard-header">
+    <h2>Dashboard Gerencial</h2>
+  </div>
 
-        <!-- IZQUIERDA -->
-        <div class="left-panel">
+  <!-- ========================= -->
+  <!-- GRID PRINCIPAL ?? -->
+  <!-- ========================= -->
+  <div class="dashboard-main">
 
-          <!-- CARDS -->
-          <div class="cards">
+    <!-- ========================= -->
+    <!-- IZQUIERDA -->
+    <!-- ========================= -->
+    <div class="dashboard-left">
 
-            <div class="card">
-              <div class="card-icon blue">
-                <i class="fas fa-truck"></i>
-              </div>
-              <div>
-                <h2 id="viajesActivos">--</h2>
-                <p>Viajes Activos</p>
-              </div>
-            </div>
+      <!-- CARDS KPI -->
+      <div id="cardsDashboard" class="dashboard-cards">
+        <!-- Se renderiza con JS -->
+      </div>
+      
+      <!-- FILTROS -->
+      <div class="dashboard-filtros">
 
-            <div class="card">
-              <div class="card-icon green">
-                <i class="fas fa-check"></i>
-              </div>
-              <div>
-                <h2 id="viajesFinalizados">--</h2>
-                <p>Viajes Finalizados</p>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-icon orange">
-                <i class="fas fa-exclamation-triangle"></i>
-              </div>
-              <div>
-                <h2 id="facturasPendientes">--</h2>
-                <p>Facturas Pendientes</p>
-                <span class="money" id="totalPendiente">$0</span>
-              </div>
-            </div>
-
+        <div class="filtros-row">
+      
+          <!-- FECHA DESDE -->
+          <div class="form-group">
+            <label>Fecha desde</label>
+            <input type="date" id="fDesdeDashboard">
           </div>
-
-          <!-- TABLA -->
-          <div class="table-container">
-            <div class="table-header">
-              <h2>Últimos Viajes</h2>
-            </div>
-
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Origen</th>
-                  <th>Destino</th>
-                  <th>Estado</th>
-                  <th>Fecha</th>
-                </tr>
-              </thead>
-
-              <tbody id="tablaViajes">
-                <tr>
-                  <td colspan="5">Cargando datos...</td>
-                </tr>
-              </tbody>
-            </table>
+      
+          <!-- FECHA HASTA -->
+          <div class="form-group">
+            <label>Fecha hasta</label>
+            <input type="date" id="fHastaDashboard">
           </div>
+      
+          <!-- BOTONES -->
+          <div class="filtros-actions">
+            <button id="btnMesActual" class="btn-chip">Este mes</button>
+            <button id="btnMesAnterior" class="btn-chip active">Mes anterior</button>
+            <button id="btnLimpiarDashboard" class="btn-chip danger">Limpiar</button>
+          </div>
+      
+        </div>
+      
+      </div>
 
+      <!-- TABLA RENTABILIDAD -->
+      <div class="dashboard-table">
+
+        <div class="table-header">
+          <h3>Rentabilidad por Manifiesto</h3>
         </div>
 
-        <!-- DERECHA -->
-        <div class="right-panel">
+        <table>
+          <thead>
+            <tr>
+              <th>Manifiesto</th>
+              <th>Cliente</th>
+              <th class="text-center">Ingreso</th>
+              <th class="text-center">Egreso</th>
+              <th class="text-center">Utilidad</th>
+              <th class="text-center">Margen %</th>
+            </tr>
+          </thead>
 
-          <!-- VENCIMIENTOS -->
-          <div class="side-card">
-            <h3>Vencimientos</h3>
-
-            <ul id="vencimientosList">
-              <li>
-                Licencias 
-                <span class="badge warning" id="licenciasCount">0</span>
-              </li>
-              <li>
-                SOAT 
-                <span class="badge ok" id="soatCount">0</span>
-              </li>
-              <li>
-                Tecnomecánica 
-                <span class="badge danger" id="tecnoCount">0</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- FACTURACIÓN -->
-          <div class="side-card">
-            <h3>Facturación Pendiente</h3>
-
-            <p id="facturacionTexto">
-              No hay facturas pendientes
-            </p>
-
-            <strong id="facturacionValor" class="money">
-              $0
-            </strong>
-          </div>
-
-        </div>
+          <tbody id="tablaRentabilidad">
+            <!-- Se llena dinámicamente -->
+          </tbody>
+        </table>
 
       </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- DERECHA -->
+    <!-- ========================= -->
+    <div class="dashboard-right">
+
+      <!-- GRAFICA -->
+      <div class="dashboard-chart">
+        <h3>Ingresos vs Egresos</h3>
+        <canvas id="graficaIE"></canvas>
+      </div>
+      
+      <div class="dashboard-chart">
+        <h3>Gastos por Categoría</h3>
+      
+        <div class="chart-container">
+          <canvas id="graficaCategorias"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

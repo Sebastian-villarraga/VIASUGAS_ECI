@@ -78,6 +78,9 @@ async function loadView(view) {
       case "bancos":
         if (typeof initBancos === "function") initBancos();
         break;
+      case "dashboard":
+        if (typeof initDashboard === "function") initDashboard();
+        break;
     }
 
     setActiveMenu(view);

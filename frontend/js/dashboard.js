@@ -1,107 +1,346 @@
+let chartCategorias;
+
+let filtroDashboard = {
+  desde: null,
+  hasta: null
+};
+
 // =========================
-// INIT (SPA)
+// INIT
 // =========================
 function initDashboard() {
-  loadDashboard();
-  loadViajes();
-  loadVencimientos();
-  loadFacturacion();
+  cargarDashboard();
 }
 
 // =========================
-// DASHBOARD
+// CARGAR TODO
 // =========================
-async function loadDashboard() {
+async function cargarDashboard() {
+  await cargarKPI();
+  await cargarGraficaIngresosEgresos(); 
+  await cargarRentabilidad();
+  await cargarGraficaCategorias();
+}
+
+// =========================
+// KPI
+// =========================
+async function cargarKPI() {
   try {
-    const data = await apiFetch("/dashboard");
-    if (!data) return;
 
-    const activos = document.getElementById("viajesActivos");
-    const finalizados = document.getElementById("viajesFinalizados");
-    const pendientes = document.getElementById("facturasPendientes");
-    const total = document.getElementById("totalPendiente");
+    const query = getQueryFiltro();
+    const data = await apiFetch(`/api/dashboard/kpi${query}`);
 
-    if (activos) activos.textContent = data.viajesActivos ?? 0;
-    if (finalizados) finalizados.textContent = data.viajesFinalizados ?? 0;
-    if (pendientes) pendientes.textContent = data.facturasPendientes ?? 0;
-    if (total) total.textContent = "$" + (data.totalPendiente ?? 0).toLocaleString();
+    renderKPIs(data);
 
   } catch (error) {
-    console.error("Error dashboard:", error);
+    console.error("Error KPI:", error);
   }
 }
 
 // =========================
-// VIAJES
+// RENDER KPI
 // =========================
-async function loadViajes() {
+function renderKPIs(data) {
+  const container = document.getElementById("cardsDashboard");
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="card ingreso">
+      <h3>Ingresos</h3>
+      <p>${formatearMoneda(data.ingresos)}</p>
+    </div>
+
+    <div class="card egreso">
+      <h3>Egresos</h3>
+      <p>${formatearMoneda(data.egresos)}</p>
+    </div>
+
+    <div class="card utilidad">
+      <h3>Utilidad</h3>
+      <p>${formatearMoneda(data.utilidad)}</p>
+    </div>
+
+    <div class="card viajes">
+      <h3>Viajes</h3>
+      <p>${data.viajes}</p>
+    </div>
+  `;
+}
+
+// =========================
+// RENTABILIDAD
+// =========================
+async function cargarRentabilidad() {
   try {
-    const tabla = document.getElementById("tablaViajes");
-    if (!tabla) return;
 
-    tabla.innerHTML = `<tr><td colspan="5">Cargando...</td></tr>`;
+    const query = getQueryFiltro();
+    const data = await apiFetch(`/api/dashboard/rentabilidad${query}`);
 
-    const viajes = await apiFetch("/viajes");
-
-    if (!viajes || viajes.length === 0) {
-      tabla.innerHTML = `<tr><td colspan="5">No hay viajes</td></tr>`;
-      return;
-    }
-
-    tabla.innerHTML = viajes.map(v => `
-      <tr>
-        <td>${v.id}</td>
-        <td>${v.origen}</td>
-        <td>${v.destino}</td>
-        <td><span class="status ${v.estado}">${v.estado}</span></td>
-        <td>${v.fecha}</td>
-      </tr>
-    `).join("");
+    renderTablaRentabilidad(data);
 
   } catch (error) {
-    console.error("Error viajes:", error);
+    console.error("Error rentabilidad:", error);
   }
 }
 
 // =========================
-// VENCIMIENTOS
+// TABLA RENTABILIDAD
 // =========================
-async function loadVencimientos() {
-  try {
-    const list = document.getElementById("vencimientosList");
-    if (!list) return;
+function renderTablaRentabilidad(data) {
+  const tbody = document.getElementById("tablaRentabilidad");
+  if (!tbody) return;
 
-    const data = await apiFetch("/dashboard/vencimientos");
-    if (!data) return;
+  tbody.innerHTML = "";
 
-    list.innerHTML = `
-      <li>Licencias <span class="badge warning">${data.licencias}</span></li>
-      <li>SOAT <span class="badge ok">${data.soat}</span></li>
-      <li>Tecnomecánica <span class="badge danger">${data.tecno}</span></li>
+  data.forEach(row => {
+
+    const tr = document.createElement("tr");
+
+    const margen = calcularMargen(row.ingreso, row.egreso);
+
+    tr.innerHTML = `
+      <td>${row.id_manifiesto}</td>
+      <td>${row.cliente || "-"}</td>
+      <td class="text-green">${formatearMoneda(row.ingreso)}</td>
+      <td class="text-red">${formatearMoneda(row.egreso)}</td>
+      <td>${formatearMoneda(row.utilidad)}</td>
+      <td>${margen}%</td>
     `;
 
-  } catch (error) {
-    console.error("Error vencimientos:", error);
-  }
+    tbody.appendChild(tr);
+  });
 }
 
 // =========================
-// FACTURACIÓN
+// HELPERS
 // =========================
-async function loadFacturacion() {
+function formatearMoneda(valor) {
+  if (!valor) return "$0";
+
+  return "$ " + Number(valor).toLocaleString("es-CO");
+}
+
+function calcularMargen(ingreso, egreso) {
+  if (!ingreso || ingreso === 0) return 0;
+
+  const utilidad = ingreso - egreso;
+  return ((utilidad / ingreso) * 100).toFixed(1);
+}
+
+// =========================
+// GRAFICA INGRESO EGRESO
+// =========================
+async function cargarGraficaIngresosEgresos() {
   try {
-    const texto = document.getElementById("facturacionTexto");
-    const valor = document.getElementById("facturacionValor");
 
-    if (!texto || !valor) return;
+    const query = getQueryFiltro();
+    const data = await apiFetch(`/api/dashboard/grafica-ingresos-egresos${query}`);
 
-    const data = await apiFetch("/dashboard/facturacion");
-    if (!data) return;
+    const labels = data.map(d => d.mes);
+    const ingresos = data.map(d => Number(d.ingresos));
+    const egresos = data.map(d => Number(d.egresos));
 
-    texto.textContent = data.mensaje || "Sin información";
-    valor.textContent = "$" + (data.total ?? 0).toLocaleString();
+    const canvas = document.getElementById("graficaIE");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    if (window.graficaIEChart) {
+      window.graficaIEChart.destroy();
+    }
+
+    window.graficaIEChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          { label: "Ingresos", data: ingresos },
+          { label: "Egresos", data: egresos }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
 
   } catch (error) {
-    console.error("Error facturación:", error);
+    console.error("Error gráfica:", error);
   }
+}
+
+async function cargarGraficaCategorias() {
+  try {
+
+    const query = getQueryFiltro();
+    const data = await apiFetch(`/api/dashboard/gastos-categoria${query}`);
+
+    renderGraficaCategorias(data);
+
+  } catch (error) {
+    console.error("Error gráfica categorías:", error);
+  }
+}
+
+
+// =========================
+// RENDER GRAFICA
+// =========================
+function renderGraficaCategorias(data) {
+
+  const ctx = document.getElementById("graficaCategorias");
+  if (!ctx) return;
+
+  // ?? destruir instancia previa
+  if (window.chartCategorias) {
+    window.chartCategorias.destroy();
+  }
+
+  const labels = data.map(d => d.tipo);
+  const valores = data.map(d => Number(d.total));
+
+  // ?? TOTAL
+  const total = valores.reduce((acc, val) => acc + val, 0);
+
+  // ?? PORCENTAJES
+  const porcentajes = valores.map(v => total ? ((v / total) * 100) : 0);
+
+  // ?? TEXTO CENTRAL (FIX REAL)
+  const centerTextPlugin = {
+    id: "centerText",
+    beforeDraw(chart) {
+      const { width, height } = chart;
+      const ctx = chart.ctx;
+
+      ctx.save();
+
+      // ?? tamaño fijo (evita deformación)
+      ctx.font = "600 16px sans-serif";
+      ctx.fillStyle = "#2c3e50";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const text = "$ " + total.toLocaleString("es-CO");
+
+      ctx.fillText(text, width / 2, height / 2);
+
+      ctx.restore();
+    }
+  };
+
+  window.chartCategorias = new Chart(ctx, {
+    type: "doughnut",
+
+    data: {
+      labels,
+      datasets: [{
+        data: valores,
+
+        // ?? COLORES LIMPIOS
+        backgroundColor: [
+          "#3498db", // azul
+          "#e74c3c", // rojo
+          "#f39c12"  // naranja
+        ],
+
+        borderWidth: 0
+      }]
+    },
+
+    options: {
+      responsive: true,
+      maintainAspectRatio: false, // ?? CLAVE
+      cutout: "70%",
+
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            font: { size: 12 },
+            padding: 15
+          }
+        },
+
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.raw;
+              const porcentaje = porcentajes[context.dataIndex].toFixed(1);
+
+              return `${context.label}: $ ${value.toLocaleString("es-CO")} (${porcentaje}%)`;
+            }
+          }
+        }
+      }
+    },
+
+    plugins: [centerTextPlugin]
+  });
+}
+
+// =========================
+// EVENTOS FILTROS
+// =========================
+function eventosDashboard() {
+
+  document.getElementById("btnMesActual")?.addEventListener("click", () => {
+    const hoy = new Date();
+
+    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+
+    setFiltroFechas(inicio, fin);
+  });
+
+  document.getElementById("btnMesAnterior")?.addEventListener("click", () => {
+    const hoy = new Date();
+
+    const inicio = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    const fin = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+
+    setFiltroFechas(inicio, fin);
+  });
+
+  document.getElementById("btnLimpiarDashboard")?.addEventListener("click", () => {
+    filtroDashboard = { desde: null, hasta: null };
+
+    document.getElementById("fDesdeDashboard").value = "";
+    document.getElementById("fHastaDashboard").value = "";
+
+    cargarDashboard();
+  });
+
+  // inputs manuales
+  ["fDesdeDashboard", "fHastaDashboard"].forEach(id => {
+    document.getElementById(id)?.addEventListener("change", () => {
+      filtroDashboard.desde = document.getElementById("fDesdeDashboard").value;
+      filtroDashboard.hasta = document.getElementById("fHastaDashboard").value;
+
+      cargarDashboard();
+    });
+  });
+}
+
+function setFiltroFechas(inicio, fin) {
+
+  const desde = inicio.toISOString().split("T")[0];
+  const hasta = fin.toISOString().split("T")[0];
+
+  filtroDashboard.desde = desde;
+  filtroDashboard.hasta = hasta;
+
+  document.getElementById("fDesdeDashboard").value = desde;
+  document.getElementById("fHastaDashboard").value = hasta;
+
+  cargarDashboard();
+}
+
+function getQueryFiltro() {
+  const params = new URLSearchParams();
+
+  if (filtroDashboard.desde) params.append("desde", filtroDashboard.desde);
+  if (filtroDashboard.hasta) params.append("hasta", filtroDashboard.hasta);
+
+  return params.toString() ? `?${params.toString()}` : "";
 }
