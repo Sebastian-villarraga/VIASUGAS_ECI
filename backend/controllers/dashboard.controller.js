@@ -8,7 +8,9 @@ const getDashboardKPI = async (req, res) => {
 
     const { desde, hasta } = req.query;
 
-    // ?? FILTRO FACTURA
+    // =========================
+    // INGRESOS
+    // =========================
     const ingresosQ = await pool.query(`
       SELECT COALESCE(SUM(valor), 0) AS total
       FROM factura
@@ -16,38 +18,77 @@ const getDashboardKPI = async (req, res) => {
         AND ($2::date IS NULL OR fecha_emision <= $2)
     `, [desde || null, hasta || null]);
 
-    // ?? FILTRO TRANSACCION
+    // =========================
+    // EGRESOS
+    // =========================
     const egresosQ = await pool.query(`
       SELECT COALESCE(SUM(t.valor), 0) AS total
       FROM transaccion t
       JOIN tipo_transaccion tt 
         ON t.id_tipo_transaccion = tt.id
-      WHERE tt.tipo = 'GASTO CONDUCTOR'
+      WHERE tt.tipo IN (
+        'GASTO CONDUCTOR',
+        'EGRESO OPERACIONAL',
+        'EGRESO MANIFIESTO'
+      )
         AND ($1::date IS NULL OR t.fecha_pago >= $1)
         AND ($2::date IS NULL OR t.fecha_pago <= $2)
     `, [desde || null, hasta || null]);
 
-    // ?? FILTRO VIAJES
+    // =========================
+    // VIAJES
+    // =========================
     const viajesQ = await pool.query(`
       SELECT COUNT(*) AS total
       FROM manifiesto
-      WHERE ($1::date IS NULL OR fecha_creacion >= $1)
-        AND ($2::date IS NULL OR fecha_creacion <= $2)
+      WHERE ($1::date IS NULL OR fecha >= $1)
+        AND ($2::date IS NULL OR fecha <= $2)
+    `, [desde || null, hasta || null]);
+
+    // =========================
+    // FACTURAS PAGADAS / PENDIENTES
+    // =========================
+    const facturasQ = await pool.query(`
+      SELECT 
+        COALESCE(COUNT(*) FILTER (WHERE COALESCE(t.pagado,0) >= f.valor), 0) AS pagadas,
+        COALESCE(COUNT(*) FILTER (WHERE COALESCE(t.pagado,0) < f.valor), 0) AS pendientes
+      FROM factura f
+      LEFT JOIN (
+        SELECT 
+          id_factura,
+          COALESCE(SUM(valor),0) AS pagado
+        FROM transaccion
+        WHERE id_factura IS NOT NULL
+        GROUP BY id_factura
+      ) t ON t.id_factura = f.codigo_factura
+      WHERE ($1::date IS NULL OR f.fecha_emision >= $1)
+        AND ($2::date IS NULL OR f.fecha_emision <= $2)
     `, [desde || null, hasta || null]);
 
     const ingresos = Number(ingresosQ.rows[0].total);
     const egresos = Number(egresosQ.rows[0].total);
     const viajes = Number(viajesQ.rows[0].total);
 
+    const utilidad = ingresos - egresos;
+    const margen = ingresos > 0 ? (utilidad / ingresos) * 100 : 0;
+
+    const pagadas = Number(facturasQ.rows[0].pagadas || 0);
+    const pendientes = Number(facturasQ.rows[0].pendientes || 0);
+
     return res.json({
       ingresos,
       egresos,
-      utilidad: ingresos - egresos,
-      viajes
+      utilidad,
+      margen,
+      viajes,
+      facturas: {
+        pagadas,
+        pendientes
+      }
     });
 
   } catch (error) {
-    console.error("? Error getDashboardKPI:", error);
+    console.error("?? Error KPI:", error);
     return res.status(500).json({ error: "Error obteniendo KPI" });
   }
 };
@@ -161,10 +202,9 @@ const getIngresosEgresos = async (req, res) => {
     return res.json(final);
 
   } catch (error) {
-    console.error("? Error getIngresosEgresos:", error);
+    console.error("Error getIngresosEgresos:", error);
     return res.status(500).json({ error: "Error obteniendo gráfica" });
   }
-};
 };
 
 const getGastosPorCategoria = async (req, res) => {
@@ -198,6 +238,98 @@ const getGastosPorCategoria = async (req, res) => {
   }
 };
 
+const getEstadoFacturacion = async (req, res) => {
+  try {
+
+    const { desde, hasta } = req.query;
+
+    const result = await pool.query(`
+      SELECT 
+        c.nombre AS cliente,
+
+        -- TOTAL FACTURADO
+        COALESCE(SUM(f.valor), 0) AS total_facturado,
+
+        -- PAGADO (transacciones asociadas a factura)
+        COALESCE(SUM(
+          CASE 
+            WHEN t.id IS NOT NULL THEN t.valor
+            ELSE 0
+          END
+        ), 0) AS pagado,
+
+        -- PENDIENTE
+        COALESCE(SUM(f.valor), 0) - COALESCE(SUM(
+          CASE 
+            WHEN t.id IS NOT NULL THEN t.valor
+            ELSE 0
+          END
+        ), 0) AS pendiente
+
+      FROM factura f
+
+      JOIN manifiesto m 
+        ON f.id_manifiesto = m.id_manifiesto
+
+      JOIN cliente c 
+        ON m.id_cliente = c.nit
+
+      LEFT JOIN transaccion t 
+        ON t.id_factura = f.codigo_factura
+
+      WHERE 
+        ($1::date IS NULL OR f.fecha_emision >= $1)
+        AND ($2::date IS NULL OR f.fecha_emision <= $2)
+
+      GROUP BY c.nombre
+      ORDER BY total_facturado DESC
+    `, [desde || null, hasta || null]);
+
+    return res.json(result.rows);
+
+  } catch (error) {
+    console.error("Error estado facturación:", error);
+    return res.status(500).json({ error: "Error estado facturación" });
+  }
+};
+
+
+
+const getTopClientes = async (req, res) => {
+  try {
+
+    const { desde, hasta } = req.query;
+
+    const result = await pool.query(`
+      SELECT 
+        c.nombre AS cliente,
+        COALESCE(SUM(f.valor), 0) AS total
+
+      FROM factura f
+
+      JOIN manifiesto m 
+        ON f.id_manifiesto = m.id_manifiesto
+
+      JOIN cliente c 
+        ON m.id_cliente = c.nit
+
+      WHERE 
+        ($1::date IS NULL OR f.fecha_emision >= $1)
+        AND ($2::date IS NULL OR f.fecha_emision <= $2)
+
+      GROUP BY c.nombre
+      ORDER BY total DESC
+      LIMIT 5
+    `, [desde || null, hasta || null]);
+
+    return res.json(result.rows);
+
+  } catch (error) {
+    console.error("Error top clientes:", error);
+    return res.status(500).json({ error: "Error top clientes" });
+  }
+};
+
 // =========================
 // EXPORTS
 // =========================
@@ -205,5 +337,7 @@ module.exports = {
   getDashboardKPI,
   getRentabilidad,
   getIngresosEgresos,
-  getGastosPorCategoria
+  getGastosPorCategoria,
+  getEstadoFacturacion,
+  getTopClientes
 };

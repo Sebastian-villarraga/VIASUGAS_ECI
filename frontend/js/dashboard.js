@@ -9,6 +9,7 @@ let filtroDashboard = {
 // INIT
 // =========================
 function initDashboard() {
+  eventosDashboard(); 
   cargarDashboard();
 }
 
@@ -20,6 +21,8 @@ async function cargarDashboard() {
   await cargarGraficaIngresosEgresos(); 
   await cargarRentabilidad();
   await cargarGraficaCategorias();
+  await cargarEstadoFacturacion();
+  await cargarTopClientes(); 
 }
 
 // =========================
@@ -45,26 +48,45 @@ function renderKPIs(data) {
   const container = document.getElementById("cardsDashboard");
   if (!container) return;
 
+  const pagadas = data.facturas?.pagadas ?? 0;
+  const pendientes = data.facturas?.pendientes ?? 0;
+
   container.innerHTML = `
+
     <div class="card ingreso">
-      <h3>Ingresos</h3>
+      <h3>Ingresos Totales (Facturación)</h3>
       <p>${formatearMoneda(data.ingresos)}</p>
     </div>
 
     <div class="card egreso">
-      <h3>Egresos</h3>
+      <h3>Egresos Totales (Operación)</h3>
       <p>${formatearMoneda(data.egresos)}</p>
     </div>
 
     <div class="card utilidad">
-      <h3>Utilidad</h3>
+      <h3>Utilidad Neta</h3>
       <p>${formatearMoneda(data.utilidad)}</p>
     </div>
 
+    <div class="card margen">
+      <h3>Margen de Rentabilidad</h3>
+      <p>${data.margen.toFixed(1)}%</p>
+    </div>
+
     <div class="card viajes">
-      <h3>Viajes</h3>
+      <h3>Total de Viajes</h3>
       <p>${data.viajes}</p>
     </div>
+
+    <div class="card facturas">
+      <h3>Estado de Facturación</h3>
+      <p class="facturas-kpi">
+        <span class="ok">? ${pagadas}</span>
+        <span class="sep">|</span>
+        <span class="pend">? ${pendientes}</span>
+      </p>
+    </div>
+
   `;
 }
 
@@ -322,6 +344,8 @@ function eventosDashboard() {
   });
 }
 
+
+
 function setFiltroFechas(inicio, fin) {
 
   const desde = inicio.toISOString().split("T")[0];
@@ -336,6 +360,8 @@ function setFiltroFechas(inicio, fin) {
   cargarDashboard();
 }
 
+
+
 function getQueryFiltro() {
   const params = new URLSearchParams();
 
@@ -343,4 +369,113 @@ function getQueryFiltro() {
   if (filtroDashboard.hasta) params.append("hasta", filtroDashboard.hasta);
 
   return params.toString() ? `?${params.toString()}` : "";
+}
+
+
+
+
+async function cargarEstadoFacturacion() {
+  try {
+
+    const query = getQueryFiltro();
+    const data = await apiFetch(`/api/dashboard/estado-facturacion${query}`);
+
+    renderTablaEstadoFacturacion(data);
+
+  } catch (error) {
+    console.error("Error estado facturación:", error);
+  }
+}
+
+
+function renderTablaEstadoFacturacion(data) {
+
+  const tbody = document.getElementById("tablaEstadoFacturacion");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  data.forEach(row => {
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${row.cliente}</td>
+      <td class="text-green">${formatearMoneda(row.total_facturado)}</td>
+      <td class="text-blue">${formatearMoneda(row.pagado)}</td>
+      <td class="text-red">${formatearMoneda(row.pendiente)}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+
+
+async function cargarTopClientes() {
+  try {
+
+    const query = getQueryFiltro();
+    const data = await apiFetch(`/api/dashboard/top-clientes${query}`);
+
+    renderGraficaTopClientes(data);
+
+  } catch (error) {
+    console.error("Error top clientes:", error);
+  }
+}
+
+
+function renderGraficaTopClientes(data) {
+
+  const canvas = document.getElementById("graficaTopClientes");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  if (window.chartTopClientes) {
+    window.chartTopClientes.destroy();
+  }
+
+  const labels = data.map(d => d.cliente);
+  const valores = data.map(d => Number(d.total));
+
+  window.chartTopClientes = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Facturación",
+        data: valores
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return "$ " + context.raw.toLocaleString("es-CO");
+            }
+          }
+        }
+      },
+
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return "$ " + value.toLocaleString("es-CO");
+            }
+          }
+        }
+      }
+    }
+  });
 }

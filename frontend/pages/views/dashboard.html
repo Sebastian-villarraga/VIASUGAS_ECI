@@ -16,12 +16,7 @@
     <!-- IZQUIERDA -->
     <!-- ========================= -->
     <div class="dashboard-left">
-
-      <!-- CARDS KPI -->
-      <div id="cardsDashboard" class="dashboard-cards">
-        <!-- Se renderiza con JS -->
-      </div>
-      
+    
       <!-- FILTROS -->
       <div class="dashboard-filtros">
 
@@ -50,6 +45,12 @@
       
       </div>
 
+      <!-- CARDS KPI -->
+      <div id="cardsDashboard" class="dashboard-cards">
+        <!-- Se renderiza con JS -->
+      </div>
+      
+
       <!-- TABLA RENTABILIDAD -->
       <div class="dashboard-table">
 
@@ -75,6 +76,29 @@
         </table>
 
       </div>
+      
+      <div class="dashboard-table">
+
+        <div class="table-header">
+          <h3>Estado de Facturación</h3>
+        </div>
+      
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th class="text-center">Total Facturado</th>
+              <th class="text-center">Pagado</th>
+              <th class="text-center">Pendiente</th>
+            </tr>
+          </thead>
+      
+          <tbody id="tablaEstadoFacturacion">
+            <!-- dinámico -->
+          </tbody>
+        </table>
+      
+      </div>
 
     </div>
 
@@ -95,6 +119,11 @@
         <div class="chart-container">
           <canvas id="graficaCategorias"></canvas>
         </div>
+      </div>
+      
+      <div class="dashboard-chart">
+        <h3>Top Clientes por Facturación</h3>
+        <canvas id="graficaTopClientes"></canvas>
       </div>
 
     </div>
