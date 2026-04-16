@@ -555,3 +555,103 @@
   }
 }
 
+/* ========================= */
+/* HEADER ACCIONES DETALLE */
+/* ========================= */
+.detalle-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-cerrar-detalle {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  background: #eef2f7;
+  color: #1f2d3d;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.btn-cerrar-detalle:hover {
+  background: #dbe4f0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ========================= */
+/* FORMULARIO EDICIÓN DETALLE */
+/* ========================= */
+.detalle-info-item.editando {
+  background: #f8fafc;
+  border: 1px solid #dbe4f0;
+}
+
+.detalle-info-item.editando label,
+.detalle-info-item.editando span {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.detalle-info-item.editando input,
+.detalle-info-item.editando select,
+.detalle-info-item.editando textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 13px;
+  background: white;
+}
+
+.detalle-info-item.editando input:focus,
+.detalle-info-item.editando select:focus,
+.detalle-info-item.editando textarea:focus {
+  border-color: #2a5298;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(42,82,152,0.15);
+}
+
+.detalle-info-item.editando textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.detalle-info-item.full-span {
+  grid-column: span 3;
+}
+
+.detalle-info-item.readonly-soft {
+  opacity: 0.85;
+}
+
+@media (max-width: 900px) {
+  .detalle-info-item.full-span {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .detalle-info-item.full-span {
+    grid-column: span 1;
+  }
+
+  .detalle-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .detalle-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

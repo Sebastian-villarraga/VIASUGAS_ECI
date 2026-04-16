@@ -199,17 +199,37 @@
 
       <div class="form-group">
         <label>Flete</label>
-        <input type="number" id="valor_flete" step="0.01" required>
+        <input
+          type="text"
+          id="valor_flete"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Ej: 1.500.000"
+          required
+        >
       </div>
-
+      
       <div class="form-group">
         <label>Flete porcentaje</label>
-        <input type="number" id="valor_flete_porcentaje" step="0.01">
+        <input
+          type="text"
+          id="valor_flete_porcentaje"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Ej: 300.000"
+        >
       </div>
-
+      
       <div class="form-group">
         <label>Anticipo manifiesto</label>
-        <input type="number" id="anticipo_manifiesto" step="0.01" required>
+        <input
+          type="text"
+          id="anticipo_manifiesto"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="Ej: 500.000"
+          required
+        >
       </div>
 
 
@@ -240,7 +260,24 @@
     <!-- HEADER -->
     <div class="detalle-header">
       <h3>Detalle del Manifiesto</h3>
-      
+    
+      <div class="detalle-header-actions">
+        <button type="button" id="btnEditarDetalle" class="btn-secundario">
+          <i class="fas fa-pen"></i> Editar
+        </button>
+    
+        <button type="button" id="btnGuardarDetalle" class="btn-secundario hidden">
+          <i class="fas fa-save"></i> Guardar cambios
+        </button>
+    
+        <button type="button" id="btnCancelarEdicionDetalle" class="btn-limpiar hidden">
+          Cancelar
+        </button>
+    
+        <button type="button" id="cerrarDetalleManifiesto" class="btn-cerrar-detalle">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
     </div>
 
     <!-- CONTENIDO -->

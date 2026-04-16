@@ -1,6 +1,9 @@
 let editandoManifiesto = false;
 let catalogosManifiesto = null;
 let debounceTimerManifiestos = null;
+let detalleManifiestoActual = null;
+let detalleDataActual = null;
+let modoEdicionDetalle = false;
 
 // =========================
 // INIT
@@ -76,11 +79,17 @@ function initEventosManifiestos() {
     ?.addEventListener("change", async () => {
       await llenarCiudadesPorDepartamento("destino_departamento", "destino_ciudad");
     });
-  document.getElementById("cerrarDetalleManifiesto")
-  ?.addEventListener("click", () => {
-    document.getElementById("modalDetalleManifiesto")
-      ?.classList.add("hidden");
-  });
+    document.getElementById("cerrarDetalleManifiesto")
+    ?.addEventListener("click", cerrarModalDetalleManifiesto);
+
+  document.getElementById("btnEditarDetalle")
+    ?.addEventListener("click", activarEdicionDetalle);
+
+  document.getElementById("btnCancelarEdicionDetalle")
+    ?.addEventListener("click", cancelarEdicionDetalle);
+
+  document.getElementById("btnGuardarDetalle")
+    ?.addEventListener("click", guardarEdicionDetalle);
 }
 
 function aplicarFiltrosManifiestos() {
@@ -374,10 +383,6 @@ function renderTablaManifiestos(data) {
         <button class="btn-icon" onclick="verDetalleManifiesto('${m.id_manifiesto}')">
           <i class="fas fa-eye"></i>
         </button>
-  
-        <button class="btn-icon" onclick="editarManifiesto(this, '${m.id_manifiesto.replace(/'/g, "\\'")}')">
-          <i class="fas fa-pen"></i>
-        </button>
       </td>
     </tr>
   `).join("");
@@ -427,9 +432,17 @@ function initFormManifiesto() {
       destino_departamento: destinoDepartamento,
       destino_ciudad: destinoCiudad,
 
-      valor_flete: document.getElementById("valor_flete").value,
-      valor_flete_porcentaje: document.getElementById("valor_flete_porcentaje").value,
-      anticipo_manifiesto: document.getElementById("anticipo_manifiesto").value,
+      valor_flete: limpiarNumeroInput(
+          document.getElementById("valor_flete").value
+        ),
+        
+        valor_flete_porcentaje: limpiarNumeroInput(
+          document.getElementById("valor_flete_porcentaje").value
+        ),
+        
+        anticipo_manifiesto: limpiarNumeroInput(
+          document.getElementById("anticipo_manifiesto").value
+        ),
       id_cliente: document.getElementById("id_cliente").value,
       id_conductor: document.getElementById("id_conductor").value,
       id_vehiculo: document.getElementById("id_vehiculo").value,
@@ -490,6 +503,8 @@ function abrirModalManifiesto() {
   document.getElementById("modalManifiesto")?.classList.remove("hidden");
 
   cargarCiudadesModal();
+
+  aplicarFormatoMonedaInputsManifiesto();
 }
 
 
@@ -504,245 +519,7 @@ function cerrarModalManifiesto() {
   if (destinoCiudad) destinoCiudad.innerHTML = `<option value="">Seleccione</option>`;
 }
 
-// =========================
-// EDITAR INLINE
-// =========================
-async function editarManifiesto(btn, idManifiesto) {
-  if (editandoManifiesto) {
-    showToast("Termina de editar la fila actual primero", "info");
-    return;
-  }
 
-  editandoManifiesto = true;
-
-  const fila = btn.closest("tr");
-  const d = fila.dataset;
-  const celdas = fila.querySelectorAll("td");
-
-  // ?? INPUT FULL WIDTH
-  const styleInput = `
-    style="
-      display:block;
-      width:100%;
-      min-width:0;
-      box-sizing:border-box;
-      padding:6px 8px;
-      border-radius:6px;
-      border:1px solid #ccc;
-      font-size:12px;
-    "
-  `;
-
-  // ?? SELECT FULL WIDTH (CLAVE)
-  const styleSelect = `
-    style="
-      display:block;
-      width:100%;
-      min-width:0;
-      box-sizing:border-box;
-      padding:6px 8px;
-      border-radius:6px;
-      border:1px solid #ccc;
-      font-size:12px;
-    "
-  `;
-
-  // =========================
-  // CAMPOS BASICOS
-  // =========================
-  celdas[1].innerHTML = `<input type="number" value="${d.radicado}" ${styleInput}>`;
-  celdas[2].innerHTML = `<input type="date" value="${d.fecha}" ${styleInput}>`;
-
-  celdas[3].innerHTML = `
-    <select ${styleSelect}>
-      ${catalogosManifiesto.clientes.map(c => `
-        <option value="${c.nit}" ${c.nit === d.id_cliente ? "selected" : ""}>
-          ${c.nombre} - ${c.nit}
-        </option>
-      `).join("")}
-    </select>
-  `;
-
-  celdas[4].innerHTML = `
-    <select ${styleSelect}>
-      ${catalogosManifiesto.conductores.map(c => `
-        <option value="${c.cedula}" ${String(c.cedula) === String(d.id_conductor) ? "selected" : ""}>
-          ${c.nombre} - ${c.cedula}
-        </option>
-      `).join("")}
-    </select>
-  `;
-
-  // =========================
-  // ?? RUTA VERTICAL FULL WIDTH
-  // =========================
-  celdas[5].innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:6px; width:100%; min-width:0;">
-
-      <div style="width:100%; min-width:0;">
-        <span style="font-size:10px; color:#6b7280;">Origen</span>
-        <select class="ciudad-origen" ${styleSelect}>
-          <option value="">Seleccione</option>
-        </select>
-      </div>
-
-      <div style="width:100%; min-width:0;">
-        <span style="font-size:10px; color:#6b7280;">Destino</span>
-        <select class="ciudad-destino" ${styleSelect}>
-          <option value="">Seleccione</option>
-        </select>
-      </div>
-
-    </div>
-  `;
-
-  const selectOrigen = celdas[5].querySelector(".ciudad-origen");
-  const selectDestino = celdas[5].querySelector(".ciudad-destino");
-
-  const ciudades = await apiFetch("/api/ubicaciones/municipios");
-
-  if (!ciudades) {
-    showToast("Error cargando ciudades", "error");
-    return;
-  }
-
-  selectOrigen.innerHTML = `
-    <option value="">Seleccione</option>
-    ${ciudades.map(c => `
-      <option value="${c.nombre_municipio}"
-        data-departamento="${c.nombre_departamento}"
-        ${c.nombre_municipio === d.origen_ciudad ? "selected" : ""}>
-        ${c.nombre_municipio} (${c.nombre_departamento})
-      </option>
-    `).join("")}
-  `;
-
-  selectDestino.innerHTML = `
-    <option value="">Seleccione</option>
-    ${ciudades.map(c => `
-      <option value="${c.nombre_municipio}"
-        data-departamento="${c.nombre_departamento}"
-        ${c.nombre_municipio === d.destino_ciudad ? "selected" : ""}>
-        ${c.nombre_municipio} (${c.nombre_departamento})
-      </option>
-    `).join("")}
-  `;
-
-  // =========================
-  // RESTO
-  // =========================
-  celdas[6].innerHTML = `
-    <select ${styleSelect}>
-      ${catalogosManifiesto.vehiculos.map(v => `
-        <option value="${v.placa}" ${v.placa === d.id_vehiculo ? "selected" : ""}>
-          ${v.placa}
-        </option>
-      `).join("")}
-    </select>
-  `;
-
-  celdas[7].innerHTML = `
-    <select ${styleSelect}>
-      ${catalogosManifiesto.trailers.map(t => `
-        <option value="${t.placa}" ${t.placa === d.id_trailer ? "selected" : ""}>
-          ${t.placa}
-        </option>
-      `).join("")}
-    </select>
-  `;
-
-  celdas[8].innerHTML = `
-    <select ${styleSelect}>
-      ${catalogosManifiesto.estados.map(e => `
-        <option value="${e}" ${e === d.estado ? "selected" : ""}>
-          ${e}
-        </option>
-      `).join("")}
-    </select>
-  `;
-
-  celdas[9].innerHTML = `
-    <select ${styleSelect}>
-      <option value="true" ${d.novedades === "true" ? "selected" : ""}>Si</option>
-      <option value="false" ${d.novedades === "false" ? "selected" : ""}>No</option>
-    </select>
-  `;
-
-  celdas[10].innerHTML = `
-    <button class="btn-icon btn-save" onclick="guardarManifiesto(this, '${idManifiesto.replace(/'/g, "\\'")}')">
-      <i class="fas fa-save"></i>
-    </button>
-  `;
-
-  document.querySelectorAll(".btn-icon").forEach(b => {
-    if (!b.classList.contains("btn-save")) b.disabled = true;
-  });
-}
-// =========================
-// GUARDAR
-// =========================
-async function guardarManifiesto(btn, idManifiesto) {
-  const fila = btn.closest("tr");
-  const d = fila.dataset;
-  const celdas = fila.querySelectorAll("td");
-
-  const radicado = celdas[1].querySelector("input").value;
-  const fecha = celdas[2].querySelector("input").value;
-  const idCliente = celdas[3].querySelector("select").value;
-  const idConductor = celdas[4].querySelector("select").value;
-
-  // ?? NUEVO: ciudades + departamento automático
-  const selectOrigen = celdas[5].querySelector(".ciudad-origen");
-  const selectDestino = celdas[5].querySelector(".ciudad-destino");
-
-  const origenCiudad = selectOrigen.value;
-  const destinoCiudad = selectDestino.value;
-
-  const origenDepartamento = selectOrigen.selectedOptions[0]?.dataset.departamento || "";
-  const destinoDepartamento = selectDestino.selectedOptions[0]?.dataset.departamento || "";
-
-  const idVehiculo = celdas[6].querySelector("select").value;
-  const idTrailer = celdas[7].querySelector("select").value;
-  const estado = celdas[8].querySelector("select").value;
-  const novedades = celdas[9].querySelector("select").value === "true";
-
-  const payload = {
-    radicado,
-    fecha,
-    origen_departamento: origenDepartamento,
-    origen_ciudad: origenCiudad,
-    destino_departamento: destinoDepartamento,
-    destino_ciudad: destinoCiudad,
-    estado,
-    valor_flete: d.valor_flete,
-    valor_flete_porcentaje: d.valor_flete_porcentaje,
-    anticipo_manifiesto: d.anticipo_manifiesto,
-    gastos: d.gastos,
-    documentos: d.documentos,
-    id_cliente: idCliente,
-    id_conductor: idConductor,
-    id_vehiculo: idVehiculo,
-    id_trailer: idTrailer,
-    id_empresa_a_cargo: d.id_empresa_a_cargo,
-    novedades,
-    observaciones: d.observaciones
-  };
-
-  const res = await apiFetch(`/api/manifiestos/${encodeURIComponent(idManifiesto)}`, {
-    method: "PUT",
-    body: JSON.stringify(payload)
-  });
-
-  if (!res) return;
-
-  showToast("Manifiesto actualizado", "success");
-  editandoManifiesto = false;
-
-  document.querySelectorAll(".btn-icon").forEach(b => b.disabled = false);
-
-  await cargarManifiestos();
-  aplicarFiltroEsteMes();
-}
 
 // =========================
 // UTILS
@@ -935,250 +712,521 @@ function formatearFechaLarga(fechaStr) {
 // =========================
 async function verDetalleManifiesto(id) {
   try {
-    // =========================
-    // ABRIR MODAL
-    // =========================
     const modal = document.getElementById("modalDetalleManifiesto");
     modal?.classList.remove("hidden");
 
-    // =========================
-    // TRAER DATA (ENDPOINT NUEVO)
-    // =========================
     const data = await apiFetch(`/api/manifiestos/${id}/detalle`);
+    if (!data) return;
 
-    const manifiesto = data.manifiesto;
-    const gastosConductor = data.gastos || [];
-    const transacciones = data.transacciones || [];
-    const factura = data.factura;
+    detalleDataActual = data;
+    detalleManifiestoActual = data.manifiesto;
+    modoEdicionDetalle = false;
 
-    // =========================
-    // INFO GENERAL
-    // =========================
-    const contInfo = document.getElementById("detalleInfoManifiesto");
-
-contInfo.innerHTML = `
-  <div class="detalle-info-item">
-    <span>ID</span>
-    <strong>${manifiesto.id_manifiesto}</strong>
-  </div>
-  
-  <div class="detalle-info-item">
-    <span>Radicado</span>
-    <strong>${safe(manifiesto.radicado)}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Cliente</span>
-    <strong>${safe(manifiesto.cliente_nombre) || "-"}, NIT: ${safe(manifiesto.id_cliente)}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Fecha</span>
-    <strong>${formatearFecha(manifiesto.fecha) || "-"}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Origen</span>
-    <strong>${manifiesto.origen_ciudad},   ${manifiesto.origen_departamento}</strong>
-  </div>
-  
-  <div class="detalle-info-item">
-    <span>Destino</span>
-    <strong>${manifiesto.destino_ciudad},   ${manifiesto.destino_departamento}</strong>
-  </div>
-
-
-  <div class="detalle-info-item">
-    <span>Vehículo</span>
-    <strong>${manifiesto.id_vehiculo}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Trailer</span>
-    <strong>${manifiesto.id_trailer}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Conductor</span>
-    <strong>${manifiesto.conductor_nombre}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Estado</span>
-    <strong>${manifiesto.estado}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Valor Flete</span>
-    <strong>$${Number(manifiesto.valor_flete || 0).toLocaleString()}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Porcentaje Flete</span>
-    <strong>$${Number(manifiesto.valor_flete_porcentaje || 0).toLocaleString()}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Anticipo</span>
-    <strong>$${Number(manifiesto.anticipo_manifiesto || 0).toLocaleString()}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Empresa a cargo</span>
-    <strong>${manifiesto.empresa_nombre}, Nit: ${manifiesto.empresa_nit}</strong>
-  </div>
-
-  
-  <div class="detalle-info-item">
-    <span>Docs. gastos</span>
-    <strong>${manifiesto.gastos}</strong>
-  </div>
-
-  <div class="detalle-info-item">
-    <span>Documentos</span>
-    <strong>${manifiesto.documentos}</strong>
-  </div>
-  
-  <div class="detalle-info-item">
-    <span>Novedades</span>
-    <strong>${manifiesto.novedades ? "Si" : "No"}</strong>
-  </div>
-
-
-  <div class="detalle-info-item">
-    <span>Observaciones</span>
-    <strong>${manifiesto.observaciones || "-"}</strong>
-  </div>
-  
-`;
-
-    // =========================
-    // GASTOS CONDUCTOR
-    // =========================
-    const contGastos = document.getElementById("detalleGastos");
-    contGastos.innerHTML = "";
-
-    let totalGastos = 0;
-
-    gastosConductor.forEach(g => {
-      const valor = Number(g.transaccion_valor || 0);
-      totalGastos += valor;
-
-      contGastos.innerHTML += `
-        <div class="detalle-item">
-          <span>${g.tipo_transaccion_categoria || "-"}</span>
-          <span class="valor-gasto">-$${valor.toLocaleString()}</span>
-        </div>
-      `;
-    });
-
-    if (gastosConductor.length === 0) {
-      contGastos.innerHTML = "<p>Sin gastos</p>";
-    }
-
-    document.getElementById("totalGastosDetalle").innerHTML =
-      `<span class="total-egreso">$${totalGastos.toLocaleString()}</span>`;
-
-    // =========================
-    // TRANSACCIONES
-    // =========================
-    const contTrans = document.getElementById("detalleTransacciones");
-    contTrans.innerHTML = "";
-
-    let totalIngresos = 0;
-    let totalEgresos = 0;
-
-    transacciones.forEach(t => {
-      const valor = Number(t.valor || 0);
-
-      let clase = "";
-      let signo = "";
-
-      if (t.tipo_transaccion_tipo === "INGRESO MANIFIESTO") {
-        totalIngresos += valor;
-        clase = "valor-ingreso";
-        signo = "+";
-      } else if (t.tipo_transaccion_tipo === "EGRESO MANIFIESTO") {
-        totalEgresos += valor;
-        clase = "valor-egreso";
-        signo = "-";
-      } else {
-        return;
-      }
-
-      contTrans.innerHTML += `
-        <div class="detalle-item">
-          <span>${t.tipo_transaccion_categoria}</span>
-          <span class="${clase}">${signo}$${valor.toLocaleString()}</span>
-        </div>
-      `;
-    });
-
-    if (transacciones.length === 0) {
-      contTrans.innerHTML = "<p>Sin transacciones</p>";
-    }
-
-    const utilidad = totalIngresos - totalEgresos;
-
-    document.getElementById("totalTransaccionesDetalle").innerHTML =
-      `<span class="${utilidad >= 0 ? "total-ingreso" : "total-egreso"}">
-        $${utilidad.toLocaleString()}
-      </span>`;
-
-    // =========================
-    // FACTURA
-    // =========================
-    const contFactura = document.getElementById("detalleFactura");
-    contFactura.innerHTML = "";
-
-    let totalFactura = 0;
-
-    if (factura) {
-      const valor = Number(factura.valor || 0);
-      const ret =
-        Number(factura.retencion_fuente || 0) +
-        Number(factura.retencion_ica || 0);
-
-      const neto = valor - ret;
-      totalFactura = neto;
-
-      contFactura.innerHTML = `
-        <div class="detalle-item">
-          <span>Factura: ${factura.codigo_factura}</span>
-          <span class="valor-ingreso">$${neto.toLocaleString()}</span>
-        </div>
-      `;
-    } else {
-      contFactura.innerHTML = "<p>Sin factura</p>";
-    }
-
-    document.getElementById("totalFacturaDetalle").innerHTML =
-      `<span class="total-ingreso">$${totalFactura.toLocaleString()}</span>`;
-
-    // =========================
-    // RESUMEN FINAL
-    // =========================
-    const balance = utilidad;
-
-    let texto = "";
-    let clase = "";
-
-    if (balance > 0) {
-      texto = `UTILIDAD: $${balance.toLocaleString()}`;
-      clase = "resumen-positivo";
-    } else if (balance < 0) {
-      texto = `PÉRDIDA: $${Math.abs(balance).toLocaleString()}`;
-      clase = "resumen-negativo";
-    } else {
-      texto = "PUNTO DE EQUILIBRIO";
-      clase = "resumen-cero";
-    }
-
-    document.getElementById("resumenDetalle").innerHTML =
-      `<span class="${clase}">${texto}</span>`;
+    actualizarBotonesDetalle();
+    renderDetalleModoLectura(data);
 
   } catch (error) {
-    console.error("Error detalle manifiesto:", error);
-    alert("Error cargando detalle");
+    console.error("Error cargando detalle del manifiesto:", error);
+    showToast("No se pudo cargar el detalle del manifiesto", "error");
   }
+}
+
+function actualizarBotonesDetalle() {
+  document.getElementById("btnEditarDetalle")?.classList.toggle("hidden", modoEdicionDetalle);
+  document.getElementById("btnGuardarDetalle")?.classList.toggle("hidden", !modoEdicionDetalle);
+  document.getElementById("btnCancelarEdicionDetalle")?.classList.toggle("hidden", !modoEdicionDetalle);
+}
+
+function cerrarModalDetalleManifiesto() {
+  document.getElementById("modalDetalleManifiesto")?.classList.add("hidden");
+  modoEdicionDetalle = false;
+  detalleManifiestoActual = null;
+  detalleDataActual = null;
+  actualizarBotonesDetalle();
+}
+
+function renderDetalleModoLectura(data) {
+  if (!data || !data.manifiesto) return;
+
+  const manifiesto = data.manifiesto;
+  const gastosConductor = data.gastos || [];
+  const transacciones = data.transacciones || [];
+  const factura = data.factura;
+
+  const contInfo = document.getElementById("detalleInfoManifiesto");
+
+  contInfo.innerHTML = `
+    <div class="detalle-info-item">
+      <span>ID</span>
+      <strong>${safe(manifiesto.id_manifiesto)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Radicado</span>
+      <strong>${safe(manifiesto.radicado)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Cliente</span>
+      <strong>${safe(manifiesto.cliente_nombre)}, NIT: ${safe(manifiesto.id_cliente)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Fecha</span>
+      <strong>${formatearFecha(manifiesto.fecha) || "-"}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Origen</span>
+      <strong>${safe(manifiesto.origen_ciudad)}, ${safe(manifiesto.origen_departamento)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Destino</span>
+      <strong>${safe(manifiesto.destino_ciudad)}, ${safe(manifiesto.destino_departamento)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Vehículo</span>
+      <strong>${safe(manifiesto.id_vehiculo)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Trailer</span>
+      <strong>${safe(manifiesto.id_trailer)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Conductor</span>
+      <strong>${safe(manifiesto.conductor_nombre)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Estado</span>
+      <strong>${safe(manifiesto.estado)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Valor Flete</span>
+      <strong>$${Number(manifiesto.valor_flete || 0).toLocaleString()}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Porcentaje Flete</span>
+      <strong>$${Number(manifiesto.valor_flete_porcentaje || 0).toLocaleString()}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Anticipo</span>
+      <strong>$${Number(manifiesto.anticipo_manifiesto || 0).toLocaleString()}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Empresa a cargo</span>
+      <strong>${safe(manifiesto.empresa_nombre)}, Nit: ${safe(manifiesto.empresa_nit)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Docs. gastos</span>
+      <strong>${safe(manifiesto.gastos)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Documentos</span>
+      <strong>${safe(manifiesto.documentos)}</strong>
+    </div>
+
+    <div class="detalle-info-item">
+      <span>Novedades</span>
+      <strong>${manifiesto.novedades ? "Si" : "No"}</strong>
+    </div>
+
+    <div class="detalle-info-item full-span">
+      <span>Observaciones</span>
+      <strong>${safe(manifiesto.observaciones)}</strong>
+    </div>
+  `;
+
+  // =========================
+  // GASTOS CONDUCTOR
+  // =========================
+  const contGastos = document.getElementById("detalleGastos");
+  contGastos.innerHTML = "";
+
+  let totalGastos = 0;
+
+  gastosConductor.forEach(g => {
+    const valor = Number(g.transaccion_valor || 0);
+    totalGastos += valor;
+
+    contGastos.innerHTML += `
+      <div class="detalle-item">
+        <span>${g.tipo_transaccion_categoria || "-"}</span>
+        <span class="valor-gasto">-$${valor.toLocaleString()}</span>
+      </div>
+    `;
+  });
+
+  if (gastosConductor.length === 0) {
+    contGastos.innerHTML = "<p>Sin gastos</p>";
+  }
+
+  document.getElementById("totalGastosDetalle").innerHTML =
+    `<span class="total-egreso">$${totalGastos.toLocaleString()}</span>`;
+
+  // =========================
+  // TRANSACCIONES
+  // =========================
+  const contTrans = document.getElementById("detalleTransacciones");
+  contTrans.innerHTML = "";
+
+  let totalIngresos = 0;
+  let totalEgresos = 0;
+
+  transacciones.forEach(t => {
+    const valor = Number(t.valor || 0);
+
+    let clase = "";
+    let signo = "";
+
+    if (t.tipo_transaccion_tipo === "INGRESO MANIFIESTO") {
+      totalIngresos += valor;
+      clase = "valor-ingreso";
+      signo = "+";
+    } else if (t.tipo_transaccion_tipo === "EGRESO MANIFIESTO") {
+      totalEgresos += valor;
+      clase = "valor-egreso";
+      signo = "-";
+    } else {
+      return;
+    }
+
+    contTrans.innerHTML += `
+      <div class="detalle-item">
+        <span>${t.tipo_transaccion_categoria}</span>
+        <span class="${clase}">${signo}$${valor.toLocaleString()}</span>
+      </div>
+    `;
+  });
+
+  if (transacciones.length === 0) {
+    contTrans.innerHTML = "<p>Sin transacciones</p>";
+  }
+
+  const utilidad = totalIngresos - totalEgresos;
+
+  document.getElementById("totalTransaccionesDetalle").innerHTML =
+    `<span class="${utilidad >= 0 ? "total-ingreso" : "total-egreso"}">
+      $${utilidad.toLocaleString()}
+    </span>`;
+
+  // =========================
+  // FACTURA
+  // =========================
+  const contFactura = document.getElementById("detalleFactura");
+  contFactura.innerHTML = "";
+
+  let totalFactura = 0;
+
+  if (factura) {
+    totalFactura = Number(factura.valor_total || 0);
+
+    contFactura.innerHTML = `
+      <div class="detalle-item">
+        <span>Factura: ${safe(factura.codigo_factura || factura.id_factura)}</span>
+        <span class="valor-ingreso">$${totalFactura.toLocaleString()}</span>
+      </div>
+    `;
+  } else {
+    contFactura.innerHTML = "<p>Sin factura</p>";
+  }
+
+  document.getElementById("totalFacturaDetalle").innerHTML =
+    `<span class="total-ingreso">$${totalFactura.toLocaleString()}</span>`;
+
+  // =========================
+  // RESUMEN
+  // =========================
+  const resumen = totalFactura - totalGastos - totalEgresos;
+  const resumenEl = document.getElementById("resumenDetalle");
+
+  resumenEl.className =
+    resumen > 0 ? "resumen-positivo" :
+    resumen < 0 ? "resumen-negativo" :
+    "resumen-cero";
+
+  resumenEl.textContent = `$${resumen.toLocaleString()}`;
+}
+
+async function activarEdicionDetalle() {
+  if (!detalleManifiestoActual || !catalogosManifiesto) return;
+
+  modoEdicionDetalle = true;
+  actualizarBotonesDetalle();
+
+  const manifiesto = detalleManifiestoActual;
+  const contInfo = document.getElementById("detalleInfoManifiesto");
+
+  const ciudades = await apiFetch("/api/ubicaciones/municipios");
+  if (!ciudades) {
+    showToast("No se pudieron cargar las ciudades", "error");
+    modoEdicionDetalle = false;
+    actualizarBotonesDetalle();
+    return;
+  }
+
+  const opcionesCiudades = ciudades.map(c => `
+    <option
+      value="${escapeHtml(c.nombre_municipio)}"
+      data-departamento="${escapeHtml(c.nombre_departamento)}"
+    >
+      ${c.nombre_municipio} (${c.nombre_departamento})
+    </option>
+  `).join("");
+
+  contInfo.innerHTML = `
+    <div class="detalle-info-item readonly-soft">
+      <span>ID</span>
+      <strong>${safe(manifiesto.id_manifiesto)}</strong>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditRadicado">Radicado</label>
+      <input type="number" id="detalleEditRadicado" value="${safe(manifiesto.radicado) === "-" ? "" : manifiesto.radicado}">
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditCliente">Cliente</label>
+      <select id="detalleEditCliente">
+        <option value="">Seleccione</option>
+        ${catalogosManifiesto.clientes.map(c => `
+          <option value="${c.nit}" ${String(c.nit) === String(manifiesto.id_cliente) ? "selected" : ""}>
+            ${c.nombre} - ${c.nit}
+          </option>
+        `).join("")}
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditFecha">Fecha</label>
+      <input type="date" id="detalleEditFecha" value="${manifiesto.fecha ? String(manifiesto.fecha).split("T")[0] : ""}">
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditOrigen">Origen</label>
+      <select id="detalleEditOrigen">
+        <option value="">Seleccione</option>
+        ${opcionesCiudades}
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditDestino">Destino</label>
+      <select id="detalleEditDestino">
+        <option value="">Seleccione</option>
+        ${opcionesCiudades}
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditVehiculo">Vehículo</label>
+      <select id="detalleEditVehiculo">
+        <option value="">Seleccione</option>
+        ${catalogosManifiesto.vehiculos.map(v => `
+          <option value="${v.placa}" ${v.placa === manifiesto.id_vehiculo ? "selected" : ""}>
+            ${v.placa}
+          </option>
+        `).join("")}
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditTrailer">Trailer</label>
+      <select id="detalleEditTrailer">
+        <option value="">Seleccione</option>
+        ${catalogosManifiesto.trailers.map(t => `
+          <option value="${t.placa}" ${t.placa === manifiesto.id_trailer ? "selected" : ""}>
+            ${t.placa}
+          </option>
+        `).join("")}
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditConductor">Conductor</label>
+      <select id="detalleEditConductor">
+        <option value="">Seleccione</option>
+        ${catalogosManifiesto.conductores.map(c => `
+          <option value="${c.cedula}" ${String(c.cedula) === String(manifiesto.id_conductor) ? "selected" : ""}>
+            ${c.nombre} - ${c.cedula}
+          </option>
+        `).join("")}
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditEstado">Estado</label>
+      <select id="detalleEditEstado">
+        <option value="">Seleccione</option>
+        ${catalogosManifiesto.estados.map(e => `
+          <option value="${e}" ${e === manifiesto.estado ? "selected" : ""}>
+            ${e}
+          </option>
+        `).join("")}
+      </select>
+    </div>
+
+    <div class="detalle-info-item readonly-soft">
+      <span>Valor Flete</span>
+      <strong>$${Number(manifiesto.valor_flete || 0).toLocaleString()}</strong>
+    </div>
+
+    <div class="detalle-info-item readonly-soft">
+      <span>Porcentaje Flete</span>
+      <strong>$${Number(manifiesto.valor_flete_porcentaje || 0).toLocaleString()}</strong>
+    </div>
+
+    <div class="detalle-info-item readonly-soft">
+      <span>Anticipo</span>
+      <strong>$${Number(manifiesto.anticipo_manifiesto || 0).toLocaleString()}</strong>
+    </div>
+
+    <div class="detalle-info-item readonly-soft">
+      <span>Empresa a cargo</span>
+      <strong>${safe(manifiesto.empresa_nombre)}, Nit: ${safe(manifiesto.empresa_nit)}</strong>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditGastos">Docs. gastos</label>
+      <select id="detalleEditGastos">
+        ${(catalogosManifiesto.entregas || ["PENDIENTES", "ENTREGADOS"]).map(e => `
+          <option value="${e}" ${e === manifiesto.gastos ? "selected" : ""}>${e}</option>
+        `).join("")}
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditDocumentos">Documentos</label>
+      <select id="detalleEditDocumentos">
+        ${(catalogosManifiesto.entregas || ["PENDIENTES", "ENTREGADOS"]).map(e => `
+          <option value="${e}" ${e === manifiesto.documentos ? "selected" : ""}>${e}</option>
+        `).join("")}
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando">
+      <label for="detalleEditNovedades">Novedades</label>
+      <select id="detalleEditNovedades">
+        <option value="true" ${manifiesto.novedades ? "selected" : ""}>Si</option>
+        <option value="false" ${!manifiesto.novedades ? "selected" : ""}>No</option>
+      </select>
+    </div>
+
+    <div class="detalle-info-item editando full-span">
+      <label for="detalleEditObservaciones">Observaciones</label>
+      <textarea id="detalleEditObservaciones">${manifiesto.observaciones || ""}</textarea>
+    </div>
+  `;
+
+  const origenSelect = document.getElementById("detalleEditOrigen");
+  const destinoSelect = document.getElementById("detalleEditDestino");
+
+  if (origenSelect) origenSelect.value = manifiesto.origen_ciudad || "";
+  if (destinoSelect) destinoSelect.value = manifiesto.destino_ciudad || "";
+}
+
+function cancelarEdicionDetalle() {
+  if (!detalleDataActual) return;
+  modoEdicionDetalle = false;
+  actualizarBotonesDetalle();
+  renderDetalleModoLectura(detalleDataActual);
+}
+
+async function guardarEdicionDetalle() {
+  if (!detalleManifiestoActual) return;
+
+  const origenSelect = document.getElementById("detalleEditOrigen");
+  const destinoSelect = document.getElementById("detalleEditDestino");
+
+  const payload = {
+    radicado: document.getElementById("detalleEditRadicado")?.value?.trim() || "",
+    fecha: document.getElementById("detalleEditFecha")?.value || "",
+    origen_ciudad: origenSelect?.value || "",
+    origen_departamento: origenSelect?.selectedOptions?.[0]?.dataset?.departamento || "",
+    destino_ciudad: destinoSelect?.value || "",
+    destino_departamento: destinoSelect?.selectedOptions?.[0]?.dataset?.departamento || "",
+    estado: document.getElementById("detalleEditEstado")?.value || "",
+    valor_flete: detalleManifiestoActual.valor_flete,
+    valor_flete_porcentaje: detalleManifiestoActual.valor_flete_porcentaje,
+    anticipo_manifiesto: detalleManifiestoActual.anticipo_manifiesto,
+    gastos: document.getElementById("detalleEditGastos")?.value || "",
+    documentos: document.getElementById("detalleEditDocumentos")?.value || "",
+    id_cliente: document.getElementById("detalleEditCliente")?.value || "",
+    id_conductor: document.getElementById("detalleEditConductor")?.value || "",
+    id_vehiculo: document.getElementById("detalleEditVehiculo")?.value || "",
+    id_trailer: document.getElementById("detalleEditTrailer")?.value || "",
+    id_empresa_a_cargo: detalleManifiestoActual.id_empresa_a_cargo,
+    novedades: document.getElementById("detalleEditNovedades")?.value === "true",
+    observaciones: document.getElementById("detalleEditObservaciones")?.value?.trim() || ""
+  };
+
+  const res = await apiFetch(`/api/manifiestos/${encodeURIComponent(detalleManifiestoActual.id_manifiesto)}`, {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+
+  if (!res) return;
+
+  showToast("Manifiesto actualizado correctamente", "success");
+
+  modoEdicionDetalle = false;
+
+  const dataActualizada = await apiFetch(`/api/manifiestos/${encodeURIComponent(detalleManifiestoActual.id_manifiesto)}/detalle`);
+  if (!dataActualizada) return;
+
+  detalleDataActual = dataActualizada;
+  detalleManifiestoActual = dataActualizada.manifiesto;
+
+  actualizarBotonesDetalle();
+  renderDetalleModoLectura(dataActualizada);
+
+  await filtrarManifiestos();
+}
+
+
+function formatearMilesInput(valor) {
+  if (!valor) return "";
+
+  // solo números
+  valor = valor.replace(/\D/g, "");
+
+  return valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function limpiarNumeroInput(valor) {
+  if (!valor) return "";
+  return valor.replace(/\./g, "").replace(/\D/g, "");
+}
+
+function aplicarFormatoMonedaInputsManifiesto() {
+  const ids = [
+    "valor_flete",
+    "valor_flete_porcentaje",
+    "anticipo_manifiesto"
+  ];
+
+  ids.forEach(id => {
+    const input = document.getElementById(id);
+    if (!input) return;
+
+    input.addEventListener("input", (e) => {
+      const cursorFinal = e.target.value.length;
+      e.target.value = formatearMilesInput(e.target.value);
+      e.target.setSelectionRange(cursorFinal, cursorFinal);
+    });
+
+    input.addEventListener("blur", (e) => {
+      e.target.value = formatearMilesInput(e.target.value);
+    });
+  });
 }
