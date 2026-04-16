@@ -49,6 +49,7 @@ const gastosConductorRoutes = require("./routes/gastosConductor.routes");
 const tipoTransaccionRoutes = require("./routes/tipoTransaccion.routes");
 const registroConductorRoutes = require("./routes/registroConductor.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
+const dashboardContableRoutes = require("./routes/dashboardContable.routes");
 
 
 app.use("/api", authRoutes);
@@ -67,6 +68,7 @@ app.use("/api/gastos-conductor", gastosConductorRoutes);
 app.use("/api/tipo-transaccion", tipoTransaccionRoutes);
 app.use("/api/registro-conductor", registroConductorRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/dashboard-contable", dashboardContableRoutes);
 
 // =====================
 // HEALTH CHECKS

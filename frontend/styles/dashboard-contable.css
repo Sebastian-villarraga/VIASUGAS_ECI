@@ -1,0 +1,389 @@
+/* =====================================
+   DASHBOARD CONTABLE CSS AISLADO - DBC
+===================================== */
+
+.dbc-layout{
+  padding:20px;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.dbc-main{
+  display:grid;
+  grid-template-columns:1.25fr 0.95fr;
+  gap:20px;
+  align-items:start;
+}
+
+.dbc-left,
+.dbc-right{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  min-width:0;
+}
+
+/* =========================
+   HEADER
+========================= */
+.dbc-header{
+  margin-bottom:20px;
+}
+
+.dbc-header h2{
+  margin:0 0 6px;
+  font-size:34px;
+  font-weight:700;
+  color:#111827;
+}
+
+.dbc-header p{
+  margin:0;
+  font-size:14px;
+  color:#6b7280;
+}
+
+/* =========================
+   BOTONES
+========================= */
+.dbc-btn{
+  border:none;
+  border-radius:10px;
+  height:44px;
+  padding:0 18px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:700;
+  transition:.2s ease;
+  white-space:nowrap;
+}
+
+.dbc-btn:hover{
+  transform:translateY(-1px);
+}
+
+.dbc-btn-primary{
+  background:#2f56a6;
+  color:#fff;
+}
+
+.dbc-btn-primary:hover{
+  background:#24468a;
+}
+
+.dbc-btn-light{
+  background:#eef2f7;
+  color:#111827;
+}
+
+.dbc-btn-light:hover{
+  background:#dde5ef;
+}
+
+.dbc-btn-danger{
+  background:#ea4335;
+  color:#fff;
+}
+
+.dbc-btn-danger:hover{
+  background:#cf3528;
+}
+
+/* =========================
+   FILTROS
+========================= */
+.dbc-filters-box{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+}
+
+.dbc-filters-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(220px,1fr));
+  gap:16px;
+  align-items:end;
+}
+
+.dbc-actions{
+  grid-column:1 / -1;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:4px;
+}
+
+.dbc-group{
+  display:flex;
+  flex-direction:column;
+}
+
+.dbc-group label{
+  font-size:12px;
+  font-weight:600;
+  color:#6b7280;
+  margin-bottom:6px;
+}
+
+.dbc-group input{
+  width:100%;
+  height:44px;
+  padding:0 14px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+.dbc-group input:focus{
+  outline:none;
+  border-color:#2f56a6;
+  box-shadow:0 0 0 3px rgba(47,86,166,.12);
+}
+
+.dbc-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.dbc-actions .dbc-btn{
+  min-width:140px;
+  justify-content:center;
+}
+
+/* =========================
+   CARDS KPI
+========================= */
+.dbc-cards{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.dbc-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px 20px;
+  position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+
+.dbc-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  border-radius:14px 0 0 14px;
+}
+
+.dbc-card h3{
+  margin:0 0 8px;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:#6b7280;
+}
+
+.dbc-card p{
+  margin:0;
+  font-size:24px;
+  font-weight:800;
+  color:#111827;
+  word-break:break-word;
+}
+
+.dbc-kpi-ingresos::before{ background:#16a34a; }
+.dbc-kpi-egresos::before{ background:#dc2626; }
+.dbc-kpi-utilidad::before{ background:#2563eb; }
+.dbc-kpi-margen::before{ background:#7c3aed; }
+.dbc-kpi-facturas::before{ background:#0f766e; }
+.dbc-kpi-viaje::before{ background:#d97706; }
+
+/* =========================
+   CARDS / TABLAS / CHARTS
+========================= */
+.dbc-chart-card,
+.dbc-table-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.dbc-card-header{
+  margin-bottom:14px;
+}
+
+.dbc-card-header h3{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+  color:#111827;
+}
+
+.dbc-chart-wrap{
+  position:relative;
+  width:100%;
+  height:320px;
+}
+
+.dbc-chart-wrap canvas{
+  width:100% !important;
+  height:100% !important;
+}
+
+/* =========================
+   TABLAS
+========================= */
+.dbc-table-scroll{
+  width:100%;
+  max-height:520px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.dbc-table-scroll::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+.dbc-table-scroll::-webkit-scrollbar-thumb{
+  background:#c7ced8;
+  border-radius:20px;
+}
+
+.dbc-table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:collapse;
+}
+
+.dbc-table th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#f3f4f6;
+  color:#111827;
+  font-size:13px;
+  font-weight:700;
+  text-align:left;
+  padding:12px 14px;
+  white-space:nowrap;
+}
+
+.dbc-table td{
+  padding:12px 14px;
+  font-size:14px;
+  border-bottom:1px solid #f1f1f1;
+  white-space:nowrap;
+}
+
+.dbc-table tbody tr:hover{
+  background:#fafafa;
+}
+
+.dbc-empty-row{
+  text-align:center;
+  color:#6b7280;
+  padding:18px !important;
+}
+
+/* =========================
+   TEXTOS
+========================= */
+.dbc-text-center{
+  text-align:center;
+}
+
+.dbc-text-green{
+  color:#16a34a;
+  font-weight:700;
+}
+
+.dbc-text-red{
+  color:#dc2626;
+  font-weight:700;
+}
+
+.dbc-text-blue{
+  color:#2563eb;
+  font-weight:700;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1200px){
+  .dbc-main{
+    grid-template-columns:1fr;
+  }
+
+  .dbc-chart-wrap{
+    height:300px;
+  }
+}
+
+@media (max-width: 768px){
+  .dbc-layout{
+    padding:14px;
+  }
+
+  .dbc-header h2{
+    font-size:28px;
+  }
+
+  .dbc-filters-grid{
+    grid-template-columns:1fr;
+  }
+
+  .dbc-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .dbc-btn{
+    width:100%;
+  }
+
+  .dbc-cards{
+    grid-template-columns:1fr;
+  }
+
+  .dbc-table{
+    min-width:820px;
+  }
+
+  .dbc-chart-wrap{
+    height:260px;
+  }
+}
+
+@media (max-width: 480px){
+  .dbc-header h2{
+    font-size:24px;
+  }
+
+  .dbc-filters-box,
+  .dbc-table-card,
+  .dbc-chart-card,
+  .dbc-card{
+    padding:14px;
+  }
+
+  .dbc-card p{
+    font-size:20px;
+  }
+
+  .dbc-chart-wrap{
+    height:230px;
+  }
+}
