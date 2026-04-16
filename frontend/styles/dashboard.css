@@ -1,310 +1,413 @@
-/* ========================= */
-/* LAYOUT GENERAL */
-/* ========================= */
+/* =====================================
+   DASHBOARD GERENCIAL CSS AISLADO - DBX
+   Ejecutivo / responsive / premium
+===================================== */
 
-.dashboard-layout {
-  padding: 20px;
-  width: 100%;
-  box-sizing: border-box;
+/* =========================
+   LAYOUT
+========================= */
+.dbx-layout{
+  padding:20px;
+  width:100%;
+  box-sizing:border-box;
 }
 
-/* GRID PRINCIPAL */
-.dashboard-main {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 20px;
-  align-items: start;
-  width: 100%;
+.dbx-main{
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:20px;
+  align-items:start;
 }
 
-/* COLUMNAS */
-.dashboard-left,
-.dashboard-right {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
+.dbx-left,
+.dbx-right{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  min-width:0;
 }
 
-/* ========================= */
-/* HEADER */
-/* ========================= */
-
-.dashboard-header {
-  margin-bottom: 20px;
+/* =========================
+   HEADER
+========================= */
+.dbx-header{
+  margin-bottom:20px;
 }
 
-.dashboard-header h2 {
-  font-size: 24px;
-  font-weight: 600;
+.dbx-header h2{
+  margin:0;
+  font-size:34px;
+  font-weight:700;
+  color:#111827;
 }
 
-/* ========================= */
-/* CARDS */
-/* ========================= */
-
-.dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  width: 100%;
+/* =========================
+   BOTONES
+========================= */
+.dbx-btn{
+  border:none;
+  border-radius:10px;
+  height:44px;
+  padding:0 18px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:700;
+  transition:.2s ease;
+  white-space:nowrap;
 }
 
-.dashboard-cards .card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 18px 20px;
-  border: 1px solid #e5e7eb;
-  position: relative;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  width: 100%;
+.dbx-btn:hover{
+  transform:translateY(-1px);
 }
 
-.dashboard-cards .card h3 {
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 6px;
-  text-transform: uppercase;
+.dbx-btn-primary{
+  background:#2f56a6;
+  color:#fff;
 }
 
-.dashboard-cards .card p {
-  font-size: 20px;
-  font-weight: 600;
-  word-break: break-word; /* ?? evita overflow */
+.dbx-btn-primary:hover{
+  background:#24468a;
 }
 
-/* BARRA COLOR */
-.dashboard-cards .card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  border-radius: 12px 0 0 12px;
+.dbx-btn-light{
+  background:#eef2f7;
+  color:#111827;
 }
 
-.card.ingreso::before { background: #27ae60; }
-.card.egreso::before { background: #e74c3c; }
-.card.utilidad::before { background: #3498db; }
-.card.viajes::before { background: #f39c12; }
-.card.margen::before { background: #8e44ad; }
-.card.facturas::before { background: #16a085; }
-
-/* ========================= */
-/* TABLAS */
-/* ========================= */
-
-.dashboard-table {
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  padding: 15px;
-  overflow-x: auto;
-  width: 100%;
+.dbx-btn-light:hover{
+  background:#dde5ef;
 }
 
-/* TABLA */
-.dashboard-table table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 650px;
+.dbx-btn-danger{
+  background:#ea4335;
+  color:#fff;
 }
 
-/* HEADER */
-.dashboard-table th {
-  text-align: left;
-  padding: 12px;
-  font-size: 13px;
-  color: #6b7280;
-  border-bottom: 1px solid #eee;
+.dbx-btn-danger:hover{
+  background:#cf3528;
 }
 
-/* CELDAS */
-.dashboard-table td {
-  padding: 12px;
-  font-size: 14px;
-  border-bottom: 1px solid #f1f1f1;
+/* =========================
+   FILTROS
+========================= */
+.dbx-filters-box{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
 }
 
-/* HOVER */
-.dashboard-table tbody tr:hover {
-  background: #f9fafb;
+.dbx-filters-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:16px;
+  align-items:end;
 }
 
-/* ========================= */
-/* TEXTO */
-/* ========================= */
-
-.text-green { color: #27ae60; font-weight: 500; }
-.text-red { color: #e74c3c; font-weight: 500; }
-.text-blue { color: #3498db; font-weight: 500; }
-.text-center { text-align: center; }
-
-/* ========================= */
-/* GRAFICAS */
-/* ========================= */
-
-.dashboard-chart {
-  background: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-
-  height: 380px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.dbx-group{
+  display:flex;
+  flex-direction:column;
 }
 
-.dashboard-chart h3 {
-  margin-bottom: 15px;
+.dbx-group label{
+  font-size:12px;
+  font-weight:600;
+  color:#6b7280;
+  margin-bottom:6px;
 }
 
-.dashboard-chart canvas {
-  flex: 1;
-  width: 100% !important;
-  max-height: 300px;
+.dbx-group input{
+  width:100%;
+  height:44px;
+  padding:0 14px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  font-size:14px;
+  box-sizing:border-box;
 }
 
-/* ========================= */
-/* FILTROS */
-/* ========================= */
-
-.dashboard-filtros {
-  background: #fff;
-  border-radius: 14px;
-  padding: 18px 20px;
-  border: 1px solid #e5e7eb;
-  width: 100%;
+.dbx-group input:focus{
+  outline:none;
+  border-color:#2f56a6;
+  box-shadow:0 0 0 3px rgba(47,86,166,.12);
 }
 
-/* FILTROS */
-.filtros-row {
-  display: flex;
-  gap: 20px;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  width: 100%;
+.dbx-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
-/* INPUTS */
-.filtros-row .form-group {
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-  flex: 1; /* ?? clave responsive */
+/* =========================
+   CARDS KPI
+========================= */
+.dbx-cards{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
 }
 
-.filtros-row input {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
-  width: 100%;
+/* cards que renderiza JS */
+.dbx-cards .card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px 20px;
+  position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
 }
 
-/* BOTONES */
-.filtros-actions {
-  display: flex;
-  gap: 10px;
-  margin-left: auto;
-  flex-wrap: wrap;
+.dbx-cards .card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  border-radius:14px 0 0 14px;
 }
 
-.btn-chip {
-  padding: 8px 14px;
-  border-radius: 20px;
-  border: none;
-  background: #e5e7eb;
-  cursor: pointer;
-  font-size: 13px;
+.dbx-cards .card h3{
+  margin:0 0 8px;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:#6b7280;
 }
 
-.btn-chip.active {
-  background: #2a5298;
-  color: white;
+.dbx-cards .card p{
+  margin:0;
+  font-size:24px;
+  font-weight:800;
+  color:#111827;
+  word-break:break-word;
 }
 
-.btn-chip.danger {
-  background: #e74c3c;
-  color: white;
+/* colores heredados JS */
+.dbx-cards .card.ingreso::before{ background:#27ae60; }
+.dbx-cards .card.egreso::before{ background:#e74c3c; }
+.dbx-cards .card.utilidad::before{ background:#3498db; }
+.dbx-cards .card.viajes::before{ background:#f39c12; }
+.dbx-cards .card.margen::before{ background:#8e44ad; }
+.dbx-cards .card.facturas::before{ background:#16a085; }
+
+/* =========================
+   TABLAS
+========================= */
+.dbx-table-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:16px;
 }
 
-/* ========================= */
-/* FACTURAS KPI */
-/* ========================= */
-
-.facturas-kpi {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  font-size: 16px;
-  flex-wrap: wrap;
+.dbx-table-header{
+  margin-bottom:14px;
 }
 
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
+.dbx-table-header h3{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+  color:#111827;
+}
 
-/* TABLET */
-@media (max-width: 1000px) {
+.dbx-table-scroll{
+  width:100%;
+  max-height:520px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
 
-  .dashboard-main {
-    grid-template-columns: 1fr;
+.dbx-table-scroll::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+.dbx-table-scroll::-webkit-scrollbar-thumb{
+  background:#c7ced8;
+  border-radius:20px;
+}
+
+.dbx-table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:collapse;
+}
+
+.dbx-table th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#f3f4f6;
+  color:#111827;
+  font-size:13px;
+  font-weight:700;
+  text-align:left;
+  padding:12px 14px;
+  white-space:nowrap;
+}
+
+.dbx-table td{
+  padding:12px 14px;
+  font-size:14px;
+  border-bottom:1px solid #f1f1f1;
+  white-space:nowrap;
+}
+
+.dbx-table tbody tr:hover{
+  background:#fafafa;
+}
+
+/* =========================
+   TEXTOS DE COLORES
+========================= */
+.dbx-text-center{
+  text-align:center;
+}
+
+.text-green{
+  color:#16a34a;
+  font-weight:700;
+}
+
+.text-red{
+  color:#dc2626;
+  font-weight:700;
+}
+
+.text-blue{
+  color:#2563eb;
+  font-weight:700;
+}
+
+/* =========================
+   GRAFICAS
+========================= */
+.dbx-chart-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.dbx-chart-card h3{
+  margin:0 0 14px;
+  font-size:18px;
+  font-weight:700;
+  color:#111827;
+}
+
+.dbx-chart-wrap{
+  position:relative;
+  width:100%;
+  height:320px;
+}
+
+.dbx-chart-wrap canvas{
+  width:100% !important;
+  height:100% !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1200px){
+
+  .dbx-main{
+    grid-template-columns:1fr;
   }
 
-  .dashboard-chart {
-    height: auto;
+  .dbx-chart-wrap{
+    height:300px;
   }
 }
 
-/* MOBILE */
-@media (max-width: 600px) {
+@media (max-width:768px){
 
-  .dashboard-layout {
-    padding: 10px;
+  .dbx-layout{
+    padding:14px;
   }
 
-  .dashboard-header h2 {
-    font-size: 20px;
+  .dbx-header h2{
+    font-size:28px;
   }
 
-  /* ?? CARDS FULL WIDTH */
-  .dashboard-cards {
-    grid-template-columns: 1fr;
+  .dbx-filters-grid{
+    grid-template-columns:1fr;
   }
 
-  /* ?? FILTROS EN COLUMNA */
-  .filtros-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
+  .dbx-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
   }
 
-  .filtros-actions {
-    margin-left: 0;
-    justify-content: space-between;
-    width: 100%;
+  .dbx-btn{
+    width:100%;
   }
 
-  .btn-chip {
-    flex: 1;
-    text-align: center;
+  .dbx-cards{
+    grid-template-columns:1fr;
   }
 
-  /* ?? TABLAS MÁS COMPACTAS */
-  .dashboard-table {
-    padding: 10px;
+  .dbx-table{
+    min-width:760px;
   }
 
-  /* ?? GRAFICAS MÁS PEQUEÑAS */
-  .dashboard-chart {
-    padding: 15px;
+  .dbx-chart-wrap{
+    height:260px;
+  }
+}
+
+@media (max-width:480px){
+
+  .dbx-header h2{
+    font-size:24px;
   }
 
-  .dashboard-chart canvas {
-    max-height: 250px;
+  .dbx-filters-box,
+  .dbx-table-card,
+  .dbx-chart-card,
+  .dbx-cards .card{
+    padding:14px;
   }
+
+  .dbx-cards .card p{
+    font-size:20px;
+  }
+
+  .dbx-chart-wrap{
+    height:230px;
+  }
+}
+
+/* =====================================
+   FIX BOTONES ESTE MES / MES ANTERIOR
+   Reemplaza estos estilos al final CSS
+===================================== */
+
+/* ambos botones mismo estilo gris claro */
+#btnMesActual,
+#btnMesAnterior{
+  background:#eef2f7 !important;
+  color:#111827 !important;
+  border:none !important;
+}
+
+/* hover igual al resto */
+#btnMesActual:hover,
+#btnMesAnterior:hover{
+  background:#dde5ef !important;
+  color:#111827 !important;
+}
+
+/* opcional: si uno está activo por JS */
+#btnMesActual.active,
+#btnMesAnterior.active{
+  background:#2f56a6 !important;
+  color:#fff !important;
 }

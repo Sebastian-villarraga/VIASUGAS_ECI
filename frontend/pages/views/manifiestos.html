@@ -1,110 +1,95 @@
-<div class="manifiesto-layout">
+<div class="mfx-layout">
 
-  <div class="manifiesto-left">
+  <section class="mfx-main">
 
     <!-- HEADER -->
-    <div class="manifiesto-header">
+    <div class="mfx-header">
       <h2>Manifiestos</h2>
 
-      <button class="btn-secundario" id="btnAbrirModalManifiesto">
-        <i class="fas fa-plus"></i> Agregar manifiesto
+      <button class="mfx-btn mfx-btn-primary" id="btnAbrirModalManifiesto">
+        <i class="fas fa-plus"></i>
+        Agregar manifiesto
       </button>
     </div>
 
     <!-- FILTROS -->
-    <div class="manifiesto-filtros">
-      <div class="filtros-row">
+    <div class="mfx-filters-box">
+      <div class="mfx-filters-grid">
 
-        <div class="filtro-group">
+        <div class="mfx-group">
           <label>ID Manifiesto</label>
           <input type="text" id="filtroIdManifiesto" placeholder="Ej: MF-123-4567">
         </div>
-  
-      
-        <button class="btn-secundario" id="btnVerEsteMes">
+
+        <button class="mfx-btn mfx-btn-light" id="btnVerEsteMes">
           Ver este mes
         </button>
-        
-        <button class="btn-secundario" id="btnVerMesAnterior">
+
+        <button class="mfx-btn mfx-btn-light" id="btnVerMesAnterior">
           Ver mes anterior
         </button>
 
-        
-        <div class="filtro-group">
+        <div class="mfx-group">
           <label>Fecha desde</label>
           <input type="date" id="filtroFechaDesde">
         </div>
 
-        <div class="filtro-group">
+        <div class="mfx-group">
           <label>Fecha hasta</label>
           <input type="date" id="filtroFechaHasta">
         </div>
 
-        <div class="filtro-group">
+        <div class="mfx-group">
           <label>Estado</label>
           <select id="filtroEstado">
             <option value="">Todos</option>
           </select>
         </div>
 
-        <div class="filtro-group">
+        <div class="mfx-group">
           <label>Cliente</label>
           <select id="filtroCliente">
             <option value="">Todos</option>
           </select>
         </div>
 
-        
-        
-        <button class="btn-limpiar" id="btnLimpiarFiltrosManifiestos">
+        <button class="mfx-btn mfx-btn-danger" id="btnLimpiarFiltrosManifiestos">
           Limpiar
         </button>
 
       </div>
     </div>
 
-
-    <!-- ========================= -->
     <!-- CARDS GERENCIALES -->
-    <!-- ========================= -->
-    <div class="manifiesto-cards">
-    
-      <!-- CARD 1: PERIODO -->
-      <div class="card-gerencial card-periodo">
+    <div class="mfx-cards">
+
+      <div class="mfx-card mfx-card-periodo">
         <h4>Periodo visible</h4>
-        <p id="cardPeriodo">
-          -
-        </p>
+        <p id="cardPeriodo">-</p>
       </div>
-    
-      <!-- CARD 2: VIAJES POR ESTADO -->
-      <div class="card-gerencial card-estados">
+
+      <div class="mfx-card mfx-card-estados">
         <h4>Viajes por estado</h4>
-        <p id="cardEstados" class="multi-line">
-          -
-        </p>
+        <p id="cardEstados" class="mfx-multi-line">-</p>
       </div>
-    
-      <!-- CARD 3: FUTURA -->
-      <div class="card-gerencial card-futura">
+
+      <div class="mfx-card mfx-card-futura">
         <h4>Dato futuro</h4>
         <p>Próximamente</p>
       </div>
-    
-      <!-- CARD 4: FUTURA -->
-      <div class="card-gerencial card-futura">
+
+      <div class="mfx-card mfx-card-futura">
         <h4>Dato futuro</h4>
         <p>Próximamente</p>
       </div>
-    
+
     </div>
 
-
     <!-- TABLA -->
-    <div class="manifiesto-tabla">
-      <div class="tabla-body">
+    <div class="mfx-table-card">
+      <div class="mfx-table-scroll">
 
-        <table class="manifiesto-table">
+        <table class="mfx-table">
           <thead>
             <tr>
               <th>ID Manifiesto</th>
@@ -131,73 +116,71 @@
       </div>
     </div>
 
-  </div>
+  </section>
 
 </div>
 
-<!-- MODAL -->
-<div id="modalManifiesto" class="modal hidden">
-  <div class="modal-content modal-manifiesto">
+<!-- MODAL CREAR -->
+<div id="modalManifiesto" class="mfx-modal hidden">
+  <div class="mfx-modal-box mfx-modal-create">
 
     <h3>Agregar Manifiesto</h3>
 
-    <form id="formManifiesto" class="form-grid form-manifiesto">
+    <form id="formManifiesto" class="mfx-form-grid">
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>ID Manifiesto</label>
         <input type="text" id="id_manifiesto" required>
       </div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Radicado</label>
         <input type="number" id="radicado">
       </div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Fecha</label>
         <input type="date" id="fecha" required>
       </div>
 
-      <div class="form-group">
-        <label></label>
-      </div>
+      <div class="mfx-group mfx-empty"></div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Origen</label>
         <select id="origen_ciudad" required></select>
       </div>
-      
-      <div class="form-group">
+
+      <div class="mfx-group">
         <label>Destino</label>
         <select id="destino_ciudad" required></select>
       </div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Cliente</label>
         <select id="id_cliente"></select>
       </div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Conductor</label>
         <select id="id_conductor" required></select>
       </div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Vehículo</label>
         <select id="id_vehiculo" required></select>
       </div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Trailer</label>
         <select id="id_trailer" required></select>
       </div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Empresa a cargo</label>
         <select id="id_empresa_a_cargo" required></select>
       </div>
 
-      <div class="form-group">
+      <div class="mfx-group">
         <label>Flete</label>
         <input
           type="text"
@@ -208,8 +191,8 @@
           required
         >
       </div>
-      
-      <div class="form-group">
+
+      <div class="mfx-group">
         <label>Flete porcentaje</label>
         <input
           type="text"
@@ -219,8 +202,8 @@
           placeholder="Ej: 300.000"
         >
       </div>
-      
-      <div class="form-group">
+
+      <div class="mfx-group">
         <label>Anticipo manifiesto</label>
         <input
           type="text"
@@ -232,16 +215,13 @@
         >
       </div>
 
-
-
-      <div class="form-group full-width">
+      <div class="mfx-group mfx-full">
         <label>Observaciones</label>
         <textarea id="observaciones" rows="3" placeholder="Comentarios relevantes del viaje"></textarea>
       </div>
 
-      <div class="modal-actions full-width">
-        <button type="submit" class="btn-primary">Guardar</button>
-        <button type="button" id="btnCerrarModalManifiesto">Cancelar</button>
+      <div class="mfx-modal-actions mfx-full">
+        <button type="submit" class="mfx-btn mfx-btn-primary">Guardar</button>
       </div>
 
     </form>
@@ -249,106 +229,98 @@
   </div>
 </div>
 
-
-
-<!-- ========================= -->
-<!-- MODAL DETALLE MANIFIESTO -->
-<!-- ========================= -->
-<div id="modalDetalleManifiesto" class="modal hidden">
-  <div class="modal-content modal-detalle-manifiesto">
+<!-- MODAL DETALLE -->
+<div id="modalDetalleManifiesto" class="mfx-modal hidden">
+  <div class="mfx-modal-box mfx-modal-detail">
 
     <!-- HEADER -->
-    <div class="detalle-header">
+    <div class="mfx-detail-header">
       <h3>Detalle del Manifiesto</h3>
-    
-      <div class="detalle-header-actions">
-        <button type="button" id="btnEditarDetalle" class="btn-secundario">
-          <i class="fas fa-pen"></i> Editar
+
+      <div class="mfx-detail-header-actions">
+        <button type="button" id="btnEditarDetalle" class="mfx-btn mfx-btn-light">
+          <i class="fas fa-pen"></i>
+          Editar
         </button>
-    
-        <button type="button" id="btnGuardarDetalle" class="btn-secundario hidden">
-          <i class="fas fa-save"></i> Guardar cambios
+
+        <button type="button" id="btnGuardarDetalle" class="mfx-btn mfx-btn-primary hidden">
+          <i class="fas fa-save"></i>
+          Guardar cambios
         </button>
-    
-        <button type="button" id="btnCancelarEdicionDetalle" class="btn-limpiar hidden">
+
+        <button type="button" id="btnCancelarEdicionDetalle" class="mfx-btn mfx-btn-danger hidden">
           Cancelar
         </button>
-    
-        <button type="button" id="cerrarDetalleManifiesto" class="btn-cerrar-detalle">
+
+        <button type="button" id="cerrarDetalleManifiesto" class="mfx-close-detail">
           <i class="fas fa-times"></i>
         </button>
       </div>
     </div>
 
     <!-- CONTENIDO -->
-    <div class="detalle-container">
+    <div class="mfx-detail-container">
 
-      <!-- ========================= -->
       <!-- INFO GENERAL -->
-      <!-- ========================= -->
-      <div class="detalle-card detalle-main">
+      <div class="mfx-detail-card mfx-detail-main">
         <h4>MANIFIESTO</h4>
 
-        <div id="detalleInfoManifiesto" class="detalle-info-grid">
+        <div id="detalleInfoManifiesto" class="mfx-info-grid">
           <p>-</p>
         </div>
       </div>
 
-      <!-- ========================= -->
-      <!-- CARDS PRINCIPALES -->
-      <!-- ========================= -->
-      <div class="detalle-grid">
+      <!-- GRID FINANCIERO -->
+      <div class="mfx-detail-grid">
 
-        <!-- GASTOS CONDUCTOR -->
-        <div class="detalle-card">
+        <!-- GASTOS -->
+        <div class="mfx-detail-card">
           <h4>GASTOS DE CONDUCTOR</h4>
 
-          <div id="detalleGastos" class="detalle-list">
+          <div id="detalleGastos" class="mfx-detail-list">
             <p>-</p>
           </div>
 
-          <div class="detalle-total">
-            TOTAL: <span id="totalGastosDetalle">0</span>
+          <div class="mfx-detail-total">
+            TOTAL:
+            <span id="totalGastosDetalle">0</span>
           </div>
         </div>
 
         <!-- TRANSACCIONES -->
-        <div class="detalle-card">
+        <div class="mfx-detail-card">
           <h4>TRANSACCIONES</h4>
 
-          <div id="detalleTransacciones" class="detalle-list">
+          <div id="detalleTransacciones" class="mfx-detail-list">
             <p>-</p>
           </div>
 
-          <div class="detalle-total">
-            TOTAL: <span id="totalTransaccionesDetalle">0</span>
+          <div class="mfx-detail-total">
+            TOTAL:
+            <span id="totalTransaccionesDetalle">0</span>
           </div>
         </div>
 
         <!-- FACTURA -->
-        <div class="detalle-card">
+        <div class="mfx-detail-card">
           <h4>FACTURA</h4>
 
-          <div id="detalleFactura" class="detalle-list">
+          <div id="detalleFactura" class="mfx-detail-list">
             <p>-</p>
           </div>
 
-          <div class="detalle-total">
-            TOTAL: <span id="totalFacturaDetalle">0</span>
+          <div class="mfx-detail-total">
+            TOTAL:
+            <span id="totalFacturaDetalle">0</span>
           </div>
         </div>
 
       </div>
 
-      <!-- ========================= -->
-      <!-- RESUMEN FINAL -->
-      <!-- ========================= -->
-      <div class="detalle-card detalle-resumen">
+      <!-- RESUMEN -->
+      <div class="mfx-detail-card mfx-detail-summary">
         <h4>RESUMEN GENERAL</h4>
-
-        <p id="resumenDetalle">
-          -
-        </p>
+        <p id="resumenDetalle">-</p>
       </div>
 
     </div>

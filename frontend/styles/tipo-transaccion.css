@@ -1,152 +1,122 @@
-/* ========================= */
-/* BADGE  */
-/* ========================= */
+/* =====================================
+   CATEGORIA GASTOS CSS AISLADO - TTX
+   Mantiene badges, tabla, modal y filtros
+===================================== */
 
+/* =========================
+   BADGES TIPO
+========================= */
 .badge {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
 }
 
-/* INGRESO (VERDE) */
+/* INGRESO */
 .badge.ingreso {
   background: #B1F2C0;
-  color: white;
+  color: #ffffff;
 }
 
-/* EGRESO (NARANJA) */
+/* EGRESO */
 .badge.egreso {
   background: #EDC8B4;
-  color: white;
+  color: #ffffff;
 }
 
-/* OPERACIONAL (MORADO) */
+/* OPERACIONAL */
 .badge.operacional {
   background: #a855f7;
-  color: white;
+  color: #ffffff;
 }
 
-/* ========================= */
-/* LAYOUT (FIX PRINCIPAL) */
-/* ========================= */
+/* CONDUCTOR */
+.badge.conductor {
+  background: #3b82f6;
+  color: #ffffff;
+}
 
-.empresa-layout {
-  display: flex;
+/* =========================
+   LAYOUT
+========================= */
+.ttx-layout {
+  display: block;
+}
+
+.ttx-main {
   width: 100%;
+  min-width: 0;
 }
 
-/* ?? CAMBIO CLAVE: quitar centrado */
-.empresa-left {
-  width: 100%;
-  padding: 20px 25px;
-}
-
-/* ========================= */
-/* HEADER */
-/* ========================= */
-
-.empresa-header {
+/* =========================
+   HEADER
+========================= */
+.ttx-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
-/* ========================= */
-/* FILTROS */
-/* ========================= */
-
-.empresa-filtros {
-  background: #f8f9fb;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 15px;
+.ttx-header h2 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  color: #111827;
 }
 
-.filtros-row {
-  display: flex;
-  gap: 15px;
-  align-items: flex-end;
-  flex-wrap: wrap;
+/* =========================
+   BOTONES
+========================= */
+.ttx-btn {
+  border: none;
+  border-radius: 10px;
+  height: 44px;
+  padding: 0 18px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.2s ease;
 }
 
-.filtro-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.ttx-btn:hover {
+  transform: translateY(-1px);
 }
 
-.filtro-group input,
-.filtro-group select {
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #d0d5dd;
-  font-size: 13px;
-  min-width: 160px;
+.ttx-btn-primary {
+  background: #2f56a6;
+  color: white;
 }
 
-/* ========================= */
-/* TABLA */
-/* ========================= */
-
-.empresa-tabla {
-  width: 100%;
-  overflow-x: auto;
+.ttx-btn-primary:hover {
+  background: #24468a;
 }
 
-.empresa-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 900px;
+.ttx-btn-danger {
+  background: #ea4335;
+  color: white;
 }
 
-.empresa-table th {
-  text-align: left;
-  padding: 12px;
-  background: #f1f3f6;
-  font-size: 13px;
+.ttx-btn-danger:hover {
+  background: #cf3528;
 }
 
-.empresa-table td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
-  word-break: break-word;
-}
-
-/* Centrar columnas específicas */
-.empresa-table td:nth-child(3),
-.empresa-table td:nth-child(4),
-.empresa-table th:nth-child(3),
-.empresa-table th:nth-child(4) {
-  text-align: center;
-}
-
-/* Acciones */
-.empresa-table td:last-child {
-  text-align: center;
-}
-
-/* Hover */
-.empresa-table tbody tr:hover {
-  background: #fafafa;
-}
-
-/* ========================= */
-/* BOTONES */
-/* ========================= */
-
+/* icon buttons de tabla */
+.ttx-btn-icon,
 .btn-icon {
   border: none;
   background: transparent;
   cursor: pointer;
   font-size: 14px;
   color: #555;
+  padding: 4px;
 }
 
+.ttx-btn-icon:hover,
 .btn-icon:hover {
   color: #1976d2;
 }
@@ -155,177 +125,251 @@
   color: #2e7d32;
 }
 
-/* ========================= */
-/* FORM GRID (MODAL) */
-/* ========================= */
+/* =========================
+   FILTROS
+========================= */
+.ttx-filters-box {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
 
-.form-grid {
+.ttx-filters-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.ttx-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.ttx-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.ttx-field input,
+.ttx-field select {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  background: white;
+  box-sizing: border-box;
+}
+
+.ttx-field input:focus,
+.ttx-field select:focus {
+  outline: none;
+  border-color: #2f56a6;
+  box-shadow: 0 0 0 3px rgba(47,86,166,0.12);
+}
+
+.ttx-filter-action {
+  display: flex;
+  align-items: end;
+}
+
+/* =========================
+   TABLA
+========================= */
+.ttx-table-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.ttx-table-scroll {
+  width: 100%;
+  max-height: 560px;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ttx-table-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.ttx-table-scroll::-webkit-scrollbar-thumb {
+  background: #c7ced8;
+  border-radius: 20px;
+}
+
+.ttx-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.ttx-table th {
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  padding: 12px 14px;
+  white-space: nowrap;
+}
+
+.ttx-table td {
+  font-size: 14px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f1f1;
+  vertical-align: middle;
+}
+
+.ttx-table tbody tr:hover {
+  background: #fafafa;
+}
+
+/* columnas centradas tipo / estado / acciones */
+.ttx-table th:nth-child(3),
+.ttx-table th:nth-child(4),
+.ttx-table th:nth-child(5),
+.ttx-table td:nth-child(3),
+.ttx-table td:nth-child(4),
+.ttx-table td:nth-child(5) {
+  text-align: center;
+}
+
+/* =========================
+   MODAL
+========================= */
+.ttx-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.ttx-modal-box {
+  background: white;
+  width: min(92vw, 520px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+}
+
+.ttx-modal-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ttx-modal-box::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 20px;
+}
+
+.ttx-modal-box h3 {
+  margin: 0 0 18px;
+  font-size: 24px;
+  color: #111827;
+}
+
+/* =========================
+   FORM MODAL
+========================= */
+.ttx-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
-.form-grid input,
-.form-grid select {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #d0d5dd;
-  font-size: 13px;
-  width: 100%;
-}
-
-/* descripción full */
-#descripcion {
+.ttx-full {
   grid-column: span 2;
 }
 
-/* ========================= */
-/* MODAL */
-/* ========================= */
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.4);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  z-index: 1000;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-.modal-content {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  width: 420px;
-  max-width: 95%;
-}
-
-.modal-content h3 {
-  margin-bottom: 15px;
-}
-
-/* ========================= */
-/* ACCIONES MODAL */
-/* ========================= */
-
-.modal-footer {
+.ttx-modal-actions {
   grid-column: span 2;
-  display: block;
-  margin-top: 15px;
-}
-
-.modal-footer .full-width {
-  width: 100%;
-}
-
-.modal-footer .btn-principal {
-  width: 100%;
-  height: 45px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 500;
-
-  background: #2a5298;
-  color: white;
-
   display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-top: 8px;
 }
 
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
+.ttx-modal-actions .ttx-btn {
+  width: 100%;
+}
 
+/* errores */
+.input-error,
+.ttx-form-grid input.error,
+.ttx-form-grid select.error {
+  border-color: #dc2626 !important;
+  background: #fff5f5;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 900px) {
-
-  .empresa-table {
-    min-width: 700px;
+  .ttx-table {
+    min-width: 760px;
   }
-
 }
 
 @media (max-width: 768px) {
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  #descripcion {
-    grid-column: span 1;
-  }
-
-}
-
-@media (max-width: 600px) {
-
-  .empresa-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .filtros-row {
+  .ttx-header {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .filtro-group input,
-  .filtro-group select {
+  .ttx-header h2 {
+    font-size: 28px;
+  }
+
+  .ttx-header .ttx-btn {
     width: 100%;
   }
 
+  .ttx-filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ttx-filter-action {
+    display: block;
+  }
+
+  .ttx-btn {
+    width: 100%;
+  }
+
+  .ttx-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ttx-full,
+  .ttx-modal-actions {
+    grid-column: span 1;
+  }
 }
 
+@media (max-width: 480px) {
+  .ttx-header h2 {
+    font-size: 24px;
+  }
 
-/* ========================= */
-/* FIX MODAL BOTONES */
-/* ========================= */
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.modal-actions button {
-  height: 42px;
-  min-height: 42px;
-  display: inline-flex !important; 
-  align-items: center;
-  justify-content: center;
-  line-height: normal !important; 
-  padding: 0 18px !important;
-}
-
-.modal-actions .btn-primary {
-  order: 1;
-}
-
-.modal-actions .btn-secundario {
-  order: 2;
-  background: #e74c3c !important;
-  color: white !important;
-  border: none !important;
-  opacity: 1 !important;
-}
-
-/* ========================= */
-/* INPUT ERROR */
-/* ========================= */
-
-.input-error {
-  border: 2px solid #e74c3c !important;
-  background: #fff5f5;
+  .ttx-filters-box,
+  .ttx-table-card,
+  .ttx-modal-box {
+    padding: 14px;
+  }
 }

@@ -947,7 +947,7 @@ function renderDetalleModoLectura(data) {
   // =========================
   // RESUMEN
   // =========================
-  const resumen = totalFactura - totalGastos - totalEgresos;
+  const resumen = totalFactura + totalIngresos - totalEgresos;
   const resumenEl = document.getElementById("resumenDetalle");
 
   resumenEl.className =
@@ -955,7 +955,8 @@ function renderDetalleModoLectura(data) {
     resumen < 0 ? "resumen-negativo" :
     "resumen-cero";
 
-  resumenEl.textContent = `$${resumen.toLocaleString()}`;
+  resumenEl.textContent =
+  `${resumen < 0 ? "-$" : "$"}${Math.abs(resumen).toLocaleString()}`;
 }
 
 async function activarEdicionDetalle() {

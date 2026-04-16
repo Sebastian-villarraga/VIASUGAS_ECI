@@ -1,140 +1,151 @@
-<div class="transacciones-layout">
+<div class="ftx-layout">
 
   <!-- HEADER -->
-  <div class="transacciones-header">
+  <div class="ftx-header">
     <h2>Facturas</h2>
-    <button id="btnNuevaFactura" class="btn-secundario">
+
+    <button id="btnNuevaFactura" class="ftx-btn ftx-btn-primary">
       + Nueva Factura
     </button>
   </div>
 
   <!-- CARDS -->
-  <div class="transacciones-cards">
+  <div class="ftx-cards">
 
-    <div class="card ingreso">
+    <div class="ftx-card facturado">
       <h3>Total Facturado</h3>
       <p id="totalFacturado">$0</p>
     </div>
-  
-    <div class="card cobrado">
+
+    <div class="ftx-card cobrado">
       <h3>Total Cobrado</h3>
       <p id="totalCobrado">$0</p>
     </div>
-  
-    <div class="card pendiente">
+
+    <div class="ftx-card cartera">
       <h3>Cartera</h3>
       <p id="totalPendiente">$0</p>
     </div>
-  
-    <div class="card porcentaje">
+
+    <div class="ftx-card porcentaje">
       <h3>% Cobro</h3>
       <p id="porcentajeCobro">0%</p>
     </div>
-  
+
   </div>
 
   <!-- FILTROS -->
-  <div class="transacciones-filtros facturas-filtros">
-  
-    <button id="btnEsteMesFacturas" class="facturas-btn-rango">Ver este mes</button>
-    <button id="btnMesAnteriorFacturas" class="facturas-btn-rango">Ver mes anterior</button>
-  
-    <div class="facturas-filtro-group">
+  <div class="ftx-filtros">
+
+    <button id="btnEsteMesFacturas" class="ftx-btn ftx-btn-light">
+      Ver este mes
+    </button>
+
+    <button id="btnMesAnteriorFacturas" class="ftx-btn ftx-btn-light">
+      Ver mes anterior
+    </button>
+
+    <div class="ftx-group">
       <label>Desde</label>
       <input type="date" id="fDesde">
     </div>
-  
-    <div class="facturas-filtro-group">
+
+    <div class="ftx-group">
       <label>Hasta</label>
       <input type="date" id="fHasta">
     </div>
-  
-    <div class="facturas-filtro-group">
+
+    <div class="ftx-group">
       <label>Código factura</label>
       <input type="text" id="fCodigo" placeholder="Ej: F101">
     </div>
-  
-    <div class="facturas-filtro-group">
+
+    <div class="ftx-group">
       <label>Manifiesto</label>
       <select id="fManifiesto">
         <option value="">Todos</option>
       </select>
     </div>
-  
-    <button id="btnLimpiarFacturas">Limpiar</button>
-  
+
+    <button id="btnLimpiarFacturas" class="ftx-btn ftx-btn-danger">
+      Limpiar
+    </button>
+
   </div>
 
   <!-- TABLA -->
-  <div class="transacciones-tabla">
-    <table>
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Manifiesto</th>
-          <th>Emisión</th>
-          <th>Vencimiento</th>
-          <th>Valor</th>
-          <th>Ret. Fuente</th>
-          <th>Ret. ICA</th>
-          <th>Neto</th>
-          <th>Saldo Adeudado</th> 
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody id="tablaFacturas"></tbody>
-    </table>
+  <div class="ftx-table-card">
+
+    <div class="ftx-table-scroll">
+
+      <table class="ftx-table">
+
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Manifiesto</th>
+            <th>Emisión</th>
+            <th>Vencimiento</th>
+            <th>Valor</th>
+            <th>Ret. Fuente</th>
+            <th>Ret. ICA</th>
+            <th>Neto</th>
+            <th>Saldo Adeudado</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+
+        <tbody id="tablaFacturas"></tbody>
+
+      </table>
+
+    </div>
+
   </div>
 
 </div>
 
-
 <!-- MODAL FACTURA -->
-<div id="modalFactura" class="modal hidden">
-  <div class="modal-content modal-factura">
+<div id="modalFactura" class="ftx-modal hidden">
+
+  <div class="ftx-modal-box">
 
     <h3>Nueva Factura</h3>
 
-    <div class="form-grid">
-    
-      <div class="form-group">
+    <div class="ftx-form-grid">
+
+      <div class="ftx-group">
         <label>ID Factura (DIAN)</label>
-        <input 
-          type="text" 
-          id="codigoFactura" 
+        <input
+          type="text"
+          id="codigoFactura"
           placeholder="Ej: FV-12345"
           required
         >
       </div>
-    
-      
 
-      <!-- MANIFIESTO -->
-      <div class="form-group">
+      <div class="ftx-group">
         <label>Manifiesto</label>
         <select id="manifiestoFactura" required>
           <option value="">Seleccione</option>
         </select>
       </div>
 
-      <!-- FECHA EMISIÓN -->
-      <div class="form-group">
+      <div class="ftx-group">
         <label>Fecha emisión</label>
         <input type="date" id="fechaEmision" required>
       </div>
 
-      <!-- FECHA VENCIMIENTO -->
-      <div class="form-group">
+      <div class="ftx-group">
         <label>Fecha vencimiento</label>
         <input type="date" id="fechaVencimiento">
       </div>
 
-      <!-- VALOR TOTAL -->
-      <div class="form-group">
+      <div class="ftx-group">
         <label>Valor total</label>
-        <input 
-          type="text" 
-          id="valorFactura" 
+        <input
+          type="text"
+          id="valorFactura"
           placeholder="$0"
           inputmode="numeric"
           autocomplete="off"
@@ -142,35 +153,32 @@
         >
       </div>
 
-      <!-- PLAZO -->
-      <div class="form-group">
+      <div class="ftx-group">
         <label>Plazo (días)</label>
-        <input 
-          type="number" 
-          id="plazoPago" 
-          placeholder="Ej: 30" 
+        <input
+          type="number"
+          id="plazoPago"
+          placeholder="Ej: 30"
           min="0"
         >
       </div>
 
-      <!-- RETENCIÓN FUENTE -->
-      <div class="form-group">
+      <div class="ftx-group">
         <label>Retención fuente</label>
-        <input 
-          type="text" 
-          id="retencionFuente" 
+        <input
+          type="text"
+          id="retencionFuente"
           placeholder="$0"
           inputmode="numeric"
           autocomplete="off"
         >
       </div>
 
-      <!-- RETENCIÓN ICA -->
-      <div class="form-group">
+      <div class="ftx-group">
         <label>Retención ICA</label>
-        <input 
-          type="text" 
-          id="retencionIca" 
+        <input
+          type="text"
+          id="retencionIca"
           placeholder="$0"
           inputmode="numeric"
           autocomplete="off"
@@ -179,28 +187,40 @@
 
     </div>
 
-    <!-- BOTÓN FULL WIDTH 🔥 -->
-    <div class="modal-footer">
-      <button type="button" id="guardarFactura" class="btn-principal full-width">
+    <div class="ftx-modal-actions">
+      <button
+        type="button"
+        id="guardarFactura"
+        class="ftx-btn ftx-btn-primary"
+      >
         Guardar
       </button>
     </div>
 
   </div>
+
 </div>
 
 <!-- MODAL CONFIRMACION -->
-<div id="modalConfirmacion" class="modal hidden">
-  <div class="modal-content confirm-modal">
+<div id="modalConfirmacion" class="ftx-modal hidden">
+
+  <div class="ftx-confirm-box">
 
     <h3>Confirmar acción</h3>
-    <p id="confirmMensaje">¿Estás seguro?</p>
 
-    <div class="modal-footer">
-      <button id="btnConfirmar" class="btn-principal full-width">
+    <p id="confirmMensaje">
+      ¿Estás seguro?
+    </p>
+
+    <div class="ftx-modal-actions">
+      <button
+        id="btnConfirmar"
+        class="ftx-btn ftx-btn-primary"
+      >
         Aceptar
       </button>
     </div>
 
   </div>
+
 </div>

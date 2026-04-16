@@ -1,26 +1,33 @@
-<div class="empresa-layout">
+<div class="ttx-layout">
 
-  <div class="empresa-left">
+  <section class="ttx-main">
 
     <!-- HEADER -->
-    <div class="empresa-header">
+    <div class="ttx-header">
+
       <h2>Categoria Gastos</h2>
 
-      <button class="btn-secundario" onclick="abrirModalTipo()">
-        <i class="fas fa-plus"></i> Agregar tipo
+      <button
+        class="ttx-btn ttx-btn-primary"
+        onclick="abrirModalTipo()"
+      >
+        <i class="fas fa-plus"></i>
+        Agregar tipo
       </button>
+
     </div>
 
     <!-- FILTROS -->
-    <div class="empresa-filtros">
-      <div class="filtros-row">
+    <div class="ttx-filters-box">
 
-        <div class="filtro-group">
+      <div class="ttx-filters-grid">
+
+        <div class="ttx-field">
           <label>Categoría</label>
           <input type="text" id="filtroCategoria">
         </div>
 
-        <div class="filtro-group">
+        <div class="ttx-field">
           <label>Tipo</label>
           <select id="filtroTipo">
             <option value="">Todos</option>
@@ -31,7 +38,7 @@
           </select>
         </div>
 
-        <div class="filtro-group">
+        <div class="ttx-field">
           <label>Estado</label>
           <select id="filtroEstado">
             <option value="">Todos</option>
@@ -40,57 +47,73 @@
           </select>
         </div>
 
-        <button class="btn-limpiar" onclick="limpiarFiltrosTipos()">
-          Limpiar
-        </button>
+        <div class="ttx-filter-action">
+          <button
+            class="ttx-btn ttx-btn-danger"
+            onclick="limpiarFiltrosTipos()"
+          >
+            Limpiar
+          </button>
+        </div>
 
       </div>
+
     </div>
 
     <!-- TABLA -->
-    <div class="empresa-tabla">
-      <div class="tabla-body">
-    
-        <table class="empresa-table">
+    <div class="ttx-table-card">
+
+      <div class="ttx-table-scroll">
+
+        <table class="ttx-table">
+
           <thead>
             <tr>
               <th>Categoría</th>
               <th>Descripción</th>
-              <th>Tipo</th> 
+              <th>Tipo</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
-    
+
           <tbody id="tiposTable">
-            <tr><td colspan="5">Cargando...</td></tr> 
+            <tr>
+              <td colspan="5">Cargando...</td>
+            </tr>
           </tbody>
-    
+
         </table>
-    
+
       </div>
+
     </div>
 
-  </div>
+  </section>
 
 </div>
 
 <!-- MODAL -->
-<div id="modalTipo" class="modal hidden">
-  <div class="modal-content">
+<div id="modalTipo" class="ttx-modal hidden">
+
+  <div class="ttx-modal-box">
 
     <h3 id="modalTitulo">Agregar Categoria de gastos</h3>
 
-    <form id="formTipo" class="form-grid">
+    <form id="formTipo" class="ttx-form-grid">
 
       <!-- CATEGORIA -->
-      <div class="form-group">
+      <div class="ttx-field">
         <label>Categoría</label>
-        <input id="categoria" placeholder="Ej: Combustible" required>
+        <input
+          id="categoria"
+          placeholder="Ej: Combustible"
+          required
+        >
       </div>
 
       <!-- TIPO -->
-      <div class="form-group">
+      <div class="ttx-field">
         <label>Tipo</label>
         <select id="tipo" required>
           <option value="">Seleccione tipo</option>
@@ -102,13 +125,16 @@
       </div>
 
       <!-- DESCRIPCION -->
-      <div class="form-group full-width">
+      <div class="ttx-field ttx-full">
         <label>Descripción</label>
-        <input id="descripcion" placeholder="Detalle opcional">
+        <input
+          id="descripcion"
+          placeholder="Detalle opcional"
+        >
       </div>
 
       <!-- ESTADO -->
-      <div class="form-group">
+      <div class="ttx-field">
         <label>Estado</label>
         <select id="estado">
           <option value="activo">Activo</option>
@@ -116,9 +142,12 @@
         </select>
       </div>
 
-      <!-- BOTÓN FULL WIDTH 🔥 -->
-      <div class="modal-footer full-width">
-        <button type="submit" class="btn-principal full-width">
+      <!-- BOTON -->
+      <div class="ttx-modal-actions">
+        <button
+          type="submit"
+          class="ttx-btn ttx-btn-primary"
+        >
           Guardar
         </button>
       </div>
@@ -126,4 +155,5 @@
     </form>
 
   </div>
+
 </div>

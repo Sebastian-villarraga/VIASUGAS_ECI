@@ -1,400 +1,400 @@
-/* ========================= */
-/* LAYOUT */
-/* ========================= */
+/* =====================================
+   FACTURAS CSS AISLADO - FTX
+   Vista crítica / responsive / independiente
+===================================== */
 
-.transacciones-layout {
-  padding: 20px;
+/* =========================
+   LAYOUT
+========================= */
+.ftx-layout{
+  padding:20px;
+  width:100%;
+  box-sizing:border-box;
 }
 
-/* ========================= */
-/* HEADER */
-/* ========================= */
-
-.transacciones-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+/* =========================
+   HEADER
+========================= */
+.ftx-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  margin-bottom:22px;
 }
 
-.transacciones-header h2 {
-  font-size: 24px;
-  font-weight: 600;
+.ftx-header h2{
+  margin:0;
+  font-size:34px;
+  font-weight:700;
+  color:#111827;
 }
 
-/* BOTON NUEVA FACTURA */
-#btnNuevaFactura {
-  background: #2a5298;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+/* =========================
+   BOTONES
+========================= */
+.ftx-btn{
+  border:none;
+  border-radius:10px;
+  height:44px;
+  padding:0 18px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:700;
+  transition:.2s ease;
+  white-space:nowrap;
 }
 
-#btnNuevaFactura:hover {
-  background: #1e3c72;
-  transform: translateY(-1px);
+.ftx-btn:hover{
+  transform:translateY(-1px);
 }
 
-/* ========================= */
-/* CARDS */
-/* ========================= */
-
-.transacciones-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin: 20px 0 25px 0;
+.ftx-btn-primary{
+  background:#2f56a6;
+  color:#fff;
 }
 
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 18px 20px;
-  border: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  position: relative;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+.ftx-btn-primary:hover{
+  background:#24468a;
 }
 
-.card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  border-radius: 12px 0 0 12px;
+.ftx-btn-danger{
+  background:#ea4335;
+  color:#fff;
 }
 
-.card.ingreso::before { background: #27ae60; }
-.card.egreso::before { background: #e74c3c; }
-.card.utilidad::before { background: #f39c12; }
-
-.card.cobrado::before { background: #27ae60; }
-.card.pendiente::before { background: #e74c3c; }
-.card.porcentaje::before { background: #3498db; }
-
-.card h3 {
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 6px;
-  text-transform: uppercase;
+.ftx-btn-danger:hover{
+  background:#cf3528;
 }
 
-.card p {
-  font-size: 20px;
-  font-weight: 600;
+.ftx-btn-light{
+  background:#eef2f7;
+  color:#111827;
 }
 
-/* ========================= */
-/* FILTROS (?? FIX REAL) */
-/* ========================= */
-
-.transacciones-filtros {
-  margin-bottom: 20px;
-  padding: 18px;
-  border-radius: 12px;
-  background: white;
-  border: 1px solid #ddd;
-
-  display: flex;
-  flex-wrap: nowrap; /* ?? CLAVE */
-  gap: 10px;
-  align-items: center;
-
-  overflow-x: auto;
-  overflow-y: visible; 
+.ftx-btn-light:hover{
+  background:#dde5ef;
 }
 
-.transacciones-filtros input,
-.transacciones-filtros select,
-.select-search-wrapper {
-  min-width: 160px;
-  max-width: 200px;
-  flex: 0 0 auto; /* ?? NO CRECEN */
+/* =========================
+   CARDS
+========================= */
+.ftx-cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  margin-bottom:22px;
 }
 
-.select-search-wrapper {
-  position: relative;
-  width: 200px;
-  flex: 0 0 auto;
-  z-index: 20; /* ?? importante */
+.ftx-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px 20px;
+  position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
 }
 
-.select-search-input {
-  width: 100%;
-  padding: 9px 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+.ftx-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  border-radius:14px 0 0 14px;
 }
 
-#btnLimpiarFacturas {
-  flex: 0 0 auto;
-  white-space: nowrap;
+.ftx-card.facturado::before{ background:#27ae60; }
+.ftx-card.cobrado::before{ background:#16a34a; }
+.ftx-card.cartera::before{ background:#e74c3c; }
+.ftx-card.porcentaje::before{ background:#3498db; }
+
+.ftx-card h3{
+  margin:0 0 8px;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:#6b7280;
 }
 
-/* INPUTS */
-.transacciones-filtros input,
-.transacciones-filtros select {
-  padding: 9px;
-  border-radius: 8px;
-  border: 1px solid #d0d5dd;
-  width: 100%;
-  box-sizing: border-box;
+.ftx-card p{
+  margin:0;
+  font-size:24px;
+  font-weight:800;
+  color:#111827;
 }
 
-/* BOTON LIMPIAR */
-#btnLimpiarFacturas {
-  background: #e53935;
-  color: white;
-  border: none;
-  padding: 9px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  width: fit-content;
+/* =========================
+   FILTROS
+========================= */
+.ftx-filtros{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:22px;
+
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  align-items:end;
 }
 
-#btnLimpiarFacturas:hover {
-  background: #c62828;
+.ftx-group{
+  display:flex;
+  flex-direction:column;
 }
 
-/* ========================= */
-/* SELECT BUSCADOR (?? FIX CLAVE) */
-/* ========================= */
-
-.select-search-dropdown {
-  position: absolute;
-  top: 110%; 
-  left: 0;
-  width: 100%;
-  max-height: 200px;
-  overflow-y: auto;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  z-index: 9999; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.ftx-group label{
+  font-size:12px;
+  font-weight:600;
+  color:#6b7280;
+  margin-bottom:6px;
 }
 
-.transacciones-layout,
-.transacciones-filtros,
-.transacciones-tabla {
-  overflow: visible;
+.ftx-group input,
+.ftx-group select{
+  width:100%;
+  height:44px;
+  padding:0 14px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  font-size:14px;
+  background:#fff;
+  box-sizing:border-box;
 }
 
-.select-option {
-  padding: 8px 10px;
-  cursor: pointer;
+.ftx-group input:focus,
+.ftx-group select:focus{
+  outline:none;
+  border-color:#2f56a6;
+  box-shadow:0 0 0 3px rgba(47,86,166,.12);
 }
 
-.select-option:hover {
-  background: #f1f5f9;
+/* =========================
+   TABLA
+========================= */
+.ftx-table-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:16px;
 }
 
-.no-results {
-  padding: 10px;
-  color: #888;
-  text-align: center;
+.ftx-table-scroll{
+  width:100%;
+  max-height:620px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
 }
 
-/* ========================= */
-/* TABLA */
-/* ========================= */
-
-.transacciones-tabla {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #ddd;
+.ftx-table-scroll::-webkit-scrollbar{
+  width:10px;
+  height:10px;
 }
 
-.transacciones-tabla th,
-.transacciones-tabla td {
-  padding: 12px 16px;
+.ftx-table-scroll::-webkit-scrollbar-thumb{
+  background:#c7ced8;
+  border-radius:20px;
 }
 
-.transacciones-tabla tbody tr:hover {
-  background: #f9fafb;
+.ftx-table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:collapse;
 }
 
-/* ========================= */
-/* MODAL */
-/* ========================= */
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.ftx-table th{
+  background:#f3f4f6;
+  color:#111827;
+  font-size:13px;
+  font-weight:700;
+  text-align:left;
+  padding:12px 14px;
+  white-space:nowrap;
 }
 
-.modal.hidden {
-  display: none;
+.ftx-table td{
+  padding:12px 14px;
+  font-size:14px;
+  border-bottom:1px solid #f1f1f1;
+  white-space:nowrap;
+  vertical-align:middle;
 }
 
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  width: 350px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.ftx-table tbody tr:hover{
+  background:#fafafa;
 }
 
-.modal-content input,
-.modal-content select {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+/* =========================
+   BADGES ESTADO
+========================= */
+.badge{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
 }
 
-/* ========================= */
-/* MODAL FACTURA */
-/* ========================= */
-
-.modal-factura {
-  width: 600px;
+.badge.pagada{
+  background:#e8f5e9;
+  color:#2e7d32;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.badge.pendiente{
+  background:#fff7e6;
+  color:#d97706;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
+.badge.vencida{
+  background:#fdeaea;
+  color:#c62828;
 }
 
-.form-group label {
-  font-size: 12px;
-  color: #6b7280;
+/* =========================
+   MODALES
+========================= */
+.ftx-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
 
-/* ========================= */
-/* BOTÓN FULL WIDTH */
-/* ========================= */
-
-.modal-footer {
-  display: block;
-  margin-top: 20px;
+.hidden{
+  display:none !important;
 }
 
-.modal-footer .btn-principal {
-  width: 100%;
-  height: 45px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  background: #2a5298;
-  color: white;
-  transition: all 0.2s ease;
+.ftx-modal-box,
+.ftx-confirm-box{
+  background:#fff;
+  width:min(94vw,640px);
+  max-height:92vh;
+  overflow-y:auto;
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.18);
 }
 
-.modal-footer .btn-principal:hover {
-  background: #1e3c72;
-  transform: translateY(-1px);
+.ftx-confirm-box{
+  width:min(94vw,420px);
 }
 
-/* ========================= */
-/* BADGES */
-/* ========================= */
-
-.badge {
-  padding: 4px 8px;
-  border-radius: 6px;
-  color: white;
-  font-size: 12px;
+.ftx-modal-box::-webkit-scrollbar,
+.ftx-confirm-box::-webkit-scrollbar{
+  width:8px;
 }
 
-.badge.pendiente { background: #f39c12; }
-.badge.pagada { background: #27ae60; }
-.badge.vencida { background: #e74c3c; }
+.ftx-modal-box::-webkit-scrollbar-thumb,
+.ftx-confirm-box::-webkit-scrollbar-thumb{
+  background:#d1d5db;
+  border-radius:20px;
+}
 
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
+.ftx-modal-box h3,
+.ftx-confirm-box h3{
+  margin:0 0 18px;
+  font-size:24px;
+  color:#111827;
+}
 
-@media (max-width: 600px) {
-  .modal-factura {
-    width: 90%;
+.ftx-confirm-box p{
+  margin:0 0 18px;
+  color:#4b5563;
+  font-size:14px;
+}
+
+/* =========================
+   FORM MODAL
+========================= */
+.ftx-form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.ftx-modal-actions{
+  margin-top:18px;
+  display:flex;
+}
+
+.ftx-modal-actions .ftx-btn{
+  width:100%;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1200px){
+
+  .ftx-cards{
+    grid-template-columns:repeat(2,1fr);
   }
 
-  .form-grid {
-    grid-template-columns: 1fr;
+  .ftx-filtros{
+    grid-template-columns:repeat(3,1fr);
   }
 }
 
-.filtro-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+@media (max-width:768px){
+
+  .ftx-layout{
+    padding:14px;
+  }
+
+  .ftx-header{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .ftx-header h2{
+    font-size:28px;
+  }
+
+  .ftx-header .ftx-btn,
+  .ftx-btn{
+    width:100%;
+  }
+
+  .ftx-cards{
+    grid-template-columns:1fr;
+  }
+
+  .ftx-filtros{
+    grid-template-columns:1fr;
+  }
+
+  .ftx-form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .ftx-table{
+    min-width:1200px;
+  }
 }
 
-.filtro-group label {
-  font-size: 11px;
-  color: #6b7280;
-  font-weight: 500;
-}
+@media (max-width:480px){
 
-/* ========================= */
-/* FILTROS FACTURAS (AISLADO) */
-/* ========================= */
+  .ftx-header h2{
+    font-size:24px;
+  }
 
-.facturas-filtros .facturas-filtro-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  .ftx-card,
+  .ftx-filtros,
+  .ftx-table-card,
+  .ftx-modal-box,
+  .ftx-confirm-box{
+    padding:14px;
+  }
 
-.facturas-filtros .facturas-filtro-group label {
-  font-size: 11px;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-/* OPCIONAL PRO */
-.facturas-filtros .facturas-filtro-group label {
-  text-transform: uppercase;
-  font-size: 10px;
-  letter-spacing: 0.5px;
-}
-
-
-/* ========================= */
-/* BOTONES RANGO FACTURAS */
-/* ========================= */
-
-#btnEsteMesFacturas,
-#btnMesAnteriorFacturas {
-  background: #2a5298;
-  color: #fff;
-  border: none;
-  padding: 9px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  flex: 0 0 auto;
-}
-
-#btnEsteMesFacturas:hover,
-#btnMesAnteriorFacturas:hover {
-  background: #1e3c72;
-  transform: translateY(-1px);
+  .ftx-card p{
+    font-size:20px;
+  }
 }

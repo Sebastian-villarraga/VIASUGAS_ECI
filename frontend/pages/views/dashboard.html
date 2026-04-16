@@ -1,132 +1,139 @@
-<div class="dashboard-layout">
+<div class="dbx-layout">
 
-  <!-- ========================= -->
   <!-- HEADER -->
-  <!-- ========================= -->
-  <div class="dashboard-header">
+  <div class="dbx-header">
     <h2>Dashboard Gerencial</h2>
   </div>
 
-  <!-- ========================= -->
-  <!-- GRID PRINCIPAL ?? -->
-  <!-- ========================= -->
-  <div class="dashboard-main">
+  <!-- GRID PRINCIPAL -->
+  <div class="dbx-main">
 
-    <!-- ========================= -->
     <!-- IZQUIERDA -->
-    <!-- ========================= -->
-    <div class="dashboard-left">
-    
-      <!-- FILTROS -->
-      <div class="dashboard-filtros">
+    <section class="dbx-left">
 
-        <div class="filtros-row">
-      
-          <!-- FECHA DESDE -->
-          <div class="form-group">
+      <!-- FILTROS -->
+      <div class="dbx-filters-box">
+
+        <div class="dbx-filters-grid">
+
+          <div class="dbx-group">
             <label>Fecha desde</label>
             <input type="date" id="fDesdeDashboard">
           </div>
-      
-          <!-- FECHA HASTA -->
-          <div class="form-group">
+
+          <div class="dbx-group">
             <label>Fecha hasta</label>
             <input type="date" id="fHastaDashboard">
           </div>
-      
-          <!-- BOTONES -->
-          <div class="filtros-actions">
-            <button id="btnMesActual" class="btn-chip">Este mes</button>
-            <button id="btnMesAnterior" class="btn-chip active">Mes anterior</button>
-            <button id="btnLimpiarDashboard" class="btn-chip danger">Limpiar</button>
+
+          <div class="dbx-actions">
+            <button id="btnMesActual" class="dbx-btn dbx-btn-light">
+              Este mes
+            </button>
+
+            <button id="btnMesAnterior" class="dbx-btn dbx-btn-primary">
+              Mes anterior
+            </button>
+
+            <button id="btnLimpiarDashboard" class="dbx-btn dbx-btn-danger">
+              Limpiar
+            </button>
           </div>
-      
+
         </div>
-      
+
       </div>
 
       <!-- CARDS KPI -->
-      <div id="cardsDashboard" class="dashboard-cards">
+      <div id="cardsDashboard" class="dbx-cards">
         <!-- Se renderiza con JS -->
       </div>
-      
 
       <!-- TABLA RENTABILIDAD -->
-      <div class="dashboard-table">
+      <div class="dbx-table-card">
 
-        <div class="table-header">
+        <div class="dbx-table-header">
           <h3>Rentabilidad por Manifiesto</h3>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Manifiesto</th>
-              <th>Cliente</th>
-              <th class="text-center">Ingreso</th>
-              <th class="text-center">Egreso</th>
-              <th class="text-center">Utilidad</th>
-              <th class="text-center">Margen %</th>
-            </tr>
-          </thead>
+        <div class="dbx-table-scroll">
+          <table class="dbx-table">
 
-          <tbody id="tablaRentabilidad">
-            <!-- Se llena dinámicamente -->
-          </tbody>
-        </table>
+            <thead>
+              <tr>
+                <th>Manifiesto</th>
+                <th>Cliente</th>
+                <th class="dbx-text-center">Ingreso</th>
+                <th class="dbx-text-center">Egreso</th>
+                <th class="dbx-text-center">Utilidad</th>
+                <th class="dbx-text-center">Margen %</th>
+              </tr>
+            </thead>
+
+            <tbody id="tablaRentabilidad">
+              <!-- dinámico -->
+            </tbody>
+
+          </table>
+        </div>
 
       </div>
-      
-      <div class="dashboard-table">
 
-        <div class="table-header">
+      <!-- TABLA FACTURACION -->
+      <div class="dbx-table-card">
+
+        <div class="dbx-table-header">
           <h3>Estado de Facturación</h3>
         </div>
-      
-        <table>
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th class="text-center">Total Facturado</th>
-              <th class="text-center">Pagado</th>
-              <th class="text-center">Pendiente</th>
-            </tr>
-          </thead>
-      
-          <tbody id="tablaEstadoFacturacion">
-            <!-- dinámico -->
-          </tbody>
-        </table>
-      
+
+        <div class="dbx-table-scroll">
+          <table class="dbx-table">
+
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th class="dbx-text-center">Total Facturado</th>
+                <th class="dbx-text-center">Pagado</th>
+                <th class="dbx-text-center">Pendiente</th>
+              </tr>
+            </thead>
+
+            <tbody id="tablaEstadoFacturacion">
+              <!-- dinámico -->
+            </tbody>
+
+          </table>
+        </div>
+
       </div>
 
-    </div>
+    </section>
 
-    <!-- ========================= -->
     <!-- DERECHA -->
-    <!-- ========================= -->
-    <div class="dashboard-right">
+    <aside class="dbx-right">
 
-      <!-- GRAFICA -->
-      <div class="dashboard-chart">
+      <div class="dbx-chart-card">
         <h3>Ingresos vs Egresos</h3>
-        <canvas id="graficaIE"></canvas>
+        <div class="dbx-chart-wrap">
+          <canvas id="graficaIE"></canvas>
+        </div>
       </div>
-      
-      <div class="dashboard-chart">
+
+      <div class="dbx-chart-card">
         <h3>Gastos por Categoría</h3>
-      
-        <div class="chart-container">
+        <div class="dbx-chart-wrap">
           <canvas id="graficaCategorias"></canvas>
         </div>
       </div>
-      
-      <div class="dashboard-chart">
+
+      <div class="dbx-chart-card">
         <h3>Top Clientes por Facturación</h3>
-        <canvas id="graficaTopClientes"></canvas>
+        <div class="dbx-chart-wrap">
+          <canvas id="graficaTopClientes"></canvas>
+        </div>
       </div>
 
-    </div>
+    </aside>
 
   </div>
 

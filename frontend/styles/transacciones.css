@@ -1,365 +1,416 @@
-.transacciones-layout {
-  padding: 20px;
-}
+/* =====================================
+   TRANSACCIONES CSS AISLADO - TRX
+   Vista crítica / financiera / robusta
+===================================== */
 
-.transacciones-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-
-
-/* TABLA */
-.transacciones-tabla table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.transacciones-tabla td,
-.transacciones-tabla th {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-/* BADGES */
-.badge {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  color: white;
-}
-
-.badge.ingreso { background: #27ae60; }
-.badge.egreso { background: #e74c3c; }
-.badge.operacional { background: #f39c12; }
-.badge.conductor { background: #3498db; }
-
-/* ========================= */
-/* HEADER */
-/* ========================= */
-
-.transacciones-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.transacciones-header h2 {
-  font-size: 24px;
-  font-weight: 600;
-}
-
-/* BOTON NUEVA TRANSACCION */
-#btnNuevaTransaccion {
-  background: #2a5298;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#btnNuevaTransaccion:hover {
-  background: #1e3c72;
-  transform: translateY(-1px);
-}
-
-
-
-/* ========================= */
-/* FILTROS */
-/* ========================= */
-
-.transacciones-filtros {
-  margin-bottom: 20px;
-  padding: 18px;
-  border-radius: 12px;
-  background: white;
-  border: 1px solid #ddd;
-
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-/* INPUTS Y SELECTS */
-.transacciones-filtros input,
-.transacciones-filtros select {
-  padding: 9px 10px;
-  border-radius: 8px;
-  border: 1px solid #d0d5dd;
-  font-size: 13px;
-  min-width: 140px;
-  transition: all 0.2s ease;
-}
-
-/* FOCUS */
-.transacciones-filtros input:focus,
-.transacciones-filtros select:focus {
-  border-color: #2a5298;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(42,82,152,0.15);
-}
-
-/* BOTON LIMPIAR */
-#btnLimpiar {
-  background: #e53935;
-  color: white;
-  border: none;
-  padding: 9px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-#btnLimpiar:hover {
-  background: #c62828;
-}
-
-
-
-/* ========================= */
-/* CARDS ESTILO MANIFIESTOS */
-/* ========================= */
-
-.transacciones-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* ?? FUERZA 4 COLUMNAS */
-  gap: 10px;
-  margin: 10px 0 15px 0;
-}
-
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 10px 12px; /* ?? más compactas */
-  border: 1px solid #e5e7eb;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  position: relative;
-
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-
-/* LINEA LATERAL (como manifiestos) */
-.card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  border-radius: 12px 0 0 12px;
-}
-
-/* COLORES POR TIPO */
-.card.ingreso::before {
-  background: #27ae60;
-}
-
-.card.egreso::before {
-  background: #e74c3c;
-}
-
-.card.utilidad::before {
-  background: #f39c12;
-}
-
-.card.fechas::before {
-  background: #3b82f6; /* azul elegante */
-}
-
-/* TEXTO */
-.card h3 {
-  font-size: 10px;
-  margin-bottom: 3px;
-}
-
-.card p {
-  font-size: 16px;
-}
-
-
-/* ========================= */
-/* TABLA */
-/* ========================= */
-
-.transacciones-tabla {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  overflow: hidden;
-}
-
-.transacciones-tabla table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.transacciones-tabla th {
-  text-align: left;
-  padding: 12px 16px;
-  background: #f1f3f6;
-  font-size: 13px;
-}
-
-.transacciones-tabla td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
-}
-
-
-/* ========================= */
-/* RESPONSIVE */
-/* ========================= */
-
-@media (max-width: 900px) {
-
-  /* ?? TABLA CON SCROLL */
-  .transacciones-tabla {
-    width: 100%;
-    overflow-x: auto;
-  }
-
-  .transacciones-table {
-    min-width: 900px; /* ajusta según columnas */
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  /* ?? MANTENER FORMATO TABLA */
-  .transacciones-table thead {
-    display: table-header-group;
-  }
-
-  .transacciones-table tr {
-    display: table-row;
-  }
-
-  .transacciones-table td {
-    display: table-cell;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-  }
-
-  /* ? eliminar cards */
-  .transacciones-cards {
-    display: none;
-  }
-
-  /* ========================= */
-  /* FILTROS RESPONSIVE */
-  /* ========================= */
-
-  .transacciones-filtros {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .transacciones-filtros input,
-  .transacciones-filtros select {
-    width: 100%;
-  }
-
+/* =========================
+   LAYOUT
+========================= */
+.trx-layout{
+  padding:20px;
+  width:100%;
+  box-sizing:border-box;
 }
 
 /* =========================
-   FORM LAYOUT
+   HEADER
 ========================= */
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 10px;
+.trx-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  margin-bottom:22px;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group.full {
-  grid-column: span 2;
+.trx-header h2{
+  margin:0;
+  font-size:34px;
+  font-weight:700;
+  color:#111827;
 }
 
 /* =========================
-   INPUTS
+   BOTONES
 ========================= */
-
-.form-group label {
-  font-size: 12px;
-  margin-bottom: 4px;
-  color: #374151;
+.trx-btn{
+  border:none;
+  border-radius:10px;
+  height:44px;
+  padding:0 18px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:700;
+  transition:.2s ease;
+  white-space:nowrap;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.2s ease;
+.trx-btn:hover{
+  transform:translateY(-1px);
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: #3b82f6;
+.trx-btn-primary{
+  background:#2f56a6;
+  color:#fff;
+}
+
+.trx-btn-primary:hover{
+  background:#24468a;
+}
+
+.trx-btn-danger{
+  background:#ea4335;
+  color:#fff;
+}
+
+.trx-btn-danger:hover{
+  background:#cf3528;
+}
+
+.trx-btn-light{
+  background:#eef2f7;
+  color:#111827;
+}
+
+.trx-btn-light:hover{
+  background:#dde5ef;
 }
 
 /* =========================
-   TEXTAREA
+   CARDS
 ========================= */
+.trx-cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+  margin-bottom:22px;
+}
 
-textarea {
-  min-height: 70px;
-  resize: none;
+.trx-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px 20px;
+  position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+
+.trx-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  border-radius:14px 0 0 14px;
+}
+
+.trx-fechas::before{ background:#3b82f6; }
+.trx-ingreso::before{ background:#16a34a; }
+.trx-egreso::before{ background:#e74c3c; }
+.trx-utilidad::before{ background:#f39c12; }
+
+.trx-card h3{
+  margin:0 0 8px;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:#6b7280;
+}
+
+.trx-card p{
+  margin:0;
+  font-size:24px;
+  font-weight:800;
+  color:#111827;
 }
 
 /* =========================
-   BUTTON
+   FILTROS
 ========================= */
-
-.btn-primary {
-  margin-top: 15px;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: #3b5aa3;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
+.trx-filters-box{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:22px;
 }
 
-.btn-primary:hover {
-  background: #2f4a88;
+.trx-filters-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  align-items:end;
 }
 
-.transacciones-tabla.scroll {
-  max-height: 400px; /* ?? ajusta a gusto */
-  overflow-y: auto;
-  border-radius: 10px;
+.trx-group{
+  display:flex;
+  flex-direction:column;
 }
 
-.transacciones-tabla table thead th {
-  position: sticky;
-  top: 0;
-  background: #f9fafb;
-  z-index: 2;
+.trx-group label{
+  font-size:12px;
+  font-weight:600;
+  color:#6b7280;
+  margin-bottom:6px;
+}
+
+.trx-group input,
+.trx-group select,
+.trx-group textarea{
+  width:100%;
+  min-height:44px;
+  padding:10px 14px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  font-size:14px;
+  background:#fff;
+  box-sizing:border-box;
+}
+
+.trx-group textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.trx-group input:focus,
+.trx-group select:focus,
+.trx-group textarea:focus{
+  outline:none;
+  border-color:#2f56a6;
+  box-shadow:0 0 0 3px rgba(47,86,166,.12);
+}
+
+/* =========================
+   TABLA
+========================= */
+.trx-table-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:16px;
+}
+
+.trx-table-scroll{
+  width:100%;
+  max-height:620px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.trx-table-scroll::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+.trx-table-scroll::-webkit-scrollbar-thumb{
+  background:#c7ced8;
+  border-radius:20px;
+}
+
+.trx-table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:collapse;
+}
+
+.trx-table th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#f3f4f6;
+  color:#111827;
+  font-size:13px;
+  font-weight:700;
+  text-align:left;
+  padding:12px 14px;
+  white-space:nowrap;
+}
+
+.trx-table td{
+  padding:12px 14px;
+  font-size:14px;
+  border-bottom:1px solid #f1f1f1;
+  white-space:nowrap;
+  vertical-align:middle;
+}
+
+.trx-table tbody tr:hover{
+  background:#fafafa;
+}
+
+/* valor columna */
+.trx-table td:nth-child(6){
+  font-weight:700;
+}
+
+/* =========================
+   BADGES
+========================= */
+.badge{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.badge.ingreso{
+  background:#e8f5e9;
+  color:#2e7d32;
+}
+
+.badge.egreso{
+  background:#fdeaea;
+  color:#c62828;
+}
+
+.badge.operacional{
+  background:#ede9fe;
+  color:#6d28d9;
+}
+
+.badge.conductor{
+  background:#e0f2fe;
+  color:#0369a1;
+}
+
+/* =========================
+   MODAL
+========================= */
+.trx-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+.hidden{
+  display:none !important;
+}
+
+.trx-modal-box{
+  background:#fff;
+  width:min(94vw,620px);
+  max-height:92vh;
+  overflow-y:auto;
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.18);
+}
+
+.trx-modal-box::-webkit-scrollbar{
+  width:8px;
+}
+
+.trx-modal-box::-webkit-scrollbar-thumb{
+  background:#d1d5db;
+  border-radius:20px;
+}
+
+.trx-modal-box h3{
+  margin:0 0 18px;
+  font-size:24px;
+  color:#111827;
+}
+
+/* =========================
+   FORM MODAL
+========================= */
+.trx-form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:16px;
+}
+
+.trx-full{
+  grid-column:span 2;
+}
+
+.trx-modal-actions{
+  margin-top:18px;
+  display:flex;
+}
+
+.trx-modal-actions .trx-btn{
+  width:100%;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1200px){
+
+  .trx-cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .trx-filters-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+@media (max-width:768px){
+
+  .trx-layout{
+    padding:14px;
+  }
+
+  .trx-header{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .trx-header h2{
+    font-size:28px;
+  }
+
+  .trx-header .trx-btn,
+  .trx-btn{
+    width:100%;
+  }
+
+  .trx-cards{
+    grid-template-columns:1fr;
+  }
+
+  .trx-filters-grid{
+    grid-template-columns:1fr;
+  }
+
+  .trx-form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .trx-full{
+    grid-column:span 1;
+  }
+
+  .trx-table{
+    min-width:980px;
+  }
+}
+
+@media (max-width:480px){
+
+  .trx-header h2{
+    font-size:24px;
+  }
+
+  .trx-card,
+  .trx-filters-box,
+  .trx-table-card,
+  .trx-modal-box{
+    padding:14px;
+  }
+
+  .trx-card p{
+    font-size:20px;
+  }
 }

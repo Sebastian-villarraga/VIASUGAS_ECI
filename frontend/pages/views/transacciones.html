@@ -1,140 +1,157 @@
-<div class="transacciones-layout">
+<div class="trx-layout">
 
   <!-- HEADER -->
-  <div class="transacciones-header">
+  <div class="trx-header">
     <h2>Transacciones</h2>
-    <button id="btnNuevaTransaccion" class="btn-secundario">
+
+    <button id="btnNuevaTransaccion" class="trx-btn trx-btn-primary">
       + Nueva Transacción
     </button>
   </div>
 
   <!-- CARDS -->
-  <div class="transacciones-cards">
-    <div class="card fechas">
+  <div class="trx-cards">
+
+    <div class="trx-card trx-fechas">
       <h3>Fechas consultadas</h3>
       <p id="fechasConsultadas">Todas</p>
     </div>
-    <div class="card ingreso">
+
+    <div class="trx-card trx-ingreso">
       <h3>Ingresos</h3>
       <p id="totalIngresos">$0</p>
     </div>
-    <div class="card egreso">
+
+    <div class="trx-card trx-egreso">
       <h3>Egresos</h3>
       <p id="totalEgresos">$0</p>
     </div>
-    <div class="card utilidad">
+
+    <div class="trx-card trx-utilidad">
       <h3>Utilidad</h3>
       <p id="totalUtilidad">$0</p>
     </div>
+
   </div>
 
   <!-- FILTROS -->
+  <div class="trx-filters-box">
 
-  <div class="transacciones-filtros">
-  
-    
-  
-    <div class="filtros-row">
-  
-      <button id="btnEsteMes" class="btn-secundario">Ver este mes</button>
-      <button id="btnMesAnterior" class="btn-secundario">Ver mes anterior</button>
-  
-      <div class="filtro-group">
+    <div class="trx-filters-grid">
+
+      <button id="btnEsteMes" class="trx-btn trx-btn-light">
+        Ver este mes
+      </button>
+
+      <button id="btnMesAnterior" class="trx-btn trx-btn-light">
+        Ver mes anterior
+      </button>
+
+      <div class="trx-group">
         <label>Desde</label>
         <input type="date" id="fDesde">
       </div>
-  
-      <div class="filtro-group">
+
+      <div class="trx-group">
         <label>Hasta</label>
         <input type="date" id="fHasta">
       </div>
-  
-      <div class="filtro-group">
+
+      <div class="trx-group">
         <label>Categoria transacción</label>
         <select id="fTipo"></select>
       </div>
-  
-      <div class="filtro-group">
+
+      <div class="trx-group">
         <label>Banco</label>
         <select id="fBanco"></select>
       </div>
-  
-      <div class="filtro-group">
+
+      <div class="trx-group">
         <label>Manifiesto</label>
         <select id="fManifiesto"></select>
       </div>
-  
-      <button id="btnLimpiar" class="btn-limpiar">Limpiar</button>
-  
+
+      <button id="btnLimpiar" class="trx-btn trx-btn-danger">
+        Limpiar
+      </button>
+
     </div>
-  
+
   </div>
 
   <!-- TABLA -->
-  <div class="transacciones-tabla scroll">
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Tipo</th>
-          <th>Categoria</th>
-          <th>Banco</th>
-          <th>Manifiesto</th>
-          <th>Valor</th>
-          <th>Descripción</th>
-        </tr>
-      </thead>
-      <tbody id="tablaTransacciones"></tbody>
-    </table>
+  <div class="trx-table-card">
+
+    <div class="trx-table-scroll">
+
+      <table class="trx-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Categoria</th>
+            <th>Banco</th>
+            <th>Manifiesto</th>
+            <th>Valor</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+
+        <tbody id="tablaTransacciones"></tbody>
+      </table>
+
+    </div>
+
   </div>
 
 </div>
 
-
-
 <!-- MODAL -->
-<div id="modalTransaccion" class="modal hidden">
-  <div class="modal-content">
+<div id="modalTransaccion" class="trx-modal hidden">
+  <div class="trx-modal-box">
 
     <h3>Nueva Transacción</h3>
 
-    <div class="form-group">
+    <div class="trx-group">
       <label>Tipo de transacción</label>
       <select id="tipo"></select>
     </div>
 
-    <div id="formFields" class="form-grid">
-    
-      <div id="wrapManifiesto" class="form-group">
+    <div id="formFields" class="trx-form-grid">
+
+      <div id="wrapManifiesto" class="trx-group">
         <label>Manifiesto</label>
         <select id="manifiesto"></select>
       </div>
 
-      <div class="form-group">
+      <div class="trx-group">
         <label>Banco</label>
         <select id="banco"></select>
       </div>
 
-      
-
-      <div class="form-group">
+      <div class="trx-group">
         <label>Valor</label>
         <input type="text" id="valor">
       </div>
 
-      <div class="form-group">
+      <div class="trx-group">
         <label>Fecha de pago</label>
         <input type="date" id="fecha">
       </div>
 
-      <div class="form-group full">
+      <div class="trx-group trx-full">
         <label>Descripción</label>
         <textarea id="descripcion"></textarea>
       </div>
 
     </div>
 
-    <button id="guardarTransaccion" class="btn-primary">Guardar</button>
+    <div class="trx-modal-actions">
+      <button id="guardarTransaccion" class="trx-btn trx-btn-primary">
+        Guardar
+      </button>
+    </div>
 
   </div>
 </div>

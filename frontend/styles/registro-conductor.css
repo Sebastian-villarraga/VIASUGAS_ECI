@@ -1,167 +1,160 @@
+/* =====================================
+   REGISTRO CONDUCTOR CSS AISLADO - RCX
+   Mantiene IDs JS originales
+===================================== */
+
+/* =========================
+   CONTENEDOR GENERAL
+========================= */
 #rc-container {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   color: #1f2937;
+  padding: 18px;
 }
 
-/* CONTENEDOR GENERAL */
-#rc-container {
-  padding: 15px;
-}
-
-/* GRID */
-#rc-layout {
+/* =========================
+   LAYOUT
+========================= */
+.rcx-layout {
   display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 20px;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  align-items: start;
 }
 
-/* CARDS */
-#rc-left-card,
-#rc-right-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-}
-
-/* TITULO */
-#rc-title {
-  margin-bottom: 15px;
-}
-
-/* CAMPOS */
-.rc-field {
-  margin-bottom: 12px;
-}
-
-.rc-field label {
-  font-size: 13px;
-  color: #666;
-  display: block;
-  margin-bottom: 4px;
-}
-
-/* INPUTS */
-#rc-container input,
-#rc-container select,
-#rc-container textarea {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-}
-
-/* BOTON */
-#rc-guardar {
-  width: 100%;
-  margin-top: 10px;
-  background: #2f5aa8;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-#rc-guardar:hover {
-  background: #244a8a;
-}
-
-/* TABLA */
-#rc-tabla {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-#rc-tabla th {
-  text-align: left;
-  font-size: 13px;
-  color: #666;
-  padding-bottom: 8px;
-}
-
-#rc-tabla td {
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-
-/* HIDDEN */
-.rc-hidden {
-  display: none;
-}
-
-#rc-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 18px;
-}
-
-#rc-right-card h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 18px;
-}
-
-#rc-left-card,
-#rc-right-card {
+/* =========================
+   CARDS
+========================= */
+.rcx-left-card,
+.rcx-right-card {
   background: #ffffff;
-  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
   padding: 22px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
-.rc-field {
+/* =========================
+   TITULOS
+========================= */
+#rc-title {
+  margin: 0 0 18px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.rcx-right-card h3 {
+  margin: 0 0 18px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #374151;
+}
+
+/* =========================
+   CAMPOS
+========================= */
+.rcx-field {
   margin-bottom: 16px;
 }
 
-.rc-field label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #6b7280;
-  margin-bottom: 6px;
+.rcx-field label {
   display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
 }
 
+/* inputs conservando IDs */
 #rc-container input,
 #rc-container select,
 #rc-container textarea {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
   font-size: 14px;
-  transition: all 0.2s ease;
+  background: #ffffff;
+  box-sizing: border-box;
+  transition: 0.2s ease;
+}
+
+#rc-container textarea {
+  min-height: 110px;
+  resize: vertical;
 }
 
 #rc-container input:focus,
 #rc-container select:focus,
 #rc-container textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
+  border-color: #2f56a6;
+  box-shadow: 0 0 0 3px rgba(47,86,166,0.12);
 }
 
-#rc-guardar {
-  margin-top: 14px;
-  padding: 11px;
-  border-radius: 8px;
-  background: #2563eb;
-  color: #fff;
-  font-weight: 500;
+#rc-container input:disabled,
+#rc-container select:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* =========================
+   BOTON
+========================= */
+.rcx-btn {
   border: none;
+  border-radius: 10px;
+  height: 46px;
+  padding: 0 18px;
   cursor: pointer;
-  transition: 0.2s;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.2s ease;
 }
 
-#rc-guardar:hover {
-  background: #1d4ed8;
+.rcx-btn:hover {
+  transform: translateY(-1px);
 }
 
-#rc-tabla {
+.rcx-btn-primary,
+#rc-guardar {
   width: 100%;
+  background: #2f56a6;
+  color: #ffffff;
+}
+
+.rcx-btn-primary:hover,
+#rc-guardar:hover {
+  background: #24468a;
+}
+
+/* =========================
+   TABLA
+========================= */
+.rcx-table-scroll {
+  width: 100%;
+  max-height: 560px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rcx-table-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.rcx-table-scroll::-webkit-scrollbar-thumb {
+  background: #c7ced8;
+  border-radius: 20px;
+}
+
+#rc-tabla,
+.rcx-table {
+  width: 100%;
+  min-width: 520px;
   border-collapse: collapse;
-  margin-top: 12px; /* ?? separación del título */
 }
 
 #rc-tabla thead {
@@ -170,25 +163,165 @@
 
 #rc-tabla th {
   text-align: left;
+  padding: 0 0 12px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: #6b7280;
-  padding-bottom: 10px;
+  white-space: nowrap;
 }
 
 #rc-tabla td {
-  padding: 12px 0;
-  font-size: 14px;
+  padding: 14px 0;
   border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  color: #111827;
+  vertical-align: top;
 }
 
+#rc-tabla tbody tr:hover {
+  background: #fafafa;
+}
+
+/* valor destacado */
 .rc-valor {
-  font-weight: 600;
+  font-weight: 800;
   color: #16a34a;
 }
 
-#rc-layout {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 24px;
+/* =========================
+   HIDDEN ORIGINAL
+========================= */
+.rc-hidden {
+  display: none !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1100px) {
+  .rcx-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  #rc-container {
+    padding: 14px;
+  }
+
+  #rc-title {
+    font-size: 24px;
+  }
+
+  .rcx-left-card,
+  .rcx-right-card {
+    padding: 16px;
+  }
+
+  #rc-tabla {
+    min-width: 460px;
+  }
+}
+
+@media (max-width: 480px) {
+  #rc-title {
+    font-size: 22px;
+  }
+
+  .rcx-right-card h3 {
+    font-size: 16px;
+  }
+
+  #rc-container input,
+  #rc-container select,
+  #rc-container textarea {
+    font-size: 13px;
+  }
+}
+
+/* =====================================
+   FIX RESPONSIVE SOLO REGISTRO CONDUCTOR
+   Agrega esto AL FINAL de tu CSS actual
+===================================== */
+
+@media (max-width: 768px) {
+
+  /* contenedor general */
+  #rc-container {
+    padding: 10px;
+  }
+
+  /* una sola columna */
+  .rcx-layout {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  /* cards */
+  .rcx-left-card,
+  .rcx-right-card {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  /* titulo */
+  #rc-title {
+    font-size: 24px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  /* inputs */
+  #rc-container input,
+  #rc-container select,
+  #rc-container textarea {
+    width: 100%;
+    max-width: 100%;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  /* textarea */
+  #rc-container textarea {
+    min-height: 110px;
+  }
+
+  /* boton */
+  #rc-guardar {
+    width: 100%;
+    height: 46px;
+  }
+
+  /* tabla responsive */
+  .rcx-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  #rc-tabla {
+    min-width: 520px;
+    width: max-content;
+  }
+
+}
+
+/* celulares pequeños */
+@media (max-width: 480px) {
+
+  #rc-container {
+    padding: 8px;
+  }
+
+  #rc-title {
+    font-size: 22px;
+  }
+
+  .rcx-left-card,
+  .rcx-right-card {
+    padding: 14px;
+  }
+
 }
