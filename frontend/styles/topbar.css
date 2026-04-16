@@ -25,10 +25,9 @@
 .topbar-left {
   display: flex;
   align-items: center;
-
+  
   height: 100%;
   padding: 0;
-
   z-index: 1001; /* ?? encima pero controlado */
 }
 
@@ -44,6 +43,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  width: 25%;
 }
 
 /* ?? LOGO GRANDE BIEN HECHO */

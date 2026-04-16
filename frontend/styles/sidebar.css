@@ -121,12 +121,11 @@
 .content {
   margin-top: 60px;
   margin-left: 40px;
-  width: calc(100% - 40px);
-  transition: margin-left 0.3s ease;
-  overflow-x: hidden; 
+  width: 95%;
+
 }
 
 .sidebar:hover ~ .content {
-  margin-left: 150px;
-  width: calc(100% - 150px); 
+  margin-left: 40px;
+  width: 95%; 
 }
