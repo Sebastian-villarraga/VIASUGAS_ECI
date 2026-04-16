@@ -1,0 +1,205 @@
+<!-- pages/views/dashboard-cartera.html -->
+
+<div class="dcr-layout">
+
+  <!-- HEADER -->
+  <div class="dcr-header">
+    <h2>Dashboard de Cartera</h2>
+    <p>
+      Seguimiento de saldos pendientes, vencimientos, antigüedad y prioridades de cobro.
+    </p>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="dcr-main">
+
+    <!-- =========================================
+         COLUMNA IZQUIERDA
+    ========================================== -->
+    <section class="dcr-left">
+
+      <!-- FILTROS -->
+      <div class="dcr-filters-box">
+        <div class="dcr-filters-grid">
+
+          <div class="dcr-group">
+            <label for="dcrFechaDesde">Fecha desde</label>
+            <input type="date" id="dcrFechaDesde">
+          </div>
+
+          <div class="dcr-group">
+            <label for="dcrFechaHasta">Fecha hasta</label>
+            <input type="date" id="dcrFechaHasta">
+          </div>
+
+          <div class="dcr-actions">
+            <button
+              id="dcrBtnMesActual"
+              class="dcr-btn dcr-btn-light"
+              type="button"
+            >
+              Este mes
+            </button>
+
+            <button
+              id="dcrBtnMesAnterior"
+              class="dcr-btn dcr-btn-light"
+              type="button"
+            >
+              Mes anterior
+            </button>
+
+            <button
+              id="dcrBtnAnioActual"
+              class="dcr-btn dcr-btn-primary"
+              type="button"
+            >
+              Año actual
+            </button>
+
+            <button
+              id="dcrBtnLimpiar"
+              class="dcr-btn dcr-btn-danger"
+              type="button"
+            >
+              Limpiar
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- KPIS -->
+      <div id="dcrCardsDashboard" class="dcr-cards"></div>
+
+      <!-- FACTURAS VENCIDAS -->
+      <div class="dcr-table-card">
+        <div class="dcr-card-header">
+          <h3>Facturas Vencidas</h3>
+        </div>
+
+        <div class="dcr-table-scroll">
+          <table class="dcr-table">
+            <thead>
+              <tr>
+                <th>Factura</th>
+                <th>Cliente</th>
+                <th>Emisión</th>
+                <th>Vencimiento</th>
+                <th class="dcr-text-center">Días Mora</th>
+                <th class="dcr-text-center">Pendiente</th>
+              </tr>
+            </thead>
+
+            <tbody id="dcrTablaFacturasVencidas">
+              <tr>
+                <td colspan="6" class="dcr-empty-row">
+                  Cargando información...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DETALLE GENERAL -->
+      <div class="dcr-table-card">
+        <div class="dcr-card-header">
+          <h3>Detalle de Cartera</h3>
+        </div>
+
+        <div class="dcr-table-scroll">
+          <table class="dcr-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Factura</th>
+                <th>Bruto</th>
+                <th>Rte Fuente</th>
+                <th>Rte ICA</th>
+                <th>Neto</th>
+                <th>Pagado</th>
+                <th>Pendiente</th>
+                <th>Vence</th>
+                <th>Bucket</th>
+              </tr>
+            </thead>
+
+            <tbody id="dcrTablaDetalle">
+              <tr>
+                <td colspan="10" class="dcr-empty-row">
+                  Cargando información...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =========================================
+         COLUMNA DERECHA
+    ========================================== -->
+    <aside class="dcr-right">
+
+      <!-- AGING -->
+      <div class="dcr-chart-card">
+        <div class="dcr-card-header">
+          <h3>Antigüedad de Cartera</h3>
+        </div>
+
+        <div class="dcr-chart-wrap">
+          <canvas id="dcrGraficaAging"></canvas>
+        </div>
+      </div>
+
+      <!-- TOP DEUDORES -->
+      <div class="dcr-chart-card">
+        <div class="dcr-card-header">
+          <h3>Top Deudores</h3>
+        </div>
+
+        <div class="dcr-chart-wrap">
+          <canvas id="dcrGraficaTopDeudores"></canvas>
+        </div>
+      </div>
+
+      <!-- PANEL ALERTAS -->
+      <div class="dcr-alert-card">
+
+        <div class="dcr-card-header">
+          <h3>Prioridades del Día</h3>
+        </div>
+
+        <div class="dcr-alert-list">
+
+          <div class="dcr-alert-item dcr-alert-red">
+            <span class="dcr-alert-dot"></span>
+            Facturas con mora superior a 90 días
+          </div>
+
+          <div class="dcr-alert-item dcr-alert-orange">
+            <span class="dcr-alert-dot"></span>
+            Clientes con más de 3 facturas pendientes
+          </div>
+
+          <div class="dcr-alert-item dcr-alert-blue">
+            <span class="dcr-alert-dot"></span>
+            Validar pagos sin aplicar
+          </div>
+
+          <div class="dcr-alert-item dcr-alert-green">
+            <span class="dcr-alert-dot"></span>
+            Seguimiento cartera corriente próxima a vencer
+          </div>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+</div>

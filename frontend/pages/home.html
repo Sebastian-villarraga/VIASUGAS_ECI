@@ -33,6 +33,7 @@
   <link rel="stylesheet" href="/styles/global.css">
   <link rel="stylesheet" href="/styles/home.css">
   <link rel="stylesheet" href="/styles/dashboard-contable.css">
+  <link rel="stylesheet" href="/styles/dashboard-cartera.css">
 </head>
 
 <body>
@@ -159,7 +160,12 @@
         <span>&nbsp;Contable</span>
       </a>
     </li>
-    <li class="menu-item"><a href="#"><span>Cartera</span></a></li>
+    <li class="menu-item" data-view="dashboard-cartera">
+      <a href="javascript:void(0)" onclick="navigate('dashboard-cartera')">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <span>&nbsp;Cartera</span>
+      </a>
+    </li>
     <li class="menu-item"><a href="#"><span>Proyecciones</span></a></li>
 
     <li class="menu-item"><a href="#"><span>Usuarios</span></a></li>
@@ -306,6 +312,7 @@
 <script src="/js/registro-conductor.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/js/dashboard-contable.js"></script>
+<script src="/js/dashboard-cartera.js"></script>
 
 
 

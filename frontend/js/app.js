@@ -86,6 +86,9 @@ async function loadView(view) {
       case "dashboard-contable":
         if (typeof initDashboardContable === "function") initDashboardContable();
         break;
+      case "dashboard-cartera":
+        if (typeof initDashboardCartera === "function") initDashboardCartera();
+        break;
       
     }
 

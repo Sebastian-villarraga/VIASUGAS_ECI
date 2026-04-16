@@ -1,0 +1,502 @@
+/* =====================================
+   DASHBOARD CARTERA CSS AISLADO - DCR
+   Basado en dashboard.css + dashboard-contable.css
+   Misma línea visual / tipografía / tamaños
+===================================== */
+
+/* =========================
+   LAYOUT
+========================= */
+.dcr-layout{
+  padding:20px;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.dcr-main{
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:20px;
+  align-items:start;
+}
+
+.dcr-left,
+.dcr-right{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  min-width:0;
+}
+
+/* =========================
+   HEADER
+========================= */
+.dcr-header{
+  margin-bottom:20px;
+}
+
+.dcr-header h2{
+  margin:0 0 6px;
+  font-size:34px;
+  font-weight:700;
+  color:#111827;
+}
+
+.dcr-header p{
+  margin:0;
+  font-size:14px;
+  color:#6b7280;
+}
+
+/* =========================
+   BOTONES
+========================= */
+.dcr-btn{
+  border:none;
+  border-radius:10px;
+  height:44px;
+  padding:0 18px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:700;
+  transition:.2s ease;
+  white-space:nowrap;
+}
+
+.dcr-btn:hover{
+  transform:translateY(-1px);
+}
+
+.dcr-btn-primary{
+  background:#2f56a6;
+  color:#fff;
+}
+
+.dcr-btn-primary:hover{
+  background:#24468a;
+}
+
+.dcr-btn-light{
+  background:#eef2f7;
+  color:#111827;
+}
+
+.dcr-btn-light:hover{
+  background:#dde5ef;
+}
+
+.dcr-btn-danger{
+  background:#ea4335;
+  color:#fff;
+}
+
+.dcr-btn-danger:hover{
+  background:#cf3528;
+}
+
+/* =========================
+   FILTROS
+========================= */
+.dcr-filters-box{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+}
+
+.dcr-filters-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(220px,1fr));
+  gap:16px;
+  align-items:end;
+}
+
+.dcr-group{
+  display:flex;
+  flex-direction:column;
+}
+
+.dcr-group label{
+  font-size:12px;
+  font-weight:600;
+  color:#6b7280;
+  margin-bottom:6px;
+}
+
+.dcr-group input{
+  width:100%;
+  height:44px;
+  padding:0 14px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+.dcr-group input:focus{
+  outline:none;
+  border-color:#2f56a6;
+  box-shadow:0 0 0 3px rgba(47,86,166,.12);
+}
+
+.dcr-actions{
+  grid-column:1 / -1;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.dcr-actions .dcr-btn{
+  min-width:140px;
+  justify-content:center;
+}
+
+/* =========================
+   KPI CARDS
+========================= */
+.dcr-cards{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.dcr-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px 20px;
+  position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+
+.dcr-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  border-radius:14px 0 0 14px;
+}
+
+.dcr-card h3{
+  margin:0 0 8px;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:#6b7280;
+}
+
+.dcr-card p{
+  margin:0;
+  font-size:24px;
+  font-weight:800;
+  color:#111827;
+  word-break:break-word;
+}
+
+/* colores cartera */
+.dcr-kpi-total::before{ background:#2563eb; }
+.dcr-kpi-vencida::before{ background:#dc2626; }
+.dcr-kpi-corriente::before{ background:#16a34a; }
+.dcr-kpi-clientes::before{ background:#8e44ad; }
+.dcr-kpi-facturas::before{ background:#f39c12; }
+.dcr-kpi-recaudo::before{ background:#16a085; }
+
+/* =========================
+   TABLAS / CHARTS / ALERTAS
+========================= */
+.dcr-chart-card,
+.dcr-table-card,
+.dcr-alert-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.dcr-card-header{
+  margin-bottom:14px;
+}
+
+.dcr-card-header h3{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+  color:#111827;
+}
+
+/* =========================
+   CHARTS
+========================= */
+.dcr-chart-wrap{
+  position:relative;
+  width:100%;
+  height:320px;
+}
+
+.dcr-chart-wrap canvas{
+  width:100% !important;
+  height:100% !important;
+}
+
+/* =========================
+   TABLAS
+========================= */
+.dcr-table-scroll{
+  width:100%;
+  max-height:520px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.dcr-table-scroll::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+.dcr-table-scroll::-webkit-scrollbar-thumb{
+  background:#c7ced8;
+  border-radius:20px;
+}
+
+.dcr-table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:collapse;
+}
+
+.dcr-table th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#f3f4f6;
+  color:#111827;
+  font-size:13px;
+  font-weight:700;
+  text-align:left;
+  padding:12px 14px;
+  white-space:nowrap;
+}
+
+.dcr-table td{
+  padding:12px 14px;
+  font-size:14px;
+  border-bottom:1px solid #f1f1f1;
+  white-space:nowrap;
+}
+
+.dcr-table tbody tr:hover{
+  background:#fafafa;
+}
+
+.dcr-empty-row{
+  text-align:center;
+  color:#6b7280;
+  padding:18px !important;
+}
+
+/* =========================
+   ALERTAS
+========================= */
+.dcr-alert-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.dcr-alert-item{
+  padding:12px 14px;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.dcr-alert-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.dcr-alert-red{
+  background:#fef2f2;
+  color:#991b1b;
+}
+
+.dcr-alert-red .dcr-alert-dot{
+  background:#dc2626;
+}
+
+.dcr-alert-orange{
+  background:#fff7ed;
+  color:#9a3412;
+}
+
+.dcr-alert-orange .dcr-alert-dot{
+  background:#f97316;
+}
+
+.dcr-alert-blue{
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+
+.dcr-alert-blue .dcr-alert-dot{
+  background:#2563eb;
+}
+
+.dcr-alert-green{
+  background:#ecfdf5;
+  color:#166534;
+}
+
+.dcr-alert-green .dcr-alert-dot{
+  background:#16a34a;
+}
+
+/* =========================
+   TEXTOS
+========================= */
+.dcr-text-center{
+  text-align:center;
+}
+
+.dcr-text-right{
+  text-align:right;
+}
+
+.dcr-text-green{
+  color:#16a34a;
+  font-weight:700;
+}
+
+.dcr-text-red{
+  color:#dc2626;
+  font-weight:700;
+}
+
+.dcr-text-blue{
+  color:#2563eb;
+  font-weight:700;
+}
+
+/* =========================
+   BADGES AGING
+========================= */
+.dcr-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:68px;
+  height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.dcr-badge-current{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.dcr-badge-30{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.dcr-badge-60{
+  background:#fed7aa;
+  color:#9a3412;
+}
+
+.dcr-badge-90{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.dcr-badge-90plus{
+  background:#e5e7eb;
+  color:#111827;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1200px){
+
+  .dcr-main{
+    grid-template-columns:1fr;
+  }
+
+  .dcr-chart-wrap{
+    height:300px;
+  }
+}
+
+@media (max-width:768px){
+
+  .dcr-layout{
+    padding:14px;
+  }
+
+  .dcr-header h2{
+    font-size:28px;
+  }
+
+  .dcr-filters-grid{
+    grid-template-columns:1fr;
+  }
+
+  .dcr-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .dcr-btn{
+    width:100%;
+  }
+
+  .dcr-cards{
+    grid-template-columns:1fr;
+  }
+
+  .dcr-table{
+    min-width:980px;
+  }
+
+  .dcr-chart-wrap{
+    height:260px;
+  }
+}
+
+@media (max-width:480px){
+
+  .dcr-header h2{
+    font-size:24px;
+  }
+
+  .dcr-filters-box,
+  .dcr-table-card,
+  .dcr-chart-card,
+  .dcr-alert-card,
+  .dcr-card{
+    padding:14px;
+  }
+
+  .dcr-card p{
+    font-size:20px;
+  }
+
+  .dcr-chart-wrap{
+    height:230px;
+  }
+}
