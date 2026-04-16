@@ -51,6 +51,7 @@ const registroConductorRoutes = require("./routes/registroConductor.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const dashboardContableRoutes = require("./routes/dashboardContable.routes");
 const dashboardCarteraRoutes = require("./routes/dashboardCartera.routes");
+const dashboardProyeccionesRoutes = require("./routes/dashboardProyecciones.routes");
 
 
 app.use("/api", authRoutes);
@@ -71,6 +72,7 @@ app.use("/api/registro-conductor", registroConductorRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/dashboard-contable", dashboardContableRoutes);
 app.use("/api/dashboard-cartera", dashboardCarteraRoutes);
+app.use("/api/dashboard-proyecciones", dashboardProyeccionesRoutes);
 
 // =====================
 // HEALTH CHECKS

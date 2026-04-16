@@ -1,0 +1,421 @@
+/* =====================================
+   DASHBOARD PROYECCIONES CSS AISLADO - DPR
+   Basado en dashboard.css + dashboard-contable.css
+===================================== */
+
+.dpr-layout{
+  padding:20px;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.dpr-main{
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:20px;
+  align-items:start;
+}
+
+.dpr-left,
+.dpr-right{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  min-width:0;
+}
+
+/* HEADER */
+.dpr-header{
+  margin-bottom:20px;
+}
+
+.dpr-header h2{
+  margin:0 0 6px;
+  font-size:34px;
+  font-weight:700;
+  color:#111827;
+}
+
+.dpr-header p{
+  margin:0;
+  font-size:14px;
+  color:#6b7280;
+}
+
+/* BOTONES */
+.dpr-btn{
+  border:none;
+  border-radius:10px;
+  height:44px;
+  padding:0 18px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:700;
+  transition:.2s ease;
+  white-space:nowrap;
+}
+
+.dpr-btn:hover{
+  transform:translateY(-1px);
+}
+
+.dpr-btn-primary{
+  background:#2f56a6;
+  color:#fff;
+}
+
+.dpr-btn-primary:hover{
+  background:#24468a;
+}
+
+.dpr-btn-light{
+  background:#eef2f7;
+  color:#111827;
+}
+
+.dpr-btn-light:hover{
+  background:#dde5ef;
+}
+
+.dpr-btn-danger{
+  background:#ea4335;
+  color:#fff;
+}
+
+.dpr-btn-danger:hover{
+  background:#cf3528;
+}
+
+/* FILTROS */
+.dpr-filters-box{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+}
+
+.dpr-filters-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(220px,1fr));
+  gap:16px;
+  align-items:end;
+}
+
+.dpr-group{
+  display:flex;
+  flex-direction:column;
+}
+
+.dpr-group label{
+  font-size:12px;
+  font-weight:600;
+  color:#6b7280;
+  margin-bottom:6px;
+}
+
+.dpr-group input{
+  width:100%;
+  height:44px;
+  padding:0 14px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+.dpr-group input:focus{
+  outline:none;
+  border-color:#2f56a6;
+  box-shadow:0 0 0 3px rgba(47,86,166,.12);
+}
+
+.dpr-actions{
+  grid-column:1 / -1;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.dpr-actions .dpr-btn{
+  min-width:140px;
+  justify-content:center;
+}
+
+/* KPI */
+.dpr-cards{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.dpr-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px 20px;
+  position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+
+.dpr-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:5px;
+  border-radius:14px 0 0 14px;
+}
+
+.dpr-card h3{
+  margin:0 0 8px;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  color:#6b7280;
+}
+
+.dpr-card p{
+  margin:0;
+  font-size:24px;
+  font-weight:800;
+  color:#111827;
+  word-break:break-word;
+}
+
+.dpr-kpi-mes::before{ background:#2563eb; }
+.dpr-kpi-3m::before{ background:#16a34a; }
+.dpr-kpi-6m::before{ background:#7c3aed; }
+.dpr-kpi-facturas::before{ background:#d97706; }
+.dpr-kpi-clientes::before{ background:#0f766e; }
+.dpr-kpi-ticket::before{ background:#dc2626; }
+
+/* BLOQUES */
+.dpr-chart-card,
+.dpr-table-card,
+.dpr-alert-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.dpr-card-header{
+  margin-bottom:14px;
+}
+
+.dpr-card-header h3{
+  margin:0;
+  font-size:18px;
+  font-weight:700;
+  color:#111827;
+}
+
+/* CHARTS */
+.dpr-chart-wrap{
+  position:relative;
+  width:100%;
+  height:320px;
+}
+
+.dpr-chart-wrap canvas{
+  width:100% !important;
+  height:100% !important;
+}
+
+/* TABLAS */
+.dpr-table-scroll{
+  width:100%;
+  max-height:520px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+.dpr-table-scroll::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+.dpr-table-scroll::-webkit-scrollbar-thumb{
+  background:#c7ced8;
+  border-radius:20px;
+}
+
+.dpr-table{
+  width:max-content;
+  min-width:100%;
+  border-collapse:collapse;
+}
+
+.dpr-table th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#f3f4f6;
+  color:#111827;
+  font-size:13px;
+  font-weight:700;
+  text-align:left;
+  padding:12px 14px;
+  white-space:nowrap;
+}
+
+.dpr-table td{
+  padding:12px 14px;
+  font-size:14px;
+  border-bottom:1px solid #f1f1f1;
+  white-space:nowrap;
+}
+
+.dpr-table tbody tr:hover{
+  background:#fafafa;
+}
+
+.dpr-empty-row{
+  text-align:center;
+  color:#6b7280;
+  padding:18px !important;
+}
+
+/* ALERTAS */
+.dpr-alert-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.dpr-alert-item{
+  padding:12px 14px;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.dpr-alert-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.dpr-alert-blue{
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+
+.dpr-alert-blue .dpr-alert-dot{
+  background:#2563eb;
+}
+
+.dpr-alert-green{
+  background:#ecfdf5;
+  color:#166534;
+}
+
+.dpr-alert-green .dpr-alert-dot{
+  background:#16a34a;
+}
+
+.dpr-alert-orange{
+  background:#fff7ed;
+  color:#9a3412;
+}
+
+.dpr-alert-orange .dpr-alert-dot{
+  background:#f97316;
+}
+
+/* TEXTOS */
+.dpr-text-center{
+  text-align:center;
+}
+
+.dpr-text-green{
+  color:#16a34a;
+  font-weight:700;
+}
+
+.dpr-text-blue{
+  color:#2563eb;
+  font-weight:700;
+}
+
+.dpr-text-red{
+  color:#dc2626;
+  font-weight:700;
+}
+
+/* RESPONSIVE */
+@media (max-width:1200px){
+  .dpr-main{
+    grid-template-columns:1fr;
+  }
+
+  .dpr-chart-wrap{
+    height:300px;
+  }
+}
+
+@media (max-width:768px){
+  .dpr-layout{
+    padding:14px;
+  }
+
+  .dpr-header h2{
+    font-size:28px;
+  }
+
+  .dpr-filters-grid{
+    grid-template-columns:1fr;
+  }
+
+  .dpr-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .dpr-btn{
+    width:100%;
+  }
+
+  .dpr-cards{
+    grid-template-columns:1fr;
+  }
+
+  .dpr-table{
+    min-width:980px;
+  }
+
+  .dpr-chart-wrap{
+    height:260px;
+  }
+}
+
+@media (max-width:480px){
+  .dpr-header h2{
+    font-size:24px;
+  }
+
+  .dpr-filters-box,
+  .dpr-table-card,
+  .dpr-chart-card,
+  .dpr-alert-card,
+  .dpr-card{
+    padding:14px;
+  }
+
+  .dpr-card p{
+    font-size:20px;
+  }
+
+  .dpr-chart-wrap{
+    height:230px;
+  }
+}

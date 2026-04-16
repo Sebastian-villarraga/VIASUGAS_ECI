@@ -1,0 +1,145 @@
+<!-- pages/views/dashboard-proyecciones.html -->
+<div class="dpr-layout">
+
+  <div class="dpr-header">
+    <h2>Dashboard de Proyecciones</h2>
+    <p>Estimación de ingresos futuros con base en la fecha de vencimiento de las facturas y su saldo neto pendiente.</p>
+  </div>
+
+  <div class="dpr-main">
+
+    <!-- IZQUIERDA -->
+    <section class="dpr-left">
+
+      <div class="dpr-filters-box">
+        <div class="dpr-filters-grid">
+
+          <div class="dpr-group">
+            <label for="dprFechaDesde">Fecha desde</label>
+            <input type="date" id="dprFechaDesde">
+          </div>
+
+          <div class="dpr-group">
+            <label for="dprFechaHasta">Fecha hasta</label>
+            <input type="date" id="dprFechaHasta">
+          </div>
+
+          <div class="dpr-actions">
+            <button id="dprBtnMesActual" class="dpr-btn dpr-btn-light" type="button">Este mes</button>
+            <button id="dprBtnMesAnterior" class="dpr-btn dpr-btn-light" type="button">Mes anterior</button>
+            <button id="dprBtnProx3Meses" class="dpr-btn dpr-btn-primary" type="button">Próx. 3 meses</button>
+            <button id="dprBtnLimpiar" class="dpr-btn dpr-btn-danger" type="button">Limpiar</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="dprCardsDashboard" class="dpr-cards"></div>
+
+      <div class="dpr-chart-card">
+        <div class="dpr-card-header">
+          <h3>Proyección Mensual de Ingresos</h3>
+        </div>
+        <div class="dpr-chart-wrap">
+          <canvas id="dprGraficaMensual"></canvas>
+        </div>
+      </div>
+
+      <div class="dpr-table-card">
+        <div class="dpr-card-header">
+          <h3>Facturas Próximas a Vencer</h3>
+        </div>
+
+        <div class="dpr-table-scroll">
+          <table class="dpr-table">
+            <thead>
+              <tr>
+                <th>Factura</th>
+                <th>Cliente</th>
+                <th>Vencimiento</th>
+                <th class="dpr-text-center">Neto</th>
+                <th class="dpr-text-center">Pagado</th>
+                <th class="dpr-text-center">Proyectado</th>
+              </tr>
+            </thead>
+            <tbody id="dprTablaFacturasProximas"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dpr-table-card">
+        <div class="dpr-card-header">
+          <h3>Detalle de Proyección</h3>
+        </div>
+
+        <div class="dpr-table-scroll">
+          <table class="dpr-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Factura</th>
+                <th>Emisión</th>
+                <th>Vencimiento</th>
+                <th class="dpr-text-center">Bruto</th>
+                <th class="dpr-text-center">Rte Fuente</th>
+                <th class="dpr-text-center">Rte ICA</th>
+                <th class="dpr-text-center">Neto</th>
+                <th class="dpr-text-center">Pagado</th>
+                <th class="dpr-text-center">Pendiente</th>
+              </tr>
+            </thead>
+            <tbody id="dprTablaDetalle"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- DERECHA -->
+    <aside class="dpr-right">
+
+      <div class="dpr-chart-card">
+        <div class="dpr-card-header">
+          <h3>Proyección Semanal</h3>
+        </div>
+        <div class="dpr-chart-wrap">
+          <canvas id="dprGraficaSemanal"></canvas>
+        </div>
+      </div>
+
+      <div class="dpr-chart-card">
+        <div class="dpr-card-header">
+          <h3>Top Clientes Proyectados</h3>
+        </div>
+        <div class="dpr-chart-wrap">
+          <canvas id="dprGraficaTopClientes"></canvas>
+        </div>
+      </div>
+
+      <div class="dpr-alert-card">
+        <div class="dpr-card-header">
+          <h3>Lectura Ejecutiva</h3>
+        </div>
+
+        <div class="dpr-alert-list">
+          <div class="dpr-alert-item dpr-alert-blue">
+            <span class="dpr-alert-dot"></span>
+            Este dashboard usa la fecha de vencimiento como fecha estimada de entrada de dinero.
+          </div>
+
+          <div class="dpr-alert-item dpr-alert-green">
+            <span class="dpr-alert-dot"></span>
+            Los valores están neteados por retención en la fuente y retención ICA.
+          </div>
+
+          <div class="dpr-alert-item dpr-alert-orange">
+            <span class="dpr-alert-dot"></span>
+            Solo se proyecta el saldo aún pendiente de recaudar por factura.
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</div>
