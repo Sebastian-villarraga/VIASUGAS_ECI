@@ -1,27 +1,28 @@
-<div class="conductor-layout">
+<div class="drx-layout">
 
   <!-- IZQUIERDA -->
-  <div class="conductor-left">
+  <section class="drx-main">
 
-    <div class="conductor-header">
+    <div class="drx-header">
       <h2>Conductores</h2>
     </div>
 
     <!-- FILTROS -->
-    <div class="conductor-filtros">
-      <div class="filtros-row">
+    <div class="drx-filters-box">
 
-        <div class="filtro-group">
+      <div class="drx-filters-grid">
+
+        <div class="drx-field">
           <label>Nombre</label>
           <input type="text" id="filtroNombre">
         </div>
 
-        <div class="filtro-group">
+        <div class="drx-field">
           <label>Cédula</label>
           <input type="text" id="filtroCedula">
         </div>
 
-        <div class="filtro-group">
+        <div class="drx-field">
           <label>Estado</label>
           <select id="filtroEstado">
             <option value="">Todos</option>
@@ -30,18 +31,26 @@
           </select>
         </div>
 
-        <button class="btn-limpiar" onclick="limpiarFiltrosConductores()">
-          Limpiar
-        </button>
+        <div class="drx-filter-action">
+          <button
+            class="drx-btn drx-btn-danger"
+            onclick="limpiarFiltrosConductores()"
+          >
+            Limpiar
+          </button>
+        </div>
 
       </div>
+
     </div>
 
     <!-- TABLA -->
-    <div class="conductor-tabla">
-      <div class="tabla-body">
+    <div class="drx-table-card">
 
-        <table class="conductor-table">
+      <div class="drx-table-scroll">
+
+        <table class="drx-table">
+
           <thead>
             <tr>
               <th>Cédula</th>
@@ -63,77 +72,87 @@
         </table>
 
       </div>
+
     </div>
 
-  </div>
+  </section>
 
   <!-- DERECHA -->
-  <div class="conductor-right">
+  <aside class="drx-sidebar">
 
-    <button class="btn-primary btn-add-right" onclick="abrirModalConductor()">
-      <i class="fas fa-plus"></i> Agregar conductor
+    <button
+      class="drx-btn drx-btn-primary drx-btn-full"
+      onclick="abrirModalConductor()"
+    >
+      <i class="fas fa-plus"></i>
+      Agregar conductor
     </button>
 
-    <div class="conductor-side">
+    <!-- ALERTAS -->
+    <div class="drx-alert-card">
 
       <h3>
-        <i class="fas fa-exclamation-triangle"></i> Alertas
+        <i class="fas fa-exclamation-triangle"></i>
+        Alertas
       </h3>
 
-      <ul id="alertasConductores">
-        <li>Cargando alertas...</li>
-      </ul>
+      <div class="drx-alert-list">
+        <ul id="alertasConductores">
+          <li>Cargando alertas...</li>
+        </ul>
+      </div>
 
     </div>
 
-  </div>
+  </aside>
 
 </div>
 
 <!-- MODAL -->
-<div id="modalConductor" class="modal hidden">
-  <div class="modal-content">
+<div id="modalConductor" class="drx-modal hidden">
+
+  <div class="drx-modal-box">
 
     <h3>Agregar Conductor</h3>
 
-    <form id="formConductor">
+    <form id="formConductor" class="drx-form-grid">
 
-      <div class="form-group">
+      <div class="drx-field">
         <label>Cédula</label>
         <input type="text" id="cedula" required>
       </div>
 
-      <div class="form-group">
+      <div class="drx-field">
         <label>Nombre</label>
         <input type="text" id="nombre" required>
       </div>
 
-      <div class="form-group">
+      <div class="drx-field">
         <label>Correo</label>
         <input type="text" id="correo">
       </div>
 
-      <div class="form-group">
+      <div class="drx-field">
         <label>Teléfono</label>
         <input type="text" id="telefono">
       </div>
 
-      <div class="form-group full">
+      <div class="drx-field drx-full">
         <label>Licencia</label>
         <input type="date" id="licencia" required>
       </div>
 
-      <div class="form-group full">
+      <div class="drx-field drx-full">
         <label>Manipulación alimentos</label>
         <input type="date" id="alimentos" required>
       </div>
 
-      <div class="form-group full">
+      <div class="drx-field drx-full">
         <label>Sustancias peligrosas</label>
         <input type="date" id="sustancias" required>
       </div>
 
-      <div class="form-group full">
+      <div class="drx-field drx-full">
         <label>Estado</label>
         <select id="estado">
           <option value="activo">Activo</option>
@@ -141,12 +160,11 @@
         </select>
       </div>
 
-      <div class="modal-actions">
-        <button type="button" onclick="cerrarModalConductor()" class="btn-secondary">
-          Cancelar
-        </button>
-
-        <button type="submit" class="btn-primary">
+      <div class="drx-modal-actions">
+        <button
+          type="submit"
+          class="drx-btn drx-btn-primary"
+        >
           Guardar
         </button>
       </div>
@@ -154,4 +172,5 @@
     </form>
 
   </div>
+
 </div>

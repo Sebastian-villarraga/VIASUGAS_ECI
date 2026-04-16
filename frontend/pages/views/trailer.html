@@ -1,30 +1,36 @@
-<div class="trailer-layout">
+<div class="thx-layout">
 
-  <!-- ========================= -->
   <!-- IZQUIERDA -->
-  <!-- ========================= -->
-  <div class="trailer-left">
+  <section class="thx-main">
 
-    <!-- HEADER -->
-    <div class="trailer-header">
+    <div class="thx-header">
       <h2>Trailers</h2>
     </div>
 
     <!-- FILTROS -->
-    <div class="trailer-filtros">
-      <div class="filtros-row">
-    
-        <div class="filtro-group">
+    <div class="thx-filters-box">
+
+      <div class="thx-filters-grid">
+
+        <div class="thx-field">
           <label>Placa</label>
-          <input type="text" id="filtroPlaca" placeholder="Ej: ABC123">
+          <input
+            type="text"
+            id="filtroPlaca"
+            placeholder="Ej: ABC123"
+          >
         </div>
-    
-        <div class="filtro-group">
+
+        <div class="thx-field">
           <label>Propietario</label>
-          <input type="text" id="filtroPropietario" placeholder="Nombre propietario">
+          <input
+            type="text"
+            id="filtroPropietario"
+            placeholder="Nombre propietario"
+          >
         </div>
-    
-        <div class="filtro-group">
+
+        <div class="thx-field">
           <label>Estado</label>
           <select id="filtroEstado">
             <option value="">Todos</option>
@@ -32,19 +38,27 @@
             <option value="inactivo">Inactivo</option>
           </select>
         </div>
-    
-        <button class="btn-limpiar" onclick="limpiarFiltros()">
-          Limpiar
-        </button>
-    
+
+        <div class="thx-filter-action">
+          <button
+            class="thx-btn thx-btn-danger"
+            onclick="limpiarFiltros()"
+          >
+            Limpiar
+          </button>
+        </div>
+
       </div>
+
     </div>
 
     <!-- TABLA -->
-    <div class="trailer-tabla">
-      <div class="tabla-body">
+    <div class="thx-table-card">
 
-        <table class="trailer-table">
+      <div class="thx-table-scroll">
+
+        <table class="thx-table">
+
           <thead>
             <tr>
               <th>Placa</th>
@@ -52,95 +66,104 @@
               <th>Cert. Fumigación</th>
               <th>Cert. Sanidad</th>
               <th>Estado</th>
-              <th style="width: 80px;">Acciones</th>
+              <th>Acciones</th>
             </tr>
           </thead>
 
           <tbody id="trailerTable">
             <tr>
-              <td colspan="5">Cargando trailers...</td>
+              <td colspan="6">Cargando trailers...</td>
             </tr>
           </tbody>
 
         </table>
 
       </div>
+
     </div>
 
-  </div>
+  </section>
 
-  <!-- ========================= -->
   <!-- DERECHA -->
-  <!-- ========================= -->
-  <div class="trailer-right">
+  <aside class="thx-sidebar">
 
-  <!-- BOTÓN -->
-    <button class="btn-primary btn-add-right" onclick="abrirModalTrailer()">
-      <i class="fas fa-plus"></i> Agregar trailer
+    <button
+      class="thx-btn thx-btn-primary thx-btn-full"
+      onclick="abrirModalTrailer()"
+    >
+      <i class="fas fa-plus"></i>
+      Agregar trailer
     </button>
-  
-    <!-- PANEL -->
-    <div class="trailer-side">
-  
-      <!-- ALERTAS -->
-      <h3><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
-  
-      <!-- RESUMEN -->
-      <div class="alertas-resumen">
-        <div class="alerta-box vencidos" onclick="filtrarVencidos()">
+
+    <div class="thx-alert-card">
+
+      <h3>
+        <i class="fas fa-exclamation-triangle"></i>
+        Alertas
+      </h3>
+
+      <div class="thx-alert-actions">
+      
+        <button
+          type="button"
+          class="thx-alert-summary thx-alert-summary-danger"
+          onclick="filtrarVencidos()"
+        >
           <span id="countVencidos">0</span> vencidos
-        </div>
-  
-        <div class="alerta-box proximos" onclick="filtrarProximos()">
+        </button>
+      
+        <button
+          type="button"
+          class="thx-alert-summary thx-alert-summary-warn"
+          onclick="filtrarProximos()"
+        >
           <span id="countProximos">0</span> por vencer
-        </div>
+        </button>
+      
       </div>
-  
-      <!-- LISTA -->
-      <div id="alertasList" class="alertas-list">
+
+      <div id="alertasList" class="thx-alert-list">
         <div>Cargando alertas...</div>
       </div>
-  
+
     </div>
-  
-  </div>
+
+  </aside>
 
 </div>
 
-<!-- ========================= -->
-<!-- MODAL TRAILER -->
-<!-- ========================= -->
-<div id="modalTrailer" class="modal hidden">
+<!-- MODAL -->
+<div id="modalTrailer" class="thx-modal hidden">
 
-  <div class="modal-content">
+  <div class="thx-modal-box">
 
     <h3>Agregar Trailer</h3>
 
-    <form id="formTrailer" class="form-grid">
+    <form id="formTrailer" class="thx-form-grid">
 
-      <div class="form-group">
+      <div class="thx-field">
         <label>Placa</label>
         <input type="text" id="placaTrailer" required>
       </div>
 
-      <div class="form-group">
+      <div class="thx-field">
         <label for="propietarioTrailer">Propietario</label>
         <select id="propietarioTrailer" required>
           <option value="">Seleccionar propietario</option>
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="thx-field">
         <label>Cert. Fumigación</label>
         <input type="date" id="fumigacion">
       </div>
-      
-      <div class="form-group">
+
+      <div class="thx-field">
         <label>Cert. Sanidad</label>
         <input type="date" id="sanidad">
       </div>
 
-      <div class="form-group">
+      <div class="thx-field">
         <label>Estado</label>
         <select id="estadoTrailer">
           <option value="activo">Activo</option>
@@ -148,14 +171,17 @@
         </select>
       </div>
 
-      <div class="modal-actions">
-        <button type="submit" class="btn-primary">
+      <div class="thx-modal-actions">
+
+       
+
+        <button
+          type="submit"
+          class="thx-btn thx-btn-primary"
+        >
           Guardar
         </button>
 
-        <button type="button" onclick="cerrarModalTrailer()">
-          Cancelar
-        </button>
       </div>
 
     </form>

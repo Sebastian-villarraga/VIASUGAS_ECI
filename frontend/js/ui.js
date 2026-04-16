@@ -97,3 +97,13 @@ function formatearFechaInputToDisplay(fechaStr) {
 
   return `${day}/${month}/${year}`;
 }
+
+document.addEventListener("click", function (e) {
+
+  const modal = e.target;
+
+  if ([...modal.classList].some(c => c.endsWith("-modal"))) {
+    modal.classList.add("hidden");
+  }
+
+});

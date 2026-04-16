@@ -1,42 +1,65 @@
-<div class="banco-layout">
+<div class="bnx-layout">
 
-  <div class="banco-left">
+  <section class="bnx-main">
 
     <!-- HEADER -->
-    <div class="banco-header">
+    <div class="bnx-header">
+
       <h2>Bancos</h2>
 
-      <button class="btn-secundario" onclick="abrirModalBanco()">
-        <i class="fas fa-plus"></i> Agregar banco
+      <button
+        class="bnx-btn bnx-btn-primary"
+        onclick="abrirModalBanco()"
+      >
+        <i class="fas fa-plus"></i>
+        Agregar banco
       </button>
+
     </div>
 
     <!-- FILTROS -->
-    <div class="banco-filtros">
-      <div class="filtros-row">
-    
-        <div class="filtro-group">
+    <div class="bnx-filters-box">
+
+      <div class="bnx-filters-grid">
+
+        <div class="bnx-field">
           <label>Banco</label>
-          <input type="text" id="filtroBanco" placeholder="Nombre del banco">
+          <input
+            type="text"
+            id="filtroBanco"
+            placeholder="Nombre del banco"
+          >
         </div>
-    
-        <div class="filtro-group">
+
+        <div class="bnx-field">
           <label>Num Cuenta</label>
-          <input type="text" id="filtroCuenta" placeholder="Número de cuenta">
+          <input
+            type="text"
+            id="filtroCuenta"
+            placeholder="Número de cuenta"
+          >
         </div>
-    
-        <button class="btn-limpiar" onclick="limpiarFiltrosBanco()">
-          Limpiar
-        </button>
-    
+
+        <div class="bnx-filter-action">
+          <button
+            class="bnx-btn bnx-btn-danger"
+            onclick="limpiarFiltrosBanco()"
+          >
+            Limpiar
+          </button>
+        </div>
+
       </div>
+
     </div>
 
     <!-- TABLA -->
-    <div class="banco-tabla">
-      <div class="tabla-body">
+    <div class="bnx-table-card">
 
-        <table class="banco-table">
+      <div class="bnx-table-scroll">
+
+        <table class="bnx-table">
+
           <thead>
             <tr>
               <th>Banco</th>
@@ -44,7 +67,7 @@
               <th>Tipo</th>
               <th>Titular</th>
               <th>Identificación</th>
-              <th style="width: 80px;">Acciones</th>
+              <th style="width:80px;">Acciones</th>
             </tr>
           </thead>
 
@@ -53,35 +76,37 @@
               <td colspan="6">Cargando bancos...</td>
             </tr>
           </tbody>
+
         </table>
 
       </div>
+
     </div>
 
-  </div>
+  </section>
 
 </div>
 
 <!-- MODAL -->
-<div id="modalBanco" class="modal hidden">
+<div id="modalBanco" class="bnx-modal hidden">
 
-  <div class="modal-content">
+  <div class="bnx-modal-box">
 
     <h3>Agregar Banco</h3>
 
-    <form id="formBanco" class="form-grid">
+    <form id="formBanco" class="bnx-form-grid">
 
-      <div class="form-group">
+      <div class="bnx-field">
         <label>Nombre del Banco</label>
         <select id="nombre_banco"></select>
       </div>
 
-      <div class="form-group">
+      <div class="bnx-field">
         <label>Número de Cuenta</label>
         <input type="text" id="numero_cuenta" required>
       </div>
 
-      <div class="form-group">
+      <div class="bnx-field">
         <label>Tipo de Cuenta</label>
         <select id="tipo_cuenta" required>
           <option value="">Seleccione</option>
@@ -90,19 +115,21 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="bnx-field">
         <label>Nombre Titular</label>
         <input type="text" id="nombre_titular">
       </div>
 
-      <div class="form-group">
+      <div class="bnx-field bnx-full">
         <label>Identificación</label>
         <input type="text" id="identificacion">
       </div>
 
-      <!-- BOTÓN FULL WIDTH 🔥 -->
-      <div class="modal-footer full-width">
-        <button type="submit" class="btn-principal full-width">
+      <div class="bnx-modal-actions">
+        <button
+          type="submit"
+          class="bnx-btn bnx-btn-primary"
+        >
           Guardar
         </button>
       </div>

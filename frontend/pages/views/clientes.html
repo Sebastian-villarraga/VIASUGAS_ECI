@@ -1,31 +1,38 @@
-<div class="cliente-layout">
+<div class="clx-layout">
 
-  <div class="cliente-left">
+  <section class="clx-main">
 
     <!-- HEADER -->
-    <div class="cliente-header">
+    <div class="clx-header">
+
       <h2>Clientes</h2>
 
-      <button class="btn-secundario" onclick="abrirModalCliente()">
-        <i class="fas fa-plus"></i> Agregar cliente
+      <button
+        class="clx-btn clx-btn-primary"
+        onclick="abrirModalCliente()"
+      >
+        <i class="fas fa-plus"></i>
+        Agregar cliente
       </button>
+
     </div>
 
     <!-- FILTROS -->
-    <div class="cliente-filtros">
-      <div class="filtros-row">
+    <div class="clx-filters-box">
 
-        <div class="filtro-group">
+      <div class="clx-filters-grid">
+
+        <div class="clx-field">
           <label>NIT</label>
           <input type="text" id="filtroNit">
         </div>
 
-        <div class="filtro-group">
+        <div class="clx-field">
           <label>Nombre</label>
           <input type="text" id="filtroNombre">
         </div>
 
-        <div class="filtro-group">
+        <div class="clx-field">
           <label>Estado</label>
           <select id="filtroEstado">
             <option value="">Todos</option>
@@ -34,77 +41,89 @@
           </select>
         </div>
 
-        <button class="btn-limpiar" onclick="limpiarFiltrosClientes()">
-          Limpiar
-        </button>
+        <div class="clx-filter-action">
+          <button
+            class="clx-btn clx-btn-danger"
+            onclick="limpiarFiltrosClientes()"
+          >
+            Limpiar
+          </button>
+        </div>
 
       </div>
+
     </div>
 
     <!-- TABLA -->
-    <div class="cliente-tabla">
-      <div class="tabla-body">
+    <div class="clx-table-card">
 
-        <table class="cliente-table">
+      <div class="clx-table-scroll">
+
+        <table class="clx-table">
+
           <thead>
             <tr>
               <th>NIT</th>
               <th>Nombre</th>
               <th>Correo</th>
-              <th>Telèfono</th>
-              <th>Direcciòn</th>
+              <th>Teléfono</th>
+              <th>Dirección</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
 
           <tbody id="clientesTable">
-            <tr><td colspan="7">Cargando...</td></tr>
+            <tr>
+              <td colspan="7">Cargando...</td>
+            </tr>
           </tbody>
 
         </table>
 
       </div>
+
     </div>
 
-  </div>
+  </section>
 
 </div>
 
 <!-- MODAL -->
-<div id="modalCliente" class="modal hidden">
-  <div class="modal-content">
+<div id="modalCliente" class="clx-modal hidden">
+
+  <div class="clx-modal-box">
 
     <h3>Agregar Cliente</h3>
 
-    <form id="formCliente">
+    <form id="formCliente" class="clx-form-grid">
 
-      <div class="form-group">
+      <div class="clx-field">
         <label>NIT</label>
         <input type="text" id="nit" required>
       </div>
 
-      <div class="form-group">
+      <div class="clx-field">
         <label>Nombre</label>
         <input type="text" id="nombre" required>
       </div>
 
-      <div class="form-group">
+      <div class="clx-field">
         <label>Correo</label>
         <input type="text" id="correo">
       </div>
 
-      <div class="form-group">
-        <label>Telèfono</label>
+      <div class="clx-field">
+        <label>Teléfono</label>
         <input type="text" id="telefono">
       </div>
 
-      <div class="form-group full">
-        <label>Direcciòn</label>
+      <div class="clx-field clx-full">
+        <label>Dirección</label>
         <select id="direccion"></select>
       </div>
 
-      <div class="form-group full">
+      <div class="clx-field clx-full">
         <label>Estado</label>
         <select id="estado">
           <option value="activo">Activo</option>
@@ -112,12 +131,11 @@
         </select>
       </div>
 
-      <div class="modal-actions">
-        <button type="button" onclick="cerrarModalCliente()" class="btn-secondary">
-          Cancelar
-        </button>
-
-        <button type="submit" class="btn-primary">
+      <div class="clx-modal-actions">
+        <button
+          type="submit"
+          class="clx-btn clx-btn-primary"
+        >
           Guardar
         </button>
       </div>
@@ -125,4 +143,5 @@
     </form>
 
   </div>
+
 </div>

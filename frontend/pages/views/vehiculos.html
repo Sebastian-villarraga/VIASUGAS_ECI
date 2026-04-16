@@ -1,39 +1,39 @@
-<div class="vehiculo-layout">
+<div class="vhx-layout">
 
   <!-- IZQUIERDA -->
-  <div class="vehiculo-left">
+  <section class="vhx-main">
 
-    <div class="vehiculo-header">
+    <div class="vhx-header">
       <h2>Vehículos</h2>
     </div>
 
     <!-- FILTROS -->
-    <div class="vehiculo-filtros">
-      <div class="filtros-row">
-    
-        <div class="filtro-group">
+    <div class="vhx-filters-box">
+      <div class="vhx-filters-grid">
+
+        <div class="vhx-field">
           <label>Placa</label>
-          <input 
-            type="text" 
-            id="filtroPlaca" 
+          <input
+            type="text"
+            id="filtroPlaca"
             placeholder="Ej: ABC123"
             oninput="aplicarFiltrosVehiculos()"
           >
         </div>
-    
-        <div class="filtro-group">
+
+        <div class="vhx-field">
           <label>Propietario</label>
-          <input 
-            type="text" 
-            id="filtroPropietario" 
+          <input
+            type="text"
+            id="filtroPropietario"
             placeholder="Nombre propietario"
             oninput="aplicarFiltrosVehiculos()"
           >
         </div>
-    
-        <div class="filtro-group">
+
+        <div class="vhx-field">
           <label>Estado</label>
-          <select 
+          <select
             id="filtroEstado"
             onchange="aplicarFiltrosVehiculos()"
           >
@@ -42,19 +42,27 @@
             <option value="inactivo">Inactivo</option>
           </select>
         </div>
-    
-        <button type="button" class="btn-limpiar" onclick="limpiarFiltrosVehiculos()">
-          Limpiar
-        </button>
-    
+
+        <div class="vhx-actions-filter">
+          <button
+            type="button"
+            class="vhx-btn vhx-btn-danger"
+            onclick="limpiarFiltrosVehiculos()"
+          >
+            Limpiar
+          </button>
+        </div>
+
       </div>
-</div>
+    </div>
 
     <!-- TABLA -->
-    <div class="vehiculo-tabla">
-      <div class="tabla-body">
+    <div class="vhx-table-card">
 
-        <table class="vehiculo-table">
+      <div class="vhx-table-scroll">
+
+        <table class="vhx-table">
+
           <thead>
             <tr>
               <th>Placa</th>
@@ -63,7 +71,7 @@
               <th>SOAT</th>
               <th>Tecnomecánica</th>
               <th>Estado</th>
-              <th style="width: 80px;">Acciones</th>
+              <th>Acciones</th>
             </tr>
           </thead>
 
@@ -76,81 +84,90 @@
         </table>
 
       </div>
+
     </div>
 
-  </div>
+  </section>
 
   <!-- DERECHA -->
-  <div class="vehiculo-right">
+  <aside class="vhx-sidebar">
 
-    <button class="btn-primary btn-add-right" onclick="abrirModalVehiculo()">
-      <i class="fas fa-plus"></i> Agregar vehículo
+    <button
+      class="vhx-btn vhx-btn-primary vhx-btn-full"
+      onclick="abrirModalVehiculo()"
+    >
+      <i class="fas fa-plus"></i>
+      Agregar vehículo
     </button>
-  
-    <div class="vehiculo-side">
-  
-      <h3><i class="fas fa-exclamation-triangle"></i> Alertas</h3>
-  
-      <!-- 🔥 FILTROS -->
-      <div class="alertas-filtros">
+
+    <div class="vhx-alert-card">
+
+      <h3>
+        <i class="fas fa-exclamation-triangle"></i>
+        Alertas
+      </h3>
+
+      <div class="vhx-alert-actions">
+
         <button id="btnVencidos" onclick="filtrarVehiculosVencidos()">
           0 vencidos
         </button>
-  
+
         <button id="btnProximos" onclick="filtrarVehiculosProximos()">
           0 por vencer
         </button>
+
       </div>
-  
-      <!-- 🔥 LISTA -->
-      <div class="alertas-container">
+
+      <div class="vhx-alert-list">
         <ul id="alertasList">
           <li>Cargando alertas...</li>
         </ul>
       </div>
-  
+
     </div>
-  
-  </div>
+
+  </aside>
+
+</div>
 
 <!-- MODAL -->
-<div id="modalVehiculo" class="modal hidden">
+<div id="modalVehiculo" class="vhx-modal hidden">
 
-  <div class="modal-content">
+  <div class="vhx-modal-box">
 
     <h3>Agregar Vehículo</h3>
 
-    <form id="formVehiculo" class="form-grid">
+    <form id="formVehiculo" class="vhx-form-grid">
 
-      <div class="form-group">
+      <div class="vhx-field">
         <label>Placa</label>
         <input type="text" id="placa" required>
       </div>
 
-      <!-- PROPIETARIO -->
-      <div class="form-group">
+      <div class="vhx-field">
         <label for="propietario">Propietario</label>
         <select id="propietario" required>
           <option value="">Seleccionar propietario</option>
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="vhx-field">
         <label>SOAT</label>
         <input type="date" id="soat">
       </div>
 
-      <div class="form-group">
+      <div class="vhx-field">
         <label>Tecnomecánica</label>
         <input type="date" id="tecno">
       </div>
 
-      <div class="form-group">
+      <div class="vhx-field">
         <label>Todo Riesgo</label>
         <input type="date" id="todoRiesgo">
       </div>
 
-      <div class="form-group">
+      <div class="vhx-field">
         <label>Estado</label>
         <select id="estado">
           <option value="activo">Activo</option>
@@ -158,14 +175,17 @@
         </select>
       </div>
 
-      <div class="modal-actions">
-        <button type="submit" class="btn-primary">
+      <div class="vhx-modal-actions">
+
+
+
+        <button
+          type="submit"
+          class="vhx-btn vhx-btn-primary"
+        >
           Guardar
         </button>
 
-        <button type="button" onclick="cerrarModalVehiculo()">
-          Cancelar
-        </button>
       </div>
 
     </form>

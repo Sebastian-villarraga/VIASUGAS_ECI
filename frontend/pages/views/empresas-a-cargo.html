@@ -1,31 +1,38 @@
-<div class="empresa-layout">
+<div class="emx-layout">
 
-  <div class="empresa-left">
+  <section class="emx-main">
 
     <!-- HEADER -->
-    <div class="empresa-header">
+    <div class="emx-header">
+
       <h2>Empresas a Cargo</h2>
 
-      <button class="btn-secundario" onclick="abrirModalEmpresa()">
-        <i class="fas fa-plus"></i> Agregar empresa
+      <button
+        class="emx-btn emx-btn-primary"
+        onclick="abrirModalEmpresa()"
+      >
+        <i class="fas fa-plus"></i>
+        Agregar empresa
       </button>
+
     </div>
 
     <!-- FILTROS -->
-    <div class="empresa-filtros">
-      <div class="filtros-row">
+    <div class="emx-filters-box">
 
-        <div class="filtro-group">
+      <div class="emx-filters-grid">
+
+        <div class="emx-field">
           <label>NIT</label>
           <input type="text" id="filtroNit">
         </div>
 
-        <div class="filtro-group">
+        <div class="emx-field">
           <label>Nombre</label>
           <input type="text" id="filtroNombre">
         </div>
 
-        <div class="filtro-group">
+        <div class="emx-field">
           <label>Estado</label>
           <select id="filtroEstado">
             <option value="">Todos</option>
@@ -34,18 +41,26 @@
           </select>
         </div>
 
-        <button class="btn-limpiar" onclick="limpiarFiltrosEmpresas()">
-          Limpiar
-        </button>
+        <div class="emx-filter-action">
+          <button
+            class="emx-btn emx-btn-danger"
+            onclick="limpiarFiltrosEmpresas()"
+          >
+            Limpiar
+          </button>
+        </div>
 
       </div>
+
     </div>
 
     <!-- TABLA -->
-    <div class="empresa-tabla">
-      <div class="tabla-body">
+    <div class="emx-table-card">
 
-        <table class="empresa-table">
+      <div class="emx-table-scroll">
+
+        <table class="emx-table">
+
           <thead>
             <tr>
               <th>NIT</th>
@@ -59,52 +74,56 @@
           </thead>
 
           <tbody id="empresasTable">
-            <tr><td colspan="7">Cargando...</td></tr>
+            <tr>
+              <td colspan="7">Cargando...</td>
+            </tr>
           </tbody>
 
         </table>
 
       </div>
+
     </div>
 
-  </div>
+  </section>
 
 </div>
 
 <!-- MODAL -->
-<div id="modalEmpresa" class="modal hidden">
-  <div class="modal-content">
+<div id="modalEmpresa" class="emx-modal hidden">
+
+  <div class="emx-modal-box">
 
     <h3>Agregar Empresa a Cargo</h3>
 
-    <form id="formEmpresa">
+    <form id="formEmpresa" class="emx-form-grid">
 
-      <div class="form-group">
+      <div class="emx-field">
         <label>NIT</label>
         <input type="text" id="nit" required>
       </div>
 
-      <div class="form-group">
+      <div class="emx-field">
         <label>Nombre</label>
         <input type="text" id="nombre" required>
       </div>
 
-      <div class="form-group">
+      <div class="emx-field">
         <label>Correo</label>
         <input type="text" id="correo">
       </div>
 
-      <div class="form-group">
+      <div class="emx-field">
         <label>Teléfono</label>
         <input type="text" id="telefono">
       </div>
 
-      <div class="form-group full">
+      <div class="emx-field emx-full">
         <label>Dirección</label>
         <select id="direccion"></select>
       </div>
 
-      <div class="form-group full">
+      <div class="emx-field emx-full">
         <label>Estado</label>
         <select id="estado">
           <option value="activo">Activo</option>
@@ -112,12 +131,11 @@
         </select>
       </div>
 
-      <div class="modal-actions">
-        <button type="button" onclick="cerrarModalEmpresa()" class="btn-secondary">
-          Cancelar
-        </button>
-
-        <button type="submit" class="btn-primary">
+      <div class="emx-modal-actions">
+        <button
+          type="submit"
+          class="emx-btn emx-btn-primary"
+        >
           Guardar
         </button>
       </div>
@@ -125,4 +143,5 @@
     </form>
 
   </div>
+
 </div>

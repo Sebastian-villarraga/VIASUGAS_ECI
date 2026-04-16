@@ -1,665 +1,484 @@
-/* ========================= */
-/* MAIN */
-/* ========================= */
-.main-content {
-  padding: 25px;
-  background: #f4f6f9;
-  min-height: 100vh;
-}
+/* =====================================
+   VEHICULOS CSS AISLADO - VHX
+===================================== */
 
-/* ========================= */
-/* LAYOUT PRINCIPAL */
-/* ========================= */
-.vehiculo-layout {
+.vhx-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  align-items: start; 
+  gap: 22px;
+  align-items: start;
 }
 
-/* ========================= */
-/* HEADER */
-/* ========================= */
-.vehiculo-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* =========================
+   PANEL IZQUIERDO
+========================= */
+.vhx-main {
+  min-width: 0;
+}
+
+.vhx-header {
   margin-bottom: 20px;
 }
 
-.vehiculo-header h2 {
-  font-size: 24px;
-  font-weight: 600;
+.vhx-header h2 {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
 }
 
-
-
-/* BOTÓN DERECHO */
-.btn-add-right {
-  width: 100%;
-  margin-bottom: 15px;
-}
-
-/* ========================= */
-/* FILTROS */
-/* ========================= */
-.vehiculo-filtros {
-  margin-bottom: 20px;
-  padding: 18px;
-  border-radius: 12px;
-  background: white;
-  border: 1px solid #ddd;
-}
-
-/* FILA */
-.filtros-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-/* GRUPO */
-.filtro-group {
-  display: flex;
-  flex-direction: column;
-  font-size: 12px;
-}
-
-.filtro-group label {
-  margin-bottom: 5px;
-  color: #555;
-}
-
-/* INPUTS */
-.filtro-group input,
-.filtro-group select {
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 13px;
-}
-
-/* ========================= */
-/* BOTONES FILTRO */
-/* ========================= */
-.btn-filtrar {
-  background: #2a5298;
-  color: white;
-  border: none;
-  padding: 9px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.btn-filtrar:hover {
-  background: #1e3c72;
-}
-
-.btn-limpiar {
-  background: #e53935;
-  color: white;
-  border: none;
-  padding: 9px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.btn-limpiar:hover {
-  background: #c62828;
-}
-
-/* ========================= */
-/* CARDS */
-/* ========================= */
-.vehiculo-cards {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.vehiculo-card {
-  flex: 1;
+/* =========================
+   FILTROS
+========================= */
+.vhx-filters-box {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
   padding: 20px;
-  border-radius: 12px;
-  background: white;
-  border: 1px solid #ddd;
-  text-align: center;
-  font-size: 14px;
-  transition: 0.2s;
+  margin-bottom: 20px;
 }
 
-.vehiculo-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+.vhx-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: end;
 }
 
-/* ========================= */
-/* TABLA */
-/* ========================= */
-.vehiculo-tabla {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  padding: 15px;
-
+.vhx-field {
   display: flex;
   flex-direction: column;
-  height: 500px;
 }
 
-/* HEADER TABLA */
-.tabla-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 5px;
-  color: #555;
-  font-size: 13px;
-  margin-bottom: 10px;
-  cursor: pointer;
+.vhx-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 6px;
 }
 
-/* BODY TABLA */
-.tabla-body {
-  flex: 1;
-  overflow-y: auto;
-}
-
-/* TABLA REAL */
-.vehiculo-table {
+.vhx-field input,
+.vhx-field select {
   width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  background: white;
+  box-sizing: border-box;
+}
+
+.vhx-field input:focus,
+.vhx-field select:focus {
+  outline: none;
+  border-color: #2a5298;
+  box-shadow: 0 0 0 3px rgba(42,82,152,0.12);
+}
+
+/* =========================
+   BOTONES
+========================= */
+.vhx-btn {
+  border: none;
+  border-radius: 10px;
+  height: 44px;
+  padding: 0 18px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.vhx-btn:hover {
+  transform: translateY(-1px);
+}
+
+.vhx-btn-primary {
+  background: #2f56a6;
+  color: white;
+}
+
+.vhx-btn-primary:hover {
+  background: #24468a;
+}
+
+.vhx-btn-danger {
+  background: #ea4335;
+  color: white;
+}
+
+.vhx-btn-danger:hover {
+  background: #cf3528;
+}
+
+.vhx-btn-light {
+  background: #eef2f7;
+  color: #111827;
+}
+
+.vhx-btn-light:hover {
+  background: #dde5ef;
+}
+
+.vhx-btn-full {
+  width: 100%;
+}
+
+.vhx-actions-filter {
+  display: flex;
+  align-items: end;
+}
+
+/* =========================
+   TABLA
+========================= */
+.vhx-table-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.vhx-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vhx-table-scroll::-webkit-scrollbar {
+  height: 10px;
+}
+
+.vhx-table-scroll::-webkit-scrollbar-thumb {
+  background: #c7ced8;
+  border-radius: 20px;
+}
+
+.vhx-table {
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
 }
 
-.vehiculo-table th {
+.vhx-table th {
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 700;
   text-align: left;
-  padding: 10px;
-  background: #f1f3f6;
-  font-size: 13px;
+  padding: 12px 14px;
+  white-space: nowrap;
 }
 
-.vehiculo-table td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
+.vhx-table td {
+  font-size: 14px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f1f1;
+  white-space: nowrap;
 }
 
-/* ========================= */
-/* PANEL DERECHO */
-/* ========================= */
-.vehiculo-right {
+.vhx-table tbody tr:hover {
+  background: #fafafa;
+}
+
+/* =========================
+   PANEL DERECHO
+========================= */
+.vhx-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
-/* ?? BAJAR CARD */
-.vehiculo-side {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  padding: 20px;
+/* =====================================
+   ALERTAS ESTILO CARD MODERNO
+   Reemplaza SOLO la sección alertas
+===================================== */
 
-  display: flex;
-  flex-direction: column;
-  height: 500px;
-
-  margin-top: 10px; /* ?? AJUSTE FINO (puedes subir/bajar) */
+.vhx-alert-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px;
+  min-height: 420px;
 }
 
-/* TITULO */
-.vehiculo-side h3 {
-  margin-bottom: 20px;
+.vhx-alert-card h3 {
+  margin: 0 0 16px;
   font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* LISTA */
-.vehiculo-side ul {
+/* botones resumen */
+.vhx-alert-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.vhx-alert-actions button {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.vhx-alert-actions button:hover {
+  transform: translateY(-1px);
+}
+
+/* vencidos */
+#btnVencidos {
+  background: #f9e0df;
+  color: #df2c1d;
+}
+
+/* proximos */
+#btnProximos {
+  background: #f8efc9;
+  color: #b88900;
+}
+
+/* contenedor lista */
+.vhx-alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* quitar bullets */
+.vhx-alert-list ul {
   list-style: none;
+  margin: 0;
   padding: 0;
 }
 
-.vehiculo-side li {
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-
-/* ACCIONES RÁPIDAS */
-.acciones-rapidas {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.acciones-rapidas button {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  background: #f1f3f6;
-  cursor: pointer;
-  text-align: left;
-  font-size: 13px;
-  transition: 0.2s;
-}
-
-.acciones-rapidas button:hover {
-  background: #e0e6ed;
-}
-
-.btn-icon {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #2c5aa0;
-  font-size: 16px;
-}
-
-.btn-icon:hover {
-  color: #1a3f7a;
-}
-
-
-/* ========================= */
-/* MODAL */
-/* ========================= */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.45);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  z-index: 999;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-/* ========================= */
-/* CONTENIDO */
-/* ========================= */
-.modal-content {
-  background: white;
-  padding: 25px 25px 20px;
-  border-radius: 14px;
-  width: 440px;
-
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  animation: fadeIn 0.2s ease;
-}
-
-.modal-content h3 {
-  margin-bottom: 15px;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-/* ========================= */
-/* GRID FORM */
-/* ========================= */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-/* ========================= */
-/* INPUTS */
-/* ========================= */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  font-size: 12px;
-}
-
-.form-group label {
-  margin-bottom: 5px;
-  color: #666;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-  padding: 9px 10px;
-  border-radius: 8px;
-  border: 1px solid #d0d5dd;
-  font-size: 13px;
-  transition: all 0.2s ease;
-}
-
-/* ?? EFECTO FOCUS PRO */
-.form-group input:focus,
-.form-group select:focus {
-  border-color: #2a5298;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(42,82,152,0.15);
-}
-
-/* ========================= */
-/* BOTONES */
-/* ========================= */
-.modal-actions {
-  grid-column: span 2;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.modal-actions button {
-  padding: 9px 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-
-
-/* ========================= */
-/* ANIMACIÓN */
-/* ========================= */
-@keyframes fadeIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* ========================= */
-/* ALERTAS */
-/* ========================= */
-
-/* ITEM */
-.alerta-item {
+/* item alerta */
+.vhx-alert-list li {
+  background: #f8eaea;
+  border-left: 4px solid #df2c1d;
+  border-radius: 10px;
   padding: 12px 14px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  font-size: 13px;
-  border-left: 5px solid;
-  background: #f9fafb;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* ?? VENCIDO */
-.alerta-vencido {
-  border-left: 5px solid #e53935;
-  background: #fdecea;
-  color: #b71c1c;
-}
-
-/* ?? PRÓXIMO */
-.alerta-proximo {
-  border-left: 5px solid #fbc02d;
-  background: #fff8e1;
-  color: #8d6e00;
-}
-
-/* ICONO */
-.alerta-icono {
-  margin-right: 6px;
-}
-
-/* color del icono según estado */
-.alerta-vencido .alerta-icono {
-  color: #e53935;
-}
-
-.alerta-proximo .alerta-icono {
-  color: #fbc02d;
-}
-
-/* TITULO */
-.alerta-titulo {
+  margin-bottom: 12px;
+  line-height: 1.3;
+  font-size: 14px;
+  color: #111827;
   font-weight: 600;
-  display: flex;
-  align-items: center;
 }
 
-/* FECHA */
-.alerta-fecha {
-  font-size: 12px;
-  color: #555;
+/* primera linea */
+.vhx-alert-list li strong,
+.vhx-alert-list li b {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
 }
 
-#alertasList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  justify-content: flex-start;
-  align-items: stretch;
-}
-
-/* SCROLL */
-#alertasList::-webkit-scrollbar {
-  width: 6px;
-}
-
-#alertasList::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
-}
-
-.btn-icon:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-
-.badge-activo {
-  background: #e6f4ea;
-  color: #1e8e3e;
-  padding: 4px 10px;
-  border-radius: 10px;
-  font-size: 12px;
+/* fecha */
+.vhx-alert-list li small,
+.vhx-alert-list li span {
+  font-size: 13px;
+  color: #6b7280;
   font-weight: 500;
+}
+
+/* scrollbar bonita */
+.vhx-alert-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.vhx-alert-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 20px;
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .vhx-alert-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .vhx-alert-card {
+    min-height: auto;
+  }
+}
+
+/* =========================
+   BADGES
+========================= */
+.badge-activo {
+  background: #e7f6ea;
+  color: #1e8e3e;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .badge-inactivo {
-  background: #fdecea;
+  background: #fdeaea;
   color: #c62828;
-  padding: 4px 10px;
-  border-radius: 10px;
+  padding: 5px 10px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
-/* ========================= */
-/* BOTON EDITAR
-/* ========================= */
-.acciones {
-  text-align: center;
-}
-
-.btn-icon {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.btn-icon.editar i {
-  color: #3b82f6;
-}
-
-.btn-icon:hover {
-  transform: scale(1.1);
-}
-
-.btn-icon.guardar i {
-  color: #16a34a;
-}
-
-
-
-/* ========================= */
-/* CARD DERECHO
-/* ========================= */
-
-
-
-.alertas-filtros {
+/* =========================
+   MODAL
+========================= */
+.vhx-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
   display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.alertas-filtros button {
-  flex: 1;
-  border: none;
-  padding: 10px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-#btnVencidos {
-  background: #f8d7da;
-  color: #c0392b;
-}
-
-#btnProximos {
-  background: #fdf2cc;
-  color: #b7950b;
-}
-
-/* =========================
-   FILTROS (BOTONES)
-========================= */
-.alertas-filtros button {
-  flex: 1;
-  border: none;
-  padding: 10px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-/* ?? vencidos */
-#btnVencidos {
-  background: #f8d7da;
-  color: #c0392b;
-}
-
-/* ?? próximos */
-#btnProximos {
-  background: #fdf2cc;
-  color: #b7950b;
-}
-
-/* ? HOVER BONITO */
-.alertas-filtros button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* ?? BOTÓN ACTIVO */
-.alertas-filtros button.activo {
-  outline: 2px solid #2c3e50;
-  transform: scale(1.03);
-}
-
-/* =========================
-   LISTA ALERTAS
-========================= */
-.alertas-container {
-  max-height: 350px;
-  overflow-y: auto;
-  padding-right: 5px;
-  display: block;
-}
-
-/* ? SCROLL PRO */
-.alertas-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.alertas-container::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
-  border-radius: 10px;
-}
-
-.alertas-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,0,0,0.35);
-}
-
-/* =========================
-   ITEMS ALERTA
-========================= */
-.alerta-item {
-  padding: 10px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  transition: all 0.2s ease;
-}
-
-/* ? HOVER ITEM */
-.alerta-item:hover {
-  transform: translateX(3px);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-/* ?? cuando está vacío */
-#alertasList li {
-  list-style: none;
-}
-
-/* mensaje sin alertas */
-#alertasList:has(.sin-alertas) {
   justify-content: center;
   align-items: center;
-  height: 100%;
+  z-index: 999;
 }
 
-.sin-alertas {
-  text-align: center;
-  color: #888;
-  font-size: 14px;
-  margin-top: 40px;
-  list-style: none;
+.hidden {
+  display: none !important;
 }
 
+.vhx-modal-box {
+  background: white;
+  width: min(92vw, 480px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+}
+
+.vhx-modal-box h3 {
+  margin: 0 0 18px;
+  font-size: 24px;
+}
+
+.vhx-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* =====================================
+   VEHICULOS - MODAL SIN BOTON CANCELAR
+===================================== */
+
+/* REEMPLAZA tu bloque actual */
+.vhx-modal-actions {
+  grid-column: span 2;
+  display: flex;
+  justify-content: stretch;
+  margin-top: 8px;
+}
+
+.vhx-modal-actions .vhx-btn {
+  width: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .vhx-modal-actions {
+    grid-column: span 1;
+    display: flex;
+  }
+
+  .vhx-modal-actions .vhx-btn {
+    width: 100%;
+  }
+}
 
 /* =========================
-   TOAST DESPUES DE GUARDAR
+   TOAST
 ========================= */
-
 .toast {
   position: fixed;
-  bottom: 20px;
   right: 20px;
-  background: #28a745;
+  bottom: 20px;
+  background: #16a34a;
   color: white;
-  padding: 14px 22px;
+  padding: 14px 20px;
   border-radius: 10px;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.3s ease;
+  font-weight: 600;
   z-index: 9999;
 }
 
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1100px) {
+  .vhx-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .vhx-sidebar {
+    order: 2;
+  }
+
+  .vhx-main {
+    order: 1;
+  }
 }
 
-.toast.hidden {
-  display: none;
+@media (max-width: 768px) {
+  .vhx-header h2 {
+    font-size: 28px;
+  }
+
+  .vhx-filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vhx-actions-filter {
+    display: block;
+  }
+
+  .vhx-btn {
+    width: 100%;
+  }
+
+  .vhx-alert-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .vhx-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vhx-modal-actions {
+    grid-column: span 1;
+    flex-direction: column-reverse;
+  }
+
+  .vhx-table {
+    min-width: 820px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vhx-header h2 {
+    font-size: 24px;
+  }
+
+  .vhx-filters-box,
+  .vhx-table-card,
+  .vhx-alert-card,
+  .vhx-modal-box {
+    padding: 14px;
+  }
 }

@@ -1,49 +1,72 @@
-<div class="propietario-layout">
+<div class="prx-layout">
 
-  <div class="propietario-left">
+  <section class="prx-main">
 
     <!-- HEADER -->
-    <div class="propietario-header">
+    <div class="prx-header">
+
       <h2>Propietarios</h2>
 
-      <button class="btn-secundario" onclick="abrirModalPropietario()">
-        <i class="fas fa-plus"></i> Agregar propietario
+      <button
+        class="prx-btn prx-btn-primary"
+        onclick="abrirModalPropietario()"
+      >
+        <i class="fas fa-plus"></i>
+        Agregar propietario
       </button>
+
     </div>
 
     <!-- FILTROS -->
-    <div class="propietario-filtros">
-      <div class="filtros-row">
-    
-        <div class="filtro-group">
+    <div class="prx-filters-box">
+
+      <div class="prx-filters-grid">
+
+        <div class="prx-field">
           <label>Nombre</label>
-          <input type="text" id="filtroNombre" placeholder="Nombre">
+          <input
+            type="text"
+            id="filtroNombre"
+            placeholder="Nombre"
+          >
         </div>
-    
-        <div class="filtro-group">
+
+        <div class="prx-field">
           <label>Identificación</label>
-          <input type="text" id="filtroIdentificacion" placeholder="Cédula / NIT">
+          <input
+            type="text"
+            id="filtroIdentificacion"
+            placeholder="Cédula / NIT"
+          >
         </div>
-    
-        <button class="btn-limpiar" onclick="limpiarFiltrosProp()">
-          Limpiar
-        </button>
-    
+
+        <div class="prx-filter-action">
+          <button
+            class="prx-btn prx-btn-danger"
+            onclick="limpiarFiltrosProp()"
+          >
+            Limpiar
+          </button>
+        </div>
+
       </div>
+
     </div>
 
     <!-- TABLA -->
-    <div class="propietario-tabla">
-      <div class="tabla-body">
+    <div class="prx-table-card">
 
-        <table class="propietario-table">
+      <div class="prx-table-scroll">
+
+        <table class="prx-table">
+
           <thead>
             <tr>
               <th>Identificación</th>
               <th>Nombre</th>
               <th>Correo</th>
               <th>Teléfono</th>
-              <th style="width: 80px;">Acciones</th>
+              <th style="width:80px;">Acciones</th>
             </tr>
           </thead>
 
@@ -52,47 +75,53 @@
               <td colspan="5">Cargando propietarios...</td>
             </tr>
           </tbody>
+
         </table>
 
       </div>
+
     </div>
 
-  </div>
+  </section>
 
 </div>
 
 <!-- MODAL -->
-<div id="modalPropietario" class="modal hidden">
+<div id="modalPropietario" class="prx-modal hidden">
 
-  <div class="modal-content">
+  <div class="prx-modal-box">
 
     <h3>Agregar Propietario</h3>
 
-    <form id="formPropietario" class="form-grid">
+    <form id="formPropietario" class="prx-form-grid">
 
-      <div class="form-group">
+      <div class="prx-field">
         <label>Identificación</label>
         <input type="text" id="identificacion" required>
       </div>
 
-      <div class="form-group">
+      <div class="prx-field">
         <label>Nombre</label>
         <input type="text" id="nombre" required>
       </div>
 
-      <div class="form-group">
+      <div class="prx-field">
         <label>Correo</label>
         <input type="email" id="correo">
       </div>
 
-      <div class="form-group">
+      <div class="prx-field">
         <label>Teléfono</label>
         <input type="number" id="telefono">
       </div>
 
-      <div class="modal-actions">
-        <button type="submit" class="btn-primary">Guardar</button>
-        <button type="button" onclick="cerrarModalPropietario()">Cancelar</button>
+      <div class="prx-modal-actions">
+        <button
+          type="submit"
+          class="prx-btn prx-btn-primary"
+        >
+          Guardar
+        </button>
       </div>
 
     </form>

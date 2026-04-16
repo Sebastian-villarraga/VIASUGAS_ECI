@@ -1,73 +1,299 @@
-/* ========================= */
-/* LAYOUT */
-/* ========================= */
-.propietario-layout {
+/* =====================================
+   PROPIETARIOS CSS AISLADO - PRX
+   Independiente + modal moderno
+===================================== */
+
+/* =========================
+   LAYOUT
+========================= */
+.prx-layout {
   display: block;
 }
 
-.propietario-left {
+.prx-main {
   width: 100%;
+  min-width: 0;
 }
 
-/* ========================= */
-/* HEADER */
-/* ========================= */
-.propietario-header {
+/* =========================
+   HEADER
+========================= */
+.prx-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 14px;
   margin-bottom: 20px;
 }
 
-.propietario-header h2 {
-  font-size: 24px;
+.prx-header h2 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* =========================
+   BOTONES
+========================= */
+.prx-btn {
+  border: none;
+  border-radius: 10px;
+  height: 44px;
+  padding: 0 18px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.prx-btn:hover {
+  transform: translateY(-1px);
+}
+
+.prx-btn-primary {
+  background: #2f56a6;
+  color: white;
+}
+
+.prx-btn-primary:hover {
+  background: #24468a;
+}
+
+.prx-btn-danger {
+  background: #ea4335;
+  color: white;
+}
+
+.prx-btn-danger:hover {
+  background: #cf3528;
+}
+
+/* =========================
+   FILTROS
+========================= */
+.prx-filters-box {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.prx-filters-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.prx-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.prx-field label {
+  font-size: 12px;
   font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 6px;
 }
 
-/* ========================= */
-/* FILTROS */
-/* ========================= */
-.propietario-filtros {
-  margin-bottom: 20px;
-  padding: 18px;
-  border-radius: 12px;
-  background: white;
-  border: 1px solid #ddd;
-}
-
-/* ========================= */
-/* TABLA */
-/* ========================= */
-.propietario-tabla {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  padding: 0;
+.prx-field input,
+.prx-field select {
   width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  background: white;
+  box-sizing: border-box;
 }
 
-.tabla-body {
-  max-height: 500px;
+.prx-field input:focus,
+.prx-field select:focus {
+  outline: none;
+  border-color: #2f56a6;
+  box-shadow: 0 0 0 3px rgba(47,86,166,0.12);
+}
+
+.prx-filter-action {
+  display: flex;
+  align-items: end;
+}
+
+/* =========================
+   TABLA
+========================= */
+.prx-table-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.prx-table-scroll {
+  width: 100%;
+  max-height: 520px;
+  overflow-x: auto;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* ========================= */
-/* TABLE */
-/* ========================= */
-.propietario-table {
-  width: 100%;
+.prx-table-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.prx-table-scroll::-webkit-scrollbar-thumb {
+  background: #c7ced8;
+  border-radius: 20px;
+}
+
+.prx-table {
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
 }
 
-.propietario-table th {
-  text-align: left;
-  padding: 12px 16px;
-  background: #f1f3f6;
+.prx-table th {
+  background: #f3f4f6;
+  color: #111827;
   font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  padding: 12px 14px;
+  white-space: nowrap;
 }
 
-.propietario-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
+.prx-table td {
+  font-size: 14px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f1f1;
+  white-space: nowrap;
+}
+
+.prx-table tbody tr:hover {
+  background: #fafafa;
+}
+
+/* =========================
+   MODAL
+========================= */
+.prx-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.prx-modal-box {
+  background: white;
+  width: min(92vw, 500px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+}
+
+.prx-modal-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.prx-modal-box::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 20px;
+}
+
+.prx-modal-box h3 {
+  margin: 0 0 18px;
+  font-size: 24px;
+  color: #111827;
+}
+
+/* =========================
+   FORM MODAL
+========================= */
+.prx-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.prx-modal-actions {
+  grid-column: span 2;
+  display: flex;
+  margin-top: 8px;
+}
+
+.prx-modal-actions .prx-btn {
+  width: 100%;
+}
+
+.prx-form-grid input.error,
+.prx-form-grid select.error {
+  border-color: #dc2626;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .prx-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .prx-header h2 {
+    font-size: 28px;
+  }
+
+  .prx-header .prx-btn {
+    width: 100%;
+  }
+
+  .prx-filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prx-filter-action {
+    display: block;
+  }
+
+  .prx-btn {
+    width: 100%;
+  }
+
+  .prx-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prx-modal-actions {
+    grid-column: span 1;
+  }
+
+  .prx-table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 480px) {
+  .prx-header h2 {
+    font-size: 24px;
+  }
+
+  .prx-filters-box,
+  .prx-table-card,
+  .prx-modal-box {
+    padding: 14px;
+  }
 }
