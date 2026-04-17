@@ -15,26 +15,43 @@ async function cargarCatalogos() {
   catalogos.bancos = await apiFetch("/api/bancos");
   catalogos.manifiestos = await apiFetch("/api/manifiestos");
 
-  // =========================
-  // 🔥 FILTRAR GASTO CONDUCTOR
-  // =========================
   const tiposFiltrados = catalogos.tipos.filter(t =>
     t.tipo !== "GASTO CONDUCTOR"
   );
 
-  // =========================
-  // MODAL
-  // =========================
   llenarSelect("tipo", tiposFiltrados, "categoria", "id");
   llenarSelect("banco", catalogos.bancos, "nombre_banco", "id");
   llenarSelect("manifiesto", catalogos.manifiestos, "id_manifiesto", "id_manifiesto");
 
-  // =========================
-  // FILTROS (AQUÍ SÍ VAN TODOS)
-  // =========================
   llenarSelect("fTipo", catalogos.tipos, "categoria", "tipo");
   llenarSelect("fBanco", catalogos.bancos, "nombre_banco", "id");
   llenarSelect("fManifiesto", catalogos.manifiestos, "id_manifiesto", "id_manifiesto");
+
+  // NUEVO: construir filtros únicos de cliente y empresa desde manifiestos
+  const clientesMap = new Map();
+  const empresasMap = new Map();
+
+  catalogos.manifiestos.forEach(m => {
+    if (m.id_cliente) {
+      clientesMap.set(m.id_cliente, {
+        value: m.id_cliente,
+        label: m.cliente_nombre || m.id_cliente
+      });
+    }
+
+    if (m.id_empresa_a_cargo) {
+      empresasMap.set(m.id_empresa_a_cargo, {
+        value: m.id_empresa_a_cargo,
+        label: m.empresa_a_cargo_nombre || m.id_empresa_a_cargo
+      });
+    }
+  });
+
+  const clientes = Array.from(clientesMap.values());
+  const empresas = Array.from(empresasMap.values());
+
+  llenarSelectCustom("fCliente", clientes);
+  llenarSelectCustom("fEmpresa", empresas);
 }
 
 
@@ -56,12 +73,16 @@ async function cargarTransacciones() {
   const fTipo = document.getElementById("fTipo").value;
   const fBanco = document.getElementById("fBanco").value;
   const fManifiesto = document.getElementById("fManifiesto").value;
+  const fCliente = document.getElementById("fCliente")?.value;
+  const fEmpresa = document.getElementById("fEmpresa")?.value;
 
   if (fDesde) params.append("fecha_desde", fDesde);
   if (fHasta) params.append("fecha_hasta", fHasta);
   if (fTipo) params.append("tipo", fTipo);
   if (fBanco) params.append("id_banco", fBanco);
   if (fManifiesto) params.append("id_manifiesto", fManifiesto);
+  if (fCliente) params.append("id_cliente", fCliente);
+  if (fEmpresa) params.append("id_empresa_a_cargo", fEmpresa);
 
   const url = `/api/transacciones?${params.toString()}`;
 
@@ -74,26 +95,28 @@ async function cargarTransacciones() {
   let egresos = 0;
 
   data.forEach(t => {
-
-    if (t.es_gasto_conductor) return;
-
-    if (t.tipo === "INGRESO MANIFIESTO") ingresos += Number(t.valor);
-    else egresos += Number(t.valor);
-
-    const badge = getBadge(t);
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${formatearFechaDesdeUTC(t.fecha_pago)}</td>
-        <td>${badge}</td>
-        <td>${t.categoria || "-"}</td>
-        <td>${t.nombre_banco || ""}</td>
-        <td>${t.id_manifiesto || "-"}</td>
-        <td>$${Number(t.valor).toLocaleString()}</td>
-        <td>${t.descripcion || ""}</td>
-      </tr>
-    `;
-  });
+    
+      if (t.es_gasto_conductor) return;
+    
+      if (t.tipo === "INGRESO MANIFIESTO") ingresos += Number(t.valor);
+      else egresos += Number(t.valor);
+    
+      const badge = getBadge(t);
+    
+      tbody.innerHTML += `
+        <tr>
+          <td>${formatearFechaDesdeUTC(t.fecha_pago)}</td>
+          <td>${badge}</td>
+          <td>${t.categoria || "-"}</td>
+          <td>${t.nombre_banco || "-"}</td>
+          <td>${t.id_manifiesto || "-"}</td>
+          <td>${t.cliente_nombre || "-"}</td>
+          <td>${t.empresa_a_cargo_nombre || "-"}</td>
+          <td>$${Number(t.valor).toLocaleString()}</td>
+          <td>${t.descripcion || "-"}</td>
+        </tr>
+      `;
+    });
 
   document.getElementById("totalIngresos").innerText = format(ingresos);
   document.getElementById("totalEgresos").innerText = format(egresos);
@@ -171,7 +194,7 @@ function eventos() {
   // =========================
   // FILTROS DINAMICOS
   // =========================
-  ["fDesde","fHasta","fTipo","fBanco","fManifiesto"].forEach(id => {
+  ["fDesde","fHasta","fTipo","fBanco","fManifiesto","fCliente","fEmpresa"].forEach(id => {
     document.getElementById(id)?.addEventListener("change", cargarTransacciones);
   });
 
@@ -180,7 +203,7 @@ function eventos() {
   // =========================
   document.getElementById("btnLimpiar")?.addEventListener("click", () => {
 
-    ["fDesde","fHasta","fTipo","fBanco","fManifiesto"].forEach(id => {
+    ["fDesde","fHasta","fTipo","fBanco","fManifiesto","fCliente","fEmpresa"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
@@ -393,4 +416,18 @@ function setearFechasMesActual() {
 
   document.getElementById("fDesde").value = formatearFechaInput(inicioMes);
   document.getElementById("fHasta").value = formatearFechaInput(finMes);
+}
+
+function llenarSelectCustom(id, data) {
+  const select = document.getElementById(id);
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Seleccione</option>`;
+
+  data.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item.value;
+    option.textContent = item.label;
+    select.appendChild(option);
+  });
 }

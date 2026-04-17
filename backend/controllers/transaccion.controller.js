@@ -10,7 +10,9 @@ const getTransacciones = async (req, res) => {
       fecha_hasta,
       tipo,
       id_banco,
-      id_manifiesto
+      id_manifiesto,
+      id_cliente,
+      id_empresa_a_cargo
     } = req.query;
 
     let query = `
@@ -19,14 +21,39 @@ const getTransacciones = async (req, res) => {
         b.nombre_banco,
         tt.categoria,
         tt.tipo,
+
+        m.id_cliente,
+        m.id_empresa_a_cargo,
+
+        c.nombre AS cliente_nombre,
+        c.nit AS cliente_nit,
+        c.correo AS cliente_correo,
+        c.telefono AS cliente_telefono,
+        c.direccion AS cliente_direccion,
+
+        eac.nombre AS empresa_a_cargo_nombre,
+        eac.nit AS empresa_a_cargo_nit,
+        eac.correo AS empresa_a_cargo_correo,
+        eac.telefono AS empresa_a_cargo_telefono,
+        eac.direccion AS empresa_a_cargo_direccion,
+
         CASE 
           WHEN gc.id IS NOT NULL THEN true
           ELSE false
         END AS es_gasto_conductor
       FROM transaccion t
-      LEFT JOIN banco b ON t.id_banco = b.id
-      LEFT JOIN tipo_transaccion tt ON t.id_tipo_transaccion = tt.id
-      LEFT JOIN gastos_conductor gc ON gc.id_transaccion = t.id
+      LEFT JOIN banco b 
+        ON t.id_banco = b.id
+      LEFT JOIN tipo_transaccion tt 
+        ON t.id_tipo_transaccion = tt.id
+      LEFT JOIN gastos_conductor gc 
+        ON gc.id_transaccion = t.id
+      LEFT JOIN manifiesto m 
+        ON t.id_manifiesto = m.id_manifiesto
+      LEFT JOIN cliente c 
+        ON m.id_cliente = c.nit
+      LEFT JOIN empresa_a_cargo eac 
+        ON m.id_empresa_a_cargo = eac.nit
       WHERE 1=1
     `;
 
@@ -58,7 +85,17 @@ const getTransacciones = async (req, res) => {
       values.push(id_manifiesto);
     }
 
-    query += ` ORDER BY t.fecha_pago DESC`;
+    if (id_cliente) {
+      query += ` AND m.id_cliente = $${i++}`;
+      values.push(id_cliente);
+    }
+
+    if (id_empresa_a_cargo) {
+      query += ` AND m.id_empresa_a_cargo = $${i++}`;
+      values.push(id_empresa_a_cargo);
+    }
+
+    query += ` ORDER BY t.fecha_pago DESC, t.creado DESC`;
 
     const result = await pool.query(query, values);
 
@@ -69,7 +106,6 @@ const getTransacciones = async (req, res) => {
     res.status(500).json({ error: "Error obteniendo transacciones" });
   }
 };
-
 
 
 // =========================
