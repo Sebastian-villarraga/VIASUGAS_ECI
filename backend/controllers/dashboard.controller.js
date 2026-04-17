@@ -3,6 +3,10 @@ const pool = require("../config/db");
 // =========================
 // KPI GERENCIAL
 // =========================
+// =========================
+// KPI GERENCIAL CORREGIDO
+// SOLO EGRESO MANIFIESTO
+// =========================
 const getDashboardKPI = async (req, res) => {
   try {
     const { desde, hasta } = req.query;
@@ -31,35 +35,31 @@ const getDashboardKPI = async (req, res) => {
     `,[desde || null, hasta || null]);
 
     // ======================
-    // EGRESOS
+    // EGRESOS (SOLO MANIFIESTO)
     // ======================
     const egresosQ = await pool.query(`
       SELECT
-        COALESCE(SUM(
-          CASE
-            WHEN tt.tipo IN (
-              'GASTO CONDUCTOR',
-              'EGRESO OPERACIONAL',
-              'EGRESO MANIFIESTO'
-            )
-            THEN t.valor
-            ELSE 0
-          END
-        ),0) total,
-
-        COALESCE(SUM(
-          CASE
-            WHEN tt.tipo='EGRESO OPERACIONAL'
-            THEN t.valor
-            ELSE 0
-          END
-        ),0) operacional
-
+        COALESCE(SUM(t.valor),0) AS total
       FROM transaccion t
       JOIN tipo_transaccion tt
-        ON tt.id=t.id_tipo_transaccion
+        ON tt.id = t.id_tipo_transaccion
+      WHERE tt.tipo = 'EGRESO MANIFIESTO'
+        AND ($1::date IS NULL OR t.fecha_pago >= $1)
+        AND ($2::date IS NULL OR t.fecha_pago <= $2)
+    `,[desde || null, hasta || null]);
 
-      WHERE ($1::date IS NULL OR t.fecha_pago >= $1)
+    // ======================
+    // GASTOS OPERACIONALES
+    // (SE MANTIENE CARD APARTE)
+    // ======================
+    const operacionalesQ = await pool.query(`
+      SELECT
+        COALESCE(SUM(t.valor),0) AS total
+      FROM transaccion t
+      JOIN tipo_transaccion tt
+        ON tt.id = t.id_tipo_transaccion
+      WHERE tt.tipo = 'EGRESO OPERACIONAL'
+        AND ($1::date IS NULL OR t.fecha_pago >= $1)
         AND ($2::date IS NULL OR t.fecha_pago <= $2)
     `,[desde || null, hasta || null]);
 
@@ -97,8 +97,9 @@ const getDashboardKPI = async (req, res) => {
     const ingresos = Number(ingresosQ.rows[0].total || 0);
     const facturado = Number(facturadoQ.rows[0].total || 0);
     const egresos = Number(egresosQ.rows[0].total || 0);
+
     const gastosOperacionales =
-      Number(egresosQ.rows[0].operacional || 0);
+      Number(operacionalesQ.rows[0].total || 0);
 
     const viajes = Number(viajesQ.rows[0].total || 0);
 
@@ -131,6 +132,7 @@ const getDashboardKPI = async (req, res) => {
 
   } catch(error){
     console.error(error);
+
     res.status(500).json({
       error:"Error KPI"
     });

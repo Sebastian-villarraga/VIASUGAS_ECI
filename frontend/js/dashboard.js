@@ -21,7 +21,6 @@ async function cargarDashboard() {
   await cargarKPI();
   await cargarGraficaIngresosEgresos(); 
   await cargarRentabilidad();
-  await cargarGraficaCategorias();
   await cargarEstadoFacturacion();
   await cargarTopClientes(); 
 }
@@ -370,114 +369,9 @@ async function cargarGraficaIngresosEgresos() {
   }
 }
 
-async function cargarGraficaCategorias() {
-  try {
-
-    const query = getQueryFiltro();
-    const data = await apiFetch(`/api/dashboard/gastos-categoria${query}`);
-
-    renderGraficaCategorias(data);
-
-  } catch (error) {
-    console.error("Error gráfica categorías:", error);
-  }
-}
 
 
-// =========================
-// RENDER GRAFICA
-// =========================
-function renderGraficaCategorias(data) {
 
-  const ctx = document.getElementById("graficaCategorias");
-  if (!ctx) return;
-
-  // ?? destruir instancia previa
-  if (window.chartCategorias) {
-    window.chartCategorias.destroy();
-  }
-
-  const labels = data.map(d => d.tipo);
-  const valores = data.map(d => Number(d.total));
-
-  // ?? TOTAL
-  const total = valores.reduce((acc, val) => acc + val, 0);
-
-  // ?? PORCENTAJES
-  const porcentajes = valores.map(v => total ? ((v / total) * 100) : 0);
-
-  // ?? TEXTO CENTRAL (FIX REAL)
-  const centerTextPlugin = {
-    id: "centerText",
-    beforeDraw(chart) {
-      const { width, height } = chart;
-      const ctx = chart.ctx;
-
-      ctx.save();
-
-      // ?? tamaño fijo (evita deformación)
-      ctx.font = "600 16px sans-serif";
-      ctx.fillStyle = "#2c3e50";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      const text = "$ " + total.toLocaleString("es-CO");
-
-      ctx.fillText(text, width / 2, height / 2);
-
-      ctx.restore();
-    }
-  };
-
-  window.chartCategorias = new Chart(ctx, {
-    type: "doughnut",
-
-    data: {
-      labels,
-      datasets: [{
-        data: valores,
-
-        // ?? COLORES LIMPIOS
-        backgroundColor: [
-          "#3498db", // azul
-          "#e74c3c", // rojo
-          "#f39c12"  // naranja
-        ],
-
-        borderWidth: 0
-      }]
-    },
-
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // ?? CLAVE
-      cutout: "70%",
-
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: {
-            font: { size: 12 },
-            padding: 15
-          }
-        },
-
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const value = context.raw;
-              const porcentaje = porcentajes[context.dataIndex].toFixed(1);
-
-              return `${context.label}: $ ${value.toLocaleString("es-CO")} (${porcentaje}%)`;
-            }
-          }
-        }
-      }
-    },
-
-    plugins: [centerTextPlugin]
-  });
-}
 
 // =========================
 // EVENTOS FILTROS
@@ -523,13 +417,7 @@ function eventosDashboard() {
   
   cargarSelectAniosDashboard();
   
-  document.getElementById("btnMesSiguiente")?.addEventListener("click",()=>{
-   const hoy = new Date();
-   setFiltroFechas(
-     new Date(hoy.getFullYear(), hoy.getMonth()+1,1),
-     new Date(hoy.getFullYear(), hoy.getMonth()+2,0)
-   );
-  });
+
   
   document.getElementById("btnQ1")?.addEventListener("click",()=>aplicarQuarter(1));
   document.getElementById("btnQ2")?.addEventListener("click",()=>aplicarQuarter(2));

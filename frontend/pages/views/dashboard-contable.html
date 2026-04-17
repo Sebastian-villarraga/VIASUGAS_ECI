@@ -1,123 +1,163 @@
 <!-- dashboard-contable.html -->
-<div class="dbc-layout">
+<div class="dbcx-layout">
 
-  <div class="dbc-header">
+  <div class="dbcx-header">
     <h2>Dashboard Contable</h2>
-    <p>Vista contable del negocio: ingresos, egresos, utilidad y composición del gasto.</p>
   </div>
 
-  <div class="dbc-main">
+  <!-- FILTROS FULL WIDTH -->
+  <div class="dbcx-filters-box dbcx-full">
 
-    <!-- IZQUIERDA -->
-    <section class="dbc-left">
+    <!-- FILA 1 -->
+    <div class="dbcx-toolbar">
 
-      <!-- FILTROS -->
-      <div class="dbc-filters-box">
-        <div class="dbc-filters-grid">
+      <button id="dbcxBtnMesAnterior" class="dbcx-btn dbcx-btn-light">
+        Mes anterior
+      </button>
 
-          <div class="dbc-group">
-            <label for="dbcFechaDesde">Fecha desde</label>
-            <input type="date" id="dbcFechaDesde">
-          </div>
+      <button id="dbcxBtnMesActual" class="dbcx-btn dbcx-btn-primary">
+        Este mes
+      </button>
 
-          <div class="dbc-group">
-            <label for="dbcFechaHasta">Fecha hasta</label>
-            <input type="date" id="dbcFechaHasta">
-          </div>
+      <select id="dbcxFiltroAnio" class="dbcx-select"></select>
 
-          <div class="dbc-actions">
-            <button id="dbcBtnMesActual" class="dbc-btn dbc-btn-light">Este mes</button>
-            <button id="dbcBtnMesAnterior" class="dbc-btn dbc-btn-light">Mes anterior</button>
-            <button id="dbcBtnAnioActual" class="dbc-btn dbc-btn-primary">Año actual</button>
-            <button id="dbcBtnLimpiar" class="dbc-btn dbc-btn-danger">Limpiar</button>
-          </div>
-        </div>
+      <button class="dbcx-btn dbcx-btn-light" id="dbcxBtnQ1">1er Q</button>
+      <button class="dbcx-btn dbcx-btn-light" id="dbcxBtnQ2">2do Q</button>
+      <button class="dbcx-btn dbcx-btn-light" id="dbcxBtnQ3">3er Q</button>
+      <button class="dbcx-btn dbcx-btn-light" id="dbcxBtnQ4">4to Q</button>
+
+      <button class="dbcx-btn dbcx-btn-light" id="dbcxBtnS1">1er Sem</button>
+      <button class="dbcx-btn dbcx-btn-light" id="dbcxBtnS2">2do Sem</button>
+      <button class="dbcx-btn dbcx-btn-light" id="dbcxBtnAnioCompleto">Año completo</button>
+
+    </div>
+
+    <!-- FILA 2 -->
+    <div class="dbcx-toolbar-bottom">
+
+      <div class="dbcx-group">
+        <label>Fecha desde</label>
+        <input type="date" id="dbcxFechaDesde">
       </div>
 
-      <!-- KPIs -->
-      <div id="dbcCardsDashboard" class="dbc-cards"></div>
+      <div class="dbcx-group">
+        <label>Fecha hasta</label>
+        <input type="date" id="dbcxFechaHasta">
+      </div>
+
+      <div class="dbcx-group dbcx-btn-group">
+        <label>&nbsp;</label>
+        <button id="dbcxBtnLimpiar" class="dbcx-btn dbcx-btn-danger">
+          Limpiar
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- CARDS -->
+  <div id="dbcxCardsDashboard" class="dbcx-cards"></div>
+
+  <!-- GRID PRINCIPAL -->
+  <div class="dbcx-main">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <section class="dbcx-left">
 
       <!-- ESTADO DE RESULTADOS -->
-      <div class="dbc-chart-card">
-        <div class="dbc-card-header">
-          <h3>Estado de Resultados Mensual</h3>
-        </div>
-        <div class="dbc-chart-wrap">
-          <canvas id="dbcGraficaEstadoResultados"></canvas>
+      <div class="dbcx-chart-card">
+        <h3>Estado de Resultados Mensual</h3>
+
+        <div class="dbcx-chart-wrap">
+          <canvas id="dbcxGraficaEstadoResultados"></canvas>
         </div>
       </div>
 
       <!-- RESUMEN MENSUAL -->
-      <div class="dbc-table-card">
-        <div class="dbc-card-header">
-          <h3>Resumen Mensual Contable</h3>
-        </div>
+      <div class="dbcx-table-card">
+        <h2>Resumen Mensual Contable</h2>
 
-        <div class="dbc-table-scroll">
-          <table class="dbc-table">
+        <div class="dbcx-table-scroll">
+          <table class="dbcx-table">
             <thead>
               <tr>
                 <th>Mes</th>
-                <th class="dbc-text-center">Facturas</th>
-                <th class="dbc-text-center">Ingresos</th>
-                <th class="dbc-text-center">Egresos</th>
-                <th class="dbc-text-center">Utilidad</th>
-                <th class="dbc-text-center">Margen %</th>
+                <th>Facturas</th>
+                <th>Total Facturado</th>
+                <th>Ingresos</th>
+                <th>Egresos</th>
+                <th>Utilidad</th>
+                <th>Margen %</th>
               </tr>
             </thead>
-            <tbody id="dbcTablaResumenMensual"></tbody>
+
+            <tbody id="dbcxTablaResumenMensual"></tbody>
           </table>
         </div>
       </div>
-
-      <!-- DETALLE GASTOS -->
-      <div class="dbc-table-card">
-        <div class="dbc-card-header">
-          <h3>Detalle de Egresos Contables</h3>
+      
+      
+      
+      <div class="dbcx-row-50">
+      
+        <!-- IZQUIERDA = TABLA -->
+        <div class="dbcx-table-card">
+      
+          <h2>Flujo por Banco</h2>
+      
+          <div class="dbcx-table-scroll">
+      
+            <table class="dbcx-table">
+      
+              <thead>
+                <tr>
+                  <th>Banco</th>
+                  <th>Ingresó</th>
+                  <th>Salió</th>
+                </tr>
+              </thead>
+      
+              <tbody id="dbcxTablaFlujoBancos"></tbody>
+      
+            </table>
+      
+          </div>
+      
         </div>
-
-        <div class="dbc-table-scroll">
-          <table class="dbc-table">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Tipo</th>
-                <th>Categoría</th>
-                <th>Descripción</th>
-                <th>Manifiesto</th>
-                <th>Factura</th>
-                <th class="dbc-text-center">Valor</th>
-              </tr>
-            </thead>
-            <tbody id="dbcTablaDetalleGastos"></tbody>
-          </table>
+      
+        <!-- DERECHA = GRAFICA -->
+        <div class="dbcx-chart-card">
+      
+          <h3>Entradas vs Salidas por Banco</h3>
+      
+          <div class="dbcx-chart-wrap">
+            <canvas id="dbcxGraficaFlujoBancos"></canvas>
+          </div>
+      
         </div>
+      
       </div>
+
+      
 
     </section>
 
-    <!-- DERECHA -->
-    <aside class="dbc-right">
+    <!-- COLUMNA DERECHA -->
+    <aside class="dbcx-right">
 
-      <div class="dbc-chart-card">
-        <div class="dbc-card-header">
-          <h3>Utilidad Mensual</h3>
-        </div>
-        <div class="dbc-chart-wrap">
-          <canvas id="dbcGraficaUtilidadMensual"></canvas>
+      <div class="dbcx-chart-card">
+        <h3>Utilidad Mensual</h3>
+
+        <div class="dbcx-chart-wrap">
+          <canvas id="dbcxGraficaUtilidadMensual"></canvas>
         </div>
       </div>
 
-      <div class="dbc-chart-card">
-        <div class="dbc-card-header">
-          <h3>Gastos por Categoría</h3>
-        </div>
-        <div class="dbc-chart-wrap">
-          <canvas id="dbcGraficaGastosCategoria"></canvas>
-        </div>
-      </div>
+      
 
     </aside>
 
   </div>
+
 </div>
