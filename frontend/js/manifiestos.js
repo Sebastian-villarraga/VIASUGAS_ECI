@@ -920,45 +920,70 @@ function renderDetalleModoLectura(data) {
       $${utilidad.toLocaleString()}
     </span>`;
 
+
   // =========================
   // FACTURA
   // =========================
   const contFactura = document.getElementById("detalleFactura");
   contFactura.innerHTML = "";
-
+  
   let totalFactura = 0;
-
+  
   if (factura) {
-    totalFactura = Number(factura.valor_total || 0);
-
+  
+    totalFactura = Number(factura.valor || 0);
+  
     contFactura.innerHTML = `
       <div class="detalle-item">
-        <span>Factura: ${safe(factura.codigo_factura || factura.id_factura)}</span>
-        <span class="valor-ingreso">$${totalFactura.toLocaleString()}</span>
+        <span>Factura: ${safe(factura.codigo_factura)}</span>
+        <span class="valor-ingreso">
+          $${totalFactura.toLocaleString("es-CO")}
+        </span>
+      </div>
+  
+      <div class="detalle-item">
+        <span>Fecha emisión</span>
+        <span>${formatearFecha(factura.fecha_emision)}</span>
+      </div>
+  
+      <div class="detalle-item">
+        <span>Vencimiento</span>
+        <span>${formatearFecha(factura.fecha_vencimiento)}</span>
       </div>
     `;
+  
   } else {
     contFactura.innerHTML = "<p>Sin factura</p>";
   }
-
+  
   document.getElementById("totalFacturaDetalle").innerHTML =
-    `<span class="total-ingreso">$${totalFactura.toLocaleString()}</span>`;
+    `<span class="total-ingreso">
+      $${totalFactura.toLocaleString("es-CO")}
+    </span>`;
 
   // =========================
   // RESUMEN
   // =========================
-  const resumen = totalFactura + totalIngresos - totalEgresos;
+  // Regla solicitada:
+  // RESUMEN = FACTURA - TOTAL TRANSACCIONES
+  // Donde "utilidad" ya representa el neto de transacciones:
+  // totalIngresos - totalEgresos
+  
+  const resumen = utilidad;
   const resumenEl = document.getElementById("resumenDetalle");
-
+  
   resumenEl.className =
     resumen > 0 ? "resumen-positivo" :
     resumen < 0 ? "resumen-negativo" :
     "resumen-cero";
-
+  
   resumenEl.textContent =
-  `${resumen < 0 ? "-$" : "$"}${Math.abs(resumen).toLocaleString()}`;
+    `${resumen < 0 ? "-$" : "$"}${Math.abs(resumen).toLocaleString("es-CO")}`;
 }
 
+  // =========================
+  // ACTIVAR EDICION
+  // =========================
 async function activarEdicionDetalle() {
   if (!detalleManifiestoActual || !catalogosManifiesto) return;
 

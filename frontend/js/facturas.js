@@ -505,8 +505,7 @@ function llenarSelectManifiesto(id, data, usados = new Set()) {
 
       // ?? ESTILO VISUAL
       if (yaUsado) {
-        option.style.opacity = "0.5";
-        option.style.cursor = "not-allowed";
+        option.classList.add("disabled");
       }
 
       option.addEventListener("click", () => {
