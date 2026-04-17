@@ -1,6 +1,6 @@
 /* =====================================
    DASHBOARD GERENCIAL CSS AISLADO - DBX
-   Ejecutivo / responsive / premium
+   VERSION UNIFICADA / TOTALS CORREGIDOS
 ===================================== */
 
 /* =========================
@@ -13,18 +13,17 @@
 }
 
 .dbx-main{
-  display:grid;
-  grid-template-columns:1.2fr 1fr;
+  display:flex !important;
+  flex-direction:column !important;
   gap:20px;
-  align-items:start;
 }
 
 .dbx-left,
 .dbx-right{
+  width:100% !important;
   display:flex;
   flex-direction:column;
   gap:20px;
-  min-width:0;
 }
 
 /* =========================
@@ -65,26 +64,14 @@
   color:#fff;
 }
 
-.dbx-btn-primary:hover{
-  background:#24468a;
-}
-
 .dbx-btn-light{
   background:#eef2f7;
   color:#111827;
 }
 
-.dbx-btn-light:hover{
-  background:#dde5ef;
-}
-
 .dbx-btn-danger{
   background:#ea4335;
   color:#fff;
-}
-
-.dbx-btn-danger:hover{
-  background:#cf3528;
 }
 
 /* =========================
@@ -97,10 +84,18 @@
   padding:18px;
 }
 
-.dbx-filters-grid{
+.dbx-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  margin-bottom:16px;
+}
+
+.dbx-toolbar-bottom{
   display:grid;
-  grid-template-columns:1fr 1fr auto;
-  gap:16px;
+  grid-template-columns:220px 220px 160px;
+  gap:14px;
   align-items:end;
 }
 
@@ -116,45 +111,33 @@
   margin-bottom:6px;
 }
 
-.dbx-group input{
+.dbx-group input,
+.dbx-select{
   width:100%;
   height:44px;
-  padding:0 14px;
+  padding:0 12px;
   border:1px solid #d1d5db;
   border-radius:10px;
   font-size:14px;
+  background:#fff;
   box-sizing:border-box;
 }
 
-.dbx-group input:focus{
-  outline:none;
-  border-color:#2f56a6;
-  box-shadow:0 0 0 3px rgba(47,86,166,.12);
-}
-
-.dbx-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
 /* =========================
-   CARDS KPI
+   KPI CARDS
 ========================= */
-.dbx-cards{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
+#cardsDashboard.dbx-cards{
+  display:grid !important;
+  grid-template-columns:repeat(4,1fr) !important;
   gap:16px;
 }
 
-/* cards que renderiza JS */
 .dbx-cards .card{
   background:#fff;
   border:1px solid #e5e7eb;
   border-radius:14px;
-  padding:18px 20px;
+  padding:18px;
   position:relative;
-  box-shadow:0 2px 8px rgba(0,0,0,.04);
 }
 
 .dbx-cards .card::before{
@@ -168,85 +151,78 @@
 }
 
 .dbx-cards .card h3{
-  margin:0 0 8px;
+  margin:0 0 10px;
   font-size:12px;
   font-weight:700;
   text-transform:uppercase;
-  letter-spacing:.4px;
   color:#6b7280;
+  letter-spacing:.4px;
 }
 
 .dbx-cards .card p{
   margin:0;
-  font-size:24px;
+  font-size:22px;
   font-weight:800;
   color:#111827;
-  word-break:break-word;
 }
 
-/* colores heredados JS */
-.dbx-cards .card.ingreso::before{ background:#27ae60; }
-.dbx-cards .card.egreso::before{ background:#e74c3c; }
-.dbx-cards .card.utilidad::before{ background:#3498db; }
-.dbx-cards .card.viajes::before{ background:#f39c12; }
-.dbx-cards .card.margen::before{ background:#8e44ad; }
-.dbx-cards .card.facturas::before{ background:#16a085; }
+.small-kpi{
+  font-size:17px !important;
+  line-height:1.4;
+}
+
+/* colores cards */
+.card.periodo::before{ background:#34495e; }
+.card.ingreso::before{ background:#27ae60; }
+.card.egreso::before{ background:#e74c3c; }
+.card.utilidad::before{ background:#3498db; }
+.card.margen::before{ background:#8e44ad; }
+.card.viajes::before{ background:#f39c12; }
+.card.facturas::before{ background:#16a085; }
+.card.operacional::before{ background:#c0392b; }
+
+.card.facturas .facturas-kpi{
+  font-size:16px !important;
+  line-height:1.4;
+  font-weight:600;
+}
 
 /* =========================
-   TABLAS
+   TABLAS / TARJETAS
 ========================= */
-.dbx-table-card{
+.dbx-table-card,
+.dbx-chart-card{
   background:#fff;
   border:1px solid #e5e7eb;
   border-radius:14px;
   padding:16px;
 }
 
-.dbx-table-header{
-  margin-bottom:14px;
-}
-
-.dbx-table-header h3{
-  margin:0;
+.dbx-table-card h2,
+.dbx-chart-card h3{
+  margin:0 0 14px;
   font-size:18px;
   font-weight:700;
   color:#111827;
 }
 
-.dbx-table-scroll{
-  width:100%;
-  max-height:520px;
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-}
-
-.dbx-table-scroll::-webkit-scrollbar{
-  width:10px;
-  height:10px;
-}
-
-.dbx-table-scroll::-webkit-scrollbar-thumb{
-  background:#c7ced8;
-  border-radius:20px;
-}
-
+/* =========================
+   TABLAS GENERALES
+========================= */
 .dbx-table{
-  width:max-content;
-  min-width:100%;
+  width:100%;
   border-collapse:collapse;
 }
 
 .dbx-table th{
   position:sticky;
   top:0;
-  z-index:2;
-  background:#f3f4f6;
-  color:#111827;
-  font-size:13px;
-  font-weight:700;
+  background:#f5f7fb;
+  z-index:5;
   text-align:left;
   padding:12px 14px;
-  white-space:nowrap;
+  font-size:13px;
+  font-weight:700;
 }
 
 .dbx-table td{
@@ -261,45 +237,76 @@
 }
 
 /* =========================
-   TEXTOS DE COLORES
+   SCROLL TABLAS
 ========================= */
-.dbx-text-center{
-  text-align:center;
+.tabla-scroll-wrap{
+  max-height:340px;
+  overflow-y:auto;
+  overflow-x:auto;
+  border-radius:10px;
 }
 
-.text-green{
-  color:#16a34a;
+/* =========================
+   FOOTER TOTALES UNIFICADO
+========================= */
+.dbx-table tfoot td{
+  position:sticky;
+  bottom:0;
+  background:#eef2f7 !important;
+  font-weight:800 !important;
+  border-top:2px solid #d9dee8 !important;
+  font-size:14px;
+  z-index:6;
+}
+
+/* misma altura */
+.dbx-table tfoot tr td{
+  padding:13px 14px;
+}
+
+/* primera celda totales */
+.dbx-table tfoot td:first-child{
+  color:#111827;
+  font-weight:900;
+}
+
+/* =========================
+   COLORES TEXTO
+========================= */
+.text-green,
+.total-green{
+  color:#00a63e;
   font-weight:700;
 }
 
-.text-red{
-  color:#dc2626;
+.text-red,
+.total-red{
+  color:#e53935;
   font-weight:700;
 }
 
-.text-blue{
-  color:#2563eb;
+.text-blue,
+.total-blue{
+  color:#2457ff;
   font-weight:700;
+}
+
+.text-orange,
+.total-orange{
+  color:#f59e0b;
+  font-weight:700;
+}
+
+/* utilidad total negra */
+.dbx-table tfoot td:last-child,
+.dbx-table tfoot td:nth-last-child(2){
+  color:#111827;
+  font-weight:900;
 }
 
 /* =========================
    GRAFICAS
 ========================= */
-.dbx-chart-card{
-  background:#fff;
-  border:1px solid #e5e7eb;
-  border-radius:14px;
-  padding:18px;
-  box-shadow:0 4px 12px rgba(0,0,0,.05);
-}
-
-.dbx-chart-card h3{
-  margin:0 0 14px;
-  font-size:18px;
-  font-weight:700;
-  color:#111827;
-}
-
 .dbx-chart-wrap{
   position:relative;
   width:100%;
@@ -314,18 +321,31 @@
 /* =========================
    RESPONSIVE
 ========================= */
-@media (max-width:1200px){
+@media(max-width:1300px){
 
-  .dbx-main{
-    grid-template-columns:1fr;
+  #cardsDashboard.dbx-cards{
+    grid-template-columns:repeat(2,1fr) !important;
   }
 
-  .dbx-chart-wrap{
-    height:300px;
+  .dbx-toolbar-bottom{
+    grid-template-columns:1fr 1fr;
   }
 }
 
-@media (max-width:768px){
+@media(max-width:768px){
+
+  #cardsDashboard.dbx-cards{
+    grid-template-columns:1fr !important;
+  }
+
+  .dbx-toolbar{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  .dbx-toolbar-bottom{
+    grid-template-columns:1fr;
+  }
 
   .dbx-layout{
     padding:14px;
@@ -335,45 +355,15 @@
     font-size:28px;
   }
 
-  .dbx-filters-grid{
-    grid-template-columns:1fr;
-  }
-
-  .dbx-actions{
-    width:100%;
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-
-  .dbx-btn{
-    width:100%;
-  }
-
-  .dbx-cards{
-    grid-template-columns:1fr;
-  }
-
   .dbx-table{
     min-width:760px;
   }
-
-  .dbx-chart-wrap{
-    height:260px;
-  }
 }
 
-@media (max-width:480px){
+@media(max-width:480px){
 
   .dbx-header h2{
     font-size:24px;
-  }
-
-  .dbx-filters-box,
-  .dbx-table-card,
-  .dbx-chart-card,
-  .dbx-cards .card{
-    padding:14px;
   }
 
   .dbx-cards .card p{
@@ -381,33 +371,383 @@
   }
 
   .dbx-chart-wrap{
-    height:230px;
+    height:240px;
   }
 }
 
 /* =====================================
-   FIX BOTONES ESTE MES / MES ANTERIOR
-   Reemplaza estos estilos al final CSS
+FIX COLORES TOTALES = MISMO COLOR DATOS
+Pegar al FINAL de dashboard.css
 ===================================== */
 
-/* ambos botones mismo estilo gris claro */
-#btnMesActual,
-#btnMesAnterior{
+/* no forzar negro en últimos td */
+.dbx-table tfoot td:last-child,
+.dbx-table tfoot td:nth-last-child(2){
+  color:inherit !important;
+  font-weight:800 !important;
+}
+
+/* mantener colores iguales a columnas */
+.dbx-table tfoot .total-green{
+  color:#00a63e !important;
+}
+
+.dbx-table tfoot .total-blue{
+  color:#2457ff !important;
+}
+
+.dbx-table tfoot .total-red{
+  color:#e53935 !important;
+}
+
+.dbx-table tfoot .total-orange{
+  color:#f59e0b !important;
+}
+
+/* solo palabra TOTALES negra */
+.dbx-table tfoot td:first-child{
+  color:#111827 !important;
+  font-weight:900 !important;
+}
+
+/* =====================================
+   CORRECCION POSICION FILTROS
+   PEGAR AL FINAL DEL CSS
+===================================== */
+
+/* contenedor principal filtros */
+.dbx-filters-box{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* FILA 1 = botones rápidos + año + periodos */
+.dbx-toolbar{
+  display:grid !important;
+  grid-template-columns:
+    auto auto auto   /* mes anterior / este mes / siguiente */
+    110px            /* año */
+    auto auto auto auto /* Q1 Q2 Q3 Q4 */
+    auto auto auto;  /* sem1 sem2 año completo */
+
+  gap:10px;
+  align-items:center;
+  margin:0 !important;
+}
+
+/* select año */
+.dbx-toolbar .dbx-select{
+  width:110px;
+}
+
+/* FILA 2 = fechas + limpiar */
+.dbx-toolbar-bottom{
+  display:grid !important;
+  grid-template-columns:220px 220px 160px;
+  gap:14px;
+  align-items:end;
+  margin:0 !important;
+}
+
+/* labels fechas */
+.dbx-toolbar-bottom .dbx-group{
+  display:flex;
+  flex-direction:column;
+}
+
+.dbx-toolbar-bottom .dbx-group label{
+  font-size:12px;
+  font-weight:600;
+  color:#6b7280;
+  margin-bottom:6px;
+}
+
+/* inputs fechas */
+.dbx-toolbar-bottom input{
+  width:100%;
+  height:44px;
+  padding:0 12px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  font-size:14px;
+  background:#fff;
+  box-sizing:border-box;
+}
+
+/* botón limpiar */
+.dbx-btn-group{
+  display:flex;
+  align-items:end;
+}
+
+.dbx-btn-group .dbx-btn{
+  width:100%;
+  height:44px;
+}
+
+/* responsive */
+@media(max-width:1400px){
+
+  .dbx-toolbar{
+    grid-template-columns:repeat(6, auto);
+  }
+
+}
+
+@media(max-width:1100px){
+
+  .dbx-toolbar{
+    grid-template-columns:repeat(4, auto);
+  }
+
+}
+
+@media(max-width:768px){
+
+  .dbx-toolbar{
+    grid-template-columns:1fr;
+  }
+
+  .dbx-toolbar-bottom{
+    grid-template-columns:1fr;
+  }
+
+}
+
+/* =====================================
+   ESPACIADO ENTRE BLOQUES DASHBOARD
+   PEGAR AL FINAL DEL CSS
+===================================== */
+
+/* separación filtros -> cards */
+.dbx-filters-box{
+  margin-bottom:18px !important;
+}
+
+/* separación cards -> tablas/graficas */
+#cardsDashboard.dbx-cards{
+  margin-bottom:22px !important;
+}
+
+/* separación entre tablas/cards inferiores */
+.dbx-table-card,
+.dbx-chart-card{
+  margin-top:6px;
+}
+
+/* si existe primera tabla luego de cards */
+.rentabilidad-full{
+  margin-top:4px;
+}
+
+/* =====================================
+   UNIFICACION COLORES TABLAS FINANCIERAS
+   PEGAR AL FINAL de dashboard.css
+===================================== */
+
+/* =====================================
+   PALETA UNICA
+   Facturado   = Azul
+   Ingreso     = Verde
+   Pagado      = Verde
+   Pendiente   = Naranja
+   Egreso      = Rojo
+   Gasto Cond. = Naranja
+===================================== */
+
+/* ---------- texto normal ---------- */
+.text-facturado,
+.total-facturado,
+.text-blue,
+.total-blue{
+  color:#2457ff !important;
+  font-weight:700;
+}
+
+.text-ingreso,
+.total-ingreso,
+.text-green,
+.total-green{
+  color:#00a63e !important;
+  font-weight:700;
+}
+
+.text-pendiente,
+.total-pendiente,
+.text-orange,
+.total-orange{
+  color:#f59e0b !important;
+  font-weight:700;
+}
+
+.text-egreso,
+.total-egreso,
+.text-red,
+.total-red{
+  color:#e53935 !important;
+  font-weight:700;
+}
+
+/* utilidad negra */
+.text-utilidad,
+.total-utilidad{
+  color:#111827 !important;
+  font-weight:800;
+}
+
+/* =====================================
+   FOOTERS / TOTALES
+===================================== */
+
+.dbx-table tfoot td{
   background:#eef2f7 !important;
-  color:#111827 !important;
-  border:none !important;
+  font-weight:800 !important;
 }
 
-/* hover igual al resto */
-#btnMesActual:hover,
-#btnMesAnterior:hover{
-  background:#dde5ef !important;
+.dbx-table tfoot td:first-child{
   color:#111827 !important;
+  font-weight:900 !important;
 }
 
-/* opcional: si uno está activo por JS */
-#btnMesActual.active,
-#btnMesAnterior.active{
-  background:#2f56a6 !important;
-  color:#fff !important;
+/* evita negro heredado viejo */
+.dbx-table tfoot td:last-child,
+.dbx-table tfoot td:nth-last-child(2){
+  color:inherit !important;
+}
+
+/* =====================================
+   TABLA RENTABILIDAD
+===================================== */
+
+/* Col 3 Facturado */
+#tablaRentabilidadTable tbody td:nth-child(3),
+#tablaRentabilidadTable tfoot td:nth-child(3){
+  color:#2457ff !important;
+  font-weight:700;
+}
+
+/* Col 4 Ingreso */
+#tablaRentabilidadTable tbody td:nth-child(4),
+#tablaRentabilidadTable tfoot td:nth-child(4){
+  color:#00a63e !important;
+  font-weight:700;
+}
+
+/* Col 5 Egreso */
+#tablaRentabilidadTable tbody td:nth-child(5),
+#tablaRentabilidadTable tfoot td:nth-child(5){
+  color:#e53935 !important;
+  font-weight:700;
+}
+
+/* Col 6 Gasto conductor */
+#tablaRentabilidadTable tbody td:nth-child(6),
+#tablaRentabilidadTable tfoot td:nth-child(6){
+  color:#f59e0b !important;
+  font-weight:700;
+}
+
+/* Col 7 Utilidad */
+#tablaRentabilidadTable tbody td:nth-child(7),
+#tablaRentabilidadTable tfoot td:nth-child(7){
+  color:#111827 !important;
+  font-weight:800;
+}
+
+/* =====================================
+   TABLA ESTADO FACTURACION
+===================================== */
+
+/* Col 2 Facturado */
+#tablaEstadoFacturacionTable tbody td:nth-child(2),
+#tablaEstadoFacturacionTable tfoot td:nth-child(2){
+  color:#2457ff !important;
+  font-weight:700;
+}
+
+/* Col 3 Pagado */
+#tablaEstadoFacturacionTable tbody td:nth-child(3),
+#tablaEstadoFacturacionTable tfoot td:nth-child(3){
+  color:#00a63e !important;
+  font-weight:700;
+}
+
+/* Col 4 Pendiente */
+#tablaEstadoFacturacionTable tbody td:nth-child(4),
+#tablaEstadoFacturacionTable tfoot td:nth-child(4){
+  color:#f59e0b !important;
+  font-weight:700;
+}
+
+/* =====================================
+   FIX FINAL COLORES TABLA RENTABILIDAD
+===================================== */
+
+/* RENTABILIDAD - FOOTER correcto por columna */
+#tablaRentabilidadTable tfoot td:nth-child(2){
+  color:#2457ff !important; /* Valor Facturado */
+  font-weight:700 !important;
+}
+
+#tablaRentabilidadTable tfoot td:nth-child(3){
+  color:#00a63e !important; /* Ingreso */
+  font-weight:700 !important;
+}
+
+#tablaRentabilidadTable tfoot td:nth-child(4){
+  color:#e53935 !important; /* Egreso */
+  font-weight:700 !important;
+}
+
+#tablaRentabilidadTable tfoot td:nth-child(5){
+  color:#f59e0b !important; /* Gasto Conductor */
+  font-weight:700 !important;
+}
+
+#tablaRentabilidadTable tfoot td:nth-child(6){
+  color:#111827 !important; /* Utilidad */
+  font-weight:800 !important;
+}
+
+#tablaRentabilidadTable tfoot td:nth-child(7){
+  color:#111827 !important; /* Margen % */
+  font-weight:800 !important;
+}
+
+/* primera celda TOTALES */
+#tablaRentabilidadTable tfoot td:first-child{
+  color:#111827 !important;
+  font-weight:900 !important;
+}
+
+/* BODY correcto por columna */
+#tablaRentabilidadTable tbody td:nth-child(3){
+  color:#2457ff !important; /* Valor Facturado */
+  font-weight:700 !important;
+}
+
+#tablaRentabilidadTable tbody td:nth-child(4){
+  color:#00a63e !important; /* Ingreso */
+  font-weight:700 !important;
+}
+
+#tablaRentabilidadTable tbody td:nth-child(5){
+  color:#e53935 !important; /* Egreso */
+  font-weight:700 !important;
+}
+
+#tablaRentabilidadTable tbody td:nth-child(6){
+  color:#f59e0b !important; /* Gasto Conductor */
+  font-weight:700 !important;
+}
+
+#tablaRentabilidadTable tbody td:nth-child(7){
+  color:#111827 !important; /* Utilidad */
+  font-weight:800 !important;
+}
+
+#tablaRentabilidadTable tbody td:nth-child(8){
+  color:#111827 !important; /* Margen % */
+  font-weight:400 !important;
 }

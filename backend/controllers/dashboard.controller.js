@@ -5,75 +5,109 @@ const pool = require("../config/db");
 // =========================
 const getDashboardKPI = async (req, res) => {
   try {
-
     const { desde, hasta } = req.query;
 
-    // =========================
-    // INGRESOS
-    // =========================
+    // ======================
+    // INGRESOS REALES
+    // ======================
     const ingresosQ = await pool.query(`
-      SELECT COALESCE(SUM(valor), 0) AS total
+      SELECT COALESCE(SUM(t.valor),0) AS total
+      FROM transaccion t
+      JOIN tipo_transaccion tt
+        ON tt.id = t.id_tipo_transaccion
+      WHERE tt.tipo = 'INGRESO MANIFIESTO'
+        AND ($1::date IS NULL OR t.fecha_pago >= $1)
+        AND ($2::date IS NULL OR t.fecha_pago <= $2)
+    `,[desde || null, hasta || null]);
+
+    // ======================
+    // FACTURADO
+    // ======================
+    const facturadoQ = await pool.query(`
+      SELECT COALESCE(SUM(valor),0) AS total
       FROM factura
       WHERE ($1::date IS NULL OR fecha_emision >= $1)
         AND ($2::date IS NULL OR fecha_emision <= $2)
-    `, [desde || null, hasta || null]);
+    `,[desde || null, hasta || null]);
 
-    // =========================
+    // ======================
     // EGRESOS
-    // =========================
+    // ======================
     const egresosQ = await pool.query(`
-      SELECT COALESCE(SUM(t.valor), 0) AS total
-      FROM transaccion t
-      JOIN tipo_transaccion tt 
-        ON t.id_tipo_transaccion = tt.id
-      WHERE tt.tipo IN (
-        'GASTO CONDUCTOR',
-        'EGRESO OPERACIONAL',
-        'EGRESO MANIFIESTO'
-      )
-        AND ($1::date IS NULL OR t.fecha_pago >= $1)
-        AND ($2::date IS NULL OR t.fecha_pago <= $2)
-    `, [desde || null, hasta || null]);
+      SELECT
+        COALESCE(SUM(
+          CASE
+            WHEN tt.tipo IN (
+              'GASTO CONDUCTOR',
+              'EGRESO OPERACIONAL',
+              'EGRESO MANIFIESTO'
+            )
+            THEN t.valor
+            ELSE 0
+          END
+        ),0) total,
 
-    // =========================
+        COALESCE(SUM(
+          CASE
+            WHEN tt.tipo='EGRESO OPERACIONAL'
+            THEN t.valor
+            ELSE 0
+          END
+        ),0) operacional
+
+      FROM transaccion t
+      JOIN tipo_transaccion tt
+        ON tt.id=t.id_tipo_transaccion
+
+      WHERE ($1::date IS NULL OR t.fecha_pago >= $1)
+        AND ($2::date IS NULL OR t.fecha_pago <= $2)
+    `,[desde || null, hasta || null]);
+
+    // ======================
     // VIAJES
-    // =========================
+    // ======================
     const viajesQ = await pool.query(`
-      SELECT COUNT(*) AS total
+      SELECT COUNT(*) total
       FROM manifiesto
       WHERE ($1::date IS NULL OR fecha >= $1)
         AND ($2::date IS NULL OR fecha <= $2)
-    `, [desde || null, hasta || null]);
+    `,[desde || null, hasta || null]);
 
-    // =========================
-    // FACTURAS PAGADAS / PENDIENTES
-    // =========================
-    const facturasQ = await pool.query(`
-      SELECT 
-        COALESCE(COUNT(*) FILTER (WHERE COALESCE(t.pagado,0) >= f.valor), 0) AS pagadas,
-        COALESCE(COUNT(*) FILTER (WHERE COALESCE(t.pagado,0) < f.valor), 0) AS pendientes
-      FROM factura f
-      LEFT JOIN (
-        SELECT 
-          id_factura,
-          COALESCE(SUM(valor),0) AS pagado
-        FROM transaccion
-        WHERE id_factura IS NOT NULL
-        GROUP BY id_factura
-      ) t ON t.id_factura = f.codigo_factura
-      WHERE ($1::date IS NULL OR f.fecha_emision >= $1)
-        AND ($2::date IS NULL OR f.fecha_emision <= $2)
-    `, [desde || null, hasta || null]);
+    // ======================
+    // ESTADO FACTURACION
+    // ======================
+    const estadoQ = await pool.query(`
+      SELECT
+        COUNT(*) FILTER (
+          WHERE f.codigo_factura IS NOT NULL
+        ) facturados,
 
-    const ingresos = Number(ingresosQ.rows[0].total);
-    const egresos = Number(egresosQ.rows[0].total);
-    const viajes = Number(viajesQ.rows[0].total);
+        COUNT(*) FILTER (
+          WHERE f.codigo_factura IS NULL
+        ) pendientes
+
+      FROM manifiesto m
+      LEFT JOIN factura f
+        ON f.id_manifiesto = m.id_manifiesto
+
+      WHERE ($1::date IS NULL OR m.fecha >= $1)
+        AND ($2::date IS NULL OR m.fecha <= $2)
+    `,[desde || null, hasta || null]);
+
+    const ingresos = Number(ingresosQ.rows[0].total || 0);
+    const facturado = Number(facturadoQ.rows[0].total || 0);
+    const egresos = Number(egresosQ.rows[0].total || 0);
+    const gastosOperacionales =
+      Number(egresosQ.rows[0].operacional || 0);
+
+    const viajes = Number(viajesQ.rows[0].total || 0);
 
     const utilidad = ingresos - egresos;
-    const margen = ingresos > 0 ? (utilidad / ingresos) * 100 : 0;
 
-    const pagadas = Number(facturasQ.rows[0].pagadas || 0);
-    const pendientes = Number(facturasQ.rows[0].pendientes || 0);
+    const margen =
+      ingresos > 0
+      ? ((utilidad / ingresos) * 100)
+      : 0;
 
     return res.json({
       ingresos,
@@ -81,78 +115,120 @@ const getDashboardKPI = async (req, res) => {
       utilidad,
       margen,
       viajes,
-      facturas: {
-        pagadas,
-        pendientes
+      gastosOperacionales,
+
+      periodo:{
+        desde,
+        hasta
+      },
+
+      facturas:{
+        totalFacturado: facturado,
+        facturados: Number(estadoQ.rows[0].facturados || 0),
+        pendientes: Number(estadoQ.rows[0].pendientes || 0)
       }
     });
 
-  } catch (error) {
-    console.error("?? Error KPI:", error);
-    return res.status(500).json({ error: "Error obteniendo KPI" });
+  } catch(error){
+    console.error(error);
+    res.status(500).json({
+      error:"Error KPI"
+    });
   }
 };
+
 
 // =========================
 // RENTABILIDAD POR MANIFIESTO
 // =========================
 const getRentabilidad = async (req, res) => {
   try {
-
     const { desde, hasta } = req.query;
 
     const result = await pool.query(`
-      SELECT 
+      SELECT
         m.id_manifiesto,
         c.nombre AS cliente,
 
-        COALESCE(f.valor, 0) AS ingreso,
+        COALESCE(f.valor,0) AS valor_facturado,
 
         COALESCE(SUM(
-          CASE 
-            WHEN tt.tipo = 'GASTO CONDUCTOR' THEN t.valor
+          CASE
+            WHEN tt.tipo = 'INGRESO MANIFIESTO'
+            THEN t.valor
             ELSE 0
           END
-        ), 0) AS egreso,
+        ),0) AS ingreso,
 
-        COALESCE(f.valor, 0) - COALESCE(SUM(
-          CASE 
-            WHEN tt.tipo = 'GASTO CONDUCTOR' THEN t.valor
+        COALESCE(SUM(
+          CASE
+            WHEN tt.tipo = 'EGRESO MANIFIESTO'
+            THEN t.valor
             ELSE 0
           END
-        ), 0) AS utilidad
+        ),0) AS egreso,
+
+        COALESCE(SUM(
+          CASE
+            WHEN tt.tipo = 'GASTO CONDUCTOR'
+            THEN t.valor
+            ELSE 0
+          END
+        ),0) AS gasto_conductor,
+
+        COALESCE(SUM(
+          CASE
+            WHEN tt.tipo = 'INGRESO MANIFIESTO'
+            THEN t.valor
+            ELSE 0
+          END
+        ),0)
+
+        -
+
+        COALESCE(SUM(
+          CASE
+            WHEN tt.tipo = 'EGRESO MANIFIESTO'
+            THEN t.valor
+            ELSE 0
+          END
+        ),0)
+
+        AS utilidad
 
       FROM manifiesto m
 
-      LEFT JOIN factura f 
-        ON m.id_manifiesto = f.id_manifiesto
+      LEFT JOIN factura f
+        ON f.id_manifiesto = m.id_manifiesto
 
       LEFT JOIN cliente c
         ON m.id_cliente = c.nit
 
       LEFT JOIN transaccion t
-        ON m.id_manifiesto = t.id_manifiesto
+        ON t.id_manifiesto = m.id_manifiesto
 
       LEFT JOIN tipo_transaccion tt
-        ON t.id_tipo_transaccion = tt.id
+        ON tt.id = t.id_tipo_transaccion
 
-      WHERE 
-        ($1::date IS NULL OR f.fecha_emision >= $1)
-        AND ($2::date IS NULL OR f.fecha_emision <= $2)
+      WHERE
+        ($1::date IS NULL OR m.fecha >= $1)
+        AND ($2::date IS NULL OR m.fecha <= $2)
 
-      GROUP BY 
+      GROUP BY
         m.id_manifiesto,
         c.nombre,
         f.valor
 
-      ORDER BY m.id_manifiesto DESC
+      ORDER BY utilidad DESC
     `, [desde || null, hasta || null]);
 
     return res.json(result.rows);
 
   } catch (error) {
-    console.error("? Error getRentabilidad:", error);
-    return res.status(500).json({ error: "Error obteniendo rentabilidad" });
+    console.error("Error getRentabilidad:", error);
+    return res.status(500).json({
+      error: "Error obteniendo rentabilidad"
+    });
   }
 };
 
@@ -238,58 +314,72 @@ const getGastosPorCategoria = async (req, res) => {
   }
 };
 
+
 const getEstadoFacturacion = async (req, res) => {
   try {
-
     const { desde, hasta } = req.query;
 
     const result = await pool.query(`
-      SELECT 
-        c.nombre AS cliente,
+      SELECT
+        base.cliente,
+        base.total_facturado,
 
-        -- TOTAL FACTURADO
-        COALESCE(SUM(f.valor), 0) AS total_facturado,
+        COALESCE(pagos.pagado,0) AS pagado,
 
-        -- PAGADO (transacciones asociadas a factura)
-        COALESCE(SUM(
-          CASE 
-            WHEN t.id IS NOT NULL THEN t.valor
-            ELSE 0
-          END
-        ), 0) AS pagado,
+        base.total_facturado - COALESCE(pagos.pagado,0) AS pendiente
 
-        -- PENDIENTE
-        COALESCE(SUM(f.valor), 0) - COALESCE(SUM(
-          CASE 
-            WHEN t.id IS NOT NULL THEN t.valor
-            ELSE 0
-          END
-        ), 0) AS pendiente
+      FROM (
 
-      FROM factura f
+        SELECT
+          c.nombre AS cliente,
+          SUM(f.valor) AS total_facturado
 
-      JOIN manifiesto m 
-        ON f.id_manifiesto = m.id_manifiesto
+        FROM factura f
+        JOIN manifiesto m
+          ON f.id_manifiesto = m.id_manifiesto
+        JOIN cliente c
+          ON m.id_cliente = c.nit
 
-      JOIN cliente c 
-        ON m.id_cliente = c.nit
+        WHERE ($1::date IS NULL OR f.fecha_emision >= $1)
+          AND ($2::date IS NULL OR f.fecha_emision <= $2)
 
-      LEFT JOIN transaccion t 
-        ON t.id_factura = f.codigo_factura
+        GROUP BY c.nombre
 
-      WHERE 
-        ($1::date IS NULL OR f.fecha_emision >= $1)
-        AND ($2::date IS NULL OR f.fecha_emision <= $2)
+      ) base
 
-      GROUP BY c.nombre
-      ORDER BY total_facturado DESC
+      LEFT JOIN (
+
+        SELECT
+          c.nombre AS cliente,
+          SUM(t.valor) AS pagado
+
+        FROM transaccion t
+        JOIN tipo_transaccion tt
+          ON tt.id = t.id_tipo_transaccion
+        JOIN manifiesto m
+          ON t.id_manifiesto = m.id_manifiesto
+        JOIN cliente c
+          ON m.id_cliente = c.nit
+
+        WHERE tt.tipo = 'INGRESO MANIFIESTO'
+          AND ($1::date IS NULL OR t.fecha_pago >= $1)
+          AND ($2::date IS NULL OR t.fecha_pago <= $2)
+
+        GROUP BY c.nombre
+
+      ) pagos
+        ON pagos.cliente = base.cliente
+
+      ORDER BY base.total_facturado DESC
     `, [desde || null, hasta || null]);
 
     return res.json(result.rows);
 
   } catch (error) {
     console.error("Error estado facturación:", error);
-    return res.status(500).json({ error: "Error estado facturación" });
+    return res.status(500).json({
+      error: "Error estado facturación"
+    });
   }
 };
 
