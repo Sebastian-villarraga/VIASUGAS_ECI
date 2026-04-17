@@ -90,42 +90,48 @@
       
       </div>
 
-      <div class="dbx-table-card facturacion-full">
+      <!-- FILA: FACTURACION + GRAFICA -->
+      <div class="dbx-row-50">
       
-        <h2>Estado de Facturación</h2>
+        <!-- IZQUIERDA -->
+        <div class="dbx-table-card facturacion-half">
       
-        <div class="tabla-scroll-wrap fact-scroll">
+          <h2>Estado de Facturación</h2>
       
-          <table class="dbx-table" id="tablaEstadoFacturacionTable">
+          <div class="tabla-scroll-wrap fact-scroll">
       
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Facturado</th>
-                <th>Pagado</th>
-                <th>Pendiente</th>
-              </tr>
-            </thead>
+            <table class="dbx-table" id="tablaEstadoFacturacionTable">
       
-            <tbody id="tablaEstadoFacturacion"></tbody>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Facturado</th>
+                  <th>Pagado</th>
+                  <th>Pendiente</th>
+                </tr>
+              </thead>
       
-            <tfoot id="tablaEstadoFacturacionTotal"></tfoot>
+              <tbody id="tablaEstadoFacturacion"></tbody>
       
-          </table>
+              <tfoot id="tablaEstadoFacturacionTotal"></tfoot>
+      
+            </table>
+      
+          </div>
       
         </div>
       
-      </div>
-
-    </section>
-
-    <aside class="dbx-right">
-
-      <div class="dbx-chart-card">
-        <h3>Ingresos vs Egresos</h3>
-        <div class="dbx-chart-wrap">
-          <canvas id="graficaIE"></canvas>
+        <!-- DERECHA -->
+        <div class="dbx-chart-card grafica-half">
+      
+          <h3>Ingresos vs Egresos</h3>
+      
+          <div class="dbx-chart-wrap">
+            <canvas id="graficaIE"></canvas>
+          </div>
+      
         </div>
+      
       </div>
 
       <div class="dbx-chart-card">

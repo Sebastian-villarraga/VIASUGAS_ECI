@@ -269,13 +269,12 @@ function calcularMargen(ingreso, egreso) {
 // =========================
 async function cargarGraficaIngresosEgresos() {
   try {
-
     const query = getQueryFiltro();
     const data = await apiFetch(`/api/dashboard/grafica-ingresos-egresos${query}`);
 
     const labels = data.map(d => d.mes);
-    const ingresos = data.map(d => Number(d.ingresos));
-    const egresos = data.map(d => Number(d.egresos));
+    const ingresos = data.map(d => Number(d.ingresos || 0));
+    const egresos = data.map(d => Number(d.egresos || 0));
 
     const canvas = document.getElementById("graficaIE");
     if (!canvas) return;
@@ -286,19 +285,84 @@ async function cargarGraficaIngresosEgresos() {
       window.graficaIEChart.destroy();
     }
 
+    const valueLabelsPlugin = {
+      id: "valueLabelsPlugin",
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        ctx.save();
+
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+          const meta = chart.getDatasetMeta(datasetIndex);
+
+          meta.data.forEach((bar, index) => {
+            const value = Number(dataset.data[index] || 0);
+            if (!value) return;
+
+            const label = "$ " + value.toLocaleString("es-CO");
+
+            ctx.font = "bold 11px Arial";
+            ctx.fillStyle = "#111";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+
+            let y = bar.y - 8;
+            if (y < 16) y = 16;
+
+            ctx.fillText(label, bar.x, y);
+          });
+        });
+
+        ctx.restore();
+      }
+    };
+
     window.graficaIEChart = new Chart(ctx, {
       type: "bar",
       data: {
         labels,
         datasets: [
-          { label: "Ingresos", data: ingresos },
-          { label: "Egresos", data: egresos }
+          {
+            label: "Ingresos",
+            data: ingresos,
+            backgroundColor: "#00a63e"
+          },
+          {
+            label: "Egresos",
+            data: egresos,
+            backgroundColor: "#e53935"
+          }
         ]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false
-      }
+        maintainAspectRatio: false,
+        animation: false,
+        layout: {
+          padding: {
+            top: 28
+          }
+        },
+        plugins: {
+          legend: {
+            position: "top"
+          },
+          tooltip: {
+            enabled: true
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grace: "10%",
+            ticks: {
+              callback(value) {
+                return "$ " + Number(value).toLocaleString("es-CO");
+              }
+            }
+          }
+        }
+      },
+      plugins: [valueLabelsPlugin]
     });
 
   } catch (error) {

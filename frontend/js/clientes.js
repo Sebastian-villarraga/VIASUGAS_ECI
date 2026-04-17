@@ -98,46 +98,8 @@ function initFormCliente() {
   const inputNombre = document.getElementById("nombre");
   const inputCorreo = document.getElementById("correo");
   const inputTelefono = document.getElementById("telefono");
-  const selectDireccion = document.getElementById("direccion");
+  const inputDireccion = document.getElementById("direccion");
 
-  // =========================
-  // DATOS (puedes mover esto a archivo aparte luego)
-  // =========================
-  const ubicaciones = [
-    { dep: "Antioquia", ciudad: "Medellín" },
-    { dep: "Antioquia", ciudad: "Bello" },
-    { dep: "Cundinamarca", ciudad: "Bogotá" },
-    { dep: "Cundinamarca", ciudad: "Soacha" },
-    { dep: "Valle del Cauca", ciudad: "Cali" },
-    { dep: "Valle del Cauca", ciudad: "Palmira" },
-    { dep: "Atlántico", ciudad: "Barranquilla" },
-    { dep: "Santander", ciudad: "Bucaramanga" }
-  ];
-
-  // =========================
-  // CARGAR SELECT DIRECCIÓN
-  // =========================
-  function cargarDirecciones() {
-    selectDireccion.innerHTML = `<option value="">Seleccione</option>`;
-
-    ubicaciones.forEach(u => {
-      const option = document.createElement("option");
-
-      // 🔥 lo que se guarda
-      option.value = u.ciudad;
-
-      // 🔥 lo que ve el usuario
-      option.textContent = `${u.ciudad} (${u.dep})`;
-
-      selectDireccion.appendChild(option);
-    });
-  }
-
-  cargarDirecciones();
-
-  // =========================
-  // HELPERS
-  // =========================
   const marcarError = (el) => el.classList.add("error");
   const limpiarError = (el) => el.classList.remove("error");
 
@@ -145,9 +107,10 @@ function initFormCliente() {
   // VALIDACIONES
   // =========================
 
+  // NIT: permitir números, letras, guion, punto y espacios
   inputNit.addEventListener("input", () => {
-    inputNit.value = inputNit.value.replace(/\D/g, "");
-    inputNit.value ? limpiarError(inputNit) : marcarError(inputNit);
+    inputNit.value = inputNit.value.replace(/[^0-9a-zA-Z\-. ]/g, "");
+    inputNit.value.trim() ? limpiarError(inputNit) : marcarError(inputNit);
   });
 
   inputNombre.addEventListener("input", () => {
@@ -176,14 +139,13 @@ function initFormCliente() {
     }
   });
 
-  selectDireccion.addEventListener("change", () => {
-    selectDireccion.value ? limpiarError(selectDireccion) : marcarError(selectDireccion);
+  inputDireccion.addEventListener("input", () => {
+    inputDireccion.value.trim() ? limpiarError(inputDireccion) : marcarError(inputDireccion);
   });
 
   // =========================
   // SUBMIT
   // =========================
-
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -191,7 +153,7 @@ function initFormCliente() {
     const nombre = inputNombre.value.trim();
     const correo = inputCorreo.value.trim();
     const telefono = inputTelefono.value.trim();
-    const direccion = selectDireccion.value;
+    const direccion = inputDireccion.value.trim();
     const estado = document.getElementById("estado").value;
 
     let hayError = false;
@@ -207,7 +169,7 @@ function initFormCliente() {
     }
 
     if (!direccion) {
-      marcarError(selectDireccion);
+      marcarError(inputDireccion);
       hayError = true;
     }
 
@@ -232,7 +194,7 @@ function initFormCliente() {
       nombre,
       correo,
       telefono,
-      direccion, // 🔥 solo ciudad
+      direccion,
       estado
     };
 

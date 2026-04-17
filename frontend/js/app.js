@@ -27,10 +27,7 @@ async function loadView(view) {
     // INIT POR VISTA
     // =========================
     switch (view) {
-      case "dashboard":
-      case "home":
-        if (typeof initDashboard === "function") initDashboard();
-        break;
+      
 
       case "vehiculos":
         if (typeof initVehiculos === "function") initVehiculos();

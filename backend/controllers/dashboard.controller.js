@@ -258,7 +258,7 @@ const getIngresosEgresos = async (req, res) => {
       FROM transaccion t
       JOIN tipo_transaccion tt 
         ON t.id_tipo_transaccion = tt.id
-      WHERE tt.tipo = 'GASTO CONDUCTOR'
+      WHERE tt.tipo = 'EGRESO MANIFIESTO'
         AND ($1::date IS NULL OR t.fecha_pago >= $1)
         AND ($2::date IS NULL OR t.fecha_pago <= $2)
       GROUP BY mes
