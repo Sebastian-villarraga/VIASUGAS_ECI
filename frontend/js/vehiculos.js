@@ -375,15 +375,6 @@ function renderAlertas(data) {
 
   if (!lista) return;
 
-  if (!data || data.length === 0) {
-    lista.innerHTML = `<li class="sin-alertas">Sin alertas</li>`;
-
-    if (btnV) btnV.textContent = "0 vencidos";
-    if (btnP) btnP.textContent = "0 por vencer";
-
-    return;
-  }
-
   const all = window._alertasVehiculos || [];
 
   const vencidos = all.filter(a => a.estado === "vencido").length;
@@ -392,23 +383,28 @@ function renderAlertas(data) {
   if (btnV) btnV.textContent = `${vencidos} vencidos`;
   if (btnP) btnP.textContent = `${proximos} por vencer`;
 
+  if (!data || data.length === 0) {
+    lista.innerHTML = `<li class="sin-alertas">Sin alertas</li>`;
+    return;
+  }
+
   lista.innerHTML = data.map(a => {
 
     const clase = a.estado === "vencido"
-      ? "alerta-item alerta-vencido"
-      : "alerta-item alerta-proximo";
+      ? "vencido"
+      : "proximo";
 
     return `
       <li class="${clase}">
-        <div class="alerta-titulo">
-          <strong>${a.propietario || "Sin nombre"} - ${a.placa}</strong>
-        </div>
-        <div>${a.tipo || "-"}</div>
-        <div class="alerta-fecha">${a.fecha ? formatearFechaDesdeUTC(a.fecha) : "-"}</div>
+        <strong>${a.propietario || "Sin nombre"} - ${a.placa}</strong>
+        ${a.tipo || "-"}
+        <small>${a.fecha ? formatearFechaDesdeUTC(a.fecha) : "-"}</small>
       </li>
     `;
   }).join("");
 }
+
+
 // =========================
 // FORM
 // =========================

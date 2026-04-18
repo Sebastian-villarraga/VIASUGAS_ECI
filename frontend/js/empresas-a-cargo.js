@@ -155,8 +155,14 @@ function initFormEmpresa() {
   // =========================
 
   inputNit.addEventListener("input", () => {
-    inputNit.value = inputNit.value.replace(/\D/g, "");
-    inputNit.value ? limpiarError(inputNit) : marcarError(inputNit);
+  
+    inputNit.value = inputNit.value
+      .replace(/[^0-9\-]/g, "")
+      .slice(0, 20);
+  
+    inputNit.value
+      ? limpiarError(inputNit)
+      : marcarError(inputNit);
   });
 
   inputNombre.addEventListener("input", () => {

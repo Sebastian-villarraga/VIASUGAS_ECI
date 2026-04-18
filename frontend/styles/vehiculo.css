@@ -268,8 +268,6 @@
 
 /* item alerta */
 .vhx-alert-list li {
-  background: #f8eaea;
-  border-left: 4px solid #df2c1d;
   border-radius: 10px;
   padding: 12px 14px;
   margin-bottom: 12px;
@@ -277,6 +275,18 @@
   font-size: 14px;
   color: #111827;
   font-weight: 600;
+}
+
+/* ALERTAS VENCIDAS */
+.vhx-alert-list li.vencido{
+  background:#f8eaea;
+  border-left:4px solid #df2c1d;
+}
+
+/* ALERTAS POR VENCER */
+.vhx-alert-list li.proximo{
+  background:#fff8dc;
+  border-left:4px solid #e0a100;
 }
 
 /* primera linea */

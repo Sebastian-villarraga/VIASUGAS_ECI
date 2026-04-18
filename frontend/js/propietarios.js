@@ -122,8 +122,15 @@ function initFormPropietario() {
   // =========================
 
   inputId.addEventListener("input", () => {
-    inputId.value = inputId.value.replace(/\D/g, "");
-    inputId.value ? limpiarError(inputId) : marcarError(inputId);
+  
+    inputId.value = inputId.value
+      .replace(/[^a-zA-Z0-9\-\.]/g, "")   // letras, números, guion, punto
+      .toUpperCase()
+      .slice(0, 20);
+  
+    inputId.value.trim()
+      ? limpiarError(inputId)
+      : marcarError(inputId);
   });
 
   inputNombre.addEventListener("input", () => {
