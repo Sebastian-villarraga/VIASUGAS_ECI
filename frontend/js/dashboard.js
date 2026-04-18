@@ -146,17 +146,21 @@ async function cargarRentabilidad() {
 // =========================
 // TABLA RENTABILIDAD
 // =========================
-function renderTablaRentabilidad(data){
+function renderTablaRentabilidad(data) {
 
   const tbody = document.getElementById("tablaRentabilidad");
   const tfoot = document.getElementById("tablaRentabilidadTotal");
 
-  if(!tbody || !tfoot) return;
+  if (!tbody) return;
 
   tbody.innerHTML = "";
-  tfoot.innerHTML = "";
+
+  if (tfoot) {
+    tfoot.innerHTML = "";
+  }
 
   let totalFacturado = 0;
+  let totalRetenciones = 0;
   let totalIngreso = 0;
   let totalEgreso = 0;
   let totalConductor = 0;
@@ -165,6 +169,7 @@ function renderTablaRentabilidad(data){
   data.forEach(row => {
 
     const facturado = Number(row.valor_facturado || 0);
+    const retenciones = Number(row.retenciones || 0);
     const ingreso = Number(row.ingreso || 0);
     const egreso = Number(row.egreso || 0);
     const conductor = Number(row.gasto_conductor || 0);
@@ -172,10 +177,11 @@ function renderTablaRentabilidad(data){
 
     const margen =
       ingreso > 0
-      ? ((utilidad / ingreso) * 100).toFixed(1)
-      : "0.0";
+        ? ((utilidad / ingreso) * 100).toFixed(1)
+        : "0.0";
 
     totalFacturado += facturado;
+    totalRetenciones += retenciones;
     totalIngreso += ingreso;
     totalEgreso += egreso;
     totalConductor += conductor;
@@ -184,28 +190,23 @@ function renderTablaRentabilidad(data){
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${row.id_manifiesto}</td>
-      <td>${row.cliente || "-"}</td>
+      <td>${row.id_manifiesto || "-"}</td>
 
-      <td class="text-blue">
-        ${formatearMoneda(facturado)}
-      </td>
+      <td>${row.cliente || "Sin cliente"}</td>
 
-      <td class="text-green">
-        ${formatearMoneda(ingreso)}
-      </td>
+      <td>${row.empresa_a_cargo || "Sin empresa"}</td>
 
-      <td class="text-red">
-        ${formatearMoneda(egreso)}
-      </td>
+      <td>${formatearMoneda(facturado)}</td>
 
-      <td class="text-orange">
-        ${formatearMoneda(conductor)}
-      </td>
+      <td>${formatearMoneda(retenciones)}</td>
 
-      <td>
-        ${formatearMoneda(utilidad)}
-      </td>
+      <td>${formatearMoneda(ingreso)}</td>
+
+      <td>${formatearMoneda(egreso)}</td>
+
+      <td>${formatearMoneda(conductor)}</td>
+
+      <td>${formatearMoneda(utilidad)}</td>
 
       <td>${margen}%</td>
     `;
@@ -213,38 +214,33 @@ function renderTablaRentabilidad(data){
     tbody.appendChild(tr);
   });
 
-  const margenTotal =
-    totalIngreso > 0
-    ? ((totalUtilidad / totalIngreso) * 100).toFixed(1)
-    : "0.0";
+  if (tfoot) {
 
-  tfoot.innerHTML = `
-    <tr>
-      <td colspan="2"><strong>TOTALES</strong></td>
+    const margenTotal =
+      totalIngreso > 0
+        ? ((totalUtilidad / totalIngreso) * 100).toFixed(1)
+        : "0.0";
 
-      <td class="total-blue">
-        ${formatearMoneda(totalFacturado)}
-      </td>
+    tfoot.innerHTML = `
+      <tr>
+        <td colspan="3"><strong>TOTALES</strong></td>
 
-      <td class="total-green">
-        ${formatearMoneda(totalIngreso)}
-      </td>
+        <td>${formatearMoneda(totalFacturado)}</td>
 
-      <td class="total-red">
-        ${formatearMoneda(totalEgreso)}
-      </td>
+        <td>${formatearMoneda(totalRetenciones)}</td>
 
-      <td class="total-orange">
-        ${formatearMoneda(totalConductor)}
-      </td>
+        <td>${formatearMoneda(totalIngreso)}</td>
 
-      <td>
-        ${formatearMoneda(totalUtilidad)}
-      </td>
+        <td>${formatearMoneda(totalEgreso)}</td>
 
-      <td>${margenTotal}%</td>
-    </tr>
-  `;
+        <td>${formatearMoneda(totalConductor)}</td>
+
+        <td>${formatearMoneda(totalUtilidad)}</td>
+
+        <td>${margenTotal}%</td>
+      </tr>
+    `;
+  }
 }
 
 // =========================
@@ -491,35 +487,36 @@ function renderTablaEstadoFacturacion(data) {
   }
 
   let totalFacturado = 0;
+  let totalRetenciones = 0;
   let totalPagado = 0;
   let totalPendiente = 0;
 
   data.forEach(row => {
 
     const facturado = Number(row.total_facturado || 0);
+    const retenciones = Number(row.retenciones || 0);
     const pagado = Number(row.pagado || 0);
     const pendiente = Number(row.pendiente || 0);
 
     totalFacturado += facturado;
+    totalRetenciones += retenciones;
     totalPagado += pagado;
     totalPendiente += pendiente;
 
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${row.cliente}</td>
+      <td>${row.cliente || "Sin cliente"}</td>
 
-      <td class="text-green">
-        ${formatearMoneda(facturado)}
-      </td>
+      <td>${row.empresa_a_cargo || "Sin empresa"}</td>
 
-      <td class="text-blue">
-        ${formatearMoneda(pagado)}
-      </td>
+      <td>${formatearMoneda(facturado)}</td>
 
-      <td class="text-red">
-        ${formatearMoneda(pendiente)}
-      </td>
+      <td>${formatearMoneda(retenciones)}</td>
+
+      <td>${formatearMoneda(pagado)}</td>
+
+      <td>${formatearMoneda(pendiente)}</td>
     `;
 
     tbody.appendChild(tr);
@@ -528,19 +525,15 @@ function renderTablaEstadoFacturacion(data) {
   if (tfoot) {
     tfoot.innerHTML = `
       <tr>
-        <td><strong>TOTALES</strong></td>
+        <td colspan="2"><strong>TOTALES</strong></td>
 
-        <td class="total-green">
-          ${formatearMoneda(totalFacturado)}
-        </td>
+        <td>${formatearMoneda(totalFacturado)}</td>
 
-        <td class="total-blue">
-          ${formatearMoneda(totalPagado)}
-        </td>
+        <td>${formatearMoneda(totalRetenciones)}</td>
 
-        <td class="total-red">
-          ${formatearMoneda(totalPendiente)}
-        </td>
+        <td>${formatearMoneda(totalPagado)}</td>
+
+        <td>${formatearMoneda(totalPendiente)}</td>
       </tr>
     `;
   }
@@ -554,7 +547,7 @@ async function cargarTopClientes() {
     const query = getQueryFiltro();
     const data = await apiFetch(`/api/dashboard/top-clientes${query}`);
 
-    renderGraficaTopClientes(data);
+   
 
   } catch (error) {
     console.error("Error top clientes:", error);
@@ -562,59 +555,7 @@ async function cargarTopClientes() {
 }
 
 
-function renderGraficaTopClientes(data) {
 
-  const canvas = document.getElementById("graficaTopClientes");
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-
-  if (window.chartTopClientes) {
-    window.chartTopClientes.destroy();
-  }
-
-  const labels = data.map(d => d.cliente);
-  const valores = data.map(d => Number(d.total));
-
-  window.chartTopClientes = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: "Facturación",
-        data: valores
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return "$ " + context.raw.toLocaleString("es-CO");
-            }
-          }
-        }
-      },
-
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return "$ " + value.toLocaleString("es-CO");
-            }
-          }
-        }
-      }
-    }
-  });
-}
 
 
 // ======================

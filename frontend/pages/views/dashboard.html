@@ -70,7 +70,9 @@
               <tr>
                 <th>Manifiesto</th>
                 <th>Cliente</th>
+                <th>Empresa a Cargo</th>
                 <th>Valor Facturado</th>
+                <th>Retenciones</th>
                 <th>Ingreso</th>
                 <th>Egreso</th>
                 <th>Gasto Conductor</th>
@@ -101,10 +103,17 @@
       
             <table class="dbx-table" id="tablaEstadoFacturacionTable">
       
+              <!-- =====================================
+              ESTADO DE FACTURACIÓN
+              REEMPLAZA SOLO EL THEAD
+              ===================================== -->
+              
               <thead>
                 <tr>
                   <th>Cliente</th>
+                  <th>Empresa a Cargo</th>
                   <th>Facturado</th>
+                  <th>Retenciones</th>
                   <th>Pagado</th>
                   <th>Pendiente</th>
                 </tr>
@@ -135,12 +144,7 @@
 
     
 
-      <div class="dbx-chart-card">
-        <h3>Top Clientes</h3>
-        <div class="dbx-chart-wrap">
-          <canvas id="graficaTopClientes"></canvas>
-        </div>
-      </div>
+     
 
     </aside>
 

@@ -112,25 +112,33 @@ INSERT INTO tipo_transaccion VALUES
 ('TT5','NOMINA','Pago nomina','EGRESO OPERACIONAL','activo',NOW());
 
 -- =====================================================
--- TRANSACCIONES (FLUJO REAL)
+-- TRANSACCIONES COHERENTES
 -- =====================================================
 
 INSERT INTO transaccion VALUES
 
--- ANTICIPO SIN FACTURA
+-- MF1001 SIN FACTURA
 ('TRX1','BAN1','TT3','JGV196','T68945','MF1001',NULL,500000,'2026-04-01','Anticipo conductor MF1001',NOW()),
 
--- GASTOS VIAJE
 ('TRX2','BAN1','TT1','JGV196','T68945','MF1001',NULL,300000,'2026-04-01','Combustible viaje',NOW()),
+
+-- MF1002 / FAC1002 = PAGO PARCIAL
+-- Factura 7.000.000
+-- Retenciones 420.000
+-- Neto 6.580.000
+-- Pago parcial 3.000.000
+
 ('TRX3','BAN1','TT2','HGT678','T78452','MF1002',NULL,200000,'2026-04-02','Peajes viaje',NOW()),
 
--- INGRESO CON FACTURA
-('TRX4','BAN1','TT4','HGT678','T78452','MF1002','FAC1002',6580000,'2026-04-05','Pago cliente MF1002',NOW()),
+('TRX4','BAN1','TT4','HGT678','T78452','MF1002','FAC1002',3000000,'2026-04-05','Pago parcial cliente MF1002',NOW()),
 
--- INGRESO MANIFIESTO PAGADO
-('TRX5','BAN1','TT4','JGV196','T68945','MF1003','FAC1003',5640000,'2026-04-06','Pago cliente MF1003',NOW()),
+-- MF1003 / FAC1003 = PAGADA TOTAL
+-- Neto = 5.640.000
+
+('TRX5','BAN1','TT4','JGV196','T68945','MF1003','FAC1003',5640000,'2026-04-06','Pago total cliente MF1003',NOW()),
 
 -- GASTO OPERACIONAL
+
 ('TRX6','BAN1','TT5',NULL,NULL,NULL,NULL,2000000,'2026-04-07','Pago nomina',NOW());
 
 -- =====================================================

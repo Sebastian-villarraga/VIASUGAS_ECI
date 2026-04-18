@@ -1,137 +1,180 @@
-// public/js/dashboard-cartera.js
+// =====================================================
+// DASHBOARD CARTERA PREMIUM JS
+// CSS/HTML nuevos con prefijo dcrt-
+// Lógica original de cartera preservada
+// =====================================================
 
-let dcrFiltro = {
+let dcrtFiltro = {
   desde: null,
   hasta: null
 };
 
-let dcrChartAging = null;
-let dcrChartTopDeudores = null;
+let dcrtChartAging = null;
+let dcrtChartTopDeudores = null;
 
-// =====================================
+// =====================================================
 // INIT
-// =====================================
+// =====================================================
 function initDashboardCartera() {
-  dcrConfigurarEventos();
-  dcrCargarDashboard();
+  dcrtConfigurarEventos();
+  dcrtCargarSelectAnio();
+  dcrtAplicarEsteMesPorDefecto();
 }
 
-// =====================================
+// =====================================================
 // LOAD ALL
-// =====================================
-async function dcrCargarDashboard() {
+// =====================================================
+async function dcrtCargarDashboard() {
   try {
     await Promise.all([
-      dcrCargarKPI(),
-      dcrCargarAging(),
-      dcrCargarTopDeudores(),
-      dcrCargarFacturasVencidas(),
-      dcrCargarDetalle()
+      dcrtCargarKPI(),
+      dcrtCargarAging(),
+      dcrtCargarTopDeudores(),
+      dcrtCargarFacturasVencidas(),
+      dcrtCargarDetalle()
     ]);
   } catch (error) {
     console.error("Error cargando dashboard cartera:", error);
   }
 }
 
-// =====================================
+// =====================================================
 // HELPERS
-// =====================================
-function dcrGetQuery() {
+// =====================================================
+function dcrtGetQuery() {
   const params = new URLSearchParams();
 
-  if (dcrFiltro.desde) params.append("desde", dcrFiltro.desde);
-  if (dcrFiltro.hasta) params.append("hasta", dcrFiltro.hasta);
+  if (dcrtFiltro.desde) params.append("desde", dcrtFiltro.desde);
+  if (dcrtFiltro.hasta) params.append("hasta", dcrtFiltro.hasta);
 
   const query = params.toString();
   return query ? `?${query}` : "";
 }
 
-function dcrMoney(valor) {
+function dcrtMoney(valor) {
   return "$ " + Number(valor || 0).toLocaleString("es-CO");
 }
 
-function dcrFecha(fecha) {
-  if (!fecha) return "-";
-
-  const d = new Date(fecha);
-  return d.toLocaleDateString("es-CO");
-}
-
-function dcrNum(valor) {
+function dcrtNum(valor) {
   return Number(valor || 0);
 }
 
-// =====================================
+function dcrtFecha(fecha) {
+  if (!fecha) return "-";
+
+  // evita desfases por timezone
+  const fechaStr = String(fecha).includes("T")
+    ? String(fecha).split("T")[0]
+    : String(fecha);
+
+  const [year, month, day] = fechaStr.split("-");
+  if (!year || !month || !day) return "-";
+
+  return `${day}/${month}/${year}`;
+}
+
+function dcrtFechaInput(fecha) {
+  const y = fecha.getFullYear();
+  const m = String(fecha.getMonth() + 1).padStart(2, "0");
+  const d = String(fecha.getDate()).padStart(2, "0");
+
+  return `${y}-${m}-${d}`;
+}
+
+function dcrtGetBucket(dias) {
+  dias = Number(dias || 0);
+
+  if (dias <= 0) return "Corriente";
+  if (dias <= 30) return "1-30";
+  if (dias <= 60) return "31-60";
+  if (dias <= 90) return "61-90";
+  return "+90";
+}
+
+// =====================================================
 // KPI
-// =====================================
-async function dcrCargarKPI() {
+// =====================================================
+async function dcrtCargarKPI() {
   try {
-    const data = await apiFetch(`/api/dashboard-cartera/kpi${dcrGetQuery()}`);
-    dcrRenderKPIs(data);
+    const data = await apiFetch(`/api/dashboard-cartera/kpi${dcrtGetQuery()}`);
+    dcrtRenderKPIs(data);
   } catch (error) {
     console.error("Error KPI:", error);
   }
 }
 
-function dcrRenderKPIs(data) {
-  const box = document.getElementById("dcrCardsDashboard");
+function dcrtRenderKPIs(data) {
+  const box = document.getElementById("dcrtCardsDashboard");
   if (!box) return;
 
+  const desde = dcrtFiltro.desde ? dcrtFecha(dcrtFiltro.desde) : "--";
+  const hasta = dcrtFiltro.hasta ? dcrtFecha(dcrtFiltro.hasta) : "--";
+
   box.innerHTML = `
-    <div class="dcr-card dcr-kpi-total">
+    <div class="dcrt-card dcrt-periodo">
+      <h3>Periodo Consultado</h3>
+      <p class="dcrt-small">${desde}<br>${hasta}</p>
+    </div>
+
+    <div class="dcrt-card dcrt-total">
       <h3>Cartera Total</h3>
-      <p>${dcrMoney(data.cartera_total)}</p>
+      <p>${dcrtMoney(data.cartera_total)}</p>
     </div>
 
-    <div class="dcr-card dcr-kpi-vencida">
+    <div class="dcrt-card dcrt-vencida">
       <h3>Cartera Vencida</h3>
-      <p>${dcrMoney(data.cartera_vencida)}</p>
+      <p>${dcrtMoney(data.cartera_vencida)}</p>
     </div>
 
-    <div class="dcr-card dcr-kpi-corriente">
+    <div class="dcrt-card dcrt-corriente">
       <h3>Cartera Corriente</h3>
-      <p>${dcrMoney(data.cartera_corriente)}</p>
+      <p>${dcrtMoney(data.cartera_corriente)}</p>
     </div>
 
-    <div class="dcr-card dcr-kpi-clientes">
+    <div class="dcrt-card dcrt-clientes">
       <h3>Clientes con Deuda</h3>
-      <p>${dcrNum(data.clientes_con_deuda)}</p>
+      <p>${dcrtNum(data.clientes_con_deuda)}</p>
     </div>
 
-    <div class="dcr-card dcr-kpi-facturas">
+    <div class="dcrt-card dcrt-facturas">
       <h3>Facturas Pendientes</h3>
-      <p>${dcrNum(data.facturas_pendientes)}</p>
+      <p>${dcrtNum(data.facturas_pendientes)}</p>
     </div>
 
-    <div class="dcr-card dcr-kpi-recaudo">
-      <h3>Retenciones Totales</h3>
-      <p>${dcrMoney(data.retenciones_total)}</p>
+    <div class="dcrt-card dcrt-mora">
+      <h3>Mora Promedio</h3>
+      <p>${dcrtNum(data.mora_promedio)} días</p>
+    </div>
+
+    <div class="dcrt-card dcrt-retenciones">
+      <h3>Retenciones</h3>
+      <p>${dcrtMoney(data.retenciones_total)}</p>
     </div>
   `;
 }
 
-// =====================================
+// =====================================================
 // AGING
-// =====================================
-async function dcrCargarAging() {
+// =====================================================
+async function dcrtCargarAging() {
   try {
-    const data = await apiFetch(`/api/dashboard-cartera/aging${dcrGetQuery()}`);
-    dcrRenderAging(data);
+    const data = await apiFetch(`/api/dashboard-cartera/aging${dcrtGetQuery()}`);
+    dcrtRenderAging(data);
   } catch (error) {
     console.error("Error aging:", error);
   }
 }
 
-function dcrRenderAging(data) {
+function dcrtRenderAging(data) {
   const canvas = document.getElementById("dcrGraficaAging");
   if (!canvas) return;
 
-  if (dcrChartAging) dcrChartAging.destroy();
+  if (dcrtChartAging) dcrtChartAging.destroy();
 
   const labels = data.map(x => x.rango);
-  const valores = data.map(x => dcrNum(x.total));
+  const valores = data.map(x => dcrtNum(x.total));
 
-  dcrChartAging = new Chart(canvas, {
+  dcrtChartAging = new Chart(canvas, {
     type: "doughnut",
     data: {
       labels,
@@ -139,11 +182,11 @@ function dcrRenderAging(data) {
         {
           data: valores,
           backgroundColor: [
-            "#16a34a",
-            "#f59e0b",
-            "#fb923c",
-            "#ef4444",
-            "#991b1b"
+            "#3498db",
+            "#ef5b7a",
+            "#f39c34",
+            "#e9b949",
+            "#56b8b8"
           ],
           borderWidth: 0
         }
@@ -152,15 +195,15 @@ function dcrRenderAging(data) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: "68%",
+      cutout: "52%",
       plugins: {
         legend: {
-          position: "bottom"
+          position: "top"
         },
         tooltip: {
           callbacks: {
             label(context) {
-              return `${context.label}: ${dcrMoney(context.raw)}`;
+              return `${context.label}: ${dcrtMoney(context.raw)}`;
             }
           }
         }
@@ -169,30 +212,30 @@ function dcrRenderAging(data) {
   });
 }
 
-// =====================================
+// =====================================================
 // TOP DEUDORES
-// =====================================
-async function dcrCargarTopDeudores() {
+// =====================================================
+async function dcrtCargarTopDeudores() {
   try {
-    const data = await apiFetch(`/api/dashboard-cartera/top-deudores${dcrGetQuery()}`);
-    dcrRenderTopDeudores(data);
+    const data = await apiFetch(`/api/dashboard-cartera/top-deudores${dcrtGetQuery()}`);
+    dcrtRenderTopDeudores(data);
   } catch (error) {
     console.error("Error top deudores:", error);
   }
 }
 
-function dcrRenderTopDeudores(data) {
+function dcrtRenderTopDeudores(data) {
   const canvas = document.getElementById("dcrGraficaTopDeudores");
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
 
-  if (dcrChartTopDeudores) dcrChartTopDeudores.destroy();
+  if (dcrtChartTopDeudores) dcrtChartTopDeudores.destroy();
 
   const labels = data.map(x => x.cliente);
-  const valores = data.map(x => dcrNum(x.total));
+  const valores = data.map(x => dcrtNum(x.total));
 
-  dcrChartTopDeudores = new Chart(ctx, {
+  dcrtChartTopDeudores = new Chart(ctx, {
     type: "bar",
     data: {
       labels,
@@ -200,7 +243,8 @@ function dcrRenderTopDeudores(data) {
         {
           label: "Pendiente",
           data: valores,
-          borderRadius: 8
+          borderRadius: 8,
+          backgroundColor: "#2f56a6"
         }
       ]
     },
@@ -213,7 +257,7 @@ function dcrRenderTopDeudores(data) {
         tooltip: {
           callbacks: {
             label(context) {
-              return dcrMoney(context.raw);
+              return dcrtMoney(context.raw);
             }
           }
         }
@@ -222,7 +266,7 @@ function dcrRenderTopDeudores(data) {
         x: {
           ticks: {
             callback(value) {
-              return dcrMoney(value);
+              return dcrtMoney(value);
             }
           }
         }
@@ -231,26 +275,26 @@ function dcrRenderTopDeudores(data) {
   });
 }
 
-// =====================================
+// =====================================================
 // FACTURAS VENCIDAS
-// =====================================
-async function dcrCargarFacturasVencidas() {
+// =====================================================
+async function dcrtCargarFacturasVencidas() {
   try {
-    const data = await apiFetch(`/api/dashboard-cartera/facturas-vencidas${dcrGetQuery()}`);
-    dcrRenderFacturasVencidas(data);
+    const data = await apiFetch(`/api/dashboard-cartera/facturas-vencidas${dcrtGetQuery()}`);
+    dcrtRenderFacturasVencidas(data);
   } catch (error) {
     console.error("Error facturas vencidas:", error);
   }
 }
 
-function dcrRenderFacturasVencidas(data) {
+function dcrtRenderFacturasVencidas(data) {
   const tbody = document.getElementById("dcrTablaFacturasVencidas");
   if (!tbody) return;
 
   if (!data.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="dcr-empty-row">
+        <td colspan="7" class="dcr-empty-row">
           No hay facturas vencidas.
         </td>
       </tr>
@@ -261,35 +305,36 @@ function dcrRenderFacturasVencidas(data) {
   tbody.innerHTML = data.map(row => `
     <tr>
       <td>${row.codigo_factura}</td>
-      <td>${row.cliente}</td>
-      <td>${dcrFecha(row.fecha_emision)}</td>
-      <td>${dcrFecha(row.fecha_vencimiento)}</td>
-      <td class="dcr-text-center dcr-text-red">${row.dias_vencido}</td>
-      <td class="dcr-text-center dcr-text-red">${dcrMoney(row.pendiente)}</td>
+      <td>${row.cliente || "-"}</td>
+      <td>${row.empresa_a_cargo || "-"}</td>
+      <td>${dcrtFecha(row.fecha_emision)}</td>
+      <td>${dcrtFecha(row.fecha_vencimiento)}</td>
+      <td class="dcrt-center dcrt-red">${row.dias_vencido}</td>
+      <td class="dcrt-center dcrt-red">${dcrtMoney(row.pendiente)}</td>
     </tr>
   `).join("");
 }
 
-// =====================================
+// =====================================================
 // DETALLE
-// =====================================
-async function dcrCargarDetalle() {
+// =====================================================
+async function dcrtCargarDetalle() {
   try {
-    const data = await apiFetch(`/api/dashboard-cartera/detalle${dcrGetQuery()}`);
-    dcrRenderDetalle(data);
+    const data = await apiFetch(`/api/dashboard-cartera/detalle${dcrtGetQuery()}`);
+    dcrtRenderDetalle(data);
   } catch (error) {
     console.error("Error detalle:", error);
   }
 }
 
-function dcrRenderDetalle(data) {
+function dcrtRenderDetalle(data) {
   const tbody = document.getElementById("dcrTablaDetalle");
   if (!tbody) return;
 
   if (!data.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" class="dcr-empty-row">
+        <td colspan="11" class="dcr-empty-row">
           No hay cartera pendiente.
         </td>
       </tr>
@@ -298,109 +343,166 @@ function dcrRenderDetalle(data) {
   }
 
   tbody.innerHTML = data.map(row => {
-    const bucket = dcrGetBucket(row.dias_vencido);
+    const bucket = dcrtGetBucket(row.dias_vencido);
 
     return `
       <tr>
-        <td>${row.cliente}</td>
+        <td>${row.cliente || "-"}</td>
+        <td>${row.empresa_a_cargo || "-"}</td>
         <td>${row.codigo_factura}</td>
-        <td>${dcrMoney(row.valor_bruto)}</td>
-        <td>${dcrMoney(row.retencion_fuente)}</td>
-        <td>${dcrMoney(row.retencion_ica)}</td>
-        <td>${dcrMoney(row.valor_neto)}</td>
-        <td class="dcr-text-green">${dcrMoney(row.pagado)}</td>
-        <td class="dcr-text-red">${dcrMoney(row.pendiente)}</td>
-        <td>${dcrFecha(row.fecha_vencimiento)}</td>
+        <td>${dcrtMoney(row.valor_bruto)}</td>
+        <td>${dcrtMoney(row.retencion_fuente)}</td>
+        <td>${dcrtMoney(row.retencion_ica)}</td>
+        <td>${dcrtMoney(row.valor_neto)}</td>
+        <td>${dcrtMoney(row.pagado)}</td>
+        <td>${dcrtMoney(row.pendiente)}</td>
+        <td>${dcrtFecha(row.fecha_vencimiento)}</td>
         <td>${bucket}</td>
       </tr>
     `;
   }).join("");
 }
 
-// =====================================
-// BUCKET
-// =====================================
-function dcrGetBucket(dias) {
-  dias = Number(dias || 0);
-
-  if (dias <= 0) return "Corriente";
-  if (dias <= 30) return "1-30";
-  if (dias <= 60) return "31-60";
-  if (dias <= 90) return "61-90";
-  return "+90";
-}
-
-// =====================================
+// =====================================================
 // FILTROS
-// =====================================
-function dcrConfigurarEventos() {
-  const btnMesActual = document.getElementById("dcrBtnMesActual");
-  const btnMesAnterior = document.getElementById("dcrBtnMesAnterior");
-  const btnAnioActual = document.getElementById("dcrBtnAnioActual");
-  const btnLimpiar = document.getElementById("dcrBtnLimpiar");
+// =====================================================
+function dcrtConfigurarEventos() {
+  document.getElementById("dcrtBtnMesActual")
+    ?.addEventListener("click", () => {
+      const hoy = new Date();
 
-  const fechaDesde = document.getElementById("dcrFechaDesde");
-  const fechaHasta = document.getElementById("dcrFechaHasta");
+      const desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      const hasta = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
 
-  btnMesActual?.addEventListener("click", () => {
-    const hoy = new Date();
+      dcrtAplicarFechas(desde, hasta);
+    });
 
-    const desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    const hasta = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+  document.getElementById("dcrtBtnMesAnterior")
+    ?.addEventListener("click", () => {
+      const hoy = new Date();
 
-    dcrAplicarFechas(desde, hasta);
-  });
+      const desde = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+      const hasta = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
 
-  btnMesAnterior?.addEventListener("click", () => {
-    const hoy = new Date();
+      dcrtAplicarFechas(desde, hasta);
+    });
 
-    const desde = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-    const hasta = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+  document.getElementById("dcrtBtnLimpiar")
+    ?.addEventListener("click", () => {
+      dcrtFiltro = { desde: null, hasta: null };
 
-    dcrAplicarFechas(desde, hasta);
-  });
+      const fechaDesde = document.getElementById("dcrtFechaDesde");
+      const fechaHasta = document.getElementById("dcrtFechaHasta");
 
-  btnAnioActual?.addEventListener("click", () => {
-    const hoy = new Date();
+      if (fechaDesde) fechaDesde.value = "";
+      if (fechaHasta) fechaHasta.value = "";
 
-    const desde = new Date(hoy.getFullYear(), 0, 1);
-    const hasta = hoy;
+      dcrtCargarDashboard();
+    });
 
-    dcrAplicarFechas(desde, hasta);
-  });
+  document.getElementById("dcrtFechaDesde")
+    ?.addEventListener("change", (e) => {
+      dcrtFiltro.desde = e.target.value || null;
+      dcrtCargarDashboard();
+    });
 
-  btnLimpiar?.addEventListener("click", () => {
-    dcrFiltro = { desde: null, hasta: null };
+  document.getElementById("dcrtFechaHasta")
+    ?.addEventListener("change", (e) => {
+      dcrtFiltro.hasta = e.target.value || null;
+      dcrtCargarDashboard();
+    });
 
-    if (fechaDesde) fechaDesde.value = "";
-    if (fechaHasta) fechaHasta.value = "";
+  document.getElementById("dcrtBtnQ1")?.addEventListener("click", () => dcrtQuarter(1));
+  document.getElementById("dcrtBtnQ2")?.addEventListener("click", () => dcrtQuarter(2));
+  document.getElementById("dcrtBtnQ3")?.addEventListener("click", () => dcrtQuarter(3));
+  document.getElementById("dcrtBtnQ4")?.addEventListener("click", () => dcrtQuarter(4));
 
-    dcrCargarDashboard();
-  });
+  document.getElementById("dcrtBtnS1")?.addEventListener("click", () => dcrtSemestre(1));
+  document.getElementById("dcrtBtnS2")?.addEventListener("click", () => dcrtSemestre(2));
 
-  fechaDesde?.addEventListener("change", () => {
-    dcrFiltro.desde = fechaDesde.value || null;
-    dcrCargarDashboard();
-  });
+  document.getElementById("dcrtBtnAnioCompleto")
+    ?.addEventListener("click", dcrtAnioCompleto);
 
-  fechaHasta?.addEventListener("change", () => {
-    dcrFiltro.hasta = fechaHasta.value || null;
-    dcrCargarDashboard();
-  });
+  document.getElementById("dcrtFiltroAnio")
+    ?.addEventListener("change", () => {
+      // no dispara nada solo al cambiar año;
+      // queda listo para quarter/semestre/año completo
+    });
 }
 
-function dcrAplicarFechas(desdeDate, hastaDate) {
-  const desde = desdeDate.toISOString().split("T")[0];
-  const hasta = hastaDate.toISOString().split("T")[0];
+function dcrtAplicarFechas(desdeDate, hastaDate) {
+  const desde = dcrtFechaInput(desdeDate);
+  const hasta = dcrtFechaInput(hastaDate);
 
-  dcrFiltro.desde = desde;
-  dcrFiltro.hasta = hasta;
+  dcrtFiltro.desde = desde;
+  dcrtFiltro.hasta = hasta;
 
-  const fechaDesde = document.getElementById("dcrFechaDesde");
-  const fechaHasta = document.getElementById("dcrFechaHasta");
+  const fechaDesde = document.getElementById("dcrtFechaDesde");
+  const fechaHasta = document.getElementById("dcrtFechaHasta");
 
   if (fechaDesde) fechaDesde.value = desde;
   if (fechaHasta) fechaHasta.value = hasta;
 
-  dcrCargarDashboard();
+  dcrtCargarDashboard();
+}
+
+function dcrtAplicarEsteMesPorDefecto() {
+  const hoy = new Date();
+
+  const desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  const hasta = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+
+  dcrtAplicarFechas(desde, hasta);
+}
+
+function dcrtCargarSelectAnio() {
+  const select = document.getElementById("dcrtFiltroAnio");
+  if (!select) return;
+
+  const actual = new Date().getFullYear();
+  select.innerHTML = "";
+
+  for (let y = actual + 1; y >= actual - 5; y--) {
+    select.innerHTML += `<option value="${y}">${y}</option>`;
+  }
+
+  select.value = actual;
+}
+
+function dcrtQuarter(q) {
+  const select = document.getElementById("dcrtFiltroAnio");
+  const year = Number(select?.value || new Date().getFullYear());
+  const startMonth = (q - 1) * 3;
+
+  dcrtAplicarFechas(
+    new Date(year, startMonth, 1),
+    new Date(year, startMonth + 3, 0)
+  );
+}
+
+function dcrtSemestre(s) {
+  const select = document.getElementById("dcrtFiltroAnio");
+  const year = Number(select?.value || new Date().getFullYear());
+
+  if (s === 1) {
+    dcrtAplicarFechas(
+      new Date(year, 0, 1),
+      new Date(year, 6, 0)
+    );
+  } else {
+    dcrtAplicarFechas(
+      new Date(year, 6, 1),
+      new Date(year, 12, 0)
+    );
+  }
+}
+
+function dcrtAnioCompleto() {
+  const select = document.getElementById("dcrtFiltroAnio");
+  const year = Number(select?.value || new Date().getFullYear());
+
+  dcrtAplicarFechas(
+    new Date(year, 0, 1),
+    new Date(year, 12, 0)
+  );
 }

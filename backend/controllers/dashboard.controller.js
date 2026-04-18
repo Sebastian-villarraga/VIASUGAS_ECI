@@ -150,39 +150,43 @@ const getRentabilidad = async (req, res) => {
     const result = await pool.query(`
       SELECT
         m.id_manifiesto,
-        c.nombre AS cliente,
+
+        COALESCE(c.nombre,'Sin cliente') AS cliente,
+
+        COALESCE(eac.nombre,'Sin empresa') AS empresa_a_cargo,
 
         COALESCE(f.valor,0) AS valor_facturado,
 
+        (
+          COALESCE(f.retencion_fuente,0)
+          + COALESCE(f.retencion_ica,0)
+        ) AS retenciones,
+
         COALESCE(SUM(
           CASE
-            WHEN tt.tipo = 'INGRESO MANIFIESTO'
-            THEN t.valor
-            ELSE 0
+            WHEN tt.tipo='INGRESO MANIFIESTO'
+            THEN t.valor ELSE 0
           END
         ),0) AS ingreso,
 
         COALESCE(SUM(
           CASE
-            WHEN tt.tipo = 'EGRESO MANIFIESTO'
-            THEN t.valor
-            ELSE 0
+            WHEN tt.tipo='EGRESO MANIFIESTO'
+            THEN t.valor ELSE 0
           END
         ),0) AS egreso,
 
         COALESCE(SUM(
           CASE
-            WHEN tt.tipo = 'GASTO CONDUCTOR'
-            THEN t.valor
-            ELSE 0
+            WHEN tt.tipo='GASTO CONDUCTOR'
+            THEN t.valor ELSE 0
           END
         ),0) AS gasto_conductor,
 
         COALESCE(SUM(
           CASE
-            WHEN tt.tipo = 'INGRESO MANIFIESTO'
-            THEN t.valor
-            ELSE 0
+            WHEN tt.tipo='INGRESO MANIFIESTO'
+            THEN t.valor ELSE 0
           END
         ),0)
 
@@ -190,9 +194,8 @@ const getRentabilidad = async (req, res) => {
 
         COALESCE(SUM(
           CASE
-            WHEN tt.tipo = 'EGRESO MANIFIESTO'
-            THEN t.valor
-            ELSE 0
+            WHEN tt.tipo='EGRESO MANIFIESTO'
+            THEN t.valor ELSE 0
           END
         ),0)
 
@@ -204,7 +207,10 @@ const getRentabilidad = async (req, res) => {
         ON f.id_manifiesto = m.id_manifiesto
 
       LEFT JOIN cliente c
-        ON m.id_cliente = c.nit
+        ON c.nit = m.id_cliente
+
+      LEFT JOIN empresa_a_cargo eac
+        ON eac.nit = m.id_empresa_a_cargo
 
       LEFT JOIN transaccion t
         ON t.id_manifiesto = m.id_manifiesto
@@ -219,18 +225,19 @@ const getRentabilidad = async (req, res) => {
       GROUP BY
         m.id_manifiesto,
         c.nombre,
-        f.valor
+        eac.nombre,
+        f.valor,
+        f.retencion_fuente,
+        f.retencion_ica
 
       ORDER BY utilidad DESC
-    `, [desde || null, hasta || null]);
+    `,[desde || null, hasta || null]);
 
-    return res.json(result.rows);
+    res.json(result.rows);
 
-  } catch (error) {
-    console.error("Error getRentabilidad:", error);
-    return res.status(500).json({
-      error: "Error obteniendo rentabilidad"
-    });
+  } catch(error){
+    console.error(error);
+    res.status(500).json({ error:"Error rentabilidad" });
   }
 };
 
@@ -324,63 +331,99 @@ const getEstadoFacturacion = async (req, res) => {
     const result = await pool.query(`
       SELECT
         base.cliente,
+        base.empresa_a_cargo,
         base.total_facturado,
+        base.retenciones,
 
         COALESCE(pagos.pagado,0) AS pagado,
 
-        base.total_facturado - COALESCE(pagos.pagado,0) AS pendiente
+        (
+          base.total_facturado
+          - base.retenciones
+          - COALESCE(pagos.pagado,0)
+        ) AS pendiente
 
       FROM (
 
         SELECT
-          c.nombre AS cliente,
-          SUM(f.valor) AS total_facturado
+          COALESCE(c.nombre,'Sin cliente') AS cliente,
+
+          COALESCE(eac.nombre,'Sin empresa') AS empresa_a_cargo,
+
+          SUM(COALESCE(f.valor,0)) AS total_facturado,
+
+          SUM(
+            COALESCE(f.retencion_fuente,0)
+            + COALESCE(f.retencion_ica,0)
+          ) AS retenciones
 
         FROM factura f
+
         JOIN manifiesto m
           ON f.id_manifiesto = m.id_manifiesto
-        JOIN cliente c
+
+        LEFT JOIN cliente c
           ON m.id_cliente = c.nit
 
-        WHERE ($1::date IS NULL OR f.fecha_emision >= $1)
+        LEFT JOIN empresa_a_cargo eac
+          ON m.id_empresa_a_cargo = eac.nit
+
+        WHERE
+          ($1::date IS NULL OR f.fecha_emision >= $1)
           AND ($2::date IS NULL OR f.fecha_emision <= $2)
 
-        GROUP BY c.nombre
+        GROUP BY
+          c.nombre,
+          eac.nombre
 
       ) base
 
       LEFT JOIN (
 
         SELECT
-          c.nombre AS cliente,
-          SUM(t.valor) AS pagado
+          COALESCE(c.nombre,'Sin cliente') AS cliente,
+
+          COALESCE(eac.nombre,'Sin empresa') AS empresa_a_cargo,
+
+          SUM(COALESCE(t.valor,0)) AS pagado
 
         FROM transaccion t
+
         JOIN tipo_transaccion tt
           ON tt.id = t.id_tipo_transaccion
+
         JOIN manifiesto m
           ON t.id_manifiesto = m.id_manifiesto
-        JOIN cliente c
+
+        LEFT JOIN cliente c
           ON m.id_cliente = c.nit
 
-        WHERE tt.tipo = 'INGRESO MANIFIESTO'
+        LEFT JOIN empresa_a_cargo eac
+          ON m.id_empresa_a_cargo = eac.nit
+
+        WHERE
+          tt.tipo = 'INGRESO MANIFIESTO'
           AND ($1::date IS NULL OR t.fecha_pago >= $1)
           AND ($2::date IS NULL OR t.fecha_pago <= $2)
 
-        GROUP BY c.nombre
+        GROUP BY
+          c.nombre,
+          eac.nombre
 
       ) pagos
-        ON pagos.cliente = base.cliente
+
+      ON pagos.cliente = base.cliente
+      AND pagos.empresa_a_cargo = base.empresa_a_cargo
 
       ORDER BY base.total_facturado DESC
-    `, [desde || null, hasta || null]);
+    `,[desde || null, hasta || null]);
 
-    return res.json(result.rows);
+    res.json(result.rows);
 
   } catch (error) {
-    console.error("Error estado facturación:", error);
-    return res.status(500).json({
-      error: "Error estado facturación"
+    console.error(error);
+    res.status(500).json({
+      error:"Error estado facturación"
     });
   }
 };

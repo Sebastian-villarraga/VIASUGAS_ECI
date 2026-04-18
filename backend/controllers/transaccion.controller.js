@@ -18,47 +18,139 @@ const getTransacciones = async (req, res) => {
     let query = `
       SELECT 
         t.*,
+
+        /* =====================
+           BANCO / TIPO
+        ===================== */
         b.nombre_banco,
         tt.categoria,
         tt.tipo,
 
+        /* =====================
+           MANIFIESTO
+        ===================== */
+        m.id_manifiesto,
+        m.radicado,
+        m.fecha AS fecha_manifiesto,
+        m.estado,
+
+        m.origen_departamento,
+        m.origen_ciudad,
+        m.destino_departamento,
+        m.destino_ciudad,
+
+        m.valor_flete,
+        m.valor_flete_porcentaje,
+        m.anticipo_manifiesto,
+
+        m.gastos,
+        m.documentos,
+        m.novedades,
+        m.observaciones,
+
         m.id_cliente,
         m.id_empresa_a_cargo,
+        m.id_conductor,
+        m.id_vehiculo,
+        m.id_trailer,
 
+        /* =====================
+           CLIENTE
+        ===================== */
         c.nombre AS cliente_nombre,
         c.nit AS cliente_nit,
         c.correo AS cliente_correo,
         c.telefono AS cliente_telefono,
         c.direccion AS cliente_direccion,
 
+        /* =====================
+           EMPRESA A CARGO
+        ===================== */
         eac.nombre AS empresa_a_cargo_nombre,
         eac.nit AS empresa_a_cargo_nit,
         eac.correo AS empresa_a_cargo_correo,
         eac.telefono AS empresa_a_cargo_telefono,
         eac.direccion AS empresa_a_cargo_direccion,
 
+        /* =====================
+           CONDUCTOR
+        ===================== */
+        cond.nombre AS conductor_nombre,
+        cond.cedula AS conductor_cedula,
+        cond.telefono AS conductor_telefono,
+
+        /* =====================
+           VEHICULO
+        ===================== */
+        vh.placa AS vehiculo_placa,
+
+        /* =====================
+           TRAILER
+        ===================== */
+        tr.placa AS trailer_placa,
+
+        /* =====================
+           FACTURA RELACIONADA
+        ===================== */
+        f.codigo_factura,
+        f.fecha_emision,
+        f.fecha_vencimiento,
+        f.valor AS factura_valor,
+        f.retencion_fuente,
+        f.retencion_ica,
+
+        /* =====================
+           BANDERA GASTO CONDUCTOR
+        ===================== */
         CASE 
           WHEN gc.id IS NOT NULL THEN true
           ELSE false
         END AS es_gasto_conductor
+
       FROM transaccion t
-      LEFT JOIN banco b 
+
+      LEFT JOIN banco b
         ON t.id_banco = b.id
-      LEFT JOIN tipo_transaccion tt 
+
+      LEFT JOIN tipo_transaccion tt
         ON t.id_tipo_transaccion = tt.id
-      LEFT JOIN gastos_conductor gc 
+
+      LEFT JOIN gastos_conductor gc
         ON gc.id_transaccion = t.id
-      LEFT JOIN manifiesto m 
+
+      LEFT JOIN manifiesto m
         ON t.id_manifiesto = m.id_manifiesto
-      LEFT JOIN cliente c 
+
+      LEFT JOIN cliente c
         ON m.id_cliente = c.nit
-      LEFT JOIN empresa_a_cargo eac 
+
+      LEFT JOIN empresa_a_cargo eac
         ON m.id_empresa_a_cargo = eac.nit
+
+      LEFT JOIN conductor cond
+        ON m.id_conductor = cond.cedula
+
+      LEFT JOIN vehiculo vh
+        ON m.id_vehiculo = vh.placa
+
+      LEFT JOIN trailer tr
+        ON m.id_trailer = tr.placa
+
+      LEFT JOIN factura f
+        ON (
+          f.codigo_factura = t.id_factura
+          OR f.id_manifiesto = t.id_manifiesto
+        )
+
       WHERE 1=1
     `;
 
     const values = [];
     let i = 1;
+
+    /* =====================
+       FILTROS
+    ===================== */
 
     if (fecha_desde) {
       query += ` AND t.fecha_pago >= $${i++}`;
@@ -95,15 +187,24 @@ const getTransacciones = async (req, res) => {
       values.push(id_empresa_a_cargo);
     }
 
-    query += ` ORDER BY t.fecha_pago DESC, t.creado DESC`;
+    /* =====================
+       ORDER
+    ===================== */
+    query += `
+      ORDER BY 
+        t.fecha_pago DESC,
+        t.creado DESC
+    `;
 
     const result = await pool.query(query, values);
 
     res.json(result.rows);
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error obteniendo transacciones" });
+    console.error("Error getTransacciones:", error);
+    res.status(500).json({
+      error: "Error obteniendo transacciones"
+    });
   }
 };
 
