@@ -3,10 +3,12 @@
 // =========================
 function initTrailers() {
 
+  editandoTrailer = false; // 🔥 reset obligatorio
+
   cargarTrailers();
   cargarAlertas();
-  initFormTrailer(); 
-  initEventosFiltros(); 
+  initFormTrailer();
+  initEventosFiltros();
 }
 
 // =========================
@@ -18,6 +20,7 @@ let editandoTrailer = false;
 // CARGAR TRAILERS
 // =========================
 async function cargarTrailers() {
+  editandoTrailer = false; // 🔥 por seguridad
   try {
     const tabla = document.getElementById("trailerTable");
     if (!tabla) return;
@@ -116,6 +119,7 @@ function limpiarFiltros() {
 // RENDER TABLA
 // =========================
 function renderTablaTrailer(data) {
+  editandoTrailer = false;
   const tabla = document.getElementById("trailerTable");
 
   if (!tabla) return;

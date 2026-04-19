@@ -4,6 +4,7 @@ let editandoBanco = false;
 // INIT
 // =========================
 function initBancos() {
+  editandoBanco = false;
   cargarBancos();
   initFormBanco();
   aplicarRestriccionesInputsBanco();
@@ -122,13 +123,48 @@ function initFormBanco() {
   // =========================
   const bancosCatalogo = [
     "Bancolombia",
+    "Nequi",
+    "Daviplata",
     "Banco de Bogotá",
     "Davivienda",
-    "BBVA",
+    "BBVA Colombia",
     "Banco Popular",
+    "Banco AV Villas",
+    "Banco de Occidente",
     "Banco Caja Social",
     "Scotiabank Colpatria",
-    "Banco Agrario"
+    "Banco Agrario de Colombia",
+    "Banco Falabella",
+    "Banco Pichincha",
+    "Bancoomeva",
+    "Citibank Colombia",
+    "GNB Sudameris",
+    "Banco Finandina",
+    "Banco Mundo Mujer",
+    "Banco W",
+    "Banco Santander Colombia",
+    "Banco Serfinanza",
+    "Banco Cooperativo Coopcentral",
+    "Itaú Colombia",
+    "JP Morgan Colombia",
+    "Mibanco",
+    "Lulo Bank",
+    "Nubank Colombia",
+    "RappiPay",
+    "Movii",
+    "Ualá Colombia",
+    "Iris Bank",
+    "Banco BTG Pactual Colombia",
+    "Banco Credifinanciera",
+    "Coltefinanciera",
+    "Finandina",
+    "Confiar Cooperativa Financiera",
+    "CFA Cooperativa Financiera",
+    "Juriscoop",
+    "Cotrafa",
+    "Coofinep",
+    "Credifamilia",
+    "Tuya"
   ];
 
   // ?? AUTOCOMPLETE SIMPLE
@@ -257,14 +293,74 @@ function editarBanco(btn, id) {
   const data = fila.dataset;
   const celdas = fila.querySelectorAll("td");
 
-  celdas[0].innerHTML = `<input value="${data.nombre_banco}">`;
+  const bancos = [
+    "Bancolombia",
+    "Nequi",
+    "Daviplata",
+    "Banco de Bogotá",
+    "Davivienda",
+    "BBVA Colombia",
+    "Banco Popular",
+    "Banco AV Villas",
+    "Banco de Occidente",
+    "Banco Caja Social",
+    "Scotiabank Colpatria",
+    "Banco Agrario de Colombia",
+    "Banco Falabella",
+    "Banco Pichincha",
+    "Bancoomeva",
+    "Citibank Colombia",
+    "GNB Sudameris",
+    "Banco Finandina",
+    "Banco Mundo Mujer",
+    "Banco W",
+    "Banco Santander Colombia",
+    "Banco Serfinanza",
+    "Banco Cooperativo Coopcentral",
+    "Itaú Colombia",
+    "JP Morgan Colombia",
+    "Mibanco",
+    "Lulo Bank",
+    "Nubank Colombia",
+    "RappiPay",
+    "Movii",
+    "Ualá Colombia",
+    "Iris Bank",
+    "Banco BTG Pactual Colombia",
+    "Banco Credifinanciera",
+    "Coltefinanciera",
+    "Finandina",
+    "Confiar Cooperativa Financiera",
+    "CFA Cooperativa Financiera",
+    "Juriscoop",
+    "Cotrafa",
+    "Coofinep",
+    "Credifamilia",
+    "Tuya"
+  ];
+
+  const opcionesBanco = bancos.map(b => `
+    <option value="${b}" ${b === data.nombre_banco ? "selected" : ""}>
+      ${b}
+    </option>
+  `).join("");
+
+  celdas[0].innerHTML = `
+    <select>
+      <option value="">Seleccione</option>
+      ${opcionesBanco}
+    </select>
+  `;
+
   celdas[1].innerHTML = `<input value="${data.numero_cuenta}">`;
+
   celdas[2].innerHTML = `
     <select>
       <option value="ahorros" ${data.tipo_cuenta === "ahorros" ? "selected" : ""}>Ahorros</option>
       <option value="corriente" ${data.tipo_cuenta === "corriente" ? "selected" : ""}>Corriente</option>
     </select>
   `;
+
   celdas[3].innerHTML = `<input value="${data.nombre_titular}">`;
   celdas[4].innerHTML = `<input value="${data.identificacion}">`;
 
@@ -285,35 +381,28 @@ function editarBanco(btn, id) {
 // GUARDAR BANCO
 // =========================
 async function guardarBanco(btn, id) {
+
   const fila = btn.closest("tr");
 
+  const selects = fila.querySelectorAll("select");
   const inputs = fila.querySelectorAll("input");
-  const select = fila.querySelector("select");
-
-  let tipo_cuenta = select.value;
 
   const data = {
-    nombre_banco: inputs[0].value.trim(),
-    numero_cuenta: inputs[1].value.trim(),
-    tipo_cuenta: tipo_cuenta?.toLowerCase().trim(),
-    nombre_titular: inputs[2].value.trim() || null,
-    identificacion: inputs[3].value.trim() || null
+    nombre_banco: selects[0].value.trim(),
+    numero_cuenta: inputs[0].value.trim(),
+    tipo_cuenta: selects[1].value.trim(),
+    nombre_titular: inputs[1].value.trim() || null,
+    identificacion: inputs[2].value.trim() || null
   };
 
-  console.log("DATA UPDATE:", data);
-
   if (!data.nombre_banco || !data.numero_cuenta) {
-    showToast("Nombre banco y número de cuenta son obligatorios", "error");
-    return;
-  }
-
-  if (!data.tipo_cuenta || !["ahorros", "corriente"].includes(data.tipo_cuenta)) {
-    showToast("Tipo de cuenta inválido", "error");
+    showToast("Banco y cuenta obligatorios", "error");
     return;
   }
 
   try {
-    const res = await apiFetch(`/api/bancos/${id}`, {
+
+    await apiFetch(`/api/bancos/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
@@ -321,24 +410,13 @@ async function guardarBanco(btn, id) {
       body: JSON.stringify(data)
     });
 
-    if (!res) {
-      showToast("Error actualizando banco", "error");
-      return;
-    }
-
-    showToast("? Banco actualizado correctamente", "success");
+    showToast("Banco actualizado", "success");
 
     editandoBanco = false;
-
-    document.querySelectorAll(".btn-icon").forEach(b => {
-      b.disabled = false;
-    });
-
     cargarBancos();
 
   } catch (error) {
-    console.error("Error actualizando banco:", error);
-    showToast("Error inesperado al actualizar", "error");
+    showToast("Error actualizando banco", "error");
   }
 }
 
@@ -377,13 +455,48 @@ function llenarSelectBanco() {
 
   const bancos = [
     "Bancolombia",
-    "Banco de BogotÃ¡",
+    "Nequi",
+    "Daviplata",
+    "Banco de Bogotá",
     "Davivienda",
-    "BBVA",
+    "BBVA Colombia",
     "Banco Popular",
+    "Banco AV Villas",
+    "Banco de Occidente",
     "Banco Caja Social",
     "Scotiabank Colpatria",
-    "Banco Agrario"
+    "Banco Agrario de Colombia",
+    "Banco Falabella",
+    "Banco Pichincha",
+    "Bancoomeva",
+    "Citibank Colombia",
+    "GNB Sudameris",
+    "Banco Finandina",
+    "Banco Mundo Mujer",
+    "Banco W",
+    "Banco Santander Colombia",
+    "Banco Serfinanza",
+    "Banco Cooperativo Coopcentral",
+    "Itaú Colombia",
+    "JP Morgan Colombia",
+    "Mibanco",
+    "Lulo Bank",
+    "Nubank Colombia",
+    "RappiPay",
+    "Movii",
+    "Ualá Colombia",
+    "Iris Bank",
+    "Banco BTG Pactual Colombia",
+    "Banco Credifinanciera",
+    "Coltefinanciera",
+    "Finandina",
+    "Confiar Cooperativa Financiera",
+    "CFA Cooperativa Financiera",
+    "Juriscoop",
+    "Cotrafa",
+    "Coofinep",
+    "Credifamilia",
+    "Tuya"
   ];
 
   select.innerHTML = `<option value="">Seleccione</option>`;

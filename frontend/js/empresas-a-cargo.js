@@ -2,6 +2,7 @@ let editandoEmpresa = false;
 
 // ================= INIT
 function initEmpresas() {
+  editandoEmpresa = false;
   cargarEmpresas();
   initFormEmpresa();
 

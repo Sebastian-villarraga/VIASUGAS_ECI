@@ -1,9 +1,13 @@
+// ======================================================
 // controllers/dashboardProyecciones.controller.js
+// CORREGIDO COMPLETO / FILTROS REALES / PROFESIONAL
+// ======================================================
+
 const pool = require("../config/db");
 
-// =========================
+// ======================================================
 // HELPERS
-// =========================
+// ======================================================
 function getFiltros(req) {
   const { desde, hasta } = req.query;
 
@@ -13,53 +17,73 @@ function getFiltros(req) {
   };
 }
 
+// ======================================================
+// QUERY BASE PROYECCIÓN
+// ======================================================
 function getBaseProjectionQuery() {
   return `
-    WITH pagos_por_factura AS (
+    WITH pagos_por_manifiesto AS (
+
       SELECT
-        t.id_factura,
-        COALESCE(SUM(t.valor), 0) AS pagado
+        t.id_manifiesto,
+        COALESCE(SUM(t.valor),0) AS pagado
+
       FROM transaccion t
-      WHERE t.id_factura IS NOT NULL
-      GROUP BY t.id_factura
+
+      JOIN tipo_transaccion tt
+        ON tt.id = t.id_tipo_transaccion
+
+      WHERE t.id_manifiesto IS NOT NULL
+        AND tt.tipo = 'INGRESO MANIFIESTO'
+
+      GROUP BY t.id_manifiesto
     ),
 
     proyeccion AS (
+
       SELECT
         f.codigo_factura,
         f.fecha_emision,
         f.fecha_vencimiento,
-        f.plazo_pago,
-        c.nombre AS cliente,
+
+        COALESCE(c.nombre,'Sin cliente') AS cliente,
+        COALESCE(eac.nombre,'Sin empresa') AS empresa_a_cargo,
 
         f.valor AS valor_bruto,
-        COALESCE(f.retencion_fuente, 0) AS retencion_fuente,
-        COALESCE(f.retencion_ica, 0) AS retencion_ica,
+
+        COALESCE(f.retencion_fuente,0) AS retencion_fuente,
+        COALESCE(f.retencion_ica,0) AS retencion_ica,
 
         (
           f.valor
-          - COALESCE(f.retencion_fuente, 0)
-          - COALESCE(f.retencion_ica, 0)
+          - COALESCE(f.retencion_fuente,0)
+          - COALESCE(f.retencion_ica,0)
         ) AS valor_neto,
 
-        COALESCE(p.pagado, 0) AS pagado,
+        COALESCE(p.pagado,0) AS pagado,
 
         GREATEST(
           (
             f.valor
-            - COALESCE(f.retencion_fuente, 0)
-            - COALESCE(f.retencion_ica, 0)
-          ) - COALESCE(p.pagado, 0),
+            - COALESCE(f.retencion_fuente,0)
+            - COALESCE(f.retencion_ica,0)
+          ) - COALESCE(p.pagado,0),
           0
         ) AS pendiente_proyectado
 
       FROM factura f
+
       JOIN manifiesto m
         ON f.id_manifiesto = m.id_manifiesto
-      JOIN cliente c
-        ON m.id_cliente = c.nit
-      LEFT JOIN pagos_por_factura p
-        ON p.id_factura = f.codigo_factura
+
+      LEFT JOIN cliente c
+        ON c.nit = m.id_cliente
+
+      LEFT JOIN empresa_a_cargo eac
+        ON eac.nit = m.id_empresa_a_cargo
+
+      LEFT JOIN pagos_por_manifiesto p
+        ON p.id_manifiesto = m.id_manifiesto
 
       WHERE f.fecha_vencimiento IS NOT NULL
         AND ($1::date IS NULL OR f.fecha_vencimiento >= $1)
@@ -68,291 +92,233 @@ function getBaseProjectionQuery() {
   `;
 }
 
-// =========================
+// ======================================================
 // KPI
-// =========================
+// ======================================================
 const getDashboardProyeccionesKPI = async (req, res) => {
   try {
     const { desde, hasta } = getFiltros(req);
 
-    const result = await pool.query(
-      `
+    const result = await pool.query(`
       ${getBaseProjectionQuery()}
 
       SELECT
         COALESCE(SUM(
           CASE
-            WHEN fecha_vencimiento >= CURRENT_DATE
-             AND fecha_vencimiento < (CURRENT_DATE + INTERVAL '1 month')
+            WHEN fecha_vencimiento <= CURRENT_DATE + INTERVAL '30 day'
             THEN pendiente_proyectado
             ELSE 0
           END
-        ), 0) AS proximo_mes,
+        ),0) AS proximo_mes,
 
         COALESCE(SUM(
           CASE
-            WHEN fecha_vencimiento >= CURRENT_DATE
-             AND fecha_vencimiento < (CURRENT_DATE + INTERVAL '3 month')
+            WHEN fecha_vencimiento <= CURRENT_DATE + INTERVAL '90 day'
             THEN pendiente_proyectado
             ELSE 0
           END
-        ), 0) AS proximos_3_meses,
+        ),0) AS proximos_3_meses,
 
-        COALESCE(SUM(
-          CASE
-            WHEN fecha_vencimiento >= CURRENT_DATE
-             AND fecha_vencimiento < (CURRENT_DATE + INTERVAL '6 month')
-            THEN pendiente_proyectado
-            ELSE 0
-          END
-        ), 0) AS proximos_6_meses,
+        COUNT(*) FILTER (
+          WHERE pendiente_proyectado > 0
+        ) AS facturas_proyectadas,
 
-        COUNT(*) FILTER (WHERE pendiente_proyectado > 0) AS facturas_proyectadas,
-
-        COUNT(DISTINCT cliente) FILTER (WHERE pendiente_proyectado > 0) AS clientes_proyectados,
+        COUNT(DISTINCT cliente) FILTER (
+          WHERE pendiente_proyectado > 0
+        ) AS clientes_proyectados,
 
         ROUND(
-          COALESCE(AVG(
+          AVG(
             CASE
-              WHEN pendiente_proyectado > 0 THEN pendiente_proyectado
+              WHEN pendiente_proyectado > 0
+              THEN pendiente_proyectado
             END
-          ), 0),
-          2
+          ),2
         ) AS ticket_promedio_proyectado
 
       FROM proyeccion
       WHERE pendiente_proyectado > 0
-      `,
-      [desde, hasta]
-    );
+    `, [desde, hasta]);
 
-    return res.json(result.rows[0]);
+    res.json(result.rows[0]);
+
   } catch (error) {
-    console.error("Error getDashboardProyeccionesKPI:", error);
-    return res.status(500).json({ error: "Error obteniendo KPI de proyecciones" });
+    console.error(error);
+    res.status(500).json({
+      error: "Error KPI proyecciones"
+    });
   }
 };
 
-// =========================
-// PROYECCION MENSUAL
-// =========================
+// ======================================================
+// PROYECCIÓN MENSUAL
+// ======================================================
 const getProyeccionMensual = async (req, res) => {
   try {
-    const { desde, hasta } = getFiltros(req);
+    const { desde, hasta } = req.query;
 
-    const result = await pool.query(
-      `
+    const result = await pool.query(`
       ${getBaseProjectionQuery()}
 
       SELECT
-        TO_CHAR(DATE_TRUNC('month', fecha_vencimiento), 'YYYY-MM') AS mes,
-        COUNT(*) FILTER (WHERE pendiente_proyectado > 0) AS facturas,
-        COALESCE(SUM(pendiente_proyectado), 0) AS total
-      FROM proyeccion
-      WHERE pendiente_proyectado > 0
-      GROUP BY DATE_TRUNC('month', fecha_vencimiento)
-      ORDER BY DATE_TRUNC('month', fecha_vencimiento)
-      `,
-      [desde, hasta]
-    );
+        TO_CHAR(
+          DATE_TRUNC('month', fecha_vencimiento),
+          'YYYY-MM'
+        ) AS mes,
 
-    return res.json(
-      result.rows.map(row => ({
-        mes: row.mes,
-        facturas: Number(row.facturas || 0),
-        total: Number(row.total || 0)
-      }))
-    );
+        COUNT(*) AS facturas,
+
+        COALESCE(
+          SUM(valor_neto),0
+        ) AS total
+
+      FROM proyeccion
+
+      GROUP BY DATE_TRUNC('month', fecha_vencimiento)
+
+      ORDER BY DATE_TRUNC('month', fecha_vencimiento)
+    `, [desde || null, hasta || null]);
+
+    res.json(result.rows);
+
   } catch (error) {
-    console.error("Error getProyeccionMensual:", error);
-    return res.status(500).json({ error: "Error obteniendo proyección mensual" });
+    console.error("Error proyección mensual:", error);
+
+    res.status(500).json({
+      error: "Error proyección mensual"
+    });
   }
 };
 
-// =========================
-// PROYECCION SEMANAL PROXIMAS 8 SEMANAS
-// =========================
+// ======================================================
+// PROYECCIÓN SEMANAL
+// ======================================================
 const getProyeccionSemanal = async (req, res) => {
   try {
-    const result = await pool.query(
-      `
-      WITH pagos_por_factura AS (
-        SELECT
-          t.id_factura,
-          COALESCE(SUM(t.valor), 0) AS pagado
-        FROM transaccion t
-        WHERE t.id_factura IS NOT NULL
-        GROUP BY t.id_factura
-      ),
-      proyeccion AS (
-        SELECT
-          f.fecha_vencimiento,
-          GREATEST(
-            (
-              f.valor
-              - COALESCE(f.retencion_fuente, 0)
-              - COALESCE(f.retencion_ica, 0)
-            ) - COALESCE(p.pagado, 0),
-            0
-          ) AS pendiente_proyectado
-        FROM factura f
-        LEFT JOIN pagos_por_factura p
-          ON p.id_factura = f.codigo_factura
-        WHERE f.fecha_vencimiento IS NOT NULL
-          AND f.fecha_vencimiento >= CURRENT_DATE
-          AND f.fecha_vencimiento < (CURRENT_DATE + INTERVAL '8 week')
-      )
-      SELECT
-        TO_CHAR(DATE_TRUNC('week', fecha_vencimiento), 'YYYY-MM-DD') AS semana_inicio,
-        COALESCE(SUM(pendiente_proyectado), 0) AS total
-      FROM proyeccion
-      WHERE pendiente_proyectado > 0
-      GROUP BY DATE_TRUNC('week', fecha_vencimiento)
-      ORDER BY DATE_TRUNC('week', fecha_vencimiento)
-      `
-    );
+    const { desde, hasta } = req.query;
 
-    return res.json(
-      result.rows.map(row => ({
-        semana_inicio: row.semana_inicio,
-        total: Number(row.total || 0)
-      }))
-    );
+    const result = await pool.query(`
+      ${getBaseProjectionQuery()}
+
+      SELECT
+        TO_CHAR(
+          DATE_TRUNC('week', fecha_vencimiento),
+          'YYYY-MM-DD'
+        ) AS semana_inicio,
+
+        COUNT(*) AS facturas,
+
+        COALESCE(
+          SUM(valor_neto),0
+        ) AS total
+
+      FROM proyeccion
+
+      GROUP BY DATE_TRUNC('week', fecha_vencimiento)
+
+      ORDER BY DATE_TRUNC('week', fecha_vencimiento)
+    `, [desde || null, hasta || null]);
+
+    res.json(result.rows);
+
   } catch (error) {
-    console.error("Error getProyeccionSemanal:", error);
-    return res.status(500).json({ error: "Error obteniendo proyección semanal" });
+    console.error("Error proyección semanal:", error);
+
+    res.status(500).json({
+      error: "Error proyección semanal"
+    });
   }
 };
 
-// =========================
-// TOP CLIENTES PROYECTADOS
-// =========================
+// ======================================================
+// TOP CLIENTES
+// ======================================================
 const getTopClientesProyectados = async (req, res) => {
   try {
     const { desde, hasta } = getFiltros(req);
 
-    const result = await pool.query(
-      `
+    const result = await pool.query(`
       ${getBaseProjectionQuery()}
 
       SELECT
         cliente,
-        COALESCE(SUM(pendiente_proyectado), 0) AS total
+        COALESCE(
+          SUM(pendiente_proyectado),0
+        ) AS total
+
       FROM proyeccion
       WHERE pendiente_proyectado > 0
+
       GROUP BY cliente
       ORDER BY total DESC
-      LIMIT 8
-      `,
-      [desde, hasta]
-    );
+      LIMIT 10
+    `, [desde, hasta]);
 
-    return res.json(
-      result.rows.map(row => ({
-        cliente: row.cliente,
-        total: Number(row.total || 0)
-      }))
-    );
+    res.json(result.rows);
+
   } catch (error) {
-    console.error("Error getTopClientesProyectados:", error);
-    return res.status(500).json({ error: "Error obteniendo top clientes proyectados" });
+    console.error(error);
+    res.status(500).json({
+      error: "Error top clientes"
+    });
   }
 };
 
-// =========================
-// FACTURAS PROXIMAS A VENCER
-// =========================
+// ======================================================
+// FACTURAS PRÓXIMAS
+// ======================================================
 const getFacturasProximasVencer = async (req, res) => {
-  try {
-    const result = await pool.query(
-      `
-      WITH pagos_por_factura AS (
-        SELECT
-          t.id_factura,
-          COALESCE(SUM(t.valor), 0) AS pagado
-        FROM transaccion t
-        WHERE t.id_factura IS NOT NULL
-        GROUP BY t.id_factura
-      )
-      SELECT
-        f.codigo_factura,
-        c.nombre AS cliente,
-        f.fecha_vencimiento,
-        f.valor AS valor_bruto,
-        COALESCE(f.retencion_fuente, 0) AS retencion_fuente,
-        COALESCE(f.retencion_ica, 0) AS retencion_ica,
-        (
-          f.valor
-          - COALESCE(f.retencion_fuente, 0)
-          - COALESCE(f.retencion_ica, 0)
-        ) AS valor_neto,
-        COALESCE(p.pagado, 0) AS pagado,
-        GREATEST(
-          (
-            f.valor
-            - COALESCE(f.retencion_fuente, 0)
-            - COALESCE(f.retencion_ica, 0)
-          ) - COALESCE(p.pagado, 0),
-          0
-        ) AS pendiente_proyectado
-      FROM factura f
-      JOIN manifiesto m
-        ON f.id_manifiesto = m.id_manifiesto
-      JOIN cliente c
-        ON m.id_cliente = c.nit
-      LEFT JOIN pagos_por_factura p
-        ON p.id_factura = f.codigo_factura
-      WHERE f.fecha_vencimiento IS NOT NULL
-        AND f.fecha_vencimiento >= CURRENT_DATE
-        AND f.fecha_vencimiento < (CURRENT_DATE + INTERVAL '45 day')
-        AND GREATEST(
-          (
-            f.valor
-            - COALESCE(f.retencion_fuente, 0)
-            - COALESCE(f.retencion_ica, 0)
-          ) - COALESCE(p.pagado, 0),
-          0
-        ) > 0
-      ORDER BY f.fecha_vencimiento ASC, pendiente_proyectado DESC
-      `
-    );
-
-    return res.json(
-      result.rows.map(row => ({
-        codigo_factura: row.codigo_factura,
-        cliente: row.cliente,
-        fecha_vencimiento: row.fecha_vencimiento,
-        valor_bruto: Number(row.valor_bruto || 0),
-        retencion_fuente: Number(row.retencion_fuente || 0),
-        retencion_ica: Number(row.retencion_ica || 0),
-        valor_neto: Number(row.valor_neto || 0),
-        pagado: Number(row.pagado || 0),
-        pendiente_proyectado: Number(row.pendiente_proyectado || 0)
-      }))
-    );
-  } catch (error) {
-    console.error("Error getFacturasProximasVencer:", error);
-    return res.status(500).json({ error: "Error obteniendo facturas próximas a vencer" });
-  }
-};
-
-// =========================
-// DETALLE PROYECCION
-// =========================
-const getDetalleProyeccion = async (req, res) => {
   try {
     const { desde, hasta } = getFiltros(req);
 
-    const result = await pool.query(
-      `
+    const result = await pool.query(`
       ${getBaseProjectionQuery()}
 
       SELECT
         codigo_factura,
         cliente,
+        fecha_vencimiento,
+        valor_bruto,
+        retencion_fuente,
+        retencion_ica,
+        valor_neto,
+        pagado,
+        pendiente_proyectado
+
+      FROM proyeccion
+      WHERE pendiente_proyectado > 0
+
+      ORDER BY fecha_vencimiento ASC
+      LIMIT 50
+    `, [desde, hasta]);
+
+    res.json(result.rows);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Error facturas próximas"
+    });
+  }
+};
+
+// ======================================================
+// DETALLE
+// ======================================================
+const getDetalleProyeccion = async (req,res) => {
+  try {
+
+    const { desde, hasta } = req.query;
+
+    const result = await pool.query(`
+      ${getBaseProjectionQuery()}
+
+      SELECT
+        cliente,
+        empresa_a_cargo,
+        codigo_factura,
         fecha_emision,
         fecha_vencimiento,
-        plazo_pago,
         valor_bruto,
         retencion_fuente,
         retencion_ica,
@@ -360,33 +326,21 @@ const getDetalleProyeccion = async (req, res) => {
         pagado,
         pendiente_proyectado
       FROM proyeccion
-      WHERE pendiente_proyectado > 0
-      ORDER BY fecha_vencimiento ASC, pendiente_proyectado DESC
-      `,
-      [desde, hasta]
-    );
+      ORDER BY fecha_vencimiento ASC
 
-    return res.json(
-      result.rows.map(row => ({
-        codigo_factura: row.codigo_factura,
-        cliente: row.cliente,
-        fecha_emision: row.fecha_emision,
-        fecha_vencimiento: row.fecha_vencimiento,
-        plazo_pago: row.plazo_pago,
-        valor_bruto: Number(row.valor_bruto || 0),
-        retencion_fuente: Number(row.retencion_fuente || 0),
-        retencion_ica: Number(row.retencion_ica || 0),
-        valor_neto: Number(row.valor_neto || 0),
-        pagado: Number(row.pagado || 0),
-        pendiente_proyectado: Number(row.pendiente_proyectado || 0)
-      }))
-    );
-  } catch (error) {
-    console.error("Error getDetalleProyeccion:", error);
-    return res.status(500).json({ error: "Error obteniendo detalle de proyección" });
+    `,[desde || null, hasta || null]);
+
+    res.json(result.rows);
+
+  } catch(error){
+    console.error(error);
+    res.status(500).json({error:"Error detalle"});
   }
 };
 
+// ======================================================
+// EXPORTS
+// ======================================================
 module.exports = {
   getDashboardProyeccionesKPI,
   getProyeccionMensual,

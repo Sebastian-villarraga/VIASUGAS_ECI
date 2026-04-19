@@ -1,104 +1,58 @@
-/* =====================================
-   DASHBOARD PROYECCIONES CSS AISLADO - DPR
-   Basado en dashboard.css + dashboard-contable.css
-===================================== */
+/* ==================================================
+   DASHBOARD PROYECCIONES
+   NUEVO LAYOUT:
+   cards
+   tablas lado a lado
+   gráficas abajo
+================================================== */
 
+/* =========================
+   LAYOUT
+========================= */
 .dpr-layout{
-  padding:20px;
   width:100%;
+  padding:20px;
   box-sizing:border-box;
 }
 
-.dpr-main{
-  display:grid;
-  grid-template-columns:1.2fr 1fr;
-  gap:20px;
-  align-items:start;
-}
-
-.dpr-left,
-.dpr-right{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  min-width:0;
-}
-
-/* HEADER */
 .dpr-header{
   margin-bottom:20px;
 }
 
 .dpr-header h2{
-  margin:0 0 6px;
+  margin:0;
   font-size:34px;
   font-weight:700;
   color:#111827;
 }
 
-.dpr-header p{
-  margin:0;
-  font-size:14px;
-  color:#6b7280;
-}
-
-/* BOTONES */
-.dpr-btn{
-  border:none;
-  border-radius:10px;
-  height:44px;
-  padding:0 18px;
-  cursor:pointer;
-  font-size:14px;
-  font-weight:700;
-  transition:.2s ease;
-  white-space:nowrap;
-}
-
-.dpr-btn:hover{
-  transform:translateY(-1px);
-}
-
-.dpr-btn-primary{
-  background:#2f56a6;
-  color:#fff;
-}
-
-.dpr-btn-primary:hover{
-  background:#24468a;
-}
-
-.dpr-btn-light{
-  background:#eef2f7;
-  color:#111827;
-}
-
-.dpr-btn-light:hover{
-  background:#dde5ef;
-}
-
-.dpr-btn-danger{
-  background:#ea4335;
-  color:#fff;
-}
-
-.dpr-btn-danger:hover{
-  background:#cf3528;
-}
-
-/* FILTROS */
+/* =========================
+   FILTROS
+========================= */
 .dpr-filters-box{
   background:#fff;
   border:1px solid #e5e7eb;
   border-radius:14px;
   padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-bottom:20px;
 }
 
-.dpr-filters-grid{
+.dpr-toolbar{
   display:grid;
-  grid-template-columns:repeat(2,minmax(220px,1fr));
-  gap:16px;
-  align-items:end;
+  grid-template-columns:
+    auto auto 110px
+    auto auto auto auto
+    auto auto auto;
+  gap:10px;
+}
+
+.dpr-toolbar-bottom{
+  display:grid;
+  grid-template-columns:220px 220px 160px;
+  gap:14px;
 }
 
 .dpr-group{
@@ -113,48 +67,68 @@
   margin-bottom:6px;
 }
 
-.dpr-group input{
+.dpr-group input,
+.dpr-select{
   width:100%;
   height:44px;
-  padding:0 14px;
   border:1px solid #d1d5db;
   border-radius:10px;
+  padding:0 12px;
   font-size:14px;
+  background:#fff;
   box-sizing:border-box;
 }
 
-.dpr-group input:focus{
-  outline:none;
-  border-color:#2f56a6;
-  box-shadow:0 0 0 3px rgba(47,86,166,.12);
+/* =========================
+   BOTONES
+========================= */
+.dpr-btn{
+  height:44px;
+  border:none;
+  border-radius:10px;
+  padding:0 18px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
 }
 
-.dpr-actions{
-  grid-column:1 / -1;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+.dpr-btn:hover{
+  transform:translateY(-1px);
 }
 
-.dpr-actions .dpr-btn{
-  min-width:140px;
-  justify-content:center;
+.dpr-btn-primary{
+  background:#2f56a6;
+  color:#fff;
 }
 
-/* KPI */
+.dpr-btn-light{
+  background:#eef2f7;
+  color:#111827;
+}
+
+.dpr-btn-danger{
+  background:#ea4335;
+  color:#fff;
+}
+
+/* =========================
+   CARDS KPI
+========================= */
 .dpr-cards{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:16px;
+  margin-bottom:20px;
 }
 
 .dpr-card{
   background:#fff;
   border:1px solid #e5e7eb;
   border-radius:14px;
-  padding:18px 20px;
+  padding:18px;
   position:relative;
-  box-shadow:0 2px 8px rgba(0,0,0,.04);
+  min-height:110px;
 }
 
 .dpr-card::before{
@@ -168,52 +142,119 @@
 }
 
 .dpr-card h3{
-  margin:0 0 8px;
+  margin:0 0 12px;
   font-size:12px;
   font-weight:700;
   text-transform:uppercase;
-  letter-spacing:.4px;
   color:#6b7280;
+  letter-spacing:.4px;
 }
 
 .dpr-card p{
   margin:0;
-  font-size:24px;
+  font-size:22px;
   font-weight:800;
   color:#111827;
-  word-break:break-word;
+  line-height:1.3;
 }
 
-.dpr-kpi-mes::before{ background:#2563eb; }
-.dpr-kpi-3m::before{ background:#16a34a; }
-.dpr-kpi-6m::before{ background:#7c3aed; }
-.dpr-kpi-facturas::before{ background:#d97706; }
-.dpr-kpi-clientes::before{ background:#0f766e; }
-.dpr-kpi-ticket::before{ background:#dc2626; }
+.dpr-kpi-mes::before{background:#34495e;}
+.dpr-kpi-3m::before{background:#27ae60;}
+.dpr-kpi-6m::before{background:#e74c3c;}
+.dpr-kpi-facturas::before{background:#3498db;}
+.dpr-kpi-clientes::before{background:#8e44ad;}
+.dpr-kpi-ticket::before{background:#f39c12;}
 
-/* BLOQUES */
+/* =========================
+   GRID PRINCIPAL
+========================= */
+.dpr-main{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-bottom:20px;
+  align-items:start;
+}
+
+.dpr-left,
+.dpr-right{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  min-width:0;
+}
+
+/* =========================
+   BLOQUES
+========================= */
 .dpr-chart-card,
-.dpr-table-card,
-.dpr-alert-card{
+.dpr-table-card{
   background:#fff;
   border:1px solid #e5e7eb;
   border-radius:14px;
-  padding:18px;
-  box-shadow:0 4px 12px rgba(0,0,0,.05);
-}
-
-.dpr-card-header{
-  margin-bottom:14px;
+  padding:16px;
+  box-sizing:border-box;
+  overflow:hidden;
 }
 
 .dpr-card-header h3{
-  margin:0;
+  margin:0 0 14px;
   font-size:18px;
   font-weight:700;
   color:#111827;
 }
 
-/* CHARTS */
+/* =========================
+   TABLAS
+========================= */
+.dpr-table-scroll{
+  width:100%;
+  overflow:auto;
+  max-height:420px;
+  border-radius:10px;
+}
+
+.dpr-table{
+  width:100%;
+  min-width:780px;
+  border-collapse:collapse;
+}
+
+.dpr-table th{
+  position:sticky;
+  top:0;
+  background:#f5f7fb;
+  z-index:5;
+  text-align:left;
+  padding:12px 14px;
+  font-size:13px;
+  font-weight:700;
+  color:#111827;
+  white-space:nowrap;
+}
+
+.dpr-table td{
+  padding:12px 14px;
+  font-size:14px;
+  border-bottom:1px solid #f1f1f1;
+  white-space:nowrap;
+  color:#111827;
+}
+
+.dpr-table tbody tr:hover{
+  background:#fafafa;
+}
+
+.dpr-empty-row{
+  text-align:center;
+  color:#6b7280;
+  font-weight:600;
+  padding:20px !important;
+}
+
+/* =========================
+   CHARTS
+========================= */
 .dpr-chart-wrap{
   position:relative;
   width:100%;
@@ -225,143 +266,52 @@
   height:100% !important;
 }
 
-/* TABLAS */
-.dpr-table-scroll{
-  width:100%;
-  max-height:520px;
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
+.dpr-right .dpr-chart-wrap{
+  height:280px;
 }
 
-.dpr-table-scroll::-webkit-scrollbar{
-  width:10px;
-  height:10px;
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:1400px){
+
+  .dpr-toolbar{
+    grid-template-columns:repeat(6,1fr);
+  }
+
+  .dpr-cards{
+    grid-template-columns:repeat(3,1fr);
+  }
 }
 
-.dpr-table-scroll::-webkit-scrollbar-thumb{
-  background:#c7ced8;
-  border-radius:20px;
-}
+@media(max-width:1200px){
 
-.dpr-table{
-  width:max-content;
-  min-width:100%;
-  border-collapse:collapse;
-}
-
-.dpr-table th{
-  position:sticky;
-  top:0;
-  z-index:2;
-  background:#f3f4f6;
-  color:#111827;
-  font-size:13px;
-  font-weight:700;
-  text-align:left;
-  padding:12px 14px;
-  white-space:nowrap;
-}
-
-.dpr-table td{
-  padding:12px 14px;
-  font-size:14px;
-  border-bottom:1px solid #f1f1f1;
-  white-space:nowrap;
-}
-
-.dpr-table tbody tr:hover{
-  background:#fafafa;
-}
-
-.dpr-empty-row{
-  text-align:center;
-  color:#6b7280;
-  padding:18px !important;
-}
-
-/* ALERTAS */
-.dpr-alert-list{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.dpr-alert-item{
-  padding:12px 14px;
-  border-radius:10px;
-  font-size:14px;
-  font-weight:600;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.dpr-alert-dot{
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  flex-shrink:0;
-}
-
-.dpr-alert-blue{
-  background:#eff6ff;
-  color:#1d4ed8;
-}
-
-.dpr-alert-blue .dpr-alert-dot{
-  background:#2563eb;
-}
-
-.dpr-alert-green{
-  background:#ecfdf5;
-  color:#166534;
-}
-
-.dpr-alert-green .dpr-alert-dot{
-  background:#16a34a;
-}
-
-.dpr-alert-orange{
-  background:#fff7ed;
-  color:#9a3412;
-}
-
-.dpr-alert-orange .dpr-alert-dot{
-  background:#f97316;
-}
-
-/* TEXTOS */
-.dpr-text-center{
-  text-align:center;
-}
-
-.dpr-text-green{
-  color:#16a34a;
-  font-weight:700;
-}
-
-.dpr-text-blue{
-  color:#2563eb;
-  font-weight:700;
-}
-
-.dpr-text-red{
-  color:#dc2626;
-  font-weight:700;
-}
-
-/* RESPONSIVE */
-@media (max-width:1200px){
   .dpr-main{
     grid-template-columns:1fr;
   }
 
-  .dpr-chart-wrap{
-    height:300px;
+  .dpr-cards{
+    grid-template-columns:repeat(2,1fr);
   }
 }
 
-@media (max-width:768px){
+@media(max-width:900px){
+
+  .dpr-toolbar{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .dpr-toolbar-bottom{
+    grid-template-columns:1fr;
+  }
+
+  .dpr-cards{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:768px){
+
   .dpr-layout{
     padding:14px;
   }
@@ -370,52 +320,114 @@
     font-size:28px;
   }
 
-  .dpr-filters-grid{
-    grid-template-columns:1fr;
-  }
-
-  .dpr-actions{
-    width:100%;
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-
-  .dpr-btn{
-    width:100%;
-  }
-
-  .dpr-cards{
+  .dpr-toolbar{
     grid-template-columns:1fr;
   }
 
   .dpr-table{
-    min-width:980px;
+    min-width:760px;
   }
 
   .dpr-chart-wrap{
-    height:260px;
+    height:250px;
+  }
+
+  .dpr-right .dpr-chart-wrap{
+    height:250px;
   }
 }
 
-@media (max-width:480px){
+@media(max-width:480px){
+
   .dpr-header h2{
     font-size:24px;
   }
 
-  .dpr-filters-box,
-  .dpr-table-card,
-  .dpr-chart-card,
-  .dpr-alert-card,
-  .dpr-card{
-    padding:14px;
+  .dpr-card p{
+    font-size:18px;
+  }
+}
+
+/* ==================================================
+   AJUSTE SOLICITADO:
+   TABLAS UNA DEBAJO DE LA OTRA
+   (después de cards)
+================================================== */
+
+/* =========================
+   CONTENEDOR GENERAL TABLAS
+========================= */
+.dpr-main{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  margin-bottom:20px;
+}
+
+/* =========================
+   COLUMNAS FULL WIDTH
+========================= */
+.dpr-left,
+.dpr-right{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+/* =========================
+   TARJETAS TABLA / CHART
+========================= */
+.dpr-table-card,
+.dpr-chart-card{
+  width:100%;
+}
+
+/* =========================
+   TABLAS GRANDES
+========================= */
+.dpr-table-scroll{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:auto;
+  max-height:420px;
+  border-radius:10px;
+}
+
+.dpr-table{
+  width:100%;
+  min-width:1100px;
+  border-collapse:collapse;
+}
+
+/* =========================
+   GRÁFICAS
+========================= */
+.dpr-chart-wrap{
+  position:relative;
+  width:100%;
+  height:320px;
+}
+
+.dpr-chart-wrap canvas{
+  width:100% !important;
+  height:100% !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:768px){
+
+  .dpr-main{
+    gap:16px;
   }
 
-  .dpr-card p{
-    font-size:20px;
+  .dpr-table{
+    min-width:760px;
   }
 
   .dpr-chart-wrap{
-    height:230px;
+    height:250px;
   }
 }

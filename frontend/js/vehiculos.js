@@ -2,7 +2,7 @@
 // INIT (SPA)
 // =========================
 function initVehiculos() {
-
+  editando = false;
   const tabla = document.getElementById("vehiculosTable");
 
 

@@ -4,7 +4,7 @@ let editandoPropietario = false;
 // INIT
 // =========================
 function initPropietarios() {
-  
+  editandoPropietario = false;
   cargarPropietarios();
   initFormPropietario();
 

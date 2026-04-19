@@ -3,6 +3,7 @@ let alertaActiva = null;
 
 // ================= INIT
 function initConductores() {
+  editandoConductor = false;
   cargarConductores();
   cargarAlertasConductores();
   initFormConductor();

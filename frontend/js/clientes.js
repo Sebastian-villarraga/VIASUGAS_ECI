@@ -2,6 +2,7 @@ let editandoCliente = false;
 
 // ================= INIT
 function initClientes() {
+  editandoCliente = false;
   cargarClientes();
   initFormCliente();
 
