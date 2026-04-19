@@ -466,6 +466,46 @@ const getTopClientes = async (req, res) => {
 };
 
 // =========================
+// GASTOS OPERACIONALES
+// =========================
+const getGastosOperacionales = async (req, res) => {
+  try {
+    const { desde, hasta } = req.query;
+
+    const result = await pool.query(`
+      SELECT
+        t.fecha_pago AS fecha,
+        tt.categoria AS categoria,
+        COALESCE(b.nombre_banco,'Sin banco') AS banco,
+        t.valor,
+        COALESCE(t.descripcion,'-') AS descripcion
+
+      FROM transaccion t
+
+      INNER JOIN tipo_transaccion tt
+        ON tt.id = t.id_tipo_transaccion
+
+      LEFT JOIN banco b
+        ON b.id = t.id_banco
+
+      WHERE tt.tipo = 'EGRESO OPERACIONAL'
+        AND ($1::date IS NULL OR t.fecha_pago >= $1)
+        AND ($2::date IS NULL OR t.fecha_pago <= $2)
+
+      ORDER BY t.fecha_pago DESC
+    `,[desde || null, hasta || null]);
+
+    res.json(result.rows);
+
+  } catch(error){
+    console.error(error);
+    res.status(500).json({
+      error: "Error gastos operacionales"
+    });
+  }
+};
+
+// =========================
 // EXPORTS
 // =========================
 module.exports = {
@@ -474,5 +514,6 @@ module.exports = {
   getIngresosEgresos,
   getGastosPorCategoria,
   getEstadoFacturacion,
-  getTopClientes
+  getTopClientes,
+  getGastosOperacionales
 };

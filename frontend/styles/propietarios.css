@@ -297,3 +297,35 @@
     padding: 14px;
   }
 }
+
+/* =====================================
+   PROPIETARIOS INLINE EDIT ONLY
+   Solo cuando se edita inline
+===================================== */
+
+.prx-table td input,
+.prx-table td select{
+  width:100%;
+  height:36px;
+  padding:0 12px;
+  border:1px solid #d1d5db;
+  border-radius:8px;
+  background:#fff;
+  font-size:13px;
+  color:#111827;
+  box-sizing:border-box;
+  transition:.2s ease;
+}
+
+/* focus elegante */
+.prx-table td input:focus,
+.prx-table td select:focus{
+  outline:none;
+  border-color:#2f56a6;
+  box-shadow:0 0 0 3px rgba(47,86,166,.12);
+}
+
+/* selects */
+.prx-table td select{
+  min-width:120px;
+}

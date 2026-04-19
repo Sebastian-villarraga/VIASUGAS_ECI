@@ -465,3 +465,40 @@
     padding: 14px;
   }
 }
+
+/* =====================================
+   TRAILER INLINE EDIT ONLY
+   Solo cuando aparece input/select
+===================================== */
+
+.thx-table td input,
+.thx-table td select{
+  width:100%;
+  height:36px;
+  padding:0 12px;
+  border:1px solid #d1d5db;
+  border-radius:8px;
+  background:#fff;
+  font-size:13px;
+  color:#111827;
+  box-sizing:border-box;
+  transition:.2s ease;
+}
+
+/* focus bonito */
+.thx-table td input:focus,
+.thx-table td select:focus{
+  outline:none;
+  border-color:#2f56a6;
+  box-shadow:0 0 0 3px rgba(47,86,166,.12);
+}
+
+/* fechas */
+.thx-table td input[type="date"]{
+  min-width:145px;
+}
+
+/* selects */
+.thx-table td select{
+  min-width:120px;
+}

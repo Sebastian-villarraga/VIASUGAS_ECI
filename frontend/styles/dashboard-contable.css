@@ -368,3 +368,12 @@
     grid-template-columns:1fr;
   }
 }
+
+/* SOLO cambiar textos de valores en tablas a negro */
+
+.dbcx-green,
+.dbcx-red,
+.dbcx-blue,
+.dbcx-orange{
+  color:#111827 !important;
+}

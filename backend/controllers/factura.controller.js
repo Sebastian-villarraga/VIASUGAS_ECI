@@ -16,12 +16,22 @@ const getFacturas = async (req, res) => {
         f.retencion_ica,
         f.plazo_pago,
         f.creado,
-        c.nombre AS cliente_nombre
+
+        c.nombre AS cliente_nombre,
+
+        COALESCE(e.nombre, '-') AS empresa_a_cargo_nombre
+
       FROM factura f
+
       LEFT JOIN manifiesto m 
         ON f.id_manifiesto = m.id_manifiesto
+
       LEFT JOIN cliente c
         ON m.id_cliente = c.nit
+
+      LEFT JOIN empresa_a_cargo e
+        ON m.id_empresa_a_cargo = e.nit
+
       ORDER BY f.fecha_emision DESC
     `);
 
@@ -44,10 +54,11 @@ const getFacturas = async (req, res) => {
     return res.json(data);
 
   } catch (error) {
-    console.error("?? Error getFacturas:", error);
+    console.error("? Error getFacturas:", error);
     return res.status(500).json({ error: "Error obteniendo facturas" });
   }
 };
+
 
 // =========================
 // GET MANIFIESTOS

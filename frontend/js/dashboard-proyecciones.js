@@ -137,6 +137,7 @@ function dprCargarAnios() {
 function dprEventos() {
   dprEl("dprBtnMesActual")?.addEventListener("click", dprAplicarEsteMes);
   dprEl("dprBtnMesAnterior")?.addEventListener("click", dprAplicarMesAnterior);
+  dprEl("dprBtnMesSiguiente")?.addEventListener("click", dprAplicarMesSiguiente);
 
   dprEl("dprBtnQ1")?.addEventListener("click", () => dprQuarter(1));
   dprEl("dprBtnQ2")?.addEventListener("click", () => dprQuarter(2));
@@ -281,30 +282,20 @@ async function dprCargarKPI() {
       <p>${desde}</p>
       <p>${hasta}</p>
     </div>
-
+  
     <div class="dpr-card dpr-kpi-3m">
-      <h3>Proyección 30 días</h3>
-      <p>${dprMoney(data.proximo_mes)}</p>
+      <h3>Ingreso Esperado en el Periodo</h3>
+      <p>${dprMoney(data.total_periodo || 0)}</p>
     </div>
-
-    <div class="dpr-card dpr-kpi-6m">
-      <h3>Proyección 90 días</h3>
-      <p>${dprMoney(data.proximos_3_meses)}</p>
+  
+    <div class="dpr-card dpr-kpi-recibido">
+      <h3>Ingreso Recibido</h3>
+      <p>${dprMoney(data.pagado_total || 0)}</p>
     </div>
-
+  
     <div class="dpr-card dpr-kpi-facturas">
       <h3>Facturas Pendientes</h3>
       <p>${Number(data.facturas_proyectadas || 0)}</p>
-    </div>
-
-    <div class="dpr-card dpr-kpi-clientes">
-      <h3>Clientes Pendientes</h3>
-      <p>${Number(data.clientes_proyectados || 0)}</p>
-    </div>
-
-    <div class="dpr-card dpr-kpi-ticket">
-      <h3>Ticket Promedio</h3>
-      <p>${dprMoney(data.ticket_promedio_proyectado)}</p>
     </div>
   `;
 }
@@ -392,4 +383,22 @@ async function dprCargarDetalle() {
       <td>${dprMoney(row.pendiente_proyectado)}</td>
     </tr>
   `).join("");
+}
+
+function dprAplicarMesSiguiente() {
+  const hoy = new Date();
+
+  const inicio = new Date(
+    hoy.getFullYear(),
+    hoy.getMonth() + 1,
+    1
+  );
+
+  const fin = new Date(
+    hoy.getFullYear(),
+    hoy.getMonth() + 2,
+    0
+  );
+
+  dprSetRango(inicio, fin);
 }

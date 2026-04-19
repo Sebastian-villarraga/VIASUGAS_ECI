@@ -23,6 +23,8 @@ async function cargarDashboard() {
   await cargarRentabilidad();
   await cargarEstadoFacturacion();
   await cargarTopClientes(); 
+  await cargarGastosOperacionales();
+  
 }
 
 // =========================
@@ -75,40 +77,23 @@ function renderKPIs(data) {
       <h3>Periodo Consultado</h3>
       <p class="small-kpi">${desde}<br>${hasta}</p>
     </div>
-
-    <div class="card ingreso">
-      <h3>Ingresos Totales</h3>
-      <p>${formatearMoneda(data.ingresos)}</p>
-    </div>
-
-    <div class="card egreso">
-      <h3>Egresos Totales</h3>
-      <p>${formatearMoneda(data.egresos)}</p>
-    </div>
-
-    <div class="card utilidad">
-      <h3>Utilidad Neta</h3>
-      <p>${formatearMoneda(data.utilidad)}</p>
-    </div>
-
-    <div class="card margen">
-      <h3>Margen Rentabilidad</h3>
-      <p>${Number(data.margen || 0).toFixed(1)}%</p>
-    </div>
-
-    <div class="card viajes">
-      <h3>Total Viajes</h3>
-      <p>${data.viajes}</p>
-    </div>
-
+    
     <div class="card facturas">
       <h3>Estado Facturación</h3>
     
       <p class="facturas-kpi">
         Total facturado:
         ${formatearMoneda(data.facturas.totalFacturado)}
-        <br><br>
+        <br>
     
+     
+      </p>
+    </div>
+    
+    <div class="card viajes">
+      <h3>Facturacion pendiente</h3>
+      <p>
+          
         Manifiestos facturados:
         ${data.facturas.facturados}
     
@@ -118,11 +103,55 @@ function renderKPIs(data) {
         ${data.facturas.pendientes}
       </p>
     </div>
+    
+    <div class="card viajes">
+      <h3>Total Viajes</h3>
+      <p>${data.viajes}</p>
+    </div>
 
+    <div class="card ingreso">
+      <h3>Balance</h3>
+      <p>Ingreso total manifiesto: ${formatearMoneda(data.ingresos)}</p>
+      <p>Egreso total manifiesto: ${formatearMoneda(data.egresos)}</p>
+    </div>
+    
+    <div class="card utilidad">
+      <h3>Utilidad Bruta</h3>
+      <p>${formatearMoneda(data.utilidad)}</p>
+      <p>
+        Margen bruto: 
+        ${Number(data.ingresos || 0) > 0
+          ? ((Number(data.utilidad || 0) / Number(data.ingresos)) * 100).toFixed(1)
+          : "0.0"}%
+      </p>
+    </div>
+    
     <div class="card operacional">
       <h3>Gastos Operacionales</h3>
       <p>${formatearMoneda(data.gastosOperacionales)}</p>
     </div>
+    
+    <div class="card operacional">
+      <h3>Utilidad Neta</h3>
+      <p>
+        ${formatearMoneda(
+          Number(data.utilidad || 0) - Number(data.gastosOperacionales || 0)
+        )}
+      </p>
+      <p>
+        Margen neto:
+        ${Number(data.ingresos || 0) > 0
+          ? (
+              (
+                (Number(data.utilidad || 0) -
+                  Number(data.gastosOperacionales || 0)) /
+                Number(data.ingresos)
+              ) * 100
+            ).toFixed(1)
+          : "0.0"}%
+      </p>
+    </div>
+    
   `;
 }
 
@@ -635,4 +664,66 @@ function aplicarFiltroEsteMesPorDefecto() {
   );
 
   setFiltroFechas(desde, hasta);
+}
+
+
+
+async function cargarGastosOperacionales() {
+  try {
+
+    const query = getQueryFiltro();
+
+    const data = await apiFetch(
+      `/api/dashboard/gastos-operacionales${query}`
+    );
+
+    renderTablaGastosOperacionales(data);
+
+  } catch (error) {
+    console.error("Error gastos operacionales:", error);
+  }
+}
+
+function renderTablaGastosOperacionales(data) {
+
+  const tbody = document.getElementById(
+    "tablaGastosOperacionales"
+  );
+
+  const tfoot = document.getElementById(
+    "tablaGastosOperacionalesTotal"
+  );
+
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+  tfoot.innerHTML = "";
+
+  let total = 0;
+
+  data.forEach(row => {
+
+    const valor = Number(row.valor || 0);
+    total += valor;
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${formatearFechaSafe(row.fecha)}</td>
+      <td>${row.categoria || "-"}</td>
+      <td>${row.banco || "-"}</td>
+      <td>${formatearMoneda(valor)}</td>
+      <td>${row.descripcion || "-"}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+
+  tfoot.innerHTML = `
+    <tr>
+      <td colspan="3"><strong>TOTAL</strong></td>
+      <td>${formatearMoneda(total)}</td>
+      <td></td>
+    </tr>
+  `;
 }

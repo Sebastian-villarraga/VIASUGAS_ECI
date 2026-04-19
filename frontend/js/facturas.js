@@ -179,6 +179,7 @@ function renderFacturas(data) {
       <tr>
         <td>${f.codigo_factura || "-"}</td>
         <td>${f.id_manifiesto || "-"} - ${f.cliente_nombre || ""}</td>
+        <td>${f.empresa_a_cargo_nombre || "-"}</td>
         <td>${f.fecha_emision ? formatearFechaDesdeUTC(f.fecha_emision) : "-"}</td>
         <td>${f.fecha_vencimiento ? formatearFechaDesdeUTC(f.fecha_vencimiento) : "-"}</td>
         <td>$${valor.toLocaleString()}</td>
@@ -188,7 +189,7 @@ function renderFacturas(data) {
         <td>$${saldo.toLocaleString()}</td>
         <td>${estadoHTML}</td>
       </tr>
-    `;
+      `;
   });
 
   const porcentajeCobro = totalFacturado > 0

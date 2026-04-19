@@ -372,6 +372,7 @@ function renderTablaManifiestos(data) {
       <td>${m.id_manifiesto}</td>
       <td>${safe(m.radicado)}</td>
       <td>${m.fecha ? formatearFechaSafe(m.fecha) : "-"}</td>
+      <td>${safe(m.empresa_a_cargo_nombre) || safe(m.id_empresa_a_cargo)}</td>
       <td>${safe(m.cliente_nombre) || safe(m.id_cliente)}</td>
       <td>${m.conductor_nombre || m.id_conductor}</td>
       <td>${m.origen_ciudad} -> ${m.destino_ciudad}</td>

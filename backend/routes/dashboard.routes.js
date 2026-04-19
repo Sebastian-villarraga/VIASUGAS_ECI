@@ -7,18 +7,19 @@ const {
   getIngresosEgresos,
   getGastosPorCategoria,
   getEstadoFacturacion,
-  getTopClientes
+  getTopClientes,
+  getGastosOperacionales
 } = require("../controllers/dashboard.controller");
 
 // =========================
 // DASHBOARD
 // =========================
-
 router.get("/kpi", getDashboardKPI);
 router.get("/rentabilidad", getRentabilidad);
 router.get("/grafica-ingresos-egresos", getIngresosEgresos);
 router.get("/gastos-categoria", getGastosPorCategoria);
 router.get("/estado-facturacion", getEstadoFacturacion);
 router.get("/top-clientes", getTopClientes);
+router.get("/gastos-operacionales", getGastosOperacionales);
 
 module.exports = router;

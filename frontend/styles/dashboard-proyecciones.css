@@ -43,10 +43,9 @@
 .dpr-toolbar{
   display:grid;
   grid-template-columns:
-    auto auto 110px
-    auto auto auto auto
-    auto auto auto;
+    repeat(11, minmax(105px, 1fr));
   gap:10px;
+  align-items:center;
 }
 
 .dpr-toolbar-bottom{

@@ -103,21 +103,9 @@ const getDashboardProyeccionesKPI = async (req, res) => {
       ${getBaseProjectionQuery()}
 
       SELECT
-        COALESCE(SUM(
-          CASE
-            WHEN fecha_vencimiento <= CURRENT_DATE + INTERVAL '30 day'
-            THEN pendiente_proyectado
-            ELSE 0
-          END
-        ),0) AS proximo_mes,
+        COALESCE(SUM(valor_neto),0) AS total_periodo,
 
-        COALESCE(SUM(
-          CASE
-            WHEN fecha_vencimiento <= CURRENT_DATE + INTERVAL '90 day'
-            THEN pendiente_proyectado
-            ELSE 0
-          END
-        ),0) AS proximos_3_meses,
+        COALESCE(SUM(pagado),0) AS pagado_total,
 
         COUNT(*) FILTER (
           WHERE pendiente_proyectado > 0
@@ -137,13 +125,13 @@ const getDashboardProyeccionesKPI = async (req, res) => {
         ) AS ticket_promedio_proyectado
 
       FROM proyeccion
-      WHERE pendiente_proyectado > 0
     `, [desde, hasta]);
 
     res.json(result.rows[0]);
 
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       error: "Error KPI proyecciones"
     });

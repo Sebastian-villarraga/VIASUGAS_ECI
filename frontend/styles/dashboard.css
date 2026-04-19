@@ -418,31 +418,87 @@
 }
 
 /* =====================================
-FIX CARD #7 ESTADO FACTURACIÓN
+FIX CARD #3 ESTADO FACTURACIÓN
 Pegar al FINAL de dashboard.css
 ===================================== */
 
 /* Card #7 */
-#cardsDashboard .card:nth-child(7) p{
-  font-size:15px !important;
+#cardsDashboard .card:nth-child(3) p{
+  font-size:16px !important;
   line-height:1.45 !important;
   font-weight:700 !important;
   white-space:normal !important;
 }
 
 /* título más limpio */
-#cardsDashboard .card:nth-child(7) h3{
+#cardsDashboard .card:nth-child(3) h3{
   font-size:12px !important;
   margin-bottom:10px !important;
 }
 
 /* responsive */
 @media(max-width:768px){
-  #cardsDashboard .card:nth-child(7) p{
-    font-size:14px !important;
+  #cardsDashboard .card:nth-child(3) p{
+    font-size:16px !important;
     line-height:1.4 !important;
   }
 }
+
+/* =====================================
+FIX CARD #2 ESTADO FACTURACIÓN
+Pegar al FINAL de dashboard.css
+===================================== */
+
+/* Card #7 */
+#cardsDashboard .card:nth-child(2) p{
+  font-size:16px !important;
+  line-height:1.45 !important;
+  font-weight:700 !important;
+  white-space:normal !important;
+}
+
+/* título más limpio */
+#cardsDashboard .card:nth-child(2) h3{
+  font-size:12px !important;
+  margin-bottom:10px !important;
+}
+
+/* responsive */
+@media(max-width:768px){
+  #cardsDashboard .card:nth-child(2) p{
+    font-size:16px !important;
+    line-height:1.4 !important;
+  }
+}
+
+/* =====================================
+FIX CARD #5 ESTADO FACTURACIÓN
+Pegar al FINAL de dashboard.css
+===================================== */
+
+/* Card #7 */
+#cardsDashboard .card:nth-child(5) p{
+  font-size:16px !important;
+  line-height:1.45 !important;
+  font-weight:700 !important;
+  white-space:normal !important;
+}
+
+/* título más limpio */
+#cardsDashboard .card:nth-child(5) h3{
+  font-size:12px !important;
+  margin-bottom:10px !important;
+}
+
+/* responsive */
+@media(max-width:768px){
+  #cardsDashboard .card:nth-child(5) p{
+    font-size:16px !important;
+    line-height:1.4 !important;
+  }
+}
+
+
 
 
 /* ==========================================

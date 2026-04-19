@@ -698,3 +698,35 @@
   }
 
 }
+
+/* =====================================
+   TABLA DINÁMICA RESPONSIVE
+===================================== */
+
+.mfx-table{
+  width:100%;
+  min-width:100%;
+  table-layout:auto;
+}
+
+.mfx-table th{
+  font-size:clamp(10px, 0.75vw, 12px);
+  padding:8px 10px;
+  white-space:nowrap;
+}
+
+.mfx-table td{
+  font-size:clamp(10px, 0.72vw, 12px);
+  padding:8px 10px;
+  white-space:nowrap;
+}
+
+.mfx-table-scroll{
+  width:100%;
+  overflow-x:auto;
+}
+
+.estado-manifiesto,
+.novedad-badge{
+  font-size:clamp(9px,0.7vw,11px);
+}
