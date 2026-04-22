@@ -213,11 +213,34 @@ function setActiveMenu(view) {
 function initApp() {
   console.log("App iniciando...");
 
+  // =========================
   // AUTH
+  // =========================
   if (typeof checkAuth === "function") {
     checkAuth();
   }
 
+  // =========================
+  // SET USER NAME (TOPBAR)
+  // =========================
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (user && user.correo) {
+      const nombre = user.correo.split("@")[0];
+
+      const span = document.getElementById("userName");
+      if (span) {
+        span.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+      }
+    }
+  } catch (err) {
+    console.error("Error obteniendo usuario:", err);
+  }
+
+  // =========================
+  // ROUTING INICIAL
+  // =========================
   let view = window.location.hash.replace("#", "");
 
   if (!view) {
@@ -227,7 +250,6 @@ function initApp() {
 
   loadView(view);
 }
-
 // =========================
 // DOM READY
 // =========================

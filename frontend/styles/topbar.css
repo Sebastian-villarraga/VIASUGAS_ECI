@@ -1,6 +1,6 @@
-/* ========================= */
-/* TOPBAR */
-/* ========================= */
+/* =========================
+   TOPBAR
+========================= */
 
 .topbar {
   position: fixed;
@@ -13,7 +13,7 @@
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* ?? clave */
 
   padding: 0 20px;
   color: white;
@@ -21,50 +21,61 @@
   z-index: 1000;
 }
 
-/* IZQUIERDA */
+/* =========================
+   IZQUIERDA (LOGO)
+========================= */
 .topbar-left {
   display: flex;
   align-items: center;
-  
   height: 100%;
-  padding: 0;
-  z-index: 1001; /* ?? encima pero controlado */
 }
 
-/* CENTRO */
+/* =========================
+   CENTRO (OPCIONAL)
+========================= */
 .topbar-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* DERECHA */
+/* =========================
+   DERECHA (USUARIO)
+========================= */
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 15px;
-  width: 25%;
+  gap: 12px;
 }
 
-/* ?? LOGO GRANDE BIEN HECHO */
+/* =========================
+   LOGO
+========================= */
 .logo-main {
-  height: 30px;   /* ?? tamaño visual */
+  height: 30px;
   width: auto;
-
-  max-height: 40px;
-
   object-fit: contain;
-
-  pointer-events: none; /* ?? NO BLOQUEA CLICK */
+  pointer-events: none;
 }
-/* PERFIL */
+
+/* =========================
+   PERFIL
+========================= */
 .profile {
   display: flex;
   align-items: center;
+  gap: 6px;
   font-size: 14px;
 }
 
-/* BOTÓN */
+/* nombre usuario */
+.profile span {
+  text-transform: capitalize;
+}
+
+/* =========================
+   BOTÓN SALIR
+========================= */
 .logout-btn {
   background: #e74c3c;
   border: none;
@@ -76,4 +87,31 @@
 
 .logout-btn:hover {
   background: #c0392b;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+
+  .topbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .topbar-left {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .topbar-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile {
+    font-size: 13px;
+  }
 }

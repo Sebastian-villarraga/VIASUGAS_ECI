@@ -274,3 +274,15 @@ function initPasswordValidation() {
   pass1.addEventListener("input", validar);
   pass2.addEventListener("input", validar);
 }
+
+
+function setUserName() {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!user || !user.correo) return;
+
+  const nombre = user.correo.split("@")[0];
+
+  const span = document.getElementById("userName");
+  if (span) span.textContent = nombre;
+}
