@@ -52,6 +52,8 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 const dashboardContableRoutes = require("./routes/dashboardContable.routes");
 const dashboardCarteraRoutes = require("./routes/dashboardCartera.routes");
 const dashboardProyeccionesRoutes = require("./routes/dashboardProyecciones.routes");
+const usuariosRoutes = require("./routes/usuarios.routes");
+const permisosRoutes = require("./routes/permisos.routes");
 
 
 app.use("/api", authRoutes);
@@ -73,6 +75,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/dashboard-contable", dashboardContableRoutes);
 app.use("/api/dashboard-cartera", dashboardCarteraRoutes);
 app.use("/api/dashboard-proyecciones", dashboardProyeccionesRoutes);
+app.use("/api/usuarios", usuariosRoutes);
+app.use("/api/permisos", permisosRoutes);
 
 // =====================
 // HEALTH CHECKS

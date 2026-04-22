@@ -82,6 +82,7 @@ CREATE TABLE usuario (
     correo VARCHAR UNIQUE,
     contrasena_hash VARCHAR,
     activo BOOLEAN,
+    debe_cambiar_contrasena BOOLEAN DEFAULT TRUE,
     creado TIMESTAMP,
     actualizado TIMESTAMP
 );

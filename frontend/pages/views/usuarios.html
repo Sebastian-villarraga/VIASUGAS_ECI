@@ -1,0 +1,80 @@
+<div id="us-container">
+
+  <div class="us-layout">
+
+    <!-- ========================= -->
+    <!-- IZQUIERDA -->
+    <!-- ========================= -->
+    <section class="us-left-card">
+
+      <h2 id="us-title">Gestión de Usuarios</h2>
+
+      <div class="us-field">
+        <label for="us-id">ID</label>
+        <input type="text" id="us-id" placeholder="Ej: US5">
+      </div>
+
+      <div class="us-field">
+        <label for="us-nombre">Nombre</label>
+        <input type="text" id="us-nombre" placeholder="Nombre completo">
+      </div>
+
+      <div class="us-field">
+        <label for="us-correo">Correo</label>
+        <input type="email" id="us-correo" placeholder="correo@empresa.com">
+      </div>
+
+      <div class="us-field">
+        <label>Permisos</label>
+        <div id="us-permisos" class="us-permisos-box">
+          <span style="color:#9ca3af;">Cargando permisos...</span>
+        </div>
+      </div>
+
+      <button id="us-guardar" class="us-btn us-btn-primary">
+        Crear Usuario
+      </button>
+
+    </section>
+
+    <!-- ========================= -->
+    <!-- DERECHA -->
+    <!-- ========================= -->
+    <section class="us-right-card">
+
+      <h3>Usuarios registrados</h3>
+
+      <div class="us-table-card">
+
+        <div class="us-table-scroll">
+
+          <table class="us-table">
+
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+
+            <tbody id="us-body">
+              <tr>
+                <td colspan="4" style="text-align:center; color:#9ca3af;">
+                  Cargando usuarios...
+                </td>
+              </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>

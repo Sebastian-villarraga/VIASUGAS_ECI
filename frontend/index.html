@@ -14,7 +14,7 @@
 
   <!-- Fondo -->
   <div class="background"></div>
-,
+
   <!-- Contenedor -->
   <div class="main-container">
 
@@ -29,7 +29,7 @@
           class="logo-viasugas"
         >
       </div>
-   
+
       <!-- Formulario -->
       <form id="loginForm">
 
@@ -41,10 +41,12 @@
         <div class="password-container">
           <input type="password" id="password" placeholder="********" required>
 
-          <img src="/assets/images/ojo.png" 
-               id="togglePassword" 
-               class="eye-icon" 
-               alt="Ver contraseña">
+          <img 
+            src="/assets/images/ojo.png" 
+            id="togglePassword" 
+            class="eye-icon" 
+            alt="Ver contraseña"
+          >
         </div>
 
         <div class="forgot">
@@ -59,19 +61,48 @@
 
   </div>
 
-  <!-- JS (ORDEN IMPORTANTE) -->
+  <!-- ========================= -->
+  <!-- 🔥 MODAL CAMBIO PASSWORD -->
+  <!-- ========================= -->
+  <div id="modal-password" class="modal hidden" style="z-index: 999999;">
+    <div class="modal-content">
+  
+      <h3>Cambiar contraseña</h3>
+      <p>Debes cambiar tu contraseña para continuar</p>
+  
+      <div class="input-group">
+        <input type="password" id="new-password" placeholder="Nueva contraseña">
+        <span class="eye" onclick="togglePass('new-password', this)">👁️</span>
+      </div>
+      
+      <div class="input-group">
+        <input type="password" id="confirm-password" placeholder="Confirmar contraseña">
+        <span class="eye" onclick="togglePass('confirm-password', this)">👁️</span>
+      </div>
+  
+      <button type="button" onclick="guardarNuevaPassword()">
+        Guardar
+      </button>
+  
+    </div>
+  </div>
+
+  <!-- JS -->
   <script src="/js/api.js"></script>
   <script src="/js/auth.js"></script>
 
-  <!-- INIT LOGIN -->
+  <!-- INIT -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      if (typeof checkAuth === "function") {
+        checkAuth(); // 🔥 IMPORTANTE
+      }
+
       if (typeof initLogin === "function") {
         initLogin();
       }
     });
   </script>
-  
 
 </body>
 </html>

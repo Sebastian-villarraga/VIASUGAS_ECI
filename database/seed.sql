@@ -148,3 +148,84 @@ INSERT INTO transaccion VALUES
 INSERT INTO gastos_conductor VALUES
 ('GC1','TRX2',109668745,'MF1001','Combustible conductor',NOW()),
 ('GC2','TRX3',79854489,'MF1002','Peajes conductor',NOW());
+
+
+-- =====================================================
+-- USUARIOS 
+-- =====================================================
+
+INSERT INTO usuario (
+    id,
+    nombre,
+    correo,
+    contrasena_hash,
+    activo,
+    debe_cambiar_contrasena,
+    creado
+) VALUES
+('US1', 'Santiago Carrillo', 'gerente@viasugas.com', '$2b$10$DNgjGZhmUKNzmHo6AeUQfeZXVK/3arkSrPL16Bg1lq5kecIsoqA3e', TRUE, FALSE, NOW()),
+('US2', 'Violeta Perez', 'operador@viasugas.com', '$2b$10$zv43ZYLyGjSvUs/3pvMQuOTojF.VlnA56ElmAkwAMwu2lPDZkymJG', TRUE, TRUE, NOW()),
+('US3', 'Andres Martines', 'contable@viasugas.com', '$2b$10$u6uJ2V0PeXrI7/adKqcRyuLpBBmx6FOOFZnaAg99ram40IH8BihUe', TRUE, TRUE, NOW()),
+('US4', 'Sandra Lopez', 'supervisor@viasugas.com', '$2b$10$E1a4Wj/DQ7BhfFLhCLX5KeETqpbQp5do2H01e449j2O1IzcQ3ax/q', TRUE, TRUE, NOW());
+
+-- =====================================================
+-- PERMISOS
+-- =====================================================
+
+INSERT INTO permiso (id, codigo, nombre, descripcion) VALUES
+('P1','manifiestos', 'Manifiestos', 'Acceso a manifiestos'),
+('P2','vehiculos', 'Vehiculos', 'Acceso a vehiculos'),
+('P3','trailer', 'Trailer', 'Acceso a trailer'),
+('P4','propietarios', 'Propietarios', 'Acceso a propietarios'),
+('P5','conductores', 'Conductores', 'Acceso a conductores'),
+('P6','clientes', 'Clientes', 'Acceso a clientes'),
+('P7','empresas-a-cargo', 'Terceros', 'Acceso a terceros'),
+('P8','bancos', 'Bancos', 'Acceso a bancos'),
+('P9','tipo-transaccion', 'Categoria gastos', 'Acceso a categorias de gasto'),
+('P10','transacciones', 'Transacciones', 'Acceso a transacciones'),
+('P11','gastos-conductor', 'Gastos conductor', 'Acceso a gastos de conductor'),
+('P12','registro-conductor', 'Registro conductor', 'Acceso a registro de conductor'),
+('P13','facturas', 'Facturas', 'Acceso a facturas'),
+('P14','dashboard', 'Gerencial', 'Acceso a dashboard gerencial'),
+('P15','dashboard-contable', 'Contable', 'Acceso a dashboard contable'),
+('P16','dashboard-cartera', 'Cartera', 'Acceso a dashboard cartera'),
+('P17','dashboard-proyecciones', 'Proyecciones', 'Acceso a proyecciones'),
+('P18','usuarios', 'Usuarios', 'Gestion de usuarios'),
+('P19','auditoria', 'Auditoria', 'Acceso a auditoria'),
+('P20', 'admin', 'Administrador', 'Acceso total');
+
+-- =====================================================
+-- USUARIO PERMISO
+-- =====================================================
+
+INSERT INTO usuario_permiso (id_usuario, id_permiso)
+SELECT 'US1', id FROM permiso;
+
+INSERT INTO usuario_permiso (id_usuario, id_permiso)
+SELECT 'US2', id FROM permiso WHERE codigo IN (
+'manifiestos',
+'vehiculos',
+'trailer',
+'conductores',
+'clientes',
+'empresas-a-cargo',
+'gastos-conductor'
+);
+
+INSERT INTO usuario_permiso (id_usuario, id_permiso)
+SELECT 'US3', id FROM permiso WHERE codigo IN (
+'bancos',
+'tipo-transaccion',
+'transacciones',
+'facturas',
+'dashboard-contable',
+'dashboard-cartera'
+);
+
+INSERT INTO usuario_permiso (id_usuario, id_permiso)
+SELECT 'US4', id FROM permiso WHERE codigo IN (
+'manifiestos',
+'gastos-conductor',
+'dashboard',
+'dashboard-proyecciones'
+);
