@@ -89,22 +89,79 @@ function renderPermisos(permisosSeleccionados = []) {
     return;
   }
 
+  // =========================
+  // ? FILTRAR
+  // =========================
+  const permisosFiltrados = permisosDisponibles.filter(p =>
+    p.codigo !== "admin" &&
+    p.codigo !== "usuarios"
+  );
+
+  // =========================
+  // ?? AGRUPAR
+  // =========================
+  const grupos = {
+    "Flota": [
+      "vehiculos",
+      "trailer",
+      "propietarios",
+      "conductores",
+      "clientes",
+      "empresas-a-cargo"
+    ],
+    "Finanzas": [
+      "bancos",
+      "tipo-transaccion",
+      "transacciones",
+      "gastos-conductor",
+      "registro-conductor",
+      "facturas"
+    ],
+    "Reportes": [
+      "dashboard",
+      "dashboard-contable",
+      "dashboard-cartera",
+      "dashboard-proyecciones"
+    ],
+    "Otros": [
+      "manifiestos",
+      "auditoria"
+    ]
+  };
+
+  // =========================
+  // ?? RENDER
+  // =========================
   let html = "";
 
-  permisosDisponibles.forEach(p => {
-    const checked = permisosSeleccionados.includes(p.codigo) ? "checked" : "";
+  Object.entries(grupos).forEach(([titulo, codigos]) => {
 
-    html += `
-      <label class="us-check">
-        <input type="checkbox" value="${p.codigo}" ${checked}>
-        <span>${p.nombre}</span>
-      </label>
-    `;
+    // filtrar permisos que existan
+    const items = permisosFiltrados.filter(p =>
+      codigos.includes(p.codigo)
+    );
+
+    if (!items.length) return;
+
+    // título
+    html += `<div class="us-perm-section">${titulo}</div>`;
+
+    // items
+    items.forEach(p => {
+      const checked = permisosSeleccionados.includes(p.codigo) ? "checked" : "";
+
+      html += `
+        <label class="us-check">
+          <input type="checkbox" value="${p.codigo}" ${checked}>
+          <span>${p.nombre}</span>
+        </label>
+      `;
+    });
+
   });
 
   container.innerHTML = html;
 }
-
 // =========================
 // OBTENER PERMISOS CHECKED
 // =========================
