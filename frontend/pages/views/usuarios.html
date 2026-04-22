@@ -10,18 +10,32 @@
       <h2 id="us-title">Gestión de Usuarios</h2>
 
       <div class="us-field">
-        <label for="us-id">ID</label>
-        <input type="text" id="us-id" placeholder="Ej: US5">
+        <label for="us-id">Cédula</label>
+        <input 
+          type="text" 
+          id="us-id" 
+          placeholder="Ej: 123456789"
+          inputmode="numeric"
+          pattern="[0-9]*"
+        />
       </div>
 
       <div class="us-field">
         <label for="us-nombre">Nombre</label>
-        <input type="text" id="us-nombre" placeholder="Nombre completo">
+        <input 
+          type="text" 
+          id="us-nombre" 
+          placeholder="Nombre completo"
+        />
       </div>
 
       <div class="us-field">
         <label for="us-correo">Correo</label>
-        <input type="email" id="us-correo" placeholder="correo@empresa.com">
+        <input 
+          type="email" 
+          id="us-correo" 
+          placeholder="correo@empresa.com"
+        />
       </div>
 
       <div class="us-field">
@@ -77,4 +91,21 @@
 
   </div>
 
+</div>
+
+
+<div id="modal-permisos" class="drx-modal hidden">
+  <div class="drx-modal-box">
+
+    <h3>Editar permisos</h3>
+
+    <div id="perm-container" class="us-permisos-box"></div>
+
+    <div class="drx-modal-actions">
+      <button class="drx-btn drx-btn-primary" onclick="guardarPermisos()">
+        Guardar cambios
+      </button>
+    </div>
+
+  </div>
 </div>

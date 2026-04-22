@@ -207,10 +207,48 @@ const cambiarPassword = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // obtener correo
+    const result = await pool.query(
+      `SELECT correo FROM usuario WHERE id = $1`,
+      [id]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const correo = result.rows[0].correo;
+
+    // password = antes del @
+    const passwordPlano = correo.split("@")[0];
+
+    const hash = await bcrypt.hash(passwordPlano, 10);
+
+    await pool.query(`
+      UPDATE usuario
+      SET contrasena_hash = $1,
+          debe_cambiar_contrasena = TRUE,
+          actualizado = NOW()
+      WHERE id = $2
+    `, [hash, id]);
+
+    res.json({ message: "Contraseña restablecida" });
+
+  } catch (error) {
+    console.error("Error resetPassword:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getUsuarios,
   createUsuario,
   updateUsuario,
   toggleUsuario,
-  cambiarPassword 
+  cambiarPassword,
+  resetPassword
 };

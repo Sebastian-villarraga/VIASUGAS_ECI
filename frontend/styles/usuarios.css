@@ -213,6 +213,11 @@
   letter-spacing: 0.5px;
 }
 
+.us-btn-primary {
+  background: #2563eb;
+  color: white;
+}
+
 /* =========================
    RESPONSIVE
 ========================= */

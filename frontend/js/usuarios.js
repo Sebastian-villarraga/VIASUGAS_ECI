@@ -1,5 +1,6 @@
 let usuarios = [];
 let permisosDisponibles = [];
+let usuarioEditando = null;
 
 // =========================
 // INIT
@@ -19,8 +20,24 @@ async function initUsuarios() {
 function eventosUsuarios() {
 
   const btnGuardar = document.getElementById("us-guardar");
+  const inputCedula = document.getElementById("us-id");
+  const inputNombre = document.getElementById("us-nombre");
 
   if (!btnGuardar) return;
+
+  // ? SOLO N⁄MEROS (C…DULA)
+  if (inputCedula) {
+    inputCedula.addEventListener("input", () => {
+      inputCedula.value = inputCedula.value.replace(/\D/g, "");
+    });
+  }
+
+  // ? SOLO LETRAS (NOMBRE)
+  if (inputNombre) {
+    inputNombre.addEventListener("input", () => {
+      inputNombre.value = inputNombre.value.replace(/[^a-zA-Z·ÈÌÛ˙¡…Õ”⁄Ò—\s]/g, "");
+    });
+  }
 
   btnGuardar.addEventListener("click", async () => {
 
@@ -28,8 +45,26 @@ function eventosUsuarios() {
     const nombre = document.getElementById("us-nombre")?.value.trim();
     const correo = document.getElementById("us-correo")?.value.trim();
 
+    // =========================
+    // VALIDACIONES
+    // =========================
     if (!id || !nombre || !correo) {
-      alert("Completa todos los campos");
+      showToast("Todos los campos son obligatorios", "error");
+      return;
+    }
+
+    if (!/^\d+$/.test(id)) {
+      showToast("La cÈdula debe contener solo n˙meros", "error");
+      return;
+    }
+
+    if (!/^[a-zA-Z·ÈÌÛ˙¡…Õ”⁄Ò—\s]+$/.test(nombre)) {
+      showToast("El nombre solo puede contener letras", "error");
+      return;
+    }
+
+    if (!esCorreoValido(correo)) {
+      showToast("Correo inv·lido", "error");
       return;
     }
 
@@ -41,11 +76,14 @@ function eventosUsuarios() {
         body: JSON.stringify({ id, nombre, correo, permisos })
       });
 
+      showToast("Usuario creado correctamente", "success");
+
       limpiarForm();
       await cargarUsuarios();
 
     } catch (err) {
       console.error("Error creando usuario:", err);
+      showToast("Error creando usuario", "error");
     }
   });
 }
@@ -209,12 +247,31 @@ function renderTabla() {
         <td>${u.correo}</td>
         <td>${estadoBadge}</td>
         <td>
-          <button 
-            class="us-btn-action ${u.activo ? 'us-btn-danger' : 'us-btn-success'}"
-            onclick="toggleUsuario('${u.id}')"
-          >
-            ${u.activo ? "Desactivar" : "Activar"}
-          </button>
+          <div class="us-actions">
+
+            <button 
+              class="us-btn-action"
+              style="background:#6b7280; color:white;"
+              onclick="abrirPermisos('${u.id}')"
+            >
+              Permisos
+            </button>
+          
+            <button 
+              class="us-btn-action us-btn-primary"
+              onclick="resetPassword('${u.id}')"
+            >
+              Restablecer
+            </button>
+          
+            <button 
+              class="us-btn-action ${u.activo ? 'us-btn-danger' : 'us-btn-success'}"
+              onclick="toggleUsuario('${u.id}')"
+            >
+              ${u.activo ? "Desactivar" : "Activar"}
+            </button>
+          
+          </div>
         </td>
       </tr>
     `;
@@ -250,4 +307,139 @@ function limpiarForm() {
   document
     .querySelectorAll("#us-permisos input")
     .forEach(c => c.checked = false);
+}
+
+// =========================
+// RESTABLECER CONTRASE—A
+// =========================
+async function resetPassword(id) {
+  if (!confirm("øRestablecer contraseÒa de este usuario?")) return;
+
+  try {
+    await apiFetch(`/api/usuarios/${id}/reset-password`, {
+      method: "POST"
+    });
+
+    showToast("ContraseÒa restablecida correctamente", "success");
+
+  } catch (err) {
+    console.error("Error reset password:", err);
+    showToast("Error al restablecer contraseÒa", "error");
+  }
+}
+
+// =========================
+// ABRIR PERMISOS
+// =========================
+function abrirPermisos(id) {
+
+  const usuario = usuarios.find(u => u.id === id);
+  if (!usuario) return;
+
+  usuarioEditando = usuario;
+
+  const modal = document.getElementById("modal-permisos");
+  const container = document.getElementById("perm-container");
+
+  if (!modal || !container) return;
+
+  modal.classList.remove("hidden");
+
+  // render permisos con selecciÛn actual
+  renderPermisosUsuario(usuario.permisos || []);
+}
+
+// =========================
+// RENDER PERMISOS
+// =========================
+function renderPermisosUsuario(permisosSeleccionados = []) {
+
+  const container = document.getElementById("perm-container");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  // quitar admin y usuarios
+  const permisosFiltrados = permisosDisponibles.filter(p =>
+    p.codigo !== "admin" &&
+    p.codigo !== "usuarios"
+  );
+
+  let html = "";
+
+  permisosFiltrados.forEach(p => {
+
+    const checked = permisosSeleccionados.includes(p.codigo)
+      ? "checked"
+      : "";
+
+    html += `
+      <label class="us-check">
+        <input type="checkbox" value="${p.codigo}" ${checked}>
+        <span>${p.nombre}</span>
+      </label>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// =========================
+// GUARDAR PERMISOS
+// =========================
+async function guardarPermisos() {
+
+  if (!usuarioEditando) return;
+
+  const container = document.getElementById("perm-container");
+  if (!container) return;
+
+  const checks = container.querySelectorAll("input:checked");
+  const permisos = Array.from(checks).map(c => c.value);
+
+  try {
+
+    await apiFetch(`/api/usuarios/${usuarioEditando.id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        nombre: usuarioEditando.nombre,
+        correo: usuarioEditando.correo,
+        permisos
+      })
+    });
+
+    // ? TOAST VERDE
+    if (typeof showToast === "function") {
+      showToast("Permisos actualizados correctamente", "success");
+    }
+
+    cerrarModalPermisos();
+    await cargarUsuarios();
+
+  } catch (err) {
+    console.error(err);
+
+    // ? TOAST ROJO
+    if (typeof showToast === "function") {
+      showToast("Error actualizando permisos", "error");
+    }
+  }
+}
+
+
+// =========================
+// CERRAR MODAL PERMISOS
+// =========================
+window.cerrarModalPermisos = function () {
+  const modal = document.getElementById("modal-permisos");
+  if (modal) modal.classList.add("hidden");
+
+  usuarioEditando = null;
+};
+
+
+
+
+function esCorreoValido(correo) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
 }

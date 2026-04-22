@@ -9,7 +9,8 @@ const {
   createUsuario,
   updateUsuario,
   toggleUsuario,
-  cambiarPassword
+  cambiarPassword,
+  resetPassword
 } = require("../controllers/usuarios.controller");
 
 // =========================
@@ -21,6 +22,8 @@ router.get("/", getUsuarios);
 
 // Crear
 router.post("/", createUsuario);
+
+router.post("/:id/reset-password", verifyToken, resetPassword);
 
 // ?? Cambiar contraseña (usuario logueado)
 router.post("/cambiar-password", verifyToken, cambiarPassword);
