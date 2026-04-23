@@ -13,7 +13,7 @@ function initLogin() {
     const password = document.getElementById("password")?.value.trim();
 
     if (!email || !password) {
-      alert("Completa todos los campos");
+      showToast("Completa todos los campos", "error");
       return;
     }
 
@@ -22,23 +22,16 @@ function initLogin() {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
-      
-      console.log("DATA LOGIN:", data);
-      console.log("USER:", data.user);
-      console.log("FLAG:", data.user?.debe_cambiar_password);
 
-      // Error backend
       if (!data || data.error) {
-        alert(data?.error || "Credenciales incorrectas");
+        showToast(data?.error || "Credenciales incorrectas", "error");
         return;
       }
 
-      // Guardar sesión
       localStorage.setItem("token", data.token);
       localStorage.setItem("permisos", JSON.stringify(data.permisos || []));
       localStorage.setItem("user", JSON.stringify(data.user || {}));
 
-      // ?? VALIDAR CAMBIO PASSWORD
       if (data.user?.debe_cambiar_password) {
         mostrarModalCambioPassword();
       } else {
@@ -47,13 +40,11 @@ function initLogin() {
 
     } catch (error) {
       console.error("Login error:", error);
-      alert("Error conectando con el servidor");
+      showToast("Error conectando con el servidor", "error");
     }
   });
 
-  // =========================
-  // TOGGLE PASSWORD
-  // =========================
+  // ?? ESTE BLOQUE VA DENTRO DE LA FUNCIÓN
   const toggle = document.getElementById("togglePassword");
   const passwordField = document.getElementById("password");
 
@@ -95,53 +86,39 @@ async function guardarNuevaPassword() {
   const nueva = pass1.value.trim();
   const confirm = pass2.value.trim();
 
-  // limpiar estados visuales
   pass1.classList.remove("input-error", "input-success");
   pass2.classList.remove("input-error", "input-success");
 
-  // =========================
-  // VALIDACIONES
-  // =========================
   if (!nueva || !confirm) {
-    alert("Completa todos los campos");
-
+    showToast("Completa todos los campos", "error");
     pass1.classList.add("input-error");
     pass2.classList.add("input-error");
     return;
   }
 
   if (nueva.length < 6) {
-    alert("La contraseña debe tener al menos 6 caracteres");
-
+    showToast("Mínimo 6 caracteres", "error");
     pass1.classList.add("input-error");
     return;
   }
 
   if (nueva !== confirm) {
-    alert("Las contraseñas no coinciden");
-
+    showToast("Las contraseñas no coinciden", "error");
     pass1.classList.add("input-error");
     pass2.classList.add("input-error");
     return;
   }
 
-  // éxito visual
   pass1.classList.add("input-success");
   pass2.classList.add("input-success");
 
   try {
 
-    // =========================
-    // BLOQUEAR BOTÓN
-    // =========================
     if (btn) {
       btn.disabled = true;
       btn.textContent = "Guardando...";
     }
 
-    // =========================
-    // REQUEST
-    // =========================
     const res = await apiFetch("/api/usuarios/cambiar-password", {
       method: "POST",
       body: JSON.stringify({ password: nueva }),
@@ -151,34 +128,20 @@ async function guardarNuevaPassword() {
       throw new Error(res.error);
     }
 
-    alert("Contraseña actualizada correctamente");
+    showToast("Contraseña actualizada correctamente", "success");
 
-    // =========================
-    // CERRAR MODAL
-    // =========================
-    const modal = document.getElementById("modal-password");
-    if (modal) modal.classList.add("hidden");
+    document.getElementById("modal-password")?.classList.add("hidden");
 
-    // =========================
-    // LIMPIAR CAMPOS
-    // =========================
     pass1.value = "";
     pass2.value = "";
 
-    // =========================
-    // REDIRECCIÓN
-    // =========================
     window.location.href = "/pages/home.html";
 
   } catch (err) {
-    console.error("Error cambiando password:", err);
-    alert(err.message || "Error cambiando contraseña");
+    console.error(err);
+    showToast(err.message || "Error cambiando contraseña", "error");
 
   } finally {
-
-    // =========================
-    // RESTAURAR BOTÓN
-    // =========================
     if (btn) {
       btn.disabled = false;
       btn.textContent = "Guardar";
@@ -236,10 +199,10 @@ function togglePass(id, el) {
 
   if (input.type === "password") {
     input.type = "text";
-    el.textContent = "??";
+    el.style.opacity = "1";
   } else {
     input.type = "password";
-    el.textContent = "???";
+    el.style.opacity = "0.6";
   }
 }
 

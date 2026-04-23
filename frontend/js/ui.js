@@ -4,11 +4,22 @@ function showToast(message, type = "success") {
   if (!toast) return;
 
   toast.innerText = message;
-  toast.className = `toast show ${type}`;
 
-  setTimeout(() => {
+  // reset clases
+  toast.className = "toast";
+
+  // aplicar tipo
+  toast.classList.add("show", type);
+
+  // limpiar anterior timeout
+  if (toast.timeoutId) {
+    clearTimeout(toast.timeoutId);
+  }
+
+  // ocultar después
+  toast.timeoutId = setTimeout(() => {
     toast.classList.remove("show");
-  }, 5000);
+  }, 4000);
 }
 
 // ================= FUNCION GLOBAL PARA FORMATEAR FECHA

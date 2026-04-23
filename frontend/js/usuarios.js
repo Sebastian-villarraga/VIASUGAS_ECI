@@ -1,6 +1,7 @@
 let usuarios = [];
 let permisosDisponibles = [];
 let usuarioEditando = null;
+let usuarioResetId = null;
 
 // =========================
 // INIT
@@ -312,20 +313,54 @@ function limpiarForm() {
 // =========================
 // RESTABLECER CONTRASEÑA
 // =========================
-async function resetPassword(id) {
-  if (!confirm("¿Restablecer contraseña de este usuario?")) return;
+async function confirmarResetPassword() {
+  if (!usuarioResetId) return;
+
+  const modal = document.getElementById("modal-reset");
+  const botones = modal.querySelectorAll("button");
+
+  // ?? desactivar mientras carga
+  botones.forEach(b => b.disabled = true);
 
   try {
-    await apiFetch(`/api/usuarios/${id}/reset-password`, {
+    await apiFetch(`/api/usuarios/${usuarioResetId}/reset-password`, {
       method: "POST"
     });
 
     showToast("Contraseña restablecida correctamente", "success");
 
+    cerrarModalReset();
+
   } catch (err) {
     console.error("Error reset password:", err);
     showToast("Error al restablecer contraseña", "error");
+
+    // ?? reactivar si falla
+    botones.forEach(b => b.disabled = false);
   }
+}
+
+
+
+
+function resetPassword(id) {
+  usuarioResetId = id;
+
+  const usuario = usuarios.find(u => u.id === id);
+
+  const modal = document.getElementById("modal-reset");
+  const text = document.getElementById("reset-text");
+
+  if (!modal || !text) return;
+
+  text.textContent = `¿Restablecer contraseña de ${usuario?.nombre || "este usuario"}?`;
+
+  // ?? FIX CLAVE (esto soluciona tu bug visual)
+  modal.querySelectorAll("button").forEach(btn => {
+    btn.disabled = false;
+  });
+
+  modal.classList.remove("hidden");
 }
 
 // =========================
@@ -437,7 +472,12 @@ window.cerrarModalPermisos = function () {
   usuarioEditando = null;
 };
 
+function cerrarModalReset() {
+  const modal = document.getElementById("modal-reset");
+  if (modal) modal.classList.add("hidden");
 
+  usuarioResetId = null;
+}
 
 
 function esCorreoValido(correo) {

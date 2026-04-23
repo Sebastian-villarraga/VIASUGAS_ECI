@@ -43,9 +43,8 @@
 
           <img 
             src="/assets/images/ojo.png" 
-            id="togglePassword" 
-            class="eye-icon" 
-            alt="Ver contraseña"
+            class="eye-icon"
+            onclick="togglePass('password', this)"
           >
         </div>
 
@@ -72,12 +71,20 @@
   
       <div class="input-group">
         <input type="password" id="new-password" placeholder="Nueva contraseña">
-        <span class="eye" onclick="togglePass('new-password', this)">👁️</span>
+        <img 
+          src="/assets/images/ojo.png" 
+          class="eye-icon"
+          onclick="togglePass('new-password', this)"
+        >
       </div>
       
       <div class="input-group">
         <input type="password" id="confirm-password" placeholder="Confirmar contraseña">
-        <span class="eye" onclick="togglePass('confirm-password', this)">👁️</span>
+        <img 
+          src="/assets/images/ojo.png" 
+          class="eye-icon"
+          onclick="togglePass('confirm-password', this)"
+        >
       </div>
   
       <button type="button" onclick="guardarNuevaPassword()">
@@ -89,18 +96,14 @@
 
   <!-- JS -->
   <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script> 
   <script src="/js/auth.js"></script>
 
   <!-- INIT -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      if (typeof checkAuth === "function") {
-        checkAuth(); // 🔥 IMPORTANTE
-      }
-
-      if (typeof initLogin === "function") {
-        initLogin();
-      }
+      if (typeof checkAuth === "function") checkAuth();
+      if (typeof initLogin === "function") initLogin();
     });
   </script>
 
