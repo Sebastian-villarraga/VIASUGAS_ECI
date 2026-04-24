@@ -241,10 +241,7 @@ body {
   background: #1e3c72;
 }
 
-/* BOTÓN CANCELAR */
-.modal-actions button:not(.btn-primary) {
-  background: #f1f3f6;
-}
+
 
 .modal-actions button:not(.btn-primary):hover {
   background: #e0e6ed;

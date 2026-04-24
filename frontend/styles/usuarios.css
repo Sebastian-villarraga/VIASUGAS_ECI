@@ -220,24 +220,22 @@
 }
 
 /* =========================
-   ?? MODAL 
+   MODAL LIMPIO Y CORREGIDO
 ========================= */
 
 /* overlay */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35); /* ?? MÁS CLARO (clave del problema) */
+  background: rgba(0, 0, 0, 0.35); /* menos oscuro */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
 
-  /* ?? eliminar cualquier blur u opacidad heredada */
   backdrop-filter: none !important;
 }
 
-/* oculto (igual que vehiculos) */
 .modal.hidden {
   display: none !important;
 }
@@ -246,26 +244,20 @@
 .modal-content {
   background: #ffffff;
   width: min(92vw, 420px);
-  max-height: 90vh;
-  overflow-y: auto;
   border-radius: 16px;
   padding: 24px;
-
-  /* misma sombra que vehiculos */
-  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
-
   text-align: center;
+
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
 }
 
 /* textos */
 .modal-content h3 {
-  margin: 0 0 10px;
+  margin-bottom: 10px;
   font-size: 20px;
-  font-weight: 700;
 }
 
 .modal-content p {
-  font-size: 14px;
   color: #6b7280;
   margin-bottom: 18px;
 }
@@ -274,15 +266,14 @@
 .modal-actions {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
 }
 
-/* botones */
+/* botones base */
 .modal-btn {
   flex: 1;
   height: 42px;
-  border: none;
   border-radius: 10px;
+  border: none;
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s ease;
@@ -292,13 +283,13 @@
   transform: translateY(-1px);
 }
 
-/* cancelar (igual que antes) */
+/* cancelar */
 .modal-btn-cancel {
   background: #6b7280;
   color: white;
 }
 
-/* confirmar (igual que antes, SIN degradado raro) */
+/* confirmar */
 .modal-btn-primary {
   background: #2f56a6;
   color: white;
@@ -308,36 +299,33 @@
   background: #24468a;
 }
 
-/* ?? FIX FINAL BOTONES MODAL */
+/* ?? CLAVE: evitar que CSS global dañe los botones */
 .modal-content button {
-  opacity: 1;
-  filter: none;
-}
-
-/* ?? FIX REAL BOTONES DESHABILITADOS */
-.modal-content button:disabled {
   opacity: 1 !important;
   filter: none !important;
+}
 
-  /* ?? FORZAR COLORES */
-  background: #9ca3af !important; /* gris visible */
-  color: #ffffff !important;
+/* ?? SOLO cuando están deshabilitados */
+.modal-content button:disabled {
+  background: #9ca3af !important;
+  color: white !important;
   cursor: not-allowed;
 }
 
-.modal-content button:not(:disabled) {
-  opacity: 1 !important;
+/* ?? OVERRIDE GLOBAL (anti login.css) */
+#us-container .modal-content button {
+  background: unset !important;
 }
 
-/* asegurar colores correctos */
-.modal-btn-cancel {
-  background: #6b7280;
-  color: white;
+/* restablecer estilos correctos */
+#us-container .modal-btn-cancel {
+  background: #6b7280 !important;
+  color: white !important;
 }
 
-.modal-btn-primary {
-  background: #2f56a6;
-  color: white;
+#us-container .modal-btn-primary {
+  background: #2f56a6 !important;
+  color: white !important;
 }
 
 /* =========================

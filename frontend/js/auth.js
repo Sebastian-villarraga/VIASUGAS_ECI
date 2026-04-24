@@ -6,14 +6,44 @@ function initLogin() {
 
   if (!form) return;
 
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const errorBox = document.getElementById("login-error");
+
+  function mostrarError(msg) {
+    if (!errorBox) return;
+
+    errorBox.textContent = msg;
+    errorBox.classList.remove("hidden");
+
+    emailInput.classList.add("input-error");
+    passwordInput.classList.add("input-error");
+  }
+
+  function limpiarError() {
+    if (!errorBox) return;
+
+    errorBox.textContent = "";
+    errorBox.classList.add("hidden");
+
+    emailInput.classList.remove("input-error");
+    passwordInput.classList.remove("input-error");
+  }
+
+  // ?? limpiar error cuando el usuario escribe
+  emailInput?.addEventListener("input", limpiarError);
+  passwordInput?.addEventListener("input", limpiarError);
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById("email")?.value.trim();
-    const password = document.getElementById("password")?.value.trim();
+    limpiarError();
+
+    const email = emailInput?.value.trim();
+    const password = passwordInput?.value.trim();
 
     if (!email || !password) {
-      showToast("Completa todos los campos", "error");
+      mostrarError("Completa todos los campos");
       return;
     }
 
@@ -24,7 +54,7 @@ function initLogin() {
       });
 
       if (!data || data.error) {
-        showToast(data?.error || "Credenciales incorrectas", "error");
+        mostrarError(data?.error || "Credenciales incorrectas");
         return;
       }
 
@@ -39,12 +69,18 @@ function initLogin() {
       }
 
     } catch (error) {
-      console.error("Login error:", error);
-      showToast("Error conectando con el servidor", "error");
-    }
+        console.error("Login error:", error);
+      
+        // ?? si el backend manda mensaje, usarlo
+        if (error?.message && error.message !== "Failed to fetch") {
+          mostrarError(error.message);
+        } else {
+          mostrarError("Credenciales incorrectas");
+        }
+      }
   });
 
-  // ?? ESTE BLOQUE VA DENTRO DE LA FUNCIÓN
+  // toggle password
   const toggle = document.getElementById("togglePassword");
   const passwordField = document.getElementById("password");
 

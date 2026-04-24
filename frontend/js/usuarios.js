@@ -26,7 +26,7 @@ function eventosUsuarios() {
 
   if (!btnGuardar) return;
 
-  // ? SOLO NÚMEROS (CÉDULA)
+  // ? SOLO NUMEROS (CEDULA)
   if (inputCedula) {
     inputCedula.addEventListener("input", () => {
       inputCedula.value = inputCedula.value.replace(/\D/g, "");
@@ -55,7 +55,7 @@ function eventosUsuarios() {
     }
 
     if (!/^\d+$/.test(id)) {
-      showToast("La cédula debe contener solo números", "error");
+      showToast("La cÃ©dula debe contener solo nÃºmeros", "error");
       return;
     }
 
@@ -65,7 +65,7 @@ function eventosUsuarios() {
     }
 
     if (!esCorreoValido(correo)) {
-      showToast("Correo inválido", "error");
+      showToast("Correo invÃ¡lido", "error");
       return;
     }
 
@@ -182,7 +182,7 @@ function renderPermisos(permisosSeleccionados = []) {
 
     if (!items.length) return;
 
-    // título
+    // tÃºtulo
     html += `<div class="us-perm-section">${titulo}</div>`;
 
     // items
@@ -251,8 +251,7 @@ function renderTabla() {
           <div class="us-actions">
 
             <button 
-              class="us-btn-action"
-              style="background:#6b7280; color:white;"
+              class="us-btn-action us-btn-secondary"
               onclick="abrirPermisos('${u.id}')"
             >
               Permisos
@@ -311,7 +310,7 @@ function limpiarForm() {
 }
 
 // =========================
-// RESTABLECER CONTRASEÑA
+// RESTABLECER CONTRASEÃ‘A
 // =========================
 async function confirmarResetPassword() {
   if (!usuarioResetId) return;
@@ -319,27 +318,26 @@ async function confirmarResetPassword() {
   const modal = document.getElementById("modal-reset");
   const botones = modal.querySelectorAll("button");
 
-  // ?? desactivar mientras carga
-  botones.forEach(b => b.disabled = true);
+  // solo evitar doble click (sin daÃ±ar estilos)
+  botones.forEach(b => b.style.pointerEvents = "none");
 
   try {
     await apiFetch(`/api/usuarios/${usuarioResetId}/reset-password`, {
       method: "POST"
     });
 
-    showToast("Contraseña restablecida correctamente", "success");
+    showToast("ContraseÃ±a restablecida correctamente", "success");
 
     cerrarModalReset();
 
   } catch (err) {
     console.error("Error reset password:", err);
-    showToast("Error al restablecer contraseña", "error");
+    showToast("Error al restablecer contraseÃ±a", "error");
 
-    // ?? reactivar si falla
-    botones.forEach(b => b.disabled = false);
+    // reactivar interacciÃ³n
+    botones.forEach(b => b.style.pointerEvents = "auto");
   }
 }
-
 
 
 
@@ -353,16 +351,18 @@ function resetPassword(id) {
 
   if (!modal || !text) return;
 
-  text.textContent = `¿Restablecer contraseña de ${usuario?.nombre || "este usuario"}?`;
+  text.textContent = `Â¿Restablecer contraseÃ±a de ${usuario?.nombre || "este usuario"}?`;
 
-  // ?? FIX CLAVE (esto soluciona tu bug visual)
-  modal.querySelectorAll("button").forEach(btn => {
-    btn.disabled = false;
+  const botones = modal.querySelectorAll("button");
+
+  botones.forEach(btn => {
+    btn.disabled = false;              // ? quitar disabled
+    btn.style.pointerEvents = "auto";  // ? reactivar clicks
+    btn.style.opacity = "1";           // ? forzar visual normal
   });
 
   modal.classList.remove("hidden");
 }
-
 // =========================
 // ABRIR PERMISOS
 // =========================
@@ -380,7 +380,7 @@ function abrirPermisos(id) {
 
   modal.classList.remove("hidden");
 
-  // render permisos con selección actual
+  // render permisos con selecciÃ³n actual
   renderPermisosUsuario(usuario.permisos || []);
 }
 
@@ -475,6 +475,13 @@ window.cerrarModalPermisos = function () {
 function cerrarModalReset() {
   const modal = document.getElementById("modal-reset");
   if (modal) modal.classList.add("hidden");
+
+  const botones = modal?.querySelectorAll("button");
+
+  botones?.forEach(btn => {
+    btn.disabled = false;
+    btn.style.pointerEvents = "auto";
+  });
 
   usuarioResetId = null;
 }

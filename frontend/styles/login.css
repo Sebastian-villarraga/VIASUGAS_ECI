@@ -188,7 +188,7 @@
 /* ========================= */
 /* CONTENIDO */
 /* ========================= */
-.modal-content {
+.login-body .modal-content button {
   background: #ffffff;
   padding: 28px 24px;
   border-radius: 16px;
@@ -332,4 +332,26 @@
 .input-success {
   border-color: #16a34a !important;
   box-shadow: 0 0 0 2px rgba(22,163,74,0.15);
+}
+
+
+/* =========================
+   ERROR LOGIN
+========================= */
+.login-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 8px;
+  text-align: left;
+}
+
+/* reutilizamos hidden */
+.hidden {
+  display: none;
+}
+
+/* input en rojo */
+.input-error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 2px rgba(220,38,38,0.15);
 }
