@@ -329,3 +329,127 @@
 .prx-table td select{
   min-width:120px;
 }
+
+/* =====================================
+   AJUSTE COMPACTO PROPIETARIOS
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.prx-layout{
+  padding:14px !important;
+}
+
+/* header */
+.prx-header{
+  margin-bottom:14px !important;
+}
+
+.prx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.prx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS EN UNA FILA
+========================= */
+.prx-filters-box{
+  padding:14px !important;
+  margin-bottom:14px !important;
+}
+
+.prx-filters-grid{
+  grid-template-columns:
+    1.2fr   /* nombre */
+    1.1fr   /* documento */
+    .85fr   /* limpiar */
+    !important;
+
+  gap:8px !important;
+}
+
+.prx-field label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.prx-field input,
+.prx-field select{
+  height:34px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+  border-radius:9px !important;
+}
+
+.prx-filter-action .prx-btn{
+  width:100% !important;
+}
+
+/* =========================
+   TABLA MÁS COMPACTA
+========================= */
+.prx-table-card{
+  padding:12px !important;
+}
+
+.prx-table th{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+.prx-table td{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+/* =========================
+   INLINE EDIT MÁS PEQUEÑO
+========================= */
+.prx-table td input,
+.prx-table td select{
+  height:28px !important;
+  min-height:28px !important;
+  padding:0 6px !important;
+  font-size:11px !important;
+  border-radius:7px !important;
+}
+
+.prx-table td select{
+  width:160px !important;
+}
+
+/* =========================
+   MODAL MÁS COMPACTO
+========================= */
+.prx-modal-box{
+  padding:18px !important;
+}
+
+.prx-modal-box h3{
+  font-size:22px !important;
+}
+
+.prx-form-grid{
+  gap:12px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:900px){
+
+  .prx-filters-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .prx-btn{
+    width:100% !important;
+  }
+}

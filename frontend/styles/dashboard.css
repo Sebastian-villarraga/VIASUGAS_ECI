@@ -730,3 +730,282 @@ Pegar al FINAL de dashboard.css
     min-width:780px;
   }
 }
+
+/* =====================================
+   AJUSTE COMPACTO DASHBOARD GERENCIAL
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.dbx-layout{
+  padding:14px !important;
+}
+
+.dbx-main,
+.dbx-left,
+.dbx-right{
+  gap:14px !important;
+}
+
+/* header */
+.dbx-header{
+  margin-bottom:14px !important;
+}
+
+.dbx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.dbx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS MÁS COMPACTOS
+========================= */
+.dbx-filters-box{
+  padding:14px !important;
+  gap:10px !important;
+  margin-bottom:14px !important;
+}
+
+/* toolbar superior en 6 columnas */
+.dbx-toolbar{
+  grid-template-columns:repeat(6,1fr) !important;
+  gap:8px !important;
+}
+
+/* toolbar inferior */
+.dbx-toolbar-bottom{
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:8px !important;
+}
+
+.dbx-group label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.dbx-group input,
+.dbx-select{
+  height:34px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   KPI CARDS MÁS PEQUEÑAS
+========================= */
+#cardsDashboard.dbx-cards{
+  grid-template-columns:repeat(4,1fr) !important;
+  gap:10px !important;
+  margin-bottom:14px !important;
+}
+
+.dbx-cards .card{
+  padding:12px 14px !important;
+  border-radius:12px !important;
+}
+
+.dbx-cards .card::before{
+  width:4px !important;
+}
+
+.dbx-cards .card h3{
+  font-size:10px !important;
+  margin-bottom:4px !important;
+}
+
+.dbx-cards .card p{
+  font-size:18px !important;
+  line-height:1.25 !important;
+}
+
+.small-kpi{
+  font-size:14px !important;
+  line-height:1.3 !important;
+}
+
+/* fixes cards especiales */
+#cardsDashboard .card:nth-child(2) p,
+#cardsDashboard .card:nth-child(3) p,
+#cardsDashboard .card:nth-child(5) p{
+  font-size:14px !important;
+  line-height:1.3 !important;
+}
+
+/* =========================
+   TARJETAS TABLAS / CHARTS
+========================= */
+.dbx-table-card,
+.dbx-chart-card{
+  padding:12px !important;
+  border-radius:12px !important;
+}
+
+.dbx-table-card h2,
+.dbx-chart-card h3{
+  font-size:16px !important;
+  margin-bottom:10px !important;
+}
+
+/* =========================
+   TABLAS MÁS COMPACTAS
+========================= */
+.dbx-table th{
+  font-size:12px !important;
+  padding:9px 10px !important;
+}
+
+.dbx-table td{
+  font-size:12px !important;
+  padding:9px 10px !important;
+}
+
+.dbx-table tfoot td{
+  font-size:12px !important;
+  padding:9px 10px !important;
+}
+
+/* scroll más elegante */
+.tabla-scroll-wrap{
+  max-height:320px !important;
+}
+
+/* =========================
+   GRÁFICAS MÁS COMPACTAS
+========================= */
+.dbx-chart-wrap{
+  height:280px !important;
+}
+
+.grafica-half .dbx-chart-wrap{
+  height:300px !important;
+}
+
+/* fila 50/50 */
+.dbx-row-50{
+  gap:14px !important;
+  margin-top:14px !important;
+}
+
+.facturacion-half,
+.grafica-half{
+  min-height:auto !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1400px){
+
+  .dbx-toolbar{
+    grid-template-columns:repeat(3,1fr) !important;
+  }
+
+  #cardsDashboard.dbx-cards{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+}
+
+@media (max-width:992px){
+
+  .dbx-toolbar-bottom{
+    grid-template-columns:1fr !important;
+  }
+
+  .dbx-row-50{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .dbx-layout{
+    padding:10px !important;
+  }
+
+  .dbx-toolbar,
+  .dbx-toolbar-bottom{
+    grid-template-columns:1fr !important;
+  }
+
+  #cardsDashboard.dbx-cards{
+    grid-template-columns:1fr !important;
+  }
+
+  .dbx-btn{
+    width:100% !important;
+  }
+
+  .dbx-header h2{
+    font-size:24px !important;
+  }
+
+  .dbx-chart-wrap{
+    height:240px !important;
+  }
+}
+
+
+/* =====================================
+   FIX REAL:
+   TODOS LOS BOTONES EN UNA FILA
+===================================== */
+
+/* contenedor principal botones */
+.dbx-toolbar{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  gap:8px !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  overflow-x:auto !important;
+  padding-bottom:2px !important;
+}
+
+/* botones y select */
+.dbx-toolbar > *{
+  flex:1 1 0 !important;
+  min-width:110px !important;
+}
+
+.dbx-toolbar .dbx-btn{
+  height:34px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+  white-space:nowrap !important;
+}
+
+.dbx-toolbar .dbx-select{
+  min-width:95px !important;
+  height:34px !important;
+}
+
+/* scrollbar elegante */
+.dbx-toolbar::-webkit-scrollbar{
+  height:6px;
+}
+.dbx-toolbar::-webkit-scrollbar-thumb{
+  background:#c7cfdd;
+  border-radius:20px;
+}
+
+/* responsive */
+@media (max-width:1200px){
+  .dbx-toolbar{
+    flex-wrap:wrap !important;
+  }
+}
+
+@media (max-width:768px){
+  .dbx-toolbar{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+  }
+}

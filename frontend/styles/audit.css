@@ -270,3 +270,196 @@
   overflow-y:auto;
   max-height:560px;
 }
+
+/* =====================================
+   AJUSTE COMPACTO AUDIT
+   AGREGAR AL FINAL
+===================================== */
+
+#audit-container{
+  padding:14px !important;
+}
+
+/* card principal */
+.audit-card{
+  padding:14px !important;
+  border-radius:12px !important;
+  box-shadow:0 6px 18px rgba(15,23,42,.06) !important;
+}
+
+/* header */
+.audit-header{
+  margin-bottom:14px !important;
+  gap:10px !important;
+}
+
+.audit-header h2{
+  font-size:26px !important;
+}
+
+.audit-header p{
+  font-size:12px !important;
+  margin-top:4px !important;
+}
+
+.audit-btn-refresh{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS COMPACTOS
+========================= */
+.audit-filtros{
+  display:grid !important;
+  grid-template-columns:repeat(6,minmax(120px,1fr)) !important;
+  gap:8px !important;
+  margin-bottom:12px !important;
+  align-items:end !important;
+}
+
+.audit-grupo{
+  gap:4px !important;
+}
+
+.audit-grupo label{
+  font-size:11px !important;
+}
+
+.audit-grupo input,
+.audit-grupo select,
+.audit-grupo button{
+  height:34px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* tabla */
+.audit-table-wrapper{
+  max-height:420px !important;
+  border-radius:10px !important;
+}
+
+.audit-table{
+  font-size:12px !important;
+}
+
+.audit-table th{
+  padding:10px !important;
+  font-size:12px !important;
+}
+
+.audit-table td{
+  padding:10px !important;
+  font-size:12px !important;
+}
+
+.audit-badge{
+  font-size:11px !important;
+  padding:4px 8px !important;
+}
+
+.audit-btn-detail{
+  padding:6px 10px !important;
+  font-size:11px !important;
+  border-radius:7px !important;
+}
+
+/* modal */
+.audit-modal-box{
+  width:min(920px,94vw) !important;
+  padding:16px !important;
+  border-radius:14px !important;
+}
+
+.audit-modal-header{
+  margin-bottom:12px !important;
+}
+
+.audit-modal-header h3{
+  font-size:20px !important;
+}
+
+.audit-modal-header button{
+  width:30px !important;
+  height:30px !important;
+  font-size:18px !important;
+}
+
+.audit-detail-grid{
+  gap:10px !important;
+  margin-bottom:14px !important;
+}
+
+.audit-detail-item{
+  padding:10px !important;
+  border-radius:10px !important;
+}
+
+.audit-detail-item small{
+  font-size:11px !important;
+}
+
+.audit-detail-item strong{
+  font-size:12px !important;
+}
+
+.audit-changes-table th,
+.audit-changes-table td{
+  padding:9px !important;
+  font-size:12px !important;
+}
+
+.audit-json-box{
+  padding:10px !important;
+  font-size:11px !important;
+  border-radius:10px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1400px){
+
+  .audit-filtros{
+    grid-template-columns:repeat(4,1fr) !important;
+  }
+}
+
+@media (max-width:992px){
+
+  .audit-filtros{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+
+  .audit-header{
+    flex-direction:column !important;
+    align-items:flex-start !important;
+  }
+}
+
+@media (max-width:768px){
+
+  #audit-container{
+    padding:10px !important;
+  }
+
+  .audit-header h2{
+    font-size:22px !important;
+  }
+
+  .audit-filtros{
+    grid-template-columns:1fr !important;
+  }
+
+  .audit-table{
+    min-width:900px !important;
+  }
+
+  .audit-detail-grid{
+    grid-template-columns:1fr !important;
+  }
+}

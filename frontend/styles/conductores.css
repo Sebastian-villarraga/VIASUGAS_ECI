@@ -453,3 +453,168 @@
 .drx-table td select{
   min-width:120px;
 }
+
+/* =====================================
+   AJUSTE COMPACTO CONDUCTORES
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.drx-layout{
+  grid-template-columns: minmax(0,1fr) 290px !important;
+  gap:16px !important;
+}
+
+/* header */
+.drx-header{
+  margin-bottom:14px !important;
+}
+
+.drx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.drx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS MÁS COMPACTOS
+========================= */
+.drx-filters-box{
+  padding:14px !important;
+  margin-bottom:14px !important;
+}
+
+.drx-filters-grid{
+  grid-template-columns:
+    1.1fr   /* nombre */
+    1fr     /* documento */
+    .9fr    /* estado */
+    .8fr    /* limpiar */
+    !important;
+
+  gap:8px !important;
+}
+
+.drx-field label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.drx-field input,
+.drx-field select{
+  height:34px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+  border-radius:9px !important;
+}
+
+.drx-filter-action .drx-btn{
+  width:100% !important;
+}
+
+/* =========================
+   TABLA MÁS PEQUEÑA
+========================= */
+.drx-table-card{
+  padding:12px !important;
+}
+
+.drx-table th{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+.drx-table td{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+/* =========================
+   INLINE EDIT PEQUEÑO
+========================= */
+.drx-table td input,
+.drx-table td select{
+  height:28px !important;
+  min-height:28px !important;
+  padding:0 6px !important;
+  font-size:11px !important;
+  border-radius:7px !important;
+}
+
+.drx-table td input[type="date"]{
+  min-width:125px !important;
+}
+
+.drx-table td select{
+  min-width:105px !important;
+}
+
+/* =========================
+   ALERTAS MÁS COMPACTAS
+========================= */
+.drx-alert-card{
+  padding:14px !important;
+  min-height:360px !important;
+}
+
+.drx-alert-card h3{
+  font-size:16px !important;
+  margin-bottom:12px !important;
+}
+
+.drx-alert-list li{
+  padding:10px 12px !important;
+  font-size:12px !important;
+  margin-bottom:8px !important;
+}
+
+.drx-alert-list li strong,
+.drx-alert-list li b{
+  font-size:13px !important;
+}
+
+.drx-alert-list li small,
+.drx-alert-list li span{
+  font-size:11px !important;
+}
+
+/* =========================
+   MODAL MÁS COMPACTO
+========================= */
+.drx-modal-box{
+  padding:18px !important;
+}
+
+.drx-modal-box h3{
+  font-size:22px !important;
+}
+
+.drx-form-grid{
+  gap:12px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1100px){
+  .drx-layout{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media (max-width:900px){
+
+  .drx-filters-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .drx-btn{
+    width:100% !important;
+  }
+}

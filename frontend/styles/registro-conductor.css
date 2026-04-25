@@ -325,3 +325,123 @@
   }
 
 }
+
+/* =====================================
+   AJUSTE COMPACTO REGISTRO CONDUCTOR
+   AGREGAR AL FINAL
+===================================== */
+
+/* contenedor */
+#rc-container{
+  padding:14px !important;
+}
+
+/* layout */
+.rcx-layout{
+  grid-template-columns:340px 1fr !important;
+  gap:16px !important;
+}
+
+/* cards */
+.rcx-left-card,
+.rcx-right-card{
+  padding:16px !important;
+  border-radius:14px !important;
+  box-shadow:0 4px 12px rgba(0,0,0,.05) !important;
+}
+
+/* títulos */
+#rc-title{
+  font-size:26px !important;
+  margin-bottom:14px !important;
+}
+
+.rcx-right-card h3{
+  font-size:17px !important;
+  margin-bottom:14px !important;
+}
+
+/* campos */
+.rcx-field{
+  margin-bottom:12px !important;
+}
+
+.rcx-field label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+/* inputs */
+#rc-container input,
+#rc-container select,
+#rc-container textarea{
+  min-height:34px !important;
+  height:34px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+#rc-container textarea{
+  min-height:80px !important;
+  padding:10px !important;
+}
+
+/* botón */
+.rcx-btn,
+#rc-guardar{
+  height:34px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* tabla */
+.rcx-table-scroll{
+  max-height:520px !important;
+}
+
+#rc-tabla th{
+  font-size:11px !important;
+  padding:0 0 10px !important;
+}
+
+#rc-tabla td{
+  font-size:12px !important;
+  padding:10px 0 !important;
+}
+
+/* valor */
+.rc-valor{
+  font-size:12px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1100px){
+
+  .rcx-layout{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media (max-width:768px){
+
+  #rc-container{
+    padding:10px !important;
+  }
+
+  .rcx-left-card,
+  .rcx-right-card{
+    padding:14px !important;
+  }
+
+  #rc-title{
+    font-size:24px !important;
+  }
+
+  .rcx-btn,
+  #rc-guardar{
+    width:100% !important;
+  }
+}

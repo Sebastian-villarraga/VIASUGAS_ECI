@@ -791,3 +791,220 @@ RESPONSIVE
   }
 
 }
+
+/* =====================================
+   AJUSTE COMPACTO DASHBOARD CARTERA
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.dcrt-layout{
+  padding:14px !important;
+}
+
+.dcrt-main,
+.dcrt-left,
+.dcrt-right{
+  gap:14px !important;
+}
+
+/* header */
+.dcrt-header{
+  margin-bottom:14px !important;
+}
+
+.dcrt-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.dcrt-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS COMPACTOS
+========================= */
+.dcrt-filters-box{
+  padding:14px !important;
+  gap:10px !important;
+  margin-bottom:14px !important;
+}
+
+/* fila superior botones */
+.dcrt-toolbar{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  gap:8px !important;
+  align-items:center !important;
+  overflow-x:auto !important;
+}
+
+.dcrt-toolbar > *{
+  flex:1 1 0 !important;
+  min-width:110px !important;
+}
+
+.dcrt-toolbar .dcrt-select{
+  min-width:90px !important;
+  height:34px !important;
+  font-size:12px !important;
+}
+
+.dcrt-toolbar::-webkit-scrollbar{
+  height:6px;
+}
+
+.dcrt-toolbar::-webkit-scrollbar-thumb{
+  background:#c7cfdd;
+  border-radius:20px;
+}
+
+/* fila inferior */
+.dcrt-toolbar-bottom{
+  grid-template-columns:1fr 1fr 1fr !important;
+  gap:8px !important;
+}
+
+.dcrt-group label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.dcrt-group input{
+  height:34px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   KPI CARDS MÁS PEQUEÑAS
+========================= */
+.dcrt-cards{
+  grid-template-columns:repeat(4,1fr) !important;
+  gap:10px !important;
+  margin-bottom:14px !important;
+}
+
+.dcrt-card{
+  padding:12px 14px !important;
+  border-radius:12px !important;
+}
+
+.dcrt-card::before{
+  width:4px !important;
+}
+
+.dcrt-card h3{
+  font-size:10px !important;
+  margin-bottom:4px !important;
+}
+
+.dcrt-card p{
+  font-size:18px !important;
+  line-height:1.25 !important;
+}
+
+.dcrt-small{
+  font-size:14px !important;
+  line-height:1.3 !important;
+}
+
+/* =========================
+   TABLAS / TARJETAS
+========================= */
+.dcrt-table-card,
+.dcrt-chart-card{
+  padding:12px !important;
+  border-radius:12px !important;
+}
+
+.dcrt-table-card h3,
+.dcrt-chart-card h3{
+  font-size:16px !important;
+  margin-bottom:10px !important;
+}
+
+.dcrt-table-scroll{
+  max-height:320px !important;
+}
+
+.dcrt-table th{
+  font-size:12px !important;
+  padding:9px 10px !important;
+}
+
+.dcrt-table td{
+  font-size:12px !important;
+  padding:9px 10px !important;
+}
+
+/* charts */
+.dcrt-chart-wrap{
+  height:280px !important;
+}
+
+.dcrt-bottom-charts{
+  gap:14px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1400px){
+
+  .dcrt-toolbar{
+    flex-wrap:wrap !important;
+  }
+
+  .dcrt-cards{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+
+  .dcrt-main{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media (max-width:992px){
+
+  .dcrt-toolbar-bottom{
+    grid-template-columns:1fr !important;
+  }
+
+  .dcrt-bottom-charts{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .dcrt-layout{
+    padding:10px !important;
+  }
+
+  .dcrt-toolbar{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+  }
+
+  .dcrt-cards{
+    grid-template-columns:1fr !important;
+  }
+
+  .dcrt-header h2{
+    font-size:24px !important;
+  }
+
+  .dcrt-chart-wrap{
+    height:240px !important;
+  }
+
+  .dcrt-btn{
+    width:100% !important;
+  }
+}

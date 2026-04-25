@@ -502,3 +502,177 @@
 .thx-table td select{
   min-width:120px;
 }
+
+/* =====================================
+   AJUSTE COMPACTO TRAILER
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout general */
+.thx-layout{
+  gap:16px !important;
+}
+
+/* header */
+.thx-header{
+  margin-bottom:14px !important;
+}
+
+.thx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.thx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS EN UNA FILA
+========================= */
+.thx-filters-box{
+  padding:14px !important;
+  margin-bottom:14px !important;
+}
+
+.thx-filters-grid{
+  grid-template-columns:
+    1.2fr   /* placa */
+    1.2fr   /* propietario */
+    .95fr   /* estado */
+    .85fr   /* limpiar */
+    !important;
+
+  gap:8px !important;
+}
+
+.thx-field label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.thx-field input,
+.thx-field select{
+  height:34px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+  border-radius:9px !important;
+}
+
+.thx-filter-action .thx-btn{
+  width:100% !important;
+}
+
+/* =========================
+   TABLA MÁS COMPACTA
+========================= */
+.thx-table-card{
+  padding:12px !important;
+}
+
+.thx-table th{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+.thx-table td{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+/* =========================
+   ALERTAS MÁS PEQUEÑAS
+========================= */
+.thx-alert-card{
+  padding:14px !important;
+  min-height:380px !important;
+}
+
+.thx-alert-card h3{
+  font-size:18px !important;
+  margin-bottom:12px !important;
+}
+
+.thx-alert-actions{
+  gap:8px !important;
+  margin-bottom:12px !important;
+}
+
+.thx-alert-summary{
+  padding:10px !important;
+  font-size:12px !important;
+}
+
+.thx-alert-list .alerta-item,
+.thx-alert-list > div{
+  padding:10px 12px !important;
+}
+
+.thx-alert-list .alerta-titulo{
+  font-size:14px !important;
+}
+
+.thx-alert-list .alerta-fecha{
+  font-size:11px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1400px){
+
+  .thx-filters-grid{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .thx-filters-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .thx-btn{
+    width:100% !important;
+  }
+
+  .thx-layout{
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* =====================================
+   TRAILER - INPUTS INLINE MÁS PEQUEÑOS
+   AGREGAR AL FINAL
+===================================== */
+
+.thx-table td input,
+.thx-table td select{
+  height:30px !important;
+  min-height:30px !important;
+  padding:0 8px !important;
+  font-size:12px !important;
+  border-radius:8px !important;
+  max-width:100% !important;
+}
+
+/* ancho específico por columna */
+.thx-table td input[type="text"]{
+  width:120px !important;
+}
+
+.thx-table td input[type="date"]{
+  width:130px !important;
+}
+
+.thx-table td select{
+  width:180px !important;
+}
+
+/* celda edición más limpia */
+.thx-table td{
+  vertical-align:middle !important;
+}

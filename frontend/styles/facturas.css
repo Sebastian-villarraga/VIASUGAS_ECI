@@ -501,3 +501,180 @@
 
   box-sizing:border-box;
 }
+
+/* =====================================
+   AJUSTE COMPACTO FACTURAS
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.ftx-layout{
+  padding:14px !important;
+}
+
+/* header */
+.ftx-header{
+  gap:12px !important;
+  margin-bottom:14px !important;
+}
+
+.ftx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.ftx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   CARDS MÁS PEQUEÑAS
+========================= */
+.ftx-cards{
+  gap:10px !important;
+  margin-bottom:14px !important;
+  grid-template-columns:repeat(4,1fr) !important;
+}
+
+.ftx-card{
+  padding:12px 14px !important;
+  border-radius:12px !important;
+}
+
+.ftx-card::before{
+  width:4px !important;
+}
+
+.ftx-card h3{
+  font-size:10px !important;
+  margin-bottom:4px !important;
+}
+
+.ftx-card p{
+  font-size:18px !important;
+  line-height:1.2 !important;
+}
+
+/* =========================
+   FILTROS MÁS COMPACTOS
+========================= */
+.ftx-filtros{
+  padding:14px !important;
+  margin-bottom:14px !important;
+
+  /* 6 por fila */
+  grid-template-columns:repeat(6,1fr) !important;
+  gap:8px !important;
+}
+
+.ftx-group label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.ftx-group input,
+.ftx-group select{
+  height:34px !important;
+  min-height:34px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+.ftx-filtros .ftx-btn{
+  width:100% !important;
+}
+
+/* buscador manifiestos */
+.select-search-input{
+  height:34px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+.select-search-dropdown{
+  max-height:205px !important;
+}
+
+.select-option{
+  height:40px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+}
+
+/* =========================
+   TABLA MÁS COMPACTA
+========================= */
+.ftx-table-card{
+  padding:12px !important;
+}
+
+.ftx-table-scroll{
+  max-height:560px !important;
+}
+
+.ftx-table th{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+.ftx-table td{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+/* badges */
+.badge{
+  font-size:11px !important;
+  padding:4px 8px !important;
+}
+
+/* =========================
+   MODALES MÁS COMPACTOS
+========================= */
+.ftx-modal-box,
+.ftx-confirm-box{
+  padding:18px !important;
+}
+
+.ftx-modal-box h3,
+.ftx-confirm-box h3{
+  font-size:22px !important;
+}
+
+.ftx-form-grid{
+  gap:12px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1400px){
+
+  .ftx-cards{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+
+  .ftx-filtros{
+    grid-template-columns:repeat(3,1fr) !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .ftx-cards{
+    grid-template-columns:1fr !important;
+  }
+
+  .ftx-filtros{
+    grid-template-columns:1fr !important;
+  }
+
+  .ftx-btn{
+    width:100% !important;
+  }
+}

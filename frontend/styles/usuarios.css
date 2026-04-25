@@ -336,3 +336,182 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* =====================================
+   AJUSTE COMPACTO USUARIOS
+   AGREGAR AL FINAL
+===================================== */
+
+#us-container{
+  padding:14px !important;
+}
+
+.us-layout{
+  grid-template-columns:320px 1fr !important;
+  gap:16px !important;
+}
+
+.us-left-card,
+.us-right-card{
+  padding:14px !important;
+  border-radius:12px !important;
+}
+
+/* títulos */
+#us-title{
+  font-size:24px !important;
+  margin-bottom:14px !important;
+}
+
+.us-right-card h3{
+  font-size:16px !important;
+  margin-bottom:12px !important;
+}
+
+/* campos */
+.us-field{
+  margin-bottom:10px !important;
+}
+
+.us-field label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+#us-container input:not([type="checkbox"]){
+  height:34px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* permisos */
+.us-permisos-box{
+  height:340px !important;
+  padding:10px 12px !important;
+  border-radius:10px !important;
+  gap:8px 14px !important;
+}
+
+.us-check{
+  gap:6px !important;
+  font-size:12px !important;
+}
+
+.us-check input[type="checkbox"]{
+  width:13px !important;
+  height:13px !important;
+}
+
+.us-check span{
+  font-size:12px !important;
+}
+
+.us-perm-section{
+  font-size:11px !important;
+  margin-top:6px !important;
+  margin-bottom:2px !important;
+}
+
+/* botones */
+.us-btn{
+  height:34px !important;
+  padding:0 12px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* tabla */
+.us-table th{
+  font-size:12px !important;
+  padding:9px !important;
+}
+
+.us-table td{
+  font-size:12px !important;
+  padding:9px !important;
+}
+
+.us-badge-activo,
+.us-badge-inactivo{
+  font-size:11px !important;
+  padding:4px 8px !important;
+}
+
+.us-btn-action{
+  padding:5px 8px !important;
+  font-size:11px !important;
+  border-radius:6px !important;
+}
+
+/* modal */
+.modal-content{
+  width:min(92vw,390px) !important;
+  padding:18px !important;
+  border-radius:14px !important;
+}
+
+.modal-content h3{
+  font-size:18px !important;
+}
+
+.modal-content p{
+  font-size:13px !important;
+  margin-bottom:14px !important;
+}
+
+.modal-btn{
+  height:36px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* responsive */
+@media (max-width:1100px){
+
+  .us-layout{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media (max-width:768px){
+
+  #us-container{
+    padding:10px !important;
+  }
+
+  #us-title{
+    font-size:22px !important;
+  }
+
+  .us-permisos-box{
+    grid-template-columns:1fr !important;
+    height:300px !important;
+  }
+
+  .modal-actions{
+    flex-direction:column !important;
+  }
+}
+
+/* ampliar caja de permisos */
+.us-permisos-box{
+  height:460px !important;
+  max-height:460px !important;
+}
+
+/* responsive tablet */
+@media (max-width:1100px){
+  .us-permisos-box{
+    height:380px !important;
+    max-height:380px !important;
+  }
+}
+
+/* responsive móvil */
+@media (max-width:768px){
+  .us-permisos-box{
+    height:320px !important;
+    max-height:320px !important;
+  }
+}

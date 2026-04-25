@@ -313,3 +313,134 @@
     padding: 14px;
   }
 }
+
+/* =====================================
+   AJUSTE COMPACTO BANCOS
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.bnx-layout{
+  padding:14px !important;
+}
+
+/* header */
+.bnx-header{
+  margin-bottom:14px !important;
+}
+
+.bnx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.bnx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS MÁS COMPACTOS
+========================= */
+.bnx-filters-box{
+  padding:14px !important;
+  margin-bottom:14px !important;
+}
+
+.bnx-filters-grid{
+  grid-template-columns:
+    1.2fr   /* banco */
+    1fr     /* estado / código */
+    .8fr    /* limpiar */
+    !important;
+
+  gap:8px !important;
+}
+
+.bnx-field label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.bnx-field input,
+.bnx-field select{
+  height:34px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+  border-radius:9px !important;
+}
+
+.bnx-filter-action .bnx-btn{
+  width:100% !important;
+}
+
+/* =========================
+   TABLA MÁS PEQUEÑA
+========================= */
+.bnx-table-card{
+  padding:12px !important;
+}
+
+.bnx-table th{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+.bnx-table td{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+/* =========================
+   INLINE EDIT MÁS PEQUEÑO
+========================= */
+.bnx-table td input,
+.bnx-table td select{
+  height:28px !important;
+  min-height:28px !important;
+  padding:0 6px !important;
+  font-size:11px !important;
+  border-radius:7px !important;
+}
+
+.bnx-table td select{
+  min-width:120px !important;
+}
+
+/* =========================
+   MODAL MÁS COMPACTO
+========================= */
+.bnx-modal-box{
+  padding:18px !important;
+}
+
+.bnx-modal-box h3{
+  font-size:22px !important;
+}
+
+.bnx-form-grid{
+  gap:12px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1100px){
+
+  .bnx-filters-grid{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .bnx-filters-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .bnx-btn{
+    width:100% !important;
+  }
+}

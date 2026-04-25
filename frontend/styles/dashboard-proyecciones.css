@@ -430,3 +430,201 @@
     height:250px;
   }
 }
+
+/* =====================================
+   AJUSTE COMPACTO DASHBOARD PROYECCIONES
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.dpr-layout{
+  padding:14px !important;
+}
+
+.dpr-header{
+  margin-bottom:14px !important;
+}
+
+.dpr-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.dpr-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS COMPACTOS
+========================= */
+.dpr-filters-box{
+  padding:14px !important;
+  gap:10px !important;
+  margin-bottom:14px !important;
+}
+
+/* botones periodo en una fila */
+.dpr-toolbar{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  gap:8px !important;
+  align-items:center !important;
+  overflow-x:auto !important;
+}
+
+.dpr-toolbar > *{
+  flex:1 1 0 !important;
+  min-width:105px !important;
+}
+
+.dpr-toolbar::-webkit-scrollbar{
+  height:6px;
+}
+
+.dpr-toolbar::-webkit-scrollbar-thumb{
+  background:#c7cfdd;
+  border-radius:20px;
+}
+
+/* fechas abajo */
+.dpr-toolbar-bottom{
+  grid-template-columns:1fr 1fr 1fr !important;
+  gap:8px !important;
+}
+
+.dpr-group label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.dpr-group input,
+.dpr-select{
+  height:34px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   KPI CARDS
+========================= */
+.dpr-cards{
+  grid-template-columns:repeat(4,1fr) !important;
+  gap:10px !important;
+  margin-bottom:14px !important;
+}
+
+.dpr-card{
+  min-height:84px !important;
+  padding:12px 14px !important;
+  border-radius:12px !important;
+}
+
+.dpr-card::before{
+  width:4px !important;
+}
+
+.dpr-card h3{
+  font-size:10px !important;
+  margin-bottom:4px !important;
+}
+
+.dpr-card p{
+  font-size:18px !important;
+  line-height:1.25 !important;
+}
+
+/* =========================
+   TABLAS / CHARTS
+========================= */
+.dpr-main,
+.dpr-left,
+.dpr-right{
+  gap:14px !important;
+}
+
+.dpr-table-card,
+.dpr-chart-card{
+  padding:12px !important;
+  border-radius:12px !important;
+}
+
+.dpr-card-header h3{
+  font-size:16px !important;
+  margin-bottom:10px !important;
+}
+
+.dpr-table-scroll{
+  max-height:320px !important;
+}
+
+.dpr-table th{
+  font-size:12px !important;
+  padding:9px 10px !important;
+}
+
+.dpr-table td{
+  font-size:12px !important;
+  padding:9px 10px !important;
+}
+
+.dpr-chart-wrap{
+  height:260px !important;
+}
+
+.dpr-right .dpr-chart-wrap{
+  height:240px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1400px){
+
+  .dpr-toolbar{
+    flex-wrap:wrap !important;
+  }
+
+  .dpr-cards{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+}
+
+@media (max-width:992px){
+
+  .dpr-toolbar-bottom{
+    grid-template-columns:1fr !important;
+  }
+
+  .dpr-cards{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .dpr-layout{
+    padding:10px !important;
+  }
+
+  .dpr-header h2{
+    font-size:24px !important;
+  }
+
+  .dpr-toolbar{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+  }
+
+  .dpr-btn{
+    width:100% !important;
+  }
+
+  .dpr-chart-wrap,
+  .dpr-right .dpr-chart-wrap{
+    height:220px !important;
+  }
+}

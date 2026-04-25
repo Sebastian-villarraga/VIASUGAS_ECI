@@ -405,3 +405,148 @@
 .ttx-table td select{
   min-width:130px;
 }
+
+/* =====================================
+   AJUSTE COMPACTO TIPO TRANSACCION
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.ttx-layout{
+  padding:14px !important;
+}
+
+/* header */
+.ttx-header{
+  margin-bottom:14px !important;
+}
+
+.ttx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.ttx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* icon buttons tabla */
+.ttx-btn-icon,
+.btn-icon{
+  font-size:13px !important;
+  padding:3px !important;
+}
+
+/* =========================
+   FILTROS MÁS COMPACTOS
+========================= */
+.ttx-filters-box{
+  padding:14px !important;
+  margin-bottom:14px !important;
+}
+
+.ttx-filters-grid{
+  grid-template-columns:
+    1.2fr   /* nombre */
+    1fr     /* tipo */
+    .9fr    /* estado */
+    .8fr    /* limpiar */
+    !important;
+
+  gap:8px !important;
+}
+
+.ttx-field label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.ttx-field input,
+.ttx-field select{
+  height:34px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+  border-radius:9px !important;
+}
+
+.ttx-filter-action .ttx-btn{
+  width:100% !important;
+}
+
+/* =========================
+   TABLA MÁS PEQUEÑA
+========================= */
+.ttx-table-card{
+  padding:12px !important;
+}
+
+.ttx-table th{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+.ttx-table td{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+/* badges compactos */
+.badge{
+  font-size:11px !important;
+  padding:4px 8px !important;
+}
+
+/* =========================
+   INLINE EDIT MÁS PEQUEÑO
+========================= */
+.ttx-table td input,
+.ttx-table td select{
+  height:28px !important;
+  min-height:28px !important;
+  padding:0 6px !important;
+  font-size:11px !important;
+  border-radius:7px !important;
+}
+
+.ttx-table td select{
+  min-width:115px !important;
+}
+
+/* =========================
+   MODAL MÁS COMPACTO
+========================= */
+.ttx-modal-box{
+  padding:18px !important;
+}
+
+.ttx-modal-box h3{
+  font-size:22px !important;
+}
+
+.ttx-form-grid{
+  gap:12px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1100px){
+
+  .ttx-filters-grid{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .ttx-filters-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .ttx-btn{
+    width:100% !important;
+  }
+}

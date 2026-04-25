@@ -730,3 +730,144 @@
 .novedad-badge{
   font-size:clamp(9px,0.7vw,11px);
 }
+
+/* =====================================
+   AJUSTE COMPACTO MANIFIESTOS
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout más compacto */
+.mfx-layout{
+  padding:14px !important;
+}
+
+/* header */
+.mfx-header{
+  margin-bottom:14px !important;
+}
+
+.mfx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.mfx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS - 8 EN UNA FILA
+========================= */
+.mfx-filters-box{
+  padding:14px !important;
+  margin-bottom:14px !important;
+}
+
+.mfx-filters-grid{
+  grid-template-columns:
+    1.35fr   /* id manifiesto */
+    .95fr    /* este mes */
+    .95fr    /* mes anterior */
+    1fr      /* fecha desde */
+    1fr      /* fecha hasta */
+    .95fr    /* estado */
+    .95fr    /* cliente */
+    .85fr    /* limpiar */
+    !important;
+
+  gap:8px !important;
+}
+
+.mfx-group label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.mfx-group input,
+.mfx-group select{
+  min-height:34px !important;
+  height:34px !important;
+  padding:0 10px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+.mfx-filters-grid .mfx-btn{
+  width:100% !important;
+}
+
+/* =========================
+   CARDS MÁS PEQUEÑAS
+========================= */
+.mfx-cards{
+  gap:10px !important;
+  margin-bottom:14px !important;
+}
+
+.mfx-card{
+  padding:12px 14px !important;
+  border-radius:12px !important;
+}
+
+.mfx-card::before{
+  width:4px !important;
+}
+
+.mfx-card h4{
+  font-size:10px !important;
+  margin-bottom:4px !important;
+}
+
+.mfx-card p{
+  font-size:12px !important;
+  line-height:1.3 !important;
+}
+
+/* tabla compacta */
+.mfx-table-card{
+  padding:12px !important;
+}
+
+.mfx-table th,
+.mfx-table td{
+  padding:9px 10px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1500px){
+
+  .mfx-filters-grid{
+    grid-template-columns:repeat(4,1fr) !important;
+  }
+}
+
+@media (max-width:1024px){
+
+  .mfx-filters-grid{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+
+  .mfx-cards{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .mfx-filters-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .mfx-cards{
+    grid-template-columns:1fr !important;
+  }
+
+  .mfx-btn{
+    width:100% !important;
+  }
+}

@@ -335,3 +335,141 @@
     padding: 14px;
   }
 }
+
+/* =====================================
+   AJUSTE COMPACTO CLIENTES
+   AGREGAR AL FINAL
+===================================== */
+
+/* layout */
+.clx-layout{
+  padding:14px !important;
+}
+
+/* header */
+.clx-header{
+  margin-bottom:14px !important;
+}
+
+.clx-header h2{
+  font-size:28px !important;
+}
+
+/* botones */
+.clx-btn{
+  height:34px !important;
+  padding:0 14px !important;
+  font-size:12px !important;
+  border-radius:9px !important;
+}
+
+/* =========================
+   FILTROS MÁS COMPACTOS
+========================= */
+.clx-filters-box{
+  padding:14px !important;
+  margin-bottom:14px !important;
+}
+
+.clx-filters-grid{
+  grid-template-columns:
+    1.2fr   /* nombre */
+    1fr     /* nit/documento */
+    .9fr    /* estado */
+    .8fr    /* limpiar */
+    !important;
+
+  gap:8px !important;
+}
+
+.clx-field label{
+  font-size:11px !important;
+  margin-bottom:4px !important;
+}
+
+.clx-field input,
+.clx-field select{
+  height:34px !important;
+  font-size:12px !important;
+  padding:0 10px !important;
+  border-radius:9px !important;
+}
+
+.clx-filter-action .clx-btn{
+  width:100% !important;
+}
+
+/* =========================
+   TABLA MÁS PEQUEÑA
+========================= */
+.clx-table-card{
+  padding:12px !important;
+}
+
+.clx-table th{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+.clx-table td{
+  font-size:12px !important;
+  padding:10px 12px !important;
+}
+
+/* =========================
+   INLINE EDIT MÁS PEQUEÑO
+========================= */
+.clx-table td input,
+.clx-table td select{
+  height:28px !important;
+  min-height:28px !important;
+  padding:0 6px !important;
+  font-size:11px !important;
+  border-radius:7px !important;
+}
+
+.clx-table td select{
+  min-width:120px !important;
+}
+
+/* badges compactos */
+.estado-badge{
+  font-size:11px !important;
+  padding:4px 8px !important;
+}
+
+/* =========================
+   MODAL MÁS COMPACTO
+========================= */
+.clx-modal-box{
+  padding:18px !important;
+}
+
+.clx-modal-box h3{
+  font-size:22px !important;
+}
+
+.clx-form-grid{
+  gap:12px !important;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width:1100px){
+
+  .clx-filters-grid{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+}
+
+@media (max-width:768px){
+
+  .clx-filters-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .clx-btn{
+    width:100% !important;
+  }
+}
