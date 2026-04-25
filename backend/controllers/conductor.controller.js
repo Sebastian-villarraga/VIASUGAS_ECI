@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =====================
 // GET CONDUCTORES (con filtros)
@@ -122,6 +123,23 @@ const crearConductor = async (req, res) => {
       vencimiento_sustancia_peligrosa
     ]);
 
+    // =====================
+    // AUDITORIA CREATE
+    // =====================
+    try {
+      await audit({
+        tabla: "conductor",
+        operacion: "CREATE",
+        registroId: result.rows[0].cedula,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT CREATE CONDUCTOR:", e.message);
+    }
+
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
@@ -147,6 +165,14 @@ const actualizarConductor = async (req, res) => {
       vencimiento_sustancia_peligrosa
     } = req.body;
 
+    // =====================
+    // TRAER ANTES
+    // =====================
+    const viejo = await pool.query(
+      `SELECT * FROM conductor WHERE cedula = $1`,
+      [cedula]
+    );
+
     await pool.query(`
       UPDATE conductor SET
         nombre = $1,
@@ -169,6 +195,28 @@ const actualizarConductor = async (req, res) => {
       cedula
     ]);
 
+    const nuevo = await pool.query(
+      `SELECT * FROM conductor WHERE cedula = $1`,
+      [cedula]
+    );
+
+    // =====================
+    // AUDITORIA UPDATE
+    // =====================
+    try {
+      await audit({
+        tabla: "conductor",
+        operacion: "UPDATE",
+        registroId: cedula,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: viejo.rows[0] || null,
+        nuevo: nuevo.rows[0] || null,
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT UPDATE CONDUCTOR:", e.message);
+    }
+
     res.json({ ok: true });
 
   } catch (error) {
@@ -183,7 +231,6 @@ const actualizarConductor = async (req, res) => {
 const getAlertasConductores = async (req, res) => {
   try {
 
-    // ?? SIN LOWER (evita error ENUM)
     const result = await pool.query(`
       SELECT 
         cedula,
@@ -245,7 +292,6 @@ const getAlertasConductores = async (req, res) => {
     res.status(500).json({ error: "Error alertas conductores" });
   }
 };
-
 
 // =====================
 module.exports = {

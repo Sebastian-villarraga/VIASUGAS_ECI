@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =====================
 // GET PROPIETARIOS
@@ -123,6 +124,23 @@ const crearPropietario = async (req, res) => {
 
     const result = await pool.query(query, values);
 
+    // =====================
+    // AUDITORIA CREATE
+    // =====================
+    try {
+      await audit({
+        tabla: "propietario",
+        operacion: "CREATE",
+        registroId: result.rows[0].identificacion,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT CREATE PROPIETARIO:", e.message);
+    }
+
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
@@ -151,6 +169,14 @@ const actualizarPropietario = async (req, res) => {
       });
     }
 
+    // =====================
+    // TRAER ANTES
+    // =====================
+    const viejo = await pool.query(
+      `SELECT * FROM propietario WHERE identificacion = $1`,
+      [id]
+    );
+
     const query = `
       UPDATE propietario SET
         nombre = $1,
@@ -169,6 +195,23 @@ const actualizarPropietario = async (req, res) => {
     ];
 
     const result = await pool.query(query, values);
+
+    // =====================
+    // AUDITORIA UPDATE
+    // =====================
+    try {
+      await audit({
+        tabla: "propietario",
+        operacion: "UPDATE",
+        registroId: id,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: viejo.rows[0] || null,
+        nuevo: result.rows[0] || null,
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT UPDATE PROPIETARIO:", e.message);
+    }
 
     res.json(result.rows[0]);
 

@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =========================
 // MANIFIESTOS POR CONDUCTOR
@@ -8,17 +9,50 @@ const getManifiestosByConductor = async (req, res) => {
     const { cedula } = req.params;
 
     const result = await pool.query(`
-      SELECT id_manifiesto, fecha, estado
+      SELECT 
+        id_manifiesto, 
+        fecha, 
+        estado
       FROM manifiesto
       WHERE id_conductor = $1
       ORDER BY fecha DESC
     `, [cedula]);
 
+    // =========================
+    // AUDITORIA CONSULTA
+    // =========================
+    try {
+      await audit({
+        tabla: "manifiesto",
+        operacion: "READ",
+        registroId: cedula,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: {
+          consulta:
+            "getManifiestosByConductor",
+          cedula,
+          total:
+            result.rows.length
+        },
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT READ REGISTRO CONDUCTOR:",
+        e.message
+      );
+    }
+
     res.json(result.rows);
 
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: error.message });
+
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
 
@@ -42,11 +76,41 @@ const getGastosByManifiesto = async (req, res) => {
       ORDER BY gc.creado DESC
     `, [manifiesto]);
 
+    // =========================
+    // AUDITORIA CONSULTA
+    // =========================
+    try {
+      await audit({
+        tabla: "gastos_conductor",
+        operacion: "READ",
+        registroId: manifiesto,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: {
+          consulta:
+            "getGastosByManifiesto",
+          manifiesto,
+          total:
+            result.rows.length
+        },
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT READ GASTOS CONDUCTOR:",
+        e.message
+      );
+    }
+
     res.json(result.rows);
 
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ error: error.message });
+
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
 

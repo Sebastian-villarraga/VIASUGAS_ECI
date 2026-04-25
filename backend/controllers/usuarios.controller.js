@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
+const audit = require("../utils/audit");
 
 // =========================
 // GET USUARIOS
@@ -41,16 +42,18 @@ const createUsuario = async (req, res) => {
     const { id, nombre, correo, permisos } = req.body;
 
     if (!id || !nombre || !correo) {
-      return res.status(400).json({ error: "Datos incompletos" });
+      return res.status(400).json({
+        error: "Datos incompletos"
+      });
     }
 
     await client.query("BEGIN");
 
-    // ?? contraseña automática
+    // contraseña automática
     const passwordPlano = correo.split("@")[0];
     const hash = await bcrypt.hash(passwordPlano, 10);
 
-    // ?? insertar usuario
+    // insertar usuario
     await client.query(`
       INSERT INTO usuario (
         id,
@@ -64,7 +67,7 @@ const createUsuario = async (req, res) => {
       VALUES ($1, $2, $3, $4, TRUE, TRUE, NOW())
     `, [id, nombre, correo, hash]);
 
-    // ?? permisos
+    // permisos
     if (permisos && permisos.length > 0) {
       for (const codigo of permisos) {
         const perm = await client.query(
@@ -74,7 +77,10 @@ const createUsuario = async (req, res) => {
 
         if (perm.rows.length) {
           await client.query(`
-            INSERT INTO usuario_permiso (id_usuario, id_permiso)
+            INSERT INTO usuario_permiso (
+              id_usuario,
+              id_permiso
+            )
             VALUES ($1, $2)
           `, [id, perm.rows[0].id]);
         }
@@ -83,12 +89,47 @@ const createUsuario = async (req, res) => {
 
     await client.query("COMMIT");
 
-    res.json({ message: "Usuario creado correctamente" });
+    // AUDITORIA CREATE
+    try {
+      await audit({
+        tabla: "usuario",
+        operacion: "CREATE",
+        registroId: id,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: {
+          id,
+          nombre,
+          correo,
+          permisos
+        },
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT CREATE USUARIO:",
+        e.message
+      );
+    }
+
+    res.json({
+      message:
+        "Usuario creado correctamente"
+    });
 
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error("Error createUsuario:", error);
-    res.status(500).json({ error: error.message });
+
+    console.error(
+      "Error createUsuario:",
+      error
+    );
+
+    res.status(500).json({
+      error: error.message
+    });
+
   } finally {
     client.release();
   }
@@ -102,9 +143,38 @@ const updateUsuario = async (req, res) => {
 
   try {
     const { id } = req.params;
-    const { nombre, correo, permisos } = req.body;
+    const {
+      nombre,
+      correo,
+      permisos
+    } = req.body;
 
     await client.query("BEGIN");
+
+    // OLD DATA
+    const oldUser =
+      await client.query(`
+      SELECT id, nombre, correo
+      FROM usuario
+      WHERE id = $1
+    `, [id]);
+
+    const oldPerms =
+      await client.query(`
+      SELECT p.codigo
+      FROM usuario_permiso up
+      INNER JOIN permiso p
+        ON p.id = up.id_permiso
+      WHERE up.id_usuario = $1
+    `, [id]);
+
+    const viejo = {
+      ...(oldUser.rows[0] || {}),
+      permisos:
+        oldPerms.rows.map(
+          x => x.codigo
+        )
+    };
 
     // actualizar datos básicos
     await client.query(`
@@ -131,7 +201,10 @@ const updateUsuario = async (req, res) => {
 
         if (perm.rows.length) {
           await client.query(`
-            INSERT INTO usuario_permiso (id_usuario, id_permiso)
+            INSERT INTO usuario_permiso (
+              id_usuario,
+              id_permiso
+            )
             VALUES ($1, $2)
           `, [id, perm.rows[0].id]);
         }
@@ -140,12 +213,47 @@ const updateUsuario = async (req, res) => {
 
     await client.query("COMMIT");
 
-    res.json({ message: "Usuario actualizado" });
+    // AUDITORIA UPDATE
+    try {
+      await audit({
+        tabla: "usuario",
+        operacion: "UPDATE",
+        registroId: id,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo,
+        nuevo: {
+          id,
+          nombre,
+          correo,
+          permisos
+        },
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT UPDATE USUARIO:",
+        e.message
+      );
+    }
+
+    res.json({
+      message:
+        "Usuario actualizado"
+    });
 
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error("Error updateUsuario:", error);
-    res.status(500).json({ error: error.message });
+
+    console.error(
+      "Error updateUsuario:",
+      error
+    );
+
+    res.status(500).json({
+      error: error.message
+    });
+
   } finally {
     client.release();
   }
@@ -158,6 +266,13 @@ const toggleUsuario = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const before =
+      await pool.query(`
+      SELECT *
+      FROM usuario
+      WHERE id = $1
+    `, [id]);
+
     await pool.query(`
       UPDATE usuario
       SET activo = NOT activo,
@@ -165,11 +280,48 @@ const toggleUsuario = async (req, res) => {
       WHERE id = $1
     `, [id]);
 
-    res.json({ message: "Estado actualizado" });
+    const after =
+      await pool.query(`
+      SELECT *
+      FROM usuario
+      WHERE id = $1
+    `, [id]);
+
+    // AUDITORIA UPDATE
+    try {
+      await audit({
+        tabla: "usuario",
+        operacion: "UPDATE",
+        registroId: id,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo:
+          before.rows[0],
+        nuevo:
+          after.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT TOGGLE USUARIO:",
+        e.message
+      );
+    }
+
+    res.json({
+      message:
+        "Estado actualizado"
+    });
 
   } catch (error) {
-    console.error("Error toggleUsuario:", error);
-    res.status(500).json({ error: error.message });
+    console.error(
+      "Error toggleUsuario:",
+      error
+    );
+
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
 
@@ -178,18 +330,35 @@ const toggleUsuario = async (req, res) => {
 // =========================
 const cambiarPassword = async (req, res) => {
   try {
-    const userId = req.user.id; // viene del token
+    const userId = req.user.id;
     const { password } = req.body;
 
     if (!password) {
-      return res.status(400).json({ error: "La contraseña es requerida" });
+      return res.status(400).json({
+        error:
+          "La contraseña es requerida"
+      });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ error: "Mínimo 6 caracteres" });
+      return res.status(400).json({
+        error:
+          "Mínimo 6 caracteres"
+      });
     }
 
-    const hash = await bcrypt.hash(password, 10);
+    const before =
+      await pool.query(`
+      SELECT id, nombre, correo
+      FROM usuario
+      WHERE id = $1
+    `, [userId]);
+
+    const hash =
+      await bcrypt.hash(
+        password,
+        10
+      );
 
     await pool.query(`
       UPDATE usuario
@@ -199,34 +368,82 @@ const cambiarPassword = async (req, res) => {
       WHERE id = $2
     `, [hash, userId]);
 
-    res.json({ message: "Contraseña actualizada correctamente" });
+    const after =
+      await pool.query(`
+      SELECT id, nombre, correo
+      FROM usuario
+      WHERE id = $1
+    `, [userId]);
+
+    // AUDITORIA
+    try {
+      await audit({
+        tabla: "usuario",
+        operacion: "UPDATE",
+        registroId: userId,
+        usuarioId: userId,
+        viejo:
+          before.rows[0],
+        nuevo:
+          after.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT PASSWORD:",
+        e.message
+      );
+    }
+
+    res.json({
+      message:
+        "Contraseña actualizada correctamente"
+    });
 
   } catch (error) {
-    console.error("Error cambiarPassword:", error);
-    res.status(500).json({ error: error.message });
+    console.error(
+      "Error cambiarPassword:",
+      error
+    );
+
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
 
+// =========================
+// RESET PASSWORD
+// =========================
 const resetPassword = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // obtener correo
-    const result = await pool.query(
-      `SELECT correo FROM usuario WHERE id = $1`,
-      [id]
-    );
+    const before =
+      await pool.query(`
+      SELECT *
+      FROM usuario
+      WHERE id = $1
+    `, [id]);
 
-    if (!result.rows.length) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
+    if (!before.rows.length) {
+      return res.status(404).json({
+        error:
+          "Usuario no encontrado"
+      });
     }
 
-    const correo = result.rows[0].correo;
+    const correo =
+      before.rows[0].correo;
 
-    // password = antes del @
-    const passwordPlano = correo.split("@")[0];
+    const passwordPlano =
+      correo.split("@")[0];
 
-    const hash = await bcrypt.hash(passwordPlano, 10);
+    const hash =
+      await bcrypt.hash(
+        passwordPlano,
+        10
+      );
 
     await pool.query(`
       UPDATE usuario
@@ -236,11 +453,48 @@ const resetPassword = async (req, res) => {
       WHERE id = $2
     `, [hash, id]);
 
-    res.json({ message: "Contraseña restablecida" });
+    const after =
+      await pool.query(`
+      SELECT *
+      FROM usuario
+      WHERE id = $1
+    `, [id]);
+
+    // AUDITORIA
+    try {
+      await audit({
+        tabla: "usuario",
+        operacion: "UPDATE",
+        registroId: id,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo:
+          before.rows[0],
+        nuevo:
+          after.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT RESET PASSWORD:",
+        e.message
+      );
+    }
+
+    res.json({
+      message:
+        "Contraseña restablecida"
+    });
 
   } catch (error) {
-    console.error("Error resetPassword:", error);
-    res.status(500).json({ error: error.message });
+    console.error(
+      "Error resetPassword:",
+      error
+    );
+
+    res.status(500).json({
+      error: error.message
+    });
   }
 };
 

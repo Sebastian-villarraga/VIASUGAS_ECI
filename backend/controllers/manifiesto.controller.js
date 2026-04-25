@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =========================================
 // HELPERS
@@ -80,7 +81,7 @@ const getManifiestos = async (req, res) => {
     let query = `
       SELECT
         m.id_manifiesto,
-        f.codigo_factura AS id_factura, -- ?? NUEVO
+        f.codigo_factura AS id_factura,
         m.radicado,
         TO_CHAR(m.fecha, 'YYYY-MM-DD') AS fecha,
         m.origen_departamento,
@@ -104,7 +105,7 @@ const getManifiestos = async (req, res) => {
         m.id_empresa_a_cargo,
         e.nombre AS empresa_a_cargo_nombre
       FROM manifiesto m
-      LEFT JOIN factura f ON f.id_manifiesto = m.id_manifiesto -- ?? CLAVE
+      LEFT JOIN factura f ON f.id_manifiesto = m.id_manifiesto
       LEFT JOIN cliente c ON m.id_cliente = c.nit
       INNER JOIN conductor co ON m.id_conductor = co.cedula
       INNER JOIN vehiculo v ON m.id_vehiculo = v.placa
@@ -184,12 +185,12 @@ const getManifiestoById = async (req, res) => {
       `
       SELECT
         m.*,
-        f.codigo_factura AS id_factura, -- ?? NUEVO
+        f.codigo_factura AS id_factura,
         c.nombre AS cliente_nombre,
         co.nombre AS conductor_nombre,
         e.nombre AS empresa_a_cargo_nombre
       FROM manifiesto m
-      LEFT JOIN factura f ON f.id_manifiesto = m.id_manifiesto -- ?? CLAVE
+      LEFT JOIN factura f ON f.id_manifiesto = m.id_manifiesto
       LEFT JOIN cliente c ON m.id_cliente = c.nit
       INNER JOIN conductor co ON m.id_conductor = co.cedula
       INNER JOIN empresa_a_cargo e ON m.id_empresa_a_cargo = e.nit
@@ -348,6 +349,21 @@ const createManifiesto = async (req, res) => {
     ];
 
     const result = await pool.query(query, values);
+
+    try {
+      await audit({
+        tabla: "manifiesto",
+        operacion: "CREATE",
+        registroId: result.rows[0].id_manifiesto,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT CREATE MANIFIESTO:", e.message);
+    }
+
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
@@ -366,8 +382,6 @@ const createManifiesto = async (req, res) => {
     res.status(500).json({ error: "Error creando manifiesto" });
   }
 };
-
-
 
 // =========================================
 // ACTUALIZAR MANIFIESTO
@@ -406,6 +420,11 @@ const updateManifiesto = async (req, res) => {
     if (existe.rows.length === 0) {
       return res.status(404).json({ error: "Manifiesto no encontrado" });
     }
+
+    const viejo = await pool.query(
+      `SELECT * FROM manifiesto WHERE id_manifiesto = $1`,
+      [id_manifiesto]
+    );
 
     if (
       !radicado ||
@@ -511,6 +530,21 @@ const updateManifiesto = async (req, res) => {
     ];
 
     const result = await pool.query(query, values);
+
+    try {
+      await audit({
+        tabla: "manifiesto",
+        operacion: "UPDATE",
+        registroId: id_manifiesto,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: viejo.rows[0],
+        nuevo: result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT UPDATE MANIFIESTO:", e.message);
+    }
+
     res.json(result.rows[0]);
 
   } catch (error) {
@@ -565,10 +599,9 @@ const getCatalogosManifiesto = async (_req, res) => {
   }
 };
 
-
-// =========================
+// =========================================
 // DETALLE COMPLETO MANIFIESTO
-// =========================
+// =========================================
 async function obtenerDetalleManifiesto(req, res) {
   try {
     const { id } = req.params;
@@ -577,10 +610,8 @@ async function obtenerDetalleManifiesto(req, res) {
       SELECT
         m.*,
 
-        -- CLIENTE
         c.nombre AS cliente_nombre,
 
-        -- CONDUCTOR COMPLETO
         co.cedula AS conductor_cedula,
         co.nombre AS conductor_nombre,
         co.correo AS conductor_correo,
@@ -590,7 +621,6 @@ async function obtenerDetalleManifiesto(req, res) {
         co.vencimiento_manip_alimentos AS conductor_vencimiento_manip_alimentos,
         co.vencimiento_sustancia_peligrosa AS conductor_vencimiento_sustancia_peligrosa,
 
-        -- EMPRESA A CARGO COMPLETA
         e.nit AS empresa_nit,
         e.nombre AS empresa_nombre,
         e.correo AS empresa_correo,
@@ -618,7 +648,6 @@ async function obtenerDetalleManifiesto(req, res) {
       SELECT
         g.*,
 
-        -- TRANSACCION
         t.id AS transaccion_id,
         t.id_banco AS transaccion_id_banco,
         t.id_tipo_transaccion AS transaccion_id_tipo_transaccion,
@@ -631,7 +660,6 @@ async function obtenerDetalleManifiesto(req, res) {
         t.descripcion AS transaccion_descripcion,
         t.creado AS transaccion_creado,
 
-        -- TIPO TRANSACCION COMPLETO
         tt.id AS tipo_transaccion_id,
         tt.categoria AS tipo_transaccion_categoria,
         tt.descripcion AS tipo_transaccion_descripcion,
@@ -651,7 +679,6 @@ async function obtenerDetalleManifiesto(req, res) {
       SELECT
         t.*,
 
-        -- TIPO TRANSACCION COMPLETO
         tt.id AS tipo_transaccion_id,
         tt.categoria AS tipo_transaccion_categoria,
         tt.descripcion AS tipo_transaccion_descripcion,
@@ -678,6 +705,7 @@ async function obtenerDetalleManifiesto(req, res) {
       transacciones: resultTransacciones.rows,
       factura: resultFactura.rows[0] || null
     });
+
   } catch (error) {
     console.error("Error detalle manifiesto:", error);
     return res.status(500).json({ error: error.message });

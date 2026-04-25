@@ -1,41 +1,66 @@
 // =========================
 // CONFIG
 // =========================
-
-// ?? IMPORTANTE: mismo servidor ? usar ruta relativa
 const API_URL = "";
 
 // =========================
 // FETCH GLOBAL
 // =========================
-
 async function apiFetch(endpoint, options = {}) {
   try {
     const token = localStorage.getItem("token");
 
+    // =========================
+    // USUARIO LOGUEADO
+    // =========================
+    let user = {};
+
+    try {
+      user = JSON.parse(
+        localStorage.getItem("user") || "{}"
+      );
+    } catch {
+      user = {};
+    }
+
     const res = await fetch(`${API_URL}${endpoint}`, {
       headers: {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
+
+        ...(token && {
+          Authorization: `Bearer ${token}`
+        }),
+
+        // =========================
+        // HEADERS AUDITORIA
+        // =========================
+        "x-usuario-id": user.id || "",
+        "x-usuario-nombre": user.nombre || "",
+
+        ...(options.headers || {})
       },
-      ...options,
+
+      ...options
     });
 
-    // ?? intentar parsear respuesta
+    // =========================
+    // PARSE JSON
+    // =========================
     let data = {};
+
     try {
       data = await res.json();
     } catch {
-      // puede no venir JSON
+      data = {};
     }
 
     // =========================
-    // ERROR HANDLING ??
+    // ERROR HANDLING
     // =========================
     if (!res.ok) {
-      const message = data.error || "Error en la API";
+      const message =
+        data.error || "Error en la API";
 
-      // mostrar toast SOLO aquí (centralizado)
       if (typeof showToast === "function") {
         showToast(message, "error");
       }
@@ -48,14 +73,14 @@ async function apiFetch(endpoint, options = {}) {
   } catch (err) {
     console.error("API ERROR:", err);
 
-    // ?? evitar doble toast
     if (typeof showToast === "function") {
       showToast(
-        err.message || "Error de conexión con el servidor",
+        err.message ||
+        "Error de conexión con el servidor",
         "error"
       );
     }
 
-    throw err; // ?? CLAVE
+    throw err;
   }
 }

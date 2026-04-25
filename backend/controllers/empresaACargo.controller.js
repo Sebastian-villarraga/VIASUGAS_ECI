@@ -1,5 +1,6 @@
 // =====================
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =====================
 // GET EMPRESAS A CARGO (con filtros)
@@ -145,6 +146,23 @@ const crearEmpresaACargo = async (req, res) => {
 
     const result = await pool.query(query, values);
 
+    // =====================
+    // AUDITORIA CREATE
+    // =====================
+    try {
+      await audit({
+        tabla: "empresa_a_cargo",
+        operacion: "CREATE",
+        registroId: result.rows[0].nit,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT CREATE EMPRESA A CARGO:", e.message);
+    }
+
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
@@ -173,6 +191,14 @@ const actualizarEmpresaACargo = async (req, res) => {
       });
     }
 
+    // =====================
+    // TRAER ANTES
+    // =====================
+    const viejo = await pool.query(
+      `SELECT * FROM empresa_a_cargo WHERE nit = $1`,
+      [nit]
+    );
+
     const query = `
       UPDATE empresa_a_cargo SET
         nombre = $1,
@@ -195,6 +221,23 @@ const actualizarEmpresaACargo = async (req, res) => {
     ];
 
     const result = await pool.query(query, values);
+
+    // =====================
+    // AUDITORIA UPDATE
+    // =====================
+    try {
+      await audit({
+        tabla: "empresa_a_cargo",
+        operacion: "UPDATE",
+        registroId: nit,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: viejo.rows[0] || null,
+        nuevo: result.rows[0] || null,
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT UPDATE EMPRESA A CARGO:", e.message);
+    }
 
     res.json(result.rows[0]);
 

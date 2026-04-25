@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =========================
 // GET FACTURAS
@@ -35,13 +36,18 @@ const getFacturas = async (req, res) => {
       ORDER BY f.fecha_emision DESC
     `);
 
-    const hoy = new Date().toISOString().split("T")[0];
+    const hoy = new Date()
+      .toISOString()
+      .split("T")[0];
 
     const data = result.rows.map(f => {
 
       let estado = "pendiente";
 
-      if (f.fecha_vencimiento && f.fecha_vencimiento < hoy) {
+      if (
+        f.fecha_vencimiento &&
+        f.fecha_vencimiento < hoy
+      ) {
         estado = "vencida";
       }
 
@@ -54,11 +60,17 @@ const getFacturas = async (req, res) => {
     return res.json(data);
 
   } catch (error) {
-    console.error("? Error getFacturas:", error);
-    return res.status(500).json({ error: "Error obteniendo facturas" });
+    console.error(
+      "Error getFacturas:",
+      error
+    );
+
+    return res.status(500).json({
+      error:
+        "Error obteniendo facturas"
+    });
   }
 };
-
 
 // =========================
 // GET MANIFIESTOS
@@ -75,11 +87,20 @@ const getManifiestos = async (req, res) => {
       ORDER BY m.id_manifiesto DESC
     `);
 
-    return res.json(result.rows);
+    return res.json(
+      result.rows
+    );
 
   } catch (error) {
-    console.error("?? Error getManifiestos:", error);
-    return res.status(500).json({ error: "Error obteniendo manifiestos" });
+    console.error(
+      "Error getManifiestos:",
+      error
+    );
+
+    return res.status(500).json({
+      error:
+        "Error obteniendo manifiestos"
+    });
   }
 };
 
@@ -104,46 +125,75 @@ const createFactura = async (req, res) => {
     // =========================
     if (!codigo_factura) {
       return res.status(400).json({
-        error: "El código de factura es obligatorio"
+        error:
+          "El código de factura es obligatorio"
       });
     }
 
-    if (!id_manifiesto || !fecha_emision || !valor) {
+    if (
+      !id_manifiesto ||
+      !fecha_emision ||
+      !valor
+    ) {
       return res.status(400).json({
-        error: "Campos obligatorios faltantes"
+        error:
+          "Campos obligatorios faltantes"
       });
     }
 
-    valor = Number(valor) || 0;
-    retencion_fuente = Number(retencion_fuente) || 0;
-    retencion_ica = Number(retencion_ica) || 0;
-    plazo_pago = Number(plazo_pago) || 0;
+    valor =
+      Number(valor) || 0;
+
+    retencion_fuente =
+      Number(
+        retencion_fuente
+      ) || 0;
+
+    retencion_ica =
+      Number(
+        retencion_ica
+      ) || 0;
+
+    plazo_pago =
+      Number(
+        plazo_pago
+      ) || 0;
 
     if (valor <= 0) {
       return res.status(400).json({
-        error: "El valor debe ser mayor a 0"
+        error:
+          "El valor debe ser mayor a 0"
       });
     }
 
     // =========================
     // VALIDAR MANIFIESTO UNICO
     // =========================
-    const existe = await pool.query(
-      `SELECT 1 FROM factura WHERE id_manifiesto = $1`,
-      [id_manifiesto]
-    );
+    const existe =
+      await pool.query(
+        `
+      SELECT 1
+      FROM factura
+      WHERE id_manifiesto = $1
+    `,
+        [id_manifiesto]
+      );
 
-    if (existe.rows.length > 0) {
+    if (
+      existe.rows.length > 0
+    ) {
       return res.status(400).json({
-        error: "Ya existe una factura para este manifiesto"
+        error:
+          "Ya existe una factura para este manifiesto"
       });
     }
 
     // =========================
-    // INSERT REAL (SIN AUTOGENERAR)
+    // INSERT REAL
     // =========================
-    const result = await pool.query(
-      `
+    const result =
+      await pool.query(
+        `
       INSERT INTO factura (
         codigo_factura,
         id_manifiesto,
@@ -158,33 +208,71 @@ const createFactura = async (req, res) => {
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW())
       RETURNING *
       `,
-      [
-        codigo_factura,
-        id_manifiesto,
-        fecha_emision,
-        fecha_vencimiento,
-        valor,
-        retencion_fuente,
-        retencion_ica,
-        plazo_pago
-      ]
-    );
+        [
+          codigo_factura,
+          id_manifiesto,
+          fecha_emision,
+          fecha_vencimiento,
+          valor,
+          retencion_fuente,
+          retencion_ica,
+          plazo_pago
+        ]
+      );
 
-    return res.status(201).json(result.rows[0]);
+    // =========================
+    // AUDITORIA CREATE
+    // =========================
+    try {
+      await audit({
+        tabla: "factura",
+        operacion:
+          "CREATE",
+        registroId:
+          result.rows[0]
+            .codigo_factura,
+        usuarioId:
+          req.headers[
+            "x-usuario-id"
+          ] || "US1",
+        viejo: null,
+        nuevo:
+          result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT CREATE FACTURA:",
+        e.message
+      );
+    }
+
+    return res
+      .status(201)
+      .json(
+        result.rows[0]
+      );
 
   } catch (error) {
 
-    // UNIQUE codigo_factura
-    if (error.code === "23505") {
+    if (
+      error.code ===
+      "23505"
+    ) {
       return res.status(400).json({
-        error: "Ya existe una factura con ese código"
+        error:
+          "Ya existe una factura con ese código"
       });
     }
 
-    console.error("?? Error createFactura:", error);
+    console.error(
+      "Error createFactura:",
+      error
+    );
 
     return res.status(500).json({
-      error: "Error creando factura"
+      error:
+        "Error creando factura"
     });
   }
 };
@@ -194,34 +282,83 @@ const createFactura = async (req, res) => {
 // =========================
 const pagarFactura = async (req, res) => {
   try {
-    const { codigo } = req.params;
+    const { codigo } =
+      req.params;
 
     if (!codigo) {
-      return res.status(400).json({ error: "Código requerido" });
+      return res.status(400).json({
+        error:
+          "Código requerido"
+      });
     }
 
-    // ?? SOLO VALIDAR QUE EXISTA
-    const result = await pool.query(`
-      SELECT codigo_factura
+    const result =
+      await pool.query(
+        `
+      SELECT *
       FROM factura
       WHERE codigo_factura = $1
-    `, [codigo]);
+    `,
+        [codigo]
+      );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Factura no encontrada" });
+    if (
+      result.rows.length === 0
+    ) {
+      return res.status(404).json({
+        error:
+          "Factura no encontrada"
+      });
     }
 
-    // ? NO TOCA DB
-    return res.json({ ok: true });
+    // =========================
+    // AUDITORIA READ/PAGO
+    // NO modifica DB (mantengo lógica)
+    // =========================
+    try {
+      await audit({
+        tabla: "factura",
+        operacion:
+          "UPDATE",
+        registroId:
+          codigo,
+        usuarioId:
+          req.headers[
+            "x-usuario-id"
+          ] || "US1",
+        viejo:
+          result.rows[0],
+        nuevo:
+          result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT PAGAR FACTURA:",
+        e.message
+      );
+    }
+
+    // NO TOCA DB
+    return res.json({
+      ok: true
+    });
 
   } catch (error) {
-    console.error("?? Error pagarFactura:", error);
-    return res.status(500).json({ error: "Error procesando pago" });
+    console.error(
+      "Error pagarFactura:",
+      error
+    );
+
+    return res.status(500).json({
+      error:
+        "Error procesando pago"
+    });
   }
 };
 
 // =========================
-// EXPORTS 
+// EXPORTS
 // =========================
 module.exports = {
   getFacturas,

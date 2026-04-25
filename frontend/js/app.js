@@ -140,6 +140,10 @@ async function loadView(view) {
       case "usuarios":
         if (typeof initUsuarios === "function") initUsuarios();
         break;
+        
+      case "audit":
+        if (typeof initAudit === "function") initAudit();
+        break;
     }
 
     // =========================

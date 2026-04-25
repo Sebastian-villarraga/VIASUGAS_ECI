@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =====================
 // GET TRAILERS
@@ -56,7 +57,7 @@ const getTrailers = async (req, res) => {
 
   } catch (error) {
     console.error("ERROR TRAILERS:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Error obteniendo trailers",
       detalle: error.message
     });
@@ -70,7 +71,7 @@ const crearTrailer = async (req, res) => {
   try {
     const {
       placa,
-      propietario, // ?? ahora es IDENTIFICACION real
+      propietario,
       vencimiento_cert_fumigacion,
       vencimiento_cert_sanidad,
       estado
@@ -88,7 +89,6 @@ const crearTrailer = async (req, res) => {
       });
     }
 
-    // VALIDAR DUPLICADO
     const existe = await pool.query(
       "SELECT placa FROM trailer WHERE placa = $1",
       [placa]
@@ -100,7 +100,6 @@ const crearTrailer = async (req, res) => {
       });
     }
 
-    // VALIDAR QUE EL PROPIETARIO EXISTA
     const propietarioExiste = await pool.query(
       "SELECT identificacion FROM propietario WHERE identificacion = $1",
       [propietario]
@@ -112,7 +111,6 @@ const crearTrailer = async (req, res) => {
       });
     }
 
-    // INSERT DIRECTO CON FK REAL
     const insertQuery = `
       INSERT INTO trailer (
         placa,
@@ -125,7 +123,10 @@ const crearTrailer = async (req, res) => {
       RETURNING *
     `;
 
-    const estadoNormalizado = (estado || "activo").toString().toLowerCase().trim();
+    const estadoNormalizado = (estado || "activo")
+      .toString()
+      .toLowerCase()
+      .trim();
 
     const values = [
       placa.toUpperCase(),
@@ -136,6 +137,23 @@ const crearTrailer = async (req, res) => {
     ];
 
     const result = await pool.query(insertQuery, values);
+
+    // =====================
+    // AUDITORIA CREATE
+    // =====================
+    try {
+      await audit({
+        tabla: "trailer",
+        operacion: "CREATE",
+        registroId: result.rows[0].placa,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT CREATE TRAILER:", e.message);
+    }
 
     res.status(201).json(result.rows[0]);
 
@@ -149,11 +167,10 @@ const crearTrailer = async (req, res) => {
 };
 
 // =====================
-// ALERTAS TRAILERS (SOLO ACTIVOS)
+// ALERTAS TRAILERS
 // =====================
 const getAlertasTrailers = async (req, res) => {
   try {
-
     const result = await pool.query(`
       SELECT 
         t.placa,
@@ -177,40 +194,38 @@ const getAlertasTrailers = async (req, res) => {
 
     result.rows.forEach(t => {
 
-      if (!t.vencimiento_cert_fumigacion) return;
+      if (t.vencimiento_cert_fumigacion) {
+        const f = new Date(t.vencimiento_cert_fumigacion);
+        f.setHours(0, 0, 0, 0);
 
-      const f = new Date(t.vencimiento_cert_fumigacion);
-      f.setHours(0, 0, 0, 0);
-
-      if (f < hoy) {
-        alertas.push({
-          placa: t.placa,
-          propietario: t.propietario,
-          tipo: "Fumigación",
-          estado: "vencido",
-          fecha: t.vencimiento_cert_fumigacion
-        });
-      } 
-      else if (f >= hoy && f <= limite) {
-        alertas.push({
-          placa: t.placa,
-          propietario: t.propietario,
-          tipo: "Fumigación",
-          estado: "proximo",
-          fecha: t.vencimiento_cert_fumigacion
-        });
-      }
-      
-      
-      // SANIDAD
-      if (t.vencimiento_cert_sanidad) {
-        const f = new Date(t.vencimiento_cert_sanidad);
-        f.setHours(0,0,0,0);
         if (f < hoy) {
           alertas.push({
             placa: t.placa,
             propietario: t.propietario,
-            tipo: "Sanidad", // ??
+            tipo: "Fumigación",
+            estado: "vencido",
+            fecha: t.vencimiento_cert_fumigacion
+          });
+        } else if (f >= hoy && f <= limite) {
+          alertas.push({
+            placa: t.placa,
+            propietario: t.propietario,
+            tipo: "Fumigación",
+            estado: "proximo",
+            fecha: t.vencimiento_cert_fumigacion
+          });
+        }
+      }
+
+      if (t.vencimiento_cert_sanidad) {
+        const f = new Date(t.vencimiento_cert_sanidad);
+        f.setHours(0, 0, 0, 0);
+
+        if (f < hoy) {
+          alertas.push({
+            placa: t.placa,
+            propietario: t.propietario,
+            tipo: "Sanidad",
             estado: "vencido",
             fecha: t.vencimiento_cert_sanidad
           });
@@ -224,8 +239,6 @@ const getAlertasTrailers = async (req, res) => {
           });
         }
       }
-      
-      
 
     });
 
@@ -238,7 +251,7 @@ const getAlertasTrailers = async (req, res) => {
 };
 
 // =====================
-// FILTRO RAPIDO (SOLO ACTIVOS)
+// FILTRO RAPIDO
 // =====================
 const getTrailersPorEstadoAlerta = async (req, res) => {
   try {
@@ -266,16 +279,13 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
 
     const filtrados = result.rows.filter(t => {
 
-      // ?? juntar todas las fechas disponibles
       const fechas = [
         t.vencimiento_cert_fumigacion,
         t.vencimiento_cert_sanidad
       ].filter(Boolean);
 
-      // si no tiene ninguna fecha ? no aplica
       if (fechas.length === 0) return false;
 
-      // ?? evaluar si ALGUNA cumple la condición
       return fechas.some(f => {
         const fecha = new Date(f);
         fecha.setHours(0, 0, 0, 0);
@@ -300,17 +310,17 @@ const getTrailersPorEstadoAlerta = async (req, res) => {
   }
 };
 
-
 // =====================
 // ACTUALIZAR TRAILER
 // =====================
 const actualizarTrailer = async (req, res) => {
   try {
     const { placa } = req.params;
+
     const {
       propietario,
       vencimiento_cert_fumigacion,
-      vencimiento_cert_sanidad, // ?? AGREGAR ESTO
+      vencimiento_cert_sanidad,
       estado
     } = req.body;
 
@@ -320,7 +330,6 @@ const actualizarTrailer = async (req, res) => {
       });
     }
 
-    // VALIDAR QUE EL PROPIETARIO EXISTA
     const propietarioExiste = await pool.query(
       "SELECT identificacion FROM propietario WHERE identificacion = $1",
       [propietario]
@@ -332,15 +341,27 @@ const actualizarTrailer = async (req, res) => {
       });
     }
 
-    const estadoNormalizado = (estado || "activo").toString().toLowerCase().trim();
+    // =====================
+    // TRAER ANTES
+    // =====================
+    const viejo = await pool.query(
+      `SELECT * FROM trailer WHERE placa = $1`,
+      [placa]
+    );
 
-    await pool.query(`
+    const estadoNormalizado = (estado || "activo")
+      .toString()
+      .toLowerCase()
+      .trim();
+
+    const result = await pool.query(`
       UPDATE trailer SET
         id_propietario = $1,
         vencimiento_cert_fumigacion = $2,
         vencimiento_cert_sanidad = $3,
         estado = $4
       WHERE placa = $5
+      RETURNING *
     `, [
       propietario,
       vencimiento_cert_fumigacion || null,
@@ -348,6 +369,23 @@ const actualizarTrailer = async (req, res) => {
       estadoNormalizado,
       placa
     ]);
+
+    // =====================
+    // AUDITORIA UPDATE
+    // =====================
+    try {
+      await audit({
+        tabla: "trailer",
+        operacion: "UPDATE",
+        registroId: placa,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
+        viejo: viejo.rows[0] || null,
+        nuevo: result.rows[0] || null,
+        req
+      });
+    } catch (e) {
+      console.error("AUDIT UPDATE TRAILER:", e.message);
+    }
 
     res.json({ ok: true });
 

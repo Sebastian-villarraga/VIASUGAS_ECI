@@ -21,7 +21,7 @@ let editando = false;
 // =========================
 async function cargarVehiculos() {
   const data = await apiFetch("/api/vehiculos");
-  renderTabla(data);
+  renderTablaVehiculos(data);
 }
 
 // =========================
@@ -42,7 +42,7 @@ async function filtrarVehiculos() {
 
   const data = await apiFetch(url);
 
-  renderTabla(data);
+  renderTablaVehiculos(data);
 }
 
 // =========================
@@ -69,7 +69,7 @@ function aplicarFiltrosVehiculos() {
 // =========================
 // RENDER TABLA (FIX CLAVE)
 // =========================
-function renderTabla(data) {
+function renderTablaVehiculos(data) {
   const tabla = document.getElementById("vehiculosTable");
 
 

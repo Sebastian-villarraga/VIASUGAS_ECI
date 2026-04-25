@@ -1,0 +1,76 @@
+<div id="audit-container">
+
+  <section class="audit-card">
+
+    <div class="audit-header">
+
+      <div>
+        <h2>Auditoría</h2>
+        <p>Historial de cambios realizados en el sistema</p>
+      </div>
+
+      <button class="audit-btn-refresh" onclick="cargarAudit()">
+        Actualizar
+      </button>
+
+    </div>
+
+    <div class="audit-filtros">
+
+      <div class="audit-grupo">
+        <label>Fecha desde</label>
+        <input type="date" id="audit-fecha-desde">
+      </div>
+
+      <div class="audit-grupo">
+        <label>Fecha hasta</label>
+        <input type="date" id="audit-fecha-hasta">
+      </div>
+
+      <button class="audit-btn-refresh" onclick="aplicarFiltroAudit()">
+        Filtrar
+      </button>
+
+    </div>
+
+    <div class="audit-table-wrapper">
+      <table class="audit-table" id="tabla-audit">
+
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Tabla</th>
+            <th>Operación</th>
+            <th>Registro</th>
+            <th>Cambios</th>
+            <th>IP</th>
+            <th>Detalle</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td colspan="8">Cargando auditoría...</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+  </section>
+
+</div>
+
+<div id="audit-modal" class="audit-modal hidden">
+  <div class="audit-modal-box">
+
+    <div class="audit-modal-header">
+      <h3>Detalle de auditoría</h3>
+      <button onclick="cerrarModalAudit()">×</button>
+    </div>
+
+    <div id="audit-modal-content"></div>
+
+  </div>
+</div>

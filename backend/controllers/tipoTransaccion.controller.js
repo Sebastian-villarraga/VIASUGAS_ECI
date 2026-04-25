@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =========================
 // CONSTANTES
@@ -61,8 +62,10 @@ const getTiposTransaccion = async (req, res) => {
     res.json(result.rows);
 
   } catch (error) {
-    console.error("?? Error obteniendo tipos:", error);
-    res.status(500).json({ error: "Error obteniendo tipos de transaccion" });
+    console.error("Error obteniendo tipos:", error);
+    res.status(500).json({
+      error: "Error obteniendo tipos de transaccion"
+    });
   }
 };
 
@@ -79,14 +82,18 @@ const getTipoTransaccionById = async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Tipo de transaccion no encontrado" });
+      return res.status(404).json({
+        error: "Tipo de transaccion no encontrado"
+      });
     }
 
     res.json(result.rows[0]);
 
   } catch (error) {
-    console.error("?? Error obteniendo tipo:", error);
-    res.status(500).json({ error: "Error obteniendo tipo de transaccion" });
+    console.error("Error obteniendo tipo:", error);
+    res.status(500).json({
+      error: "Error obteniendo tipo de transaccion"
+    });
   }
 };
 
@@ -103,24 +110,30 @@ const createTipoTransaccion = async (req, res) => {
     estado = estado?.trim();
 
     if (!categoria || !tipo || !estado) {
-      return res.status(400).json({ error: "Campos obligatorios faltantes" });
+      return res.status(400).json({
+        error: "Campos obligatorios faltantes"
+      });
     }
 
     if (!validarTipo(tipo)) {
-      return res.status(400).json({ error: "Tipo invalido" });
+      return res.status(400).json({
+        error: "Tipo invalido"
+      });
     }
 
     if (!validarEstado(estado)) {
-      return res.status(400).json({ error: "Estado invalido" });
+      return res.status(400).json({
+        error: "Estado invalido"
+      });
     }
 
     // =========================
     // GENERAR ID TT1, TT2...
     // =========================
     const ultimo = await pool.query(`
-      SELECT id 
-      FROM tipo_transaccion 
-      WHERE id LIKE 'TT%' 
+      SELECT id
+      FROM tipo_transaccion
+      WHERE id LIKE 'TT%'
       ORDER BY CAST(SUBSTRING(id FROM 3) AS INT) DESC
       LIMIT 1
     `);
@@ -129,19 +142,32 @@ const createTipoTransaccion = async (req, res) => {
 
     if (ultimo.rows.length > 0) {
       const ultimoId = ultimo.rows[0].id;
-      const numero = parseInt(ultimoId.replace("TT", ""), 10);
+      const numero = parseInt(
+        ultimoId.replace("TT", ""),
+        10
+      );
+
       nuevoId = "TT" + (numero + 1);
     }
+
+    // =========================
+    // VALIDAR CATEGORIA DUPLICADA
+    // =========================
     const existeCategoria = await pool.query(
-      `SELECT id FROM tipo_transaccion WHERE LOWER(categoria) = LOWER($1)`,
+      `SELECT id 
+       FROM tipo_transaccion 
+       WHERE LOWER(categoria) = LOWER($1)`,
       [categoria]
     );
-    
+
     if (existeCategoria.rows.length > 0) {
-      return res.status(400).json({ error: "La categoría ya existe" });
+      return res.status(400).json({
+        error: "La categoría ya existe"
+      });
     }
+
     // =========================
-    // INSERT SIN CONTEXTO
+    // INSERT
     // =========================
     const result = await pool.query(`
       INSERT INTO tipo_transaccion (
@@ -162,11 +188,34 @@ const createTipoTransaccion = async (req, res) => {
       estado
     ]);
 
+    // =========================
+    // AUDITORIA CREATE
+    // =========================
+    try {
+      await audit({
+        tabla: "tipo_transaccion",
+        operacion: "CREATE",
+        registroId: result.rows[0].id,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT CREATE TIPO TRANSACCION:",
+        e.message
+      );
+    }
+
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
-    console.error("?? Error creando tipo:", error);
-    res.status(500).json({ error: "Error creando tipo de transaccion" });
+    console.error("Error creando tipo:", error);
+    res.status(500).json({
+      error: "Error creando tipo de transaccion"
+    });
   }
 };
 
@@ -177,37 +226,65 @@ const updateTipoTransaccion = async (req, res) => {
   try {
     const { id } = req.params;
 
-    let { categoria, descripcion, tipo, estado } = req.body;
+    let {
+      categoria,
+      descripcion,
+      tipo,
+      estado
+    } = req.body;
 
     categoria = categoria?.trim();
     descripcion = descripcion?.trim() || null;
     tipo = tipo?.trim().toUpperCase();
     estado = estado?.trim();
+
     console.log("TIPO RECIBIDO:", tipo);
+
     const existe = await pool.query(
-      `SELECT id FROM tipo_transaccion WHERE id = $1`,
+      `SELECT id 
+       FROM tipo_transaccion 
+       WHERE id = $1`,
       [id]
     );
 
     if (existe.rows.length === 0) {
-      return res.status(404).json({ error: "Tipo no encontrado" });
+      return res.status(404).json({
+        error: "Tipo no encontrado"
+      });
     }
 
     if (!categoria || !tipo || !estado) {
-      return res.status(400).json({ error: "Campos obligatorios faltantes" });
+      return res.status(400).json({
+        error: "Campos obligatorios faltantes"
+      });
     }
 
     if (!validarTipo(tipo)) {
       console.log("TIPO INVALIDO:", tipo);
-      return res.status(400).json({ error: "Tipo invalido" });
+
+      return res.status(400).json({
+        error: "Tipo invalido"
+      });
     }
 
     if (!validarEstado(estado)) {
-      return res.status(400).json({ error: "Estado invalido" });
+      return res.status(400).json({
+        error: "Estado invalido"
+      });
     }
 
     // =========================
-    // UPDATE SIN CONTEXTO
+    // TRAER ANTES
+    // =========================
+    const viejo = await pool.query(
+      `SELECT * 
+       FROM tipo_transaccion 
+       WHERE id = $1`,
+      [id]
+    );
+
+    // =========================
+    // UPDATE
     // =========================
     const result = await pool.query(`
       UPDATE tipo_transaccion
@@ -226,11 +303,38 @@ const updateTipoTransaccion = async (req, res) => {
       id
     ]);
 
+    // =========================
+    // AUDITORIA UPDATE
+    // =========================
+    try {
+      await audit({
+        tabla: "tipo_transaccion",
+        operacion: "UPDATE",
+        registroId: id,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo: viejo.rows[0] || null,
+        nuevo: result.rows[0] || null,
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT UPDATE TIPO TRANSACCION:",
+        e.message
+      );
+    }
+
     res.json(result.rows[0]);
 
   } catch (error) {
-    console.error("?? Error actualizando tipo:", error);
-    res.status(500).json({ error: "Error actualizando tipo de transaccion" });
+    console.error(
+      "Error actualizando tipo:",
+      error
+    );
+
+    res.status(500).json({
+      error: "Error actualizando tipo de transaccion"
+    });
   }
 };
 

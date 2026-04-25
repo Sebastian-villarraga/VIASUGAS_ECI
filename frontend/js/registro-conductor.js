@@ -11,8 +11,10 @@ async function initRegistroConductor() {
     return;
   }
 
-  await cargarTipos();
-  eventosRegistroConductor();
+  setTimeout(async () => {
+    await cargarTipos();
+    eventosRegistroConductor();
+  }, 50);
 }
 
 // =========================
@@ -86,35 +88,37 @@ function eventosRegistroConductor() {
   // GUARDAR GASTO
   // =========================
   btnGuardar.addEventListener("click", async () => {
-
-    const tipo = document.getElementById("rc-tipo")?.value;
-    const valor = document.getElementById("rc-valor")?.value;
-
-    if (!tipo || !valor) {
-      alert("Completa tipo y valor");
-      return;
-    }
-
-    const body = {
-      tipo_transaccion: tipo,
-      valor,
-      id_manifiesto: manifiestoActual,
-      descripcion: document.getElementById("rc-descripcion")?.value,
-      fecha: document.getElementById("rc-fecha")?.value
-    };
-
+  
     try {
+  
+      const tipo = document.getElementById("rc-tipo")?.value;
+      const valor = document.getElementById("rc-valor")?.value;
+  
+      if (!tipo || !valor) {
+        alert("Completa tipo y valor");
+        return;
+      }
+  
+      const body = {
+        tipo_transaccion: tipo,
+        valor,
+        id_manifiesto: manifiestoActual,
+        descripcion: document.getElementById("rc-descripcion")?.value,
+        fecha: document.getElementById("rc-fecha")?.value
+      };
+  
       await apiFetch("/api/gastos-conductor", {
         method: "POST",
         body: JSON.stringify(body)
       });
-
-      limpiarForm();
-      await cargarGastos();
-
+  
+      await cargarGastos();   // primero refresca tabla
+      limpiarFormRC();         // luego limpia
+  
     } catch (err) {
       console.error("Error guardando:", err);
     }
+  
   });
 }
 
@@ -185,12 +189,18 @@ async function cargarGastos() {
 // =========================
 // UTILS
 // =========================
-function limpiarForm() {
+function limpiarFormRC() {
+
+  const tipo = document.getElementById("rc-tipo");
   const valor = document.getElementById("rc-valor");
+  const fecha = document.getElementById("rc-fecha");
   const descripcion = document.getElementById("rc-descripcion");
 
+  if (tipo) tipo.selectedIndex = 0;
   if (valor) valor.value = "";
+  if (fecha) fecha.value = "";
   if (descripcion) descripcion.value = "";
+
 }
 
 function limpiarTabla() {

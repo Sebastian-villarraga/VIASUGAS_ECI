@@ -50,7 +50,7 @@ DROP DOMAIN IF EXISTS moneda CASCADE;
 CREATE TYPE tactivo AS ENUM ('activo', 'inactivo');
 CREATE TYPE tcuentabanco AS ENUM ('ahorros', 'corriente');
 CREATE TYPE tvalidacion AS ENUM ('pendiente', 'aprobado', 'rechazado');
-CREATE TYPE toperacion AS ENUM ('insert', 'update', 'delete');
+CREATE TYPE toperacion AS ENUM ('CREATE', 'UPDATE', 'DELETE');
 CREATE TYPE tingresoegreso AS ENUM ('INGRESO MANIFIESTO', 'EGRESO MANIFIESTO', 'EGRESO OPERACIONAL', 'GASTO CONDUCTOR');
 
 
@@ -275,17 +275,21 @@ CREATE TABLE gastos_conductor (
     FOREIGN KEY (id_manifiesto) REFERENCES manifiesto(id_manifiesto)
 );
 
+
 CREATE TABLE audit_logs (
     id SERIAL PRIMARY KEY,
-    nombre_tabla VARCHAR,
-    operacion toperacion,
-    id_registro INT,
-    id_usuario VARCHAR,
+    nombre_tabla VARCHAR(100) NOT NULL,
+    operacion toperacion NOT NULL,
+    id_registro VARCHAR(50) NOT NULL,
+    id_usuario VARCHAR NOT NULL,
     dato_antiguo JSONB,
     dato_nuevo JSONB,
-    creado TIMESTAMP,
+    ip VARCHAR(50),
+    user_agent TEXT,
+    creado TIMESTAMP DEFAULT NOW(),
 
-    FOREIGN KEY (id_usuario) REFERENCES usuario(id)
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuario(id)
 );
 
 CREATE TABLE ubicacion_colombia (

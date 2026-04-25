@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const audit = require("../utils/audit");
 
 // =========================
 // GET CON FILTROS + FLAG CONDUCTOR
@@ -148,9 +149,9 @@ const getTransacciones = async (req, res) => {
     const values = [];
     let i = 1;
 
-    /* =====================
-       FILTROS
-    ===================== */
+    // =====================
+    // FILTROS
+    // =====================
 
     if (fecha_desde) {
       query += ` AND t.fecha_pago >= $${i++}`;
@@ -187,9 +188,9 @@ const getTransacciones = async (req, res) => {
       values.push(id_empresa_a_cargo);
     }
 
-    /* =====================
-       ORDER
-    ===================== */
+    // =====================
+    // ORDER
+    // =====================
     query += `
       ORDER BY 
         t.fecha_pago DESC,
@@ -207,7 +208,6 @@ const getTransacciones = async (req, res) => {
     });
   }
 };
-
 
 // =========================
 // CREATE (VALIDADO)
@@ -228,8 +228,16 @@ const createTransaccion = async (req, res) => {
     // =========================
     // VALIDACIONES BASICAS
     // =========================
-    if (!id || !id_banco || !id_tipo_transaccion || !valor || !fecha_pago) {
-      return res.status(400).json({ error: "Campos obligatorios faltantes" });
+    if (
+      !id ||
+      !id_banco ||
+      !id_tipo_transaccion ||
+      !valor ||
+      !fecha_pago
+    ) {
+      return res.status(400).json({
+        error: "Campos obligatorios faltantes"
+      });
     }
 
     // =========================
@@ -241,7 +249,9 @@ const createTransaccion = async (req, res) => {
     );
 
     if (existe.rows.length > 0) {
-      return res.status(400).json({ error: "ID ya existe" });
+      return res.status(400).json({
+        error: "ID ya existe"
+      });
     }
 
     // =========================
@@ -253,7 +263,9 @@ const createTransaccion = async (req, res) => {
     );
 
     if (tipoRes.rows.length === 0) {
-      return res.status(400).json({ error: "Tipo de transaccion invalido" });
+      return res.status(400).json({
+        error: "Tipo de transaccion invalido"
+      });
     }
 
     const tipo = tipoRes.rows[0].tipo;
@@ -262,25 +274,33 @@ const createTransaccion = async (req, res) => {
     // REGLAS DE NEGOCIO
     // =========================
 
-
-    // ?? INGRESO MANIFIESTO
-    // SOLO exige manifiesto, NO factura
-    if (tipo === "INGRESO MANIFIESTO" && !id_manifiesto) {
+    // INGRESO MANIFIESTO
+    if (
+      tipo === "INGRESO MANIFIESTO" &&
+      !id_manifiesto
+    ) {
       return res.status(400).json({
         error: "Ingreso requiere manifiesto"
       });
     }
 
-    // OPERACIONAL ? NO manifiesto
-    if (tipo === "EGRESO OPERACIONAL" && id_manifiesto) {
+    // OPERACIONAL
+    if (
+      tipo === "EGRESO OPERACIONAL" &&
+      id_manifiesto
+    ) {
       return res.status(400).json({
-        error: "Egreso operacional no debe tener manifiesto"
+        error:
+          "Egreso operacional no debe tener manifiesto"
       });
     }
 
-    // MANIFIESTO ? requiere manifiesto
+    // MANIFIESTO
     if (
-      (tipo === "INGRESO MANIFIESTO" || tipo === "EGRESO MANIFIESTO") &&
+      (
+        tipo === "INGRESO MANIFIESTO" ||
+        tipo === "EGRESO MANIFIESTO"
+      ) &&
       !id_manifiesto
     ) {
       return res.status(400).json({
@@ -316,11 +336,35 @@ const createTransaccion = async (req, res) => {
       descripcion || null
     ]);
 
+    // =========================
+    // AUDITORIA CREATE
+    // =========================
+    try {
+      await audit({
+        tabla: "transaccion",
+        operacion: "CREATE",
+        registroId: result.rows[0].id,
+        usuarioId:
+          req.headers["x-usuario-id"] || "US1",
+        viejo: null,
+        nuevo: result.rows[0],
+        req
+      });
+    } catch (e) {
+      console.error(
+        "AUDIT CREATE TRANSACCION:",
+        e.message
+      );
+    }
+
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error creando transaccion" });
+
+    res.status(500).json({
+      error: "Error creando transaccion"
+    });
   }
 };
 

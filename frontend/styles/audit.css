@@ -1,0 +1,272 @@
+#audit-container {
+  padding: 28px;
+}
+
+.audit-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.audit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.audit-header h2 {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.audit-header p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.audit-btn-refresh {
+  border: none;
+  background: #3158ad;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.audit-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.audit-table thead {
+  background: #f8fafc;
+}
+
+.audit-table th {
+  text-align: left;
+  padding: 14px;
+  color: #334155;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 800;
+}
+
+.audit-table td {
+  padding: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a;
+  vertical-align: middle;
+}
+
+.audit-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.audit-badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-block;
+}
+
+.audit-create {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.audit-update {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.audit-delete {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.audit-btn-detail {
+  border: none;
+  background: #eef2ff;
+  color: #3158ad;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.audit-btn-detail:hover {
+  background: #dbeafe;
+}
+
+.audit-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.audit-modal.hidden {
+  display: none;
+}
+
+.audit-modal-box {
+  width: min(950px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+
+.audit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.audit-modal-header h3 {
+  margin: 0;
+  font-size: 26px;
+  color: #0f172a;
+}
+
+.audit-modal-header button {
+  border: none;
+  background: #ef4444;
+  color: white;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.audit-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.audit-detail-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.audit-detail-item small {
+  display: block;
+  color: #64748b;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.audit-detail-item strong {
+  color: #0f172a;
+}
+
+.audit-changes-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.audit-changes-table th {
+  background: #f8fafc;
+  color: #334155;
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.audit-changes-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.audit-old {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.audit-new {
+  color: #166534;
+  font-weight: 700;
+}
+
+.audit-json-box {
+  background: #0f172a;
+  color: #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  overflow-x: auto;
+  font-size: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 800px) {
+  .audit-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .audit-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-table {
+    min-width: 900px;
+  }
+}
+
+.audit-filtros{
+  display:flex;
+  gap:14px;
+  align-items:end;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+
+.audit-grupo{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.audit-grupo label{
+  font-size:13px;
+  font-weight:700;
+  color:#334155;
+}
+
+.audit-grupo input{
+  padding:10px 12px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+}
+
+.audit-table-wrapper{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:auto;
+  max-height:560px;
+}
