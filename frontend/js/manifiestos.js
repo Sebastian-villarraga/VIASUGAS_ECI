@@ -774,7 +774,7 @@ function renderDetalleModoLectura(data) {
 
     <div class="detalle-info-item">
       <span>Fecha</span>
-      <strong>${formatearFecha(manifiesto.fecha) || "-"}</strong>
+      <strong>${formatearFechaSafe(manifiesto.fecha) || "-"}</strong>
     </div>
 
     <div class="detalle-info-item">
@@ -944,12 +944,12 @@ function renderDetalleModoLectura(data) {
   
       <div class="detalle-item">
         <span>Fecha emisión</span>
-        <span>${formatearFecha(factura.fecha_emision)}</span>
+        <span>${formatearFechaSafe(factura.fecha_emision)}</span>
       </div>
   
       <div class="detalle-item">
         <span>Vencimiento</span>
-        <span>${formatearFecha(factura.fecha_vencimiento)}</span>
+        <span>${formatearFechaSafe(factura.fecha_vencimiento)}</span>
       </div>
     `;
   
@@ -1019,7 +1019,12 @@ async function activarEdicionDetalle() {
 
     <div class="detalle-info-item editando">
       <label for="detalleEditRadicado">Radicado</label>
-      <input type="number" id="detalleEditRadicado" value="${safe(manifiesto.radicado) === "-" ? "" : manifiesto.radicado}">
+      <input
+        type="text"
+        id="detalleEditRadicado"
+        placeholder="Opcional"
+        value="${safe(manifiesto.radicado) === "-" ? "" : manifiesto.radicado}"
+      >
     </div>
 
     <div class="detalle-info-item editando">
@@ -1176,7 +1181,7 @@ async function guardarEdicionDetalle() {
   const destinoSelect = document.getElementById("detalleEditDestino");
 
   const payload = {
-    radicado: document.getElementById("detalleEditRadicado")?.value?.trim() || "",
+    radicado:  document.getElementById("detalleEditRadicado")?.value?.trim() || null,
     fecha: document.getElementById("detalleEditFecha")?.value || "",
     origen_ciudad: origenSelect?.value || "",
     origen_departamento: origenSelect?.selectedOptions?.[0]?.dataset?.departamento || "",

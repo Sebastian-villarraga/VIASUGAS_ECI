@@ -426,8 +426,8 @@ const updateManifiesto = async (req, res) => {
       [id_manifiesto]
     );
 
+    // ? radicado y cliente NO obligatorios
     if (
-      !radicado ||
       !fecha ||
       !origen_departamento ||
       !origen_ciudad ||
@@ -439,7 +439,6 @@ const updateManifiesto = async (req, res) => {
       anticipo_manifiesto === undefined ||
       !gastos ||
       !documentos ||
-      !id_cliente ||
       !id_conductor ||
       !id_vehiculo ||
       !id_trailer ||
@@ -460,24 +459,30 @@ const updateManifiesto = async (req, res) => {
     }
 
     await validarRelaciones({
-      id_cliente,
+      id_cliente: id_cliente || null,
       id_conductor,
       id_vehiculo,
       id_trailer,
       id_empresa_a_cargo
     });
 
-    const radicadoDuplicado = await pool.query(
-      `
-      SELECT radicado
-      FROM manifiesto
-      WHERE radicado = $1 AND id_manifiesto <> $2
-      `,
-      [radicado, id_manifiesto]
-    );
+    // ? Validar radicado duplicado solo si viene dato
+    if (radicado !== null && radicado !== undefined && radicado !== "") {
+      const radicadoDuplicado = await pool.query(
+        `
+        SELECT radicado
+        FROM manifiesto
+        WHERE radicado = $1
+          AND id_manifiesto <> $2
+        `,
+        [Number(radicado), id_manifiesto]
+      );
 
-    if (radicadoDuplicado.rows.length > 0) {
-      return res.status(400).json({ error: "El radicado ya está en uso por otro manifiesto" });
+      if (radicadoDuplicado.rows.length > 0) {
+        return res.status(400).json({
+          error: "El radicado ya está en uso por otro manifiesto"
+        });
+      }
     }
 
     const query = `
@@ -507,9 +512,15 @@ const updateManifiesto = async (req, res) => {
     `;
 
     const values = [
-      Number(radicado),
-      id_cliente,
-      id_conductor ? Number(id_conductor) : null,
+      radicado !== null && radicado !== undefined && radicado !== ""
+        ? Number(radicado)
+        : null,
+
+      id_cliente && id_cliente !== ""
+        ? id_cliente
+        : null,
+
+      Number(id_conductor),
       id_vehiculo,
       id_trailer,
       id_empresa_a_cargo,
@@ -563,6 +574,8 @@ const updateManifiesto = async (req, res) => {
     res.status(500).json({ error: "Error actualizando manifiesto" });
   }
 };
+
+
 
 // =========================================
 // CATÁLOGOS PARA SELECTS

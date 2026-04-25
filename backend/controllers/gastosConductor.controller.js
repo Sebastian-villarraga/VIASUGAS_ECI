@@ -12,7 +12,8 @@ const getGastosConductor = async (_req, res) => {
         gc.*,
         c.nombre AS conductor_nombre,
         t.valor,
-        t.descripcion AS transaccion_descripcion
+        t.descripcion AS transaccion_descripcion,
+        t.id_tipo_transaccion
       FROM gastos_conductor gc
       INNER JOIN conductor c 
         ON gc.id_conductor = c.cedula
@@ -24,8 +25,6 @@ const getGastosConductor = async (_req, res) => {
     res.json(result.rows);
 
   } catch (error) {
-    console.error("Error obteniendo gastos:", error);
-
     res.status(500).json({
       error: "Error obteniendo gastos conductor"
     });
@@ -33,7 +32,7 @@ const getGastosConductor = async (_req, res) => {
 };
 
 // =========================
-// POST
+// CREATE
 // =========================
 const createGastoConductor = async (req, res) => {
   const client = await pool.connect();
@@ -47,54 +46,28 @@ const createGastoConductor = async (req, res) => {
       fecha
     } = req.body;
 
-    if (
-      !tipo_transaccion ||
-      !id_manifiesto ||
-      !valor
-    ) {
+    if (!tipo_transaccion || !valor || !id_manifiesto) {
       return res.status(400).json({
-        error:
-          "tipo_transaccion, valor e id_manifiesto son obligatorios"
+        error: "tipo_transaccion, valor e id_manifiesto son obligatorios"
       });
     }
 
     await client.query("BEGIN");
 
-    // =========================
-    // 1. OBTENER CONDUCTOR
-    // =========================
-    const resultManifiesto = await client.query(`
+    const mani = await client.query(`
       SELECT id_conductor
       FROM manifiesto
       WHERE id_manifiesto = $1
-    `, [id_manifiesto]);
+    `,[id_manifiesto]);
 
-    if (
-      resultManifiesto.rows.length === 0
-    ) {
-      throw new Error(
-        "Manifiesto no encontrado"
-      );
-    }
+    const id_conductor = mani.rows[0].id_conductor;
 
-    const id_conductor =
-      resultManifiesto.rows[0]
-        .id_conductor;
+    const id_transaccion = randomUUID();
+    const id_gasto = randomUUID();
 
-    // =========================
-    // 2. CREAR TRANSACCION
-    // =========================
-    const id_transaccion =
-      randomUUID();
-
-    const id_banco_default =
-      null; // mantener lógica original
-
-    const transaccionResult =
-      await client.query(`
-      INSERT INTO transaccion (
+    await client.query(`
+      INSERT INTO transaccion(
         id,
-        id_banco,
         id_tipo_transaccion,
         id_manifiesto,
         valor,
@@ -102,28 +75,18 @@ const createGastoConductor = async (req, res) => {
         descripcion,
         creado
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,NOW())
-      RETURNING *
-    `, [
-        id_transaccion,
-        id_banco_default,
-        tipo_transaccion,
-        id_manifiesto,
-        valor,
-        fecha || new Date(),
-        descripcion ||
-          "Gasto conductor"
-      ]);
+      VALUES($1,$2,$3,$4,$5,$6,NOW())
+    `,[
+      id_transaccion,
+      tipo_transaccion,
+      id_manifiesto,
+      valor,
+      fecha,
+      descripcion
+    ]);
 
-    // =========================
-    // 3. CREAR GASTO
-    // =========================
-    const id_gasto =
-      randomUUID();
-
-    const gastoResult =
-      await client.query(`
-      INSERT INTO gastos_conductor (
+    const gasto = await client.query(`
+      INSERT INTO gastos_conductor(
         id,
         id_transaccion,
         id_conductor,
@@ -131,95 +94,131 @@ const createGastoConductor = async (req, res) => {
         descripcion,
         creado
       )
-      VALUES ($1,$2,$3,$4,$5,$6)
+      VALUES($1,$2,$3,$4,$5,NOW())
       RETURNING *
-    `, [
-        id_gasto,
-        id_transaccion,
-        id_conductor,
-        id_manifiesto,
-        descripcion || "",
-        fecha || new Date()
-      ]);
+    `,[
+      id_gasto,
+      id_transaccion,
+      id_conductor,
+      id_manifiesto,
+      descripcion
+    ]);
 
     await client.query("COMMIT");
 
-    // =========================
-    // AUDITORIA CREATE TRANSACCION
-    // =========================
-    try {
-      await audit({
-        tabla: "transaccion",
-        operacion: "CREATE",
-        registroId:
-          id_transaccion,
-        usuarioId:
-          req.headers[
-            "x-usuario-id"
-          ] || "US1",
-        viejo: null,
-        nuevo:
-          transaccionResult
-            .rows[0],
-        req
-      });
-    } catch (e) {
-      console.error(
-        "AUDIT CREATE TRANSACCION GC:",
-        e.message
-      );
-    }
-
-    // =========================
-    // AUDITORIA CREATE GASTO
-    // =========================
-    try {
-      await audit({
-        tabla:
-          "gastos_conductor",
-        operacion:
-          "CREATE",
-        registroId: id_gasto,
-        usuarioId:
-          req.headers[
-            "x-usuario-id"
-          ] || "US1",
-        viejo: null,
-        nuevo:
-          gastoResult.rows[0],
-        req
-      });
-    } catch (e) {
-      console.error(
-        "AUDIT CREATE GASTO CONDUCTOR:",
-        e.message
-      );
-    }
-
-    res.status(201).json(
-      gastoResult.rows[0]
-    );
-
-  } catch (error) {
-    await client.query(
-      "ROLLBACK"
-    );
-
-    console.error(
-      "Error creando gasto:",
-      error
-    );
-
-    res.status(500).json({
-      error: error.message
+    await audit({
+      tabla:"gastos_conductor",
+      operacion:"CREATE",
+      registroId:id_gasto,
+      usuarioId:req.headers["x-usuario-id"] || "US1",
+      viejo:null,
+      nuevo:gasto.rows[0],
+      req
     });
 
-  } finally {
+    res.status(201).json(gasto.rows[0]);
+
+  } catch(error){
+
+    await client.query("ROLLBACK");
+
+    res.status(500).json({
+      error:error.message
+    });
+
+  } finally{
+    client.release();
+  }
+};
+
+// =========================
+// UPDATE
+// =========================
+const updateGastoConductor = async (req, res) => {
+
+  const client = await pool.connect();
+
+  try {
+
+    const { id } = req.params;
+    const {
+      valor,
+      descripcion
+    } = req.body;
+
+    await client.query("BEGIN");
+
+    const oldData = await client.query(`
+      SELECT 
+        gc.*,
+        t.valor,
+        t.descripcion AS transaccion_descripcion
+      FROM gastos_conductor gc
+      INNER JOIN transaccion t
+        ON gc.id_transaccion = t.id
+      WHERE gc.id = $1
+    `,[id]);
+
+    if (!oldData.rows.length) {
+      throw new Error("Gasto no encontrado");
+    }
+
+    const gasto = oldData.rows[0];
+
+    await client.query(`
+      UPDATE transaccion
+      SET valor = $1,
+          descripcion = $2
+      WHERE id = $3
+    `,[
+      valor,
+      descripcion,
+      gasto.id_transaccion
+    ]);
+
+    await client.query(`
+      UPDATE gastos_conductor
+      SET descripcion = $1
+      WHERE id = $2
+    `,[
+      descripcion,
+      id
+    ]);
+
+    await client.query("COMMIT");
+
+    await audit({
+      tabla:"gastos_conductor",
+      operacion:"UPDATE",
+      registroId:id,
+      usuarioId:req.headers["x-usuario-id"] || "US1",
+      viejo:oldData.rows[0],
+      nuevo:{
+        valor,
+        descripcion
+      },
+      req
+    });
+
+    res.json({
+      ok:true
+    });
+
+  } catch(error){
+
+    await client.query("ROLLBACK");
+
+    res.status(500).json({
+      error:error.message
+    });
+
+  } finally{
     client.release();
   }
 };
 
 module.exports = {
   getGastosConductor,
-  createGastoConductor
+  createGastoConductor,
+  updateGastoConductor
 };

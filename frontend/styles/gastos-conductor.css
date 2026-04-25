@@ -392,3 +392,45 @@
     font-size: 20px;
   }
 }
+
+/* =====================================
+   INLINE EDIT ELEGANTE
+===================================== */
+
+.gsx-table tr.gsx-editing {
+  background: #f8fbff;
+}
+
+.gsx-table tr.gsx-editing td {
+  border-bottom: 1px solid #dbeafe;
+}
+
+.gsx-inline-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 14px;
+  background: #ffffff;
+  color: #111827;
+  box-sizing: border-box;
+  transition: .2s ease;
+}
+
+.gsx-inline-input:focus {
+  outline: none;
+  border-color: #2f56a6;
+  box-shadow: 0 0 0 3px rgba(47,86,166,.12);
+}
+
+.gsx-inline-input.valor {
+  max-width: 140px;
+  text-align: right;
+  font-weight: 700;
+}
+
+.gsx-inline-input.descripcion {
+  min-width: 320px;
+}
+

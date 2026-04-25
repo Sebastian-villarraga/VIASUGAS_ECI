@@ -3,17 +3,14 @@ const router = express.Router();
 
 const {
   getGastosConductor,
-  createGastoConductor
+  createGastoConductor,
+  updateGastoConductor
 } = require("../controllers/gastosConductor.controller");
 
-// =========================
-// GET
-// =========================
 router.get("/", getGastosConductor);
 
-// =========================
-// POST
-// =========================
 router.post("/", createGastoConductor);
+
+router.put("/:id", updateGastoConductor);
 
 module.exports = router;

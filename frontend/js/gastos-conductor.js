@@ -77,11 +77,12 @@ async function gc_cargarGastos() {
 
   filtrados.forEach(g => {
     tbody.innerHTML += `
-      <tr 
-        data-id="${g.id}"
-        data-manifiesto="${g.id_manifiesto}"
-        data-valor="${g.valor}"
-        data-descripcion="${g.descripcion || ""}"
+      <tr
+         data-id="${g.id}"
+         data-manifiesto="${g.id_manifiesto}"
+         data-valor="${g.valor}"
+         data-descripcion="${g.descripcion || ""}"
+         data-tipo="${g.id_tipo_transaccion || g.tipo_transaccion || ""}"
       >
         <td>${gc_formatearFecha(g.creado)}</td>
         <td>${g.conductor_nombre || ""}</td>
@@ -123,41 +124,40 @@ function gc_editarGasto(btn, id) {
   window.gc_editando = true;
 
   const fila = btn.closest("tr");
+  fila.classList.add("gsx-editing");
+
   const data = fila.dataset;
   const celdas = fila.querySelectorAll("td");
 
-  // MANIFIESTO
-  celdas[2].innerHTML = `
-    <select id="editManifiesto">
-      ${gc_catalogos.manifiestos.map(m => `
-        <option value="${m.id_manifiesto}" ${m.id_manifiesto == data.manifiesto ? "selected" : ""}>
-          ${m.id_manifiesto}
-        </option>
-      `).join("")}
-    </select>
-  `;
+  // Manifiesto solo lectura
+  celdas[2].textContent = data.manifiesto;
 
-  // VALOR
+  // Valor elegante
   celdas[3].innerHTML = `
-    <input type="text" id="editValor" value="${Number(data.valor).toLocaleString()}">
+    <input
+      type="text"
+      id="editValor"
+      class="gsx-inline-input valor"
+      value="${Number(data.valor).toLocaleString()}"
+    >
   `;
 
-  // DESCRIPCIÓN + TIPO
+  // Descripción elegante
   celdas[4].innerHTML = `
-    <select id="editTipo">
-      ${gc_catalogos.tipos.map(t => `
-        <option value="${t.id}">
-          ${t.categoria}
-        </option>
-      `).join("")}
-    </select>
-
-    <input type="text" id="editDescripcion" value="${data.descripcion}">
+    <input
+      type="text"
+      id="editDescripcion"
+      class="gsx-inline-input descripcion"
+      value="${data.descripcion || ""}"
+    >
   `;
 
-  // ACCIONES
+  // Botón guardar
   celdas[5].innerHTML = `
-    <button class="btn-icon btn-save" onclick="gc_guardarGasto(this, '${id}')">
+    <button
+      class="btn-icon guardar"
+      onclick="gc_guardarGasto(this,'${id}')"
+    >
       <i class="fas fa-save"></i>
     </button>
   `;
@@ -175,39 +175,49 @@ function gc_editarGasto(btn, id) {
 // =========================
 async function gc_guardarGasto(btn, id) {
 
-  const fila = btn.closest("tr");
-
-  const manifiesto = fila.querySelector("#editManifiesto").value;
-  const valorRaw = fila.querySelector("#editValor").value.replace(/\D/g, "");
-  const descripcion = fila.querySelector("#editDescripcion").value;
-  const tipo_transaccion = fila.querySelector("#editTipo").value;
-
-  const data = {
-    id,
-    tipo_transaccion, // ?? CLAVE
-    id_manifiesto: manifiesto,
-    valor: Number(valorRaw),
-    descripcion
-  };
-
   try {
 
-    await apiFetch("/api/gastos-conductor", {
-      method: "POST",
-      body: JSON.stringify(data)
+    const fila = btn.closest("tr");
+
+    const valorRaw =
+      fila.querySelector("#editValor").value.replace(/\D/g, "");
+
+    const descripcion =
+      fila.querySelector("#editDescripcion").value.trim();
+
+    if (!valorRaw) {
+      showToast("Ingresa valor", "warning");
+      return;
+    }
+
+    await apiFetch(`/api/gastos-conductor/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        valor: Number(valorRaw),
+        descripcion
+      })
     });
 
-    showToast("Gasto actualizado", "success");
+    showToast("Actualizado correctamente", "success");
 
     window.gc_editando = false;
 
-    document.querySelectorAll(".btn-icon").forEach(b => b.disabled = false);
+    document.querySelectorAll(".btn-icon").forEach(b => {
+      b.disabled = false;
+    });
 
-    gc_cargarGastos();
+    await gc_cargarGastos();
 
   } catch (error) {
-    console.error(error);
-    showToast("Error actualizando gasto", "error");
+    console.error("Error actualizando:", error);
+
+    showToast("Error actualizando", "error");
+
+    window.gc_editando = false;
+
+    document.querySelectorAll(".btn-icon").forEach(b => {
+      b.disabled = false;
+    });
   }
 }
 
