@@ -1,131 +1,142 @@
 /* ========================= */
-/* SIDEBAR PRO (FIX FINAL) */
+/* SIDEBAR MODERNO PRO */
 /* ========================= */
 
-.sidebar {
-  width: 40px; /* colapsado */
-  height: calc(100vh - 60px);
-  background: #1e3c72;
-  color: white;
-  box-sizing: border-box; /* ?? CLAVE */
+.sidebar{
   position: fixed;
-  top: 60px;
-  left: 0;
-
-  display: flex;
-  flex-direction: column;
-
-  transition: width 0.3s ease;
-
-  overflow-y: auto;   /* ?? SCROLL */
-  overflow-x: hidden; /* evita scroll horizontal */
-
-  z-index: 900;
+  top:60px;
+  left:0;
+  height:calc(100vh - 60px);
+  width:64px;
+  background:#1e3c72;
+  color:#fff;
+  overflow:hidden;
+  overflow-y:auto;
+  transition:width .25s ease;
+  z-index:900;
 }
 
-/* SCROLL FINO (opcional pero pro) */
-.sidebar::-webkit-scrollbar {
-  width: 5px;
-}
-.sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.25);
-  border-radius: 10px;
+/* abierto */
+.sidebar.open{
+  width:190px;
 }
 
-/* ========================= */
-/* EXPANSIÓN */
-/* ========================= */
-.sidebar:hover {
-  width: 150px;
+/* scrollbar */
+.sidebar::-webkit-scrollbar{
+  width:5px;
 }
 
-/* ========================= */
-/* MENÚ */
-/* ========================= */
-.menu {
-  list-style: none;
-  padding: 5px 0;
-  margin: 0;
+.sidebar::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.25);
+  border-radius:20px;
 }
 
-/* ========================= */
-/* ITEMS */
-/* ========================= */
-.menu-item {
-  display: flex;
+/* menu */
+.menu{
+  list-style:none;
+  padding:10px 0;
+  margin:0;
 }
 
-.menu-item a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 10px 15px; /* ?? más compacto */
-  font-size: 14px;    /* ?? más pequeño */
-  font-weight: 400;
-
-  color: white !important;
-  text-decoration: none;
-
-  opacity: 0.85;
-  transition: 0.2s;
+/* item */
+.menu-item{
+  width:100%;
 }
 
-/* CUANDO EXPANDE */
-.sidebar:hover .menu-item a {
-  justify-content: flex-start;
+.menu-item a{
+  display:flex;
+  align-items:center;
+  gap:8px;                 /* menos espacio icono-texto */
+  height:34px;             /* más compacto */
+  padding:0 14px;
+  color:#fff;
+  text-decoration:none;
+  white-space:nowrap;
+  font-size:12px;          /* texto más pequeño */
+  font-weight:400;
+  transition:.2s;
 }
 
-/* TEXTO OCULTO */
-.menu-item span {
-  display: none;
+/* ICONOS MÁS PEQUEÑOS */
+.menu-item i{
+  width:16px;
+  min-width:16px;
+  font-size:13px;
+  text-align:center;
 }
 
-/* TEXTO VISIBLE */
-.sidebar:hover .menu-item span {
-  display: inline;
+/* texto oculto */
+.menu-item span{
+  opacity:0;
+  visibility:hidden;
+  transition:.15s;
 }
 
-/* HOVER */
-.menu-item a:hover {
-  background: rgba(255, 255, 255, 0.12);
-  opacity: 1;
+/* mostrar texto */
+.sidebar.open .menu-item span{
+  opacity:1;
+  visibility:visible;
 }
 
-/* ACTIVO */
-.menu-item.active a {
-  background: rgba(255,255,255,0.18);
+/* hover */
+.menu-item a:hover{
+  background:rgba(255,255,255,.12);
 }
 
-
-/* ========================= */
-/* SECCIONES (AGRUPADORES) */
-/* ========================= */
-
-.menu-section {
-  display: none; /* ?? OCULTO POR DEFECTO */
+/* activo */
+.menu-item.active a{
+  background:rgba(255,255,255,.18);
 }
 
-/* CUANDO EXPANDE */
-.sidebar:hover .menu-section {
-  display: block;
-  padding: 10px 15px;
-  font-size: 16px;
-  text-transform: uppercase;
-  opacity: 0.5;
+/* TEXTO AGRUPADOR MÁS PEQUEÑO */
+.menu-section{
+  display:none;
 }
 
-/* ========================= */
-/* CONTENIDO */
-/* ========================= */
-.content {
-  margin-top: 60px;
-  margin-left: 40px;
-  width: 95%;
-
+.sidebar.open .menu-section{
+  display:block;
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:1px;
+  color:rgba(255,255,255,.45);
+  padding:6px 14px 3px;
+  margin-top:4px;
+  line-height:1;
 }
 
-.sidebar:hover ~ .content {
-  margin-left: 40px;
-  width: 95%; 
+/* contenido */
+.content{
+  margin-top:60px;
+  margin-left:60px;
+  width:calc(100% - 64px);
+  min-height:calc(100vh - 60px);
+  transition:.25s ease;
+}
+
+/* cuando abre sidebar */
+.sidebar.open ~ .content{
+  margin-left:60px;
+}
+
+.menu-toggle{
+  background:none;
+  border:none;
+  color:white;
+  font-size:20px;
+  cursor:pointer;
+  margin-right:15px;
+}
+
+.sidebar{
+   width:64px;
+   transition:.25s;
+}
+
+.sidebar.open{
+   width:220px;
+}
+
+.sidebar.open ~ .content{
+   margin-left:220px;
+   width:calc(100% - 220px);
 }
