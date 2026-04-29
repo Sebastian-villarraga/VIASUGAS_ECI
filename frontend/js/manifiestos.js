@@ -48,6 +48,9 @@ function initEventosManifiestos() {
 
   document.getElementById("btnLimpiarFiltrosManifiestos")
     ?.addEventListener("click", limpiarFiltrosManifiestos);
+    
+  document.getElementById("btnExportarExcelManifiestos")
+    ?.addEventListener("click", exportarExcelManifiestos);
 
   document.getElementById("filtroAnio")
     ?.addEventListener("change", filtrarManifiestos);
@@ -332,6 +335,63 @@ function limpiarFiltrosManifiestos() {
   document.getElementById("filtroCliente").value = "";
 
   cargarManifiestos();
+}
+
+function obtenerParamsFiltrosManifiestos() {
+  const idManifiesto = document.getElementById("filtroIdManifiesto")?.value.trim() || "";
+  const fechaDesde = document.getElementById("filtroFechaDesde")?.value || "";
+  const fechaHasta = document.getElementById("filtroFechaHasta")?.value || "";
+  const estado = document.getElementById("filtroEstado")?.value || "";
+  const idCliente = document.getElementById("filtroCliente")?.value || "";
+
+  const params = new URLSearchParams();
+
+  if (idManifiesto) params.append("id_manifiesto", idManifiesto);
+  if (fechaDesde) params.append("fecha_desde", fechaDesde);
+  if (fechaHasta) params.append("fecha_hasta", fechaHasta);
+  if (estado) params.append("estado", estado);
+  if (idCliente) params.append("id_cliente", idCliente);
+
+  return params;
+}
+
+async function exportarExcelManifiestos() {
+  try {
+    const params = obtenerParamsFiltrosManifiestos();
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`/api/manifiestos/exportar-excel?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` })
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error("No se pudo exportar el Excel");
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+
+    const hoy = new Date().toISOString().split("T")[0];
+    link.download = `Manifiestos_${hoy}.xlsx`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+
+    showToast("Excel descargado correctamente", "success");
+
+  } catch (error) {
+    console.error("Error exportando Excel:", error);
+    showToast("Error descargando Excel", "error");
+  }
 }
 
 // =========================

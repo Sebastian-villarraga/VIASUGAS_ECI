@@ -776,6 +776,7 @@
     .95fr    /* estado */
     .95fr    /* cliente */
     .85fr    /* limpiar */
+    .45fr    /* excel */
     !important;
 
   gap:8px !important;
@@ -870,4 +871,22 @@
   .mfx-btn{
     width:100% !important;
   }
+}
+
+.mfx-btn-excel {
+  background: #15803d !important;
+  color: #fff !important;
+  width: 42px !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mfx-btn-excel:hover {
+  background: #166534 !important;
+}
+
+.mfx-btn-excel i {
+  font-size: 16px;
 }
