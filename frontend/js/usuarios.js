@@ -41,47 +41,52 @@ function eventosUsuarios() {
   }
 
   btnGuardar.addEventListener("click", async () => {
-
+  
     const id = document.getElementById("us-id")?.value.trim();
     const nombre = document.getElementById("us-nombre")?.value.trim();
     const correo = document.getElementById("us-correo")?.value.trim();
-
-    // =========================
-    // VALIDACIONES
-    // =========================
+  
     if (!id || !nombre || !correo) {
       showToast("Todos los campos son obligatorios", "error");
       return;
     }
-
+  
     if (!/^\d+$/.test(id)) {
-      showToast("La cÃ©dula debe contener solo nÃºmeros", "error");
+      showToast("La cédula debe contener solo números", "error");
       return;
     }
-
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
+  
+    if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(nombre)) {
       showToast("El nombre solo puede contener letras", "error");
       return;
     }
-
+  
     if (!esCorreoValido(correo)) {
-      showToast("Correo invÃ¡lido", "error");
+      showToast("Correo inválido", "error");
       return;
     }
-
+  
     const permisos = obtenerPermisosSeleccionados();
-
+  
     try {
-      await apiFetch("/api/usuarios", {
+      const resp = await apiFetch("/api/usuarios", {
         method: "POST",
-        body: JSON.stringify({ id, nombre, correo, permisos })
+        body: JSON.stringify({
+          id,
+          nombre,
+          correo,
+          permisos
+        })
       });
-
-      showToast("Usuario creado correctamente", "success");
-
+  
       limpiarForm();
       await cargarUsuarios();
-
+  
+      mostrarModalNuevoUsuario(
+        resp.correo,
+        resp.temporalPassword
+      );
+  
     } catch (err) {
       console.error("Error creando usuario:", err);
       showToast("Error creando usuario", "error");
@@ -315,31 +320,105 @@ function limpiarForm() {
 async function confirmarResetPassword() {
   if (!usuarioResetId) return;
 
-  const modal = document.getElementById("modal-reset");
-  const botones = modal.querySelectorAll("button");
-
-  // solo evitar doble click (sin daÃ±ar estilos)
-  botones.forEach(b => b.style.pointerEvents = "none");
-
   try {
-    await apiFetch(`/api/usuarios/${usuarioResetId}/reset-password`, {
-      method: "POST"
-    });
+    const resp = await apiFetch(
+      `/api/usuarios/${usuarioResetId}/reset-password`,
+      {
+        method: "POST"
+      }
+    );
 
-    showToast("ContraseÃ±a restablecida correctamente", "success");
-
-    cerrarModalReset();
+    mostrarPasswordTemporal(resp.temporalPassword);
 
   } catch (err) {
-    console.error("Error reset password:", err);
-    showToast("Error al restablecer contraseÃ±a", "error");
-
-    // reactivar interacciÃ³n
-    botones.forEach(b => b.style.pointerEvents = "auto");
+    console.error(err);
+    showToast("Error restableciendo contraseña", "error");
   }
 }
 
+function mostrarPasswordTemporal(password) {
 
+  const text = document.getElementById("reset-text");
+  const actions = document.querySelector("#modal-reset .modal-actions");
+
+  text.innerHTML = `
+    <div style="margin-top:10px;">
+      <div style="font-size:13px;color:#6b7280;">
+        Nueva contraseña temporal:
+      </div>
+
+      <div id="temp-pass-box"
+        style="
+          margin-top:10px;
+          font-size:28px;
+          font-weight:700;
+          letter-spacing:3px;
+          color:#2f56a6;
+        ">
+        ${password}
+      </div>
+
+      <div style="font-size:12px;color:#dc2626;margin-top:10px;">
+        Esta contraseña solo se mostrará una vez
+      </div>
+    </div>
+  `;
+
+  actions.innerHTML = `
+    <button class="modal-btn modal-btn-cancel"
+      onclick="copiarPasswordTemporal('${password}')">
+      Copiar
+    </button>
+
+    <button class="modal-btn modal-btn-primary"
+      onclick="cerrarModalReset()">
+      Cerrar
+    </button>
+  `;
+}
+
+function copiarPasswordTemporal(password) {
+
+  // método moderno
+  if (navigator.clipboard && window.isSecureContext) {
+
+    navigator.clipboard.writeText(password)
+      .then(() => {
+        showToast("Contraseña copiada", "success");
+      })
+      .catch(() => {
+        copiarFallback(password);
+      });
+
+    return;
+  }
+
+  // fallback
+  copiarFallback(password);
+}
+
+function copiarFallback(texto) {
+
+  const input = document.createElement("textarea");
+
+  input.value = texto;
+  input.style.position = "fixed";
+  input.style.left = "-9999px";
+
+  document.body.appendChild(input);
+
+  input.focus();
+  input.select();
+
+  try {
+    document.execCommand("copy");
+    showToast("Contraseña copiada", "success");
+  } catch (err) {
+    alert("Copia manualmente: " + texto);
+  }
+
+  document.body.removeChild(input);
+}
 
 function resetPassword(id) {
   usuarioResetId = id;
@@ -348,18 +427,22 @@ function resetPassword(id) {
 
   const modal = document.getElementById("modal-reset");
   const text = document.getElementById("reset-text");
+  const actions = document.querySelector("#modal-reset .modal-actions");
 
-  if (!modal || !text) return;
+  text.textContent =
+    `¿Restablecer contraseña de ${usuario?.nombre}?`;
 
-  text.textContent = `Â¿Restablecer contraseÃ±a de ${usuario?.nombre || "este usuario"}?`;
+  actions.innerHTML = `
+    <button class="modal-btn modal-btn-cancel"
+      onclick="cerrarModalReset()">
+      Cancelar
+    </button>
 
-  const botones = modal.querySelectorAll("button");
-
-  botones.forEach(btn => {
-    btn.disabled = false;              // ? quitar disabled
-    btn.style.pointerEvents = "auto";  // ? reactivar clicks
-    btn.style.opacity = "1";           // ? forzar visual normal
-  });
+    <button class="modal-btn modal-btn-primary"
+      onclick="confirmarResetPassword()">
+      Restablecer
+    </button>
+  `;
 
   modal.classList.remove("hidden");
 }
@@ -489,4 +572,102 @@ function cerrarModalReset() {
 
 function esCorreoValido(correo) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+}
+
+
+function mostrarModalNuevoUsuario(correo, password) {
+
+  const modal = document.getElementById("modal-credenciales");
+
+  if (!modal) return;
+
+  modal.innerHTML = `
+    <div class="modal-backdrop">
+      <div class="modal-card">
+
+        <h2 style="margin-bottom:18px;">
+          Usuario creado
+        </h2>
+
+        <div class="cred-row">
+          <label>Correo</label>
+
+          <div class="cred-box">
+            <span>${correo}</span>
+
+            <button
+              onclick="copiarTexto('${correo}')">
+              Copiar
+            </button>
+          </div>
+        </div>
+
+        <div class="cred-row">
+          <label>Contraseña temporal</label>
+
+          <div class="cred-box">
+            <span>${password}</span>
+
+            <button
+              onclick="copiarTexto('${password}')">
+              Copiar
+            </button>
+          </div>
+        </div>
+
+        <p class="cred-warning">
+          Esta contraseña solo se mostrará una vez.
+          El usuario deberá cambiarla al ingresar.
+        </p>
+
+        <button class="modal-btn modal-btn-primary"
+          style="width:100%;margin-top:14px;"
+          onclick="cerrarModalCredenciales()">
+          Entendido
+        </button>
+
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove("hidden");
+}
+
+function cerrarModalCredenciales() {
+  const modal =
+    document.getElementById("modal-credenciales");
+
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.innerHTML = "";
+  }
+}
+
+function copiarTexto(texto) {
+
+  if (navigator.clipboard &&
+      window.isSecureContext) {
+
+    navigator.clipboard.writeText(texto)
+      .then(() => {
+        showToast("Copiado", "success");
+      });
+
+    return;
+  }
+
+  const input =
+    document.createElement("textarea");
+
+  input.value = texto;
+
+  document.body.appendChild(input);
+
+  input.select();
+
+  document.execCommand("copy");
+
+  document.body.removeChild(input);
+
+  showToast("Copiado", "success");
 }

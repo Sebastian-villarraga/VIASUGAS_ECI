@@ -171,7 +171,7 @@ async function guardarNuevaPassword() {
     pass1.value = "";
     pass2.value = "";
 
-    window.location.href = "/pages/home.html";
+    window.location.href = "/pages/home.html#inicio";
 
   } catch (err) {
     console.error(err);
@@ -280,12 +280,16 @@ function initPasswordValidation() {
 
 
 function setUserName() {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  if (!user || !user.correo) return;
-
-  const nombre = user.correo.split("@")[0];
+  const user = JSON.parse(
+    localStorage.getItem("user") || "{}"
+  );
 
   const span = document.getElementById("userName");
-  if (span) span.textContent = nombre;
+
+  if (!span) return;
+
+  span.textContent =
+    user?.nombre ||
+    user?.correo ||
+    "Usuario";
 }

@@ -49,11 +49,23 @@ const createUsuario = async (req, res) => {
 
     await client.query("BEGIN");
 
-    // contraseña automática
-    const passwordPlano = correo.split("@")[0];
+    // ============================
+    // PASSWORD TEMPORAL ALEATORIA
+    // ============================
+    const chars =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+
+    let passwordPlano = "";
+
+    for (let i = 0; i < 10; i++) {
+      passwordPlano += chars.charAt(
+        Math.floor(Math.random() * chars.length)
+      );
+    }
+
     const hash = await bcrypt.hash(passwordPlano, 10);
 
-    // insertar usuario
+    // crear usuario
     await client.query(`
       INSERT INTO usuario (
         id,
@@ -64,67 +76,48 @@ const createUsuario = async (req, res) => {
         debe_cambiar_contrasena,
         creado
       )
-      VALUES ($1, $2, $3, $4, TRUE, TRUE, NOW())
+      VALUES ($1,$2,$3,$4,TRUE,TRUE,NOW())
     `, [id, nombre, correo, hash]);
 
     // permisos
-    if (permisos && permisos.length > 0) {
-      for (const codigo of permisos) {
-        const perm = await client.query(
-          `SELECT id FROM permiso WHERE codigo = $1`,
-          [codigo]
-        );
+    let permisosFinal = Array.isArray(permisos)
+      ? [...permisos]
+      : [];
 
-        if (perm.rows.length) {
-          await client.query(`
-            INSERT INTO usuario_permiso (
-              id_usuario,
-              id_permiso
-            )
-            VALUES ($1, $2)
-          `, [id, perm.rows[0].id]);
-        }
+    if (!permisosFinal.includes("inicio")) {
+      permisosFinal.push("inicio");
+    }
+
+    permisosFinal = [...new Set(permisosFinal)];
+
+    for (const codigo of permisosFinal) {
+      const perm = await client.query(`
+        SELECT id
+        FROM permiso
+        WHERE codigo = $1
+      `, [codigo]);
+
+      if (perm.rows.length) {
+        await client.query(`
+          INSERT INTO usuario_permiso (
+            id_usuario,
+            id_permiso
+          )
+          VALUES ($1,$2)
+        `, [id, perm.rows[0].id]);
       }
     }
 
     await client.query("COMMIT");
 
-    // AUDITORIA CREATE
-    try {
-      await audit({
-        tabla: "usuario",
-        operacion: "CREATE",
-        registroId: id,
-        usuarioId:
-          req.headers["x-usuario-id"] || "US1",
-        viejo: null,
-        nuevo: {
-          id,
-          nombre,
-          correo,
-          permisos
-        },
-        req
-      });
-    } catch (e) {
-      console.error(
-        "AUDIT CREATE USUARIO:",
-        e.message
-      );
-    }
-
     res.json({
-      message:
-        "Usuario creado correctamente"
+      message: "Usuario creado",
+      correo,
+      temporalPassword: passwordPlano
     });
 
   } catch (error) {
     await client.query("ROLLBACK");
-
-    console.error(
-      "Error createUsuario:",
-      error
-    );
 
     res.status(500).json({
       error: error.message
@@ -143,6 +136,7 @@ const updateUsuario = async (req, res) => {
 
   try {
     const { id } = req.params;
+
     const {
       nombre,
       correo,
@@ -151,7 +145,7 @@ const updateUsuario = async (req, res) => {
 
     await client.query("BEGIN");
 
-    // OLD DATA
+    // datos anteriores
     const oldUser =
       await client.query(`
       SELECT id, nombre, correo
@@ -176,7 +170,7 @@ const updateUsuario = async (req, res) => {
         )
     };
 
-    // actualizar datos básicos
+    // actualizar básicos
     await client.query(`
       UPDATE usuario
       SET nombre = $1,
@@ -191,29 +185,41 @@ const updateUsuario = async (req, res) => {
       WHERE id_usuario = $1
     `, [id]);
 
-    // insertar nuevos permisos
-    if (permisos && permisos.length > 0) {
-      for (const codigo of permisos) {
-        const perm = await client.query(
-          `SELECT id FROM permiso WHERE codigo = $1`,
-          [codigo]
-        );
+    // ==========================================
+    // SIEMPRE AGREGAR PERMISO INICIO
+    // ==========================================
+    let permisosFinal = Array.isArray(permisos)
+      ? [...permisos]
+      : [];
 
-        if (perm.rows.length) {
-          await client.query(`
-            INSERT INTO usuario_permiso (
-              id_usuario,
-              id_permiso
-            )
-            VALUES ($1, $2)
-          `, [id, perm.rows[0].id]);
-        }
+    if (!permisosFinal.includes("inicio")) {
+      permisosFinal.push("inicio");
+    }
+
+    // quitar duplicados
+    permisosFinal = [...new Set(permisosFinal)];
+
+    // insertar permisos nuevos
+    for (const codigo of permisosFinal) {
+      const perm = await client.query(
+        `SELECT id FROM permiso WHERE codigo = $1`,
+        [codigo]
+      );
+
+      if (perm.rows.length) {
+        await client.query(`
+          INSERT INTO usuario_permiso (
+            id_usuario,
+            id_permiso
+          )
+          VALUES ($1, $2)
+        `, [id, perm.rows[0].id]);
       }
     }
 
     await client.query("COMMIT");
 
-    // AUDITORIA UPDATE
+    // auditoría
     try {
       await audit({
         tabla: "usuario",
@@ -226,7 +232,7 @@ const updateUsuario = async (req, res) => {
           id,
           nombre,
           correo,
-          permisos
+          permisos: permisosFinal
         },
         req
       });
@@ -258,6 +264,7 @@ const updateUsuario = async (req, res) => {
     client.release();
   }
 };
+
 
 // =========================
 // TOGGLE ACTIVO
@@ -419,31 +426,32 @@ const resetPassword = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const before =
-      await pool.query(`
-      SELECT *
-      FROM usuario
+    const before = await pool.query(`
+      SELECT * FROM usuario
       WHERE id = $1
     `, [id]);
 
     if (!before.rows.length) {
       return res.status(404).json({
-        error:
-          "Usuario no encontrado"
+        error: "Usuario no encontrado"
       });
     }
 
-    const correo =
-      before.rows[0].correo;
+    // ====================================
+    // GENERAR PASSWORD TEMPORAL
+    // ====================================
+    const chars =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
 
-    const passwordPlano =
-      correo.split("@")[0];
+    let passwordPlano = "";
 
-    const hash =
-      await bcrypt.hash(
-        passwordPlano,
-        10
+    for (let i = 0; i < 10; i++) {
+      passwordPlano += chars.charAt(
+        Math.floor(Math.random() * chars.length)
       );
+    }
+
+    const hash = await bcrypt.hash(passwordPlano, 10);
 
     await pool.query(`
       UPDATE usuario
@@ -453,44 +461,13 @@ const resetPassword = async (req, res) => {
       WHERE id = $2
     `, [hash, id]);
 
-    const after =
-      await pool.query(`
-      SELECT *
-      FROM usuario
-      WHERE id = $1
-    `, [id]);
-
-    // AUDITORIA
-    try {
-      await audit({
-        tabla: "usuario",
-        operacion: "UPDATE",
-        registroId: id,
-        usuarioId:
-          req.headers["x-usuario-id"] || "US1",
-        viejo:
-          before.rows[0],
-        nuevo:
-          after.rows[0],
-        req
-      });
-    } catch (e) {
-      console.error(
-        "AUDIT RESET PASSWORD:",
-        e.message
-      );
-    }
-
     res.json({
-      message:
-        "Contraseña restablecida"
+      message: "Contraseña restablecida",
+      temporalPassword: passwordPlano
     });
 
   } catch (error) {
-    console.error(
-      "Error resetPassword:",
-      error
-    );
+    console.error("Error resetPassword:", error);
 
     res.status(500).json({
       error: error.message

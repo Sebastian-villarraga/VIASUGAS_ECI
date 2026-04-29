@@ -192,7 +192,8 @@ INSERT INTO permiso (id, codigo, nombre, descripcion) VALUES
 ('P17','dashboard-proyecciones', 'Proyecciones', 'Acceso a proyecciones'),
 ('P18','usuarios', 'Usuarios', 'Gestion de usuarios'),
 ('P19','auditoria', 'Auditoria', 'Acceso a auditoria'),
-('P20', 'admin', 'Administrador', 'Acceso total');
+('P20', 'admin', 'Administrador', 'Acceso total'),
+('P21', 'inicio', 'Inicio', 'Acceso a inicio');
 
 -- =====================================================
 -- USUARIO PERMISO
