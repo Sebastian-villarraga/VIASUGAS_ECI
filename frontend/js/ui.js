@@ -119,9 +119,13 @@ document.addEventListener("click", function (e) {
 
 });
 
-const btn = document.getElementById("menuToggle");
-const sidebar = document.querySelector(".sidebar");
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("menuToggle");
+  const sidebar = document.querySelector(".sidebar");
 
-btn.addEventListener("click", () => {
-   sidebar.classList.toggle("open");
+  if (btn && sidebar) {
+    btn.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
+  }
 });

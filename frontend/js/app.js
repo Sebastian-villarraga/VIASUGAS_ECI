@@ -221,7 +221,9 @@ function initApp() {
   // AUTH
   // =========================
   if (typeof checkAuth === "function") {
-    checkAuth();
+    const autorizado = checkAuth();
+  
+    if (!autorizado) return;
   }
 
   // =========================
@@ -257,11 +259,7 @@ function initApp() {
 // =========================
 // DOM READY
 // =========================
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initApp);
-} else {
-  initApp();
-}
+window.addEventListener("load", initApp);
 
 
 // =========================

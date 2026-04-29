@@ -65,7 +65,7 @@ function initLogin() {
       if (data.user?.debe_cambiar_password) {
         mostrarModalCambioPassword();
       } else {
-        window.location.href = "/pages/home.html";
+        window.location.href = "/pages/home.html#inicio";
       }
 
     } catch (error) {
@@ -207,22 +207,26 @@ function checkAuth() {
     window.location.pathname === "/" ||
     window.location.pathname.includes("index.html");
 
-  // ? No token ? fuera
-  if (!token && !isLoginPage) {
-    window.location.href = "/index.html";
-    return;
+  // NO logueado
+  if (!token) {
+    if (!isLoginPage) {
+      window.location.href = "/index.html";
+    }
+    return false;
   }
 
-  // ?? SI DEBE CAMBIAR PASSWORD ? NO REDIRIGIR
+  // Si debe cambiar password
   if (user?.debe_cambiar_password) {
-    console.log("?? Usuario debe cambiar contraseña");
-    return;
+    return true;
   }
 
-  // ? Ya logueado ? evitar volver al login
+  // Ya logueado y está en login
   if (token && isLoginPage) {
     window.location.href = "/pages/home.html";
+    return false;
   }
+
+  return true;
 }
 
 
