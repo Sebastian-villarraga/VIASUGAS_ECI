@@ -55,6 +55,7 @@ const dashboardProyeccionesRoutes = require("./routes/dashboardProyecciones.rout
 const usuariosRoutes = require("./routes/usuarios.routes");
 const permisosRoutes = require("./routes/permisos.routes");
 const auditRoutes = require("./routes/audit.routes");
+const dashboardConductoresRoutes = require("./routes/dashboardConductores.routes");
 
 
 app.use("/api", authRoutes);
@@ -79,6 +80,7 @@ app.use("/api/dashboard-proyecciones", dashboardProyeccionesRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/permisos", permisosRoutes);
 app.use("/api/audit", require("./routes/audit.routes"));
+app.use("/api/dashboard-conductores", dashboardConductoresRoutes);
 
 // =====================
 // HEALTH CHECKS

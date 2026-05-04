@@ -53,11 +53,13 @@ function getBaseProjectionQuery() {
 
         COALESCE(f.retencion_fuente,0) AS retencion_fuente,
         COALESCE(f.retencion_ica,0) AS retencion_ica,
+        COALESCE(f.fopat,0) AS fopat, -- ?? NUEVO
 
         (
           f.valor
           - COALESCE(f.retencion_fuente,0)
           - COALESCE(f.retencion_ica,0)
+          - COALESCE(f.fopat,0) -- ?? CLAVE
         ) AS valor_neto,
 
         COALESCE(p.pagado,0) AS pagado,
@@ -67,6 +69,7 @@ function getBaseProjectionQuery() {
             f.valor
             - COALESCE(f.retencion_fuente,0)
             - COALESCE(f.retencion_ica,0)
+            - COALESCE(f.fopat,0) -- ?? CLAVE
           ) - COALESCE(p.pagado,0),
           0
         ) AS pendiente_proyectado
@@ -156,9 +159,9 @@ const getProyeccionMensual = async (req, res) => {
 
         COUNT(*) AS facturas,
 
-        COALESCE(
-          SUM(valor_neto),0
-        ) AS total
+        COALESCE(SUM(valor_neto),0) AS proyectado,
+
+        COALESCE(SUM(pagado),0) AS recibido -- ?? NUEVO
 
       FROM proyeccion
 
@@ -269,6 +272,7 @@ const getFacturasProximasVencer = async (req, res) => {
         valor_bruto,
         retencion_fuente,
         retencion_ica,
+        fopat,
         valor_neto,
         pagado,
         pendiente_proyectado
@@ -310,6 +314,7 @@ const getDetalleProyeccion = async (req,res) => {
         valor_bruto,
         retencion_fuente,
         retencion_ica,
+        fopat,
         valor_neto,
         pagado,
         pendiente_proyectado

@@ -334,7 +334,7 @@ function dcrtRenderDetalle(data) {
   if (!data.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="11" class="dcr-empty-row">
+        <td colspan="12" class="dcr-empty-row">
           No hay cartera pendiente.
         </td>
       </tr>
@@ -353,6 +353,7 @@ function dcrtRenderDetalle(data) {
         <td>${dcrtMoney(row.valor_bruto)}</td>
         <td>${dcrtMoney(row.retencion_fuente)}</td>
         <td>${dcrtMoney(row.retencion_ica)}</td>
+        <td>${dcrtMoney(row.fopat || 0)}</td> <!-- ?? NUEVO -->
         <td>${dcrtMoney(row.valor_neto)}</td>
         <td>${dcrtMoney(row.pagado)}</td>
         <td>${dcrtMoney(row.pendiente)}</td>

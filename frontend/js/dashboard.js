@@ -190,6 +190,7 @@ function renderTablaRentabilidad(data) {
 
   let totalFacturado = 0;
   let totalRetenciones = 0;
+  let totalNeto = 0; // ?? NUEVO
   let totalIngreso = 0;
   let totalEgreso = 0;
   let totalConductor = 0;
@@ -204,6 +205,8 @@ function renderTablaRentabilidad(data) {
     const conductor = Number(row.gasto_conductor || 0);
     const utilidad = Number(row.utilidad || 0);
 
+    const neto = facturado - retenciones; // ?? YA INCLUYE FOPAT
+
     const margen =
       ingreso > 0
         ? ((utilidad / ingreso) * 100).toFixed(1)
@@ -211,6 +214,7 @@ function renderTablaRentabilidad(data) {
 
     totalFacturado += facturado;
     totalRetenciones += retenciones;
+    totalNeto += neto; // ?? NUEVO
     totalIngreso += ingreso;
     totalEgreso += egreso;
     totalConductor += conductor;
@@ -228,6 +232,8 @@ function renderTablaRentabilidad(data) {
       <td>${formatearMoneda(facturado)}</td>
 
       <td>${formatearMoneda(retenciones)}</td>
+
+      <td>${formatearMoneda(neto)}</td> <!-- ?? NUEVO -->
 
       <td>${formatearMoneda(ingreso)}</td>
 
@@ -257,6 +263,8 @@ function renderTablaRentabilidad(data) {
         <td>${formatearMoneda(totalFacturado)}</td>
 
         <td>${formatearMoneda(totalRetenciones)}</td>
+
+        <td>${formatearMoneda(totalNeto)}</td> <!-- ?? NUEVO -->
 
         <td>${formatearMoneda(totalIngreso)}</td>
 

@@ -66,11 +66,13 @@ function getBaseQuery() {
         COALESCE(f.valor,0) AS valor_bruto,
         COALESCE(f.retencion_fuente,0) AS retencion_fuente,
         COALESCE(f.retencion_ica,0) AS retencion_ica,
+        COALESCE(f.fopat,0) AS fopat, -- ?? NUEVO
 
         (
           COALESCE(f.valor,0)
           - COALESCE(f.retencion_fuente,0)
           - COALESCE(f.retencion_ica,0)
+          - COALESCE(f.fopat,0) -- ?? CLAVE
         ) AS valor_neto,
 
         COALESCE(p.pagado,0) AS pagado,
@@ -79,6 +81,7 @@ function getBaseQuery() {
           COALESCE(f.valor,0)
           - COALESCE(f.retencion_fuente,0)
           - COALESCE(f.retencion_ica,0)
+          - COALESCE(f.fopat,0) -- ?? CLAVE
           - COALESCE(p.pagado,0),
           0
         ) AS pendiente,
@@ -156,7 +159,7 @@ const getDashboardCarteraKPI = async (req, res) => {
         ), 2) AS mora_promedio,
 
         COALESCE(SUM(
-          retencion_fuente + retencion_ica
+          retencion_fuente + retencion_ica + COALESCE(fopat,0)
         ) FILTER (
           WHERE pendiente > 0
         ), 0) AS retenciones_total
@@ -309,6 +312,7 @@ const getFacturasVencidas = async (req, res) => {
         valor_bruto,
         retencion_fuente,
         retencion_ica,
+        fopat, -- ?? ?? TAMBIÉN AQUÍ
         valor_neto,
         pagado,
         pendiente,
@@ -332,6 +336,7 @@ const getFacturasVencidas = async (req, res) => {
         valor_bruto: Number(row.valor_bruto || 0),
         retencion_fuente: Number(row.retencion_fuente || 0),
         retencion_ica: Number(row.retencion_ica || 0),
+        fopat: Number(row.fopat || 0), // ?? ??
         valor_neto: Number(row.valor_neto || 0),
         pagado: Number(row.pagado || 0),
         pendiente: Number(row.pendiente || 0),
@@ -367,6 +372,7 @@ const getDetalle = async (req, res) => {
         valor_bruto,
         retencion_fuente,
         retencion_ica,
+        fopat, -- ?? ?? ESTE ERA EL PROBLEMA
         valor_neto,
         pagado,
         pendiente,
@@ -389,6 +395,7 @@ const getDetalle = async (req, res) => {
         valor_bruto: Number(row.valor_bruto || 0),
         retencion_fuente: Number(row.retencion_fuente || 0),
         retencion_ica: Number(row.retencion_ica || 0),
+        fopat: Number(row.fopat || 0), // ?? ?? ESTE TAMBIÉN
         valor_neto: Number(row.valor_neto || 0),
         pagado: Number(row.pagado || 0),
         pendiente: Number(row.pendiente || 0),

@@ -15,6 +15,7 @@ const getFacturas = async (req, res) => {
         f.valor,
         f.retencion_fuente,
         f.retencion_ica,
+        f.fopat, -- ?? NUEVO
         f.plazo_pago,
         f.creado,
 
@@ -66,8 +67,7 @@ const getFacturas = async (req, res) => {
     );
 
     return res.status(500).json({
-      error:
-        "Error obteniendo facturas"
+      error: "Error obteniendo facturas"
     });
   }
 };
@@ -117,7 +117,8 @@ const createFactura = async (req, res) => {
       valor,
       retencion_fuente = 0,
       retencion_ica = 0,
-      plazo_pago = 0
+      plazo_pago = 0,
+      fopat = null // ?? NUEVO
     } = req.body;
 
     // =========================
@@ -125,75 +126,55 @@ const createFactura = async (req, res) => {
     // =========================
     if (!codigo_factura) {
       return res.status(400).json({
-        error:
-          "El código de factura es obligatorio"
+        error: "El código de factura es obligatorio"
       });
     }
 
-    if (
-      !id_manifiesto ||
-      !fecha_emision ||
-      !valor
-    ) {
+    if (!id_manifiesto || !fecha_emision || !valor) {
       return res.status(400).json({
-        error:
-          "Campos obligatorios faltantes"
+        error: "Campos obligatorios faltantes"
       });
     }
 
-    valor =
-      Number(valor) || 0;
+    valor = Number(valor) || 0;
+    retencion_fuente = Number(retencion_fuente) || 0;
+    retencion_ica = Number(retencion_ica) || 0;
+    plazo_pago = Number(plazo_pago) || 0;
 
-    retencion_fuente =
-      Number(
-        retencion_fuente
-      ) || 0;
-
-    retencion_ica =
-      Number(
-        retencion_ica
-      ) || 0;
-
-    plazo_pago =
-      Number(
-        plazo_pago
-      ) || 0;
+    // ?? FOPAT opcional
+    fopat = fopat !== null && fopat !== undefined
+      ? Number(fopat) || 0
+      : null;
 
     if (valor <= 0) {
       return res.status(400).json({
-        error:
-          "El valor debe ser mayor a 0"
+        error: "El valor debe ser mayor a 0"
       });
     }
 
     // =========================
     // VALIDAR MANIFIESTO UNICO
     // =========================
-    const existe =
-      await pool.query(
-        `
+    const existe = await pool.query(
+      `
       SELECT 1
       FROM factura
       WHERE id_manifiesto = $1
-    `,
-        [id_manifiesto]
-      );
+      `,
+      [id_manifiesto]
+    );
 
-    if (
-      existe.rows.length > 0
-    ) {
+    if (existe.rows.length > 0) {
       return res.status(400).json({
-        error:
-          "Ya existe una factura para este manifiesto"
+        error: "Ya existe una factura para este manifiesto"
       });
     }
 
     // =========================
     // INSERT REAL
     // =========================
-    const result =
-      await pool.query(
-        `
+    const result = await pool.query(
+      `
       INSERT INTO factura (
         codigo_factura,
         id_manifiesto,
@@ -202,23 +183,25 @@ const createFactura = async (req, res) => {
         valor,
         retencion_fuente,
         retencion_ica,
+        fopat, -- ?? NUEVO
         plazo_pago,
         creado
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW())
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW())
       RETURNING *
       `,
-        [
-          codigo_factura,
-          id_manifiesto,
-          fecha_emision,
-          fecha_vencimiento,
-          valor,
-          retencion_fuente,
-          retencion_ica,
-          plazo_pago
-        ]
-      );
+      [
+        codigo_factura,
+        id_manifiesto,
+        fecha_emision,
+        fecha_vencimiento,
+        valor,
+        retencion_fuente,
+        retencion_ica,
+        fopat, // ?? NUEVO
+        plazo_pago
+      ]
+    );
 
     // =========================
     // AUDITORIA CREATE
@@ -226,53 +209,31 @@ const createFactura = async (req, res) => {
     try {
       await audit({
         tabla: "factura",
-        operacion:
-          "CREATE",
-        registroId:
-          result.rows[0]
-            .codigo_factura,
-        usuarioId:
-          req.headers[
-            "x-usuario-id"
-          ] || "US1",
+        operacion: "CREATE",
+        registroId: result.rows[0].codigo_factura,
+        usuarioId: req.headers["x-usuario-id"] || "US1",
         viejo: null,
-        nuevo:
-          result.rows[0],
+        nuevo: result.rows[0],
         req
       });
     } catch (e) {
-      console.error(
-        "AUDIT CREATE FACTURA:",
-        e.message
-      );
+      console.error("AUDIT CREATE FACTURA:", e.message);
     }
 
-    return res
-      .status(201)
-      .json(
-        result.rows[0]
-      );
+    return res.status(201).json(result.rows[0]);
 
   } catch (error) {
 
-    if (
-      error.code ===
-      "23505"
-    ) {
+    if (error.code === "23505") {
       return res.status(400).json({
-        error:
-          "Ya existe una factura con ese código"
+        error: "Ya existe una factura con ese código"
       });
     }
 
-    console.error(
-      "Error createFactura:",
-      error
-    );
+    console.error("Error createFactura:", error);
 
     return res.status(500).json({
-      error:
-        "Error creando factura"
+      error: "Error creando factura"
     });
   }
 };

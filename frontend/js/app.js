@@ -144,6 +144,9 @@ async function loadView(view) {
       case "audit":
         if (typeof initAudit === "function") initAudit();
         break;
+      case "dashboard-conductores":
+        if (typeof initDashboardConductores === "function") initDashboardConductores();
+        break;
     }
 
     // =========================
