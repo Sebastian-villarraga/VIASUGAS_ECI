@@ -1040,6 +1040,7 @@ function renderDetalleModoLectura(data) {
   
   resumenEl.textContent =
     `${resumen < 0 ? "-$" : "$"}${Math.abs(resumen).toLocaleString("es-CO")}`;
+  actualizarTrackingEstado(manifiesto.estado);
 }
 
   // =========================
@@ -1321,4 +1322,35 @@ function aplicarFormatoMonedaInputsManifiesto() {
       e.target.value = formatearMilesInput(e.target.value);
     });
   });
+}
+
+function actualizarTrackingEstado(estado) {
+  const truck = document.querySelector(".mfx-truck");
+  const line = document.querySelector(".mfx-track-line");
+  const steps = document.querySelectorAll(".mfx-track-step");
+
+  let paso = 1;
+
+  if (estado === "CREADO-EN TRANSITO") paso = 1;
+  if (estado === "ENTREGADO POR COBRAR") paso = 2;
+  if (estado === "MANIFIESTO PAGO") paso = 3;
+
+  // ?? obtener posición REAL del step
+  const step = steps[paso - 1];
+
+  if (step && truck) {
+    const rect = step.getBoundingClientRect();
+    const parentRect = step.parentElement.getBoundingClientRect();
+
+    const center = rect.left + rect.width / 2 - parentRect.left;
+
+    truck.style.left = `${center}px`;
+  }
+
+  // progreso visual
+  const porcentaje = ((paso - 1) / 2) * 100;
+
+  if (line) {
+    line.style.setProperty("--progress", `${porcentaje}%`);
+  }
 }
