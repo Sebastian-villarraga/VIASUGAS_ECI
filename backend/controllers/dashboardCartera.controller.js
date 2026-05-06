@@ -312,7 +312,7 @@ const getFacturasVencidas = async (req, res) => {
         valor_bruto,
         retencion_fuente,
         retencion_ica,
-        fopat, -- ?? ?? TAMBIÉN AQUÍ
+        fopat, -- ?? ?? TAMBIEN AQUI
         valor_neto,
         pagado,
         pendiente,

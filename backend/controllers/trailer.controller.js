@@ -202,7 +202,7 @@ const getAlertasTrailers = async (req, res) => {
           alertas.push({
             placa: t.placa,
             propietario: t.propietario,
-            tipo: "Fumigación",
+            tipo: "FumigaciÃ³n",
             estado: "vencido",
             fecha: t.vencimiento_cert_fumigacion
           });
@@ -210,7 +210,7 @@ const getAlertasTrailers = async (req, res) => {
           alertas.push({
             placa: t.placa,
             propietario: t.propietario,
-            tipo: "Fumigación",
+            tipo: "FumigaciÃ³n",
             estado: "proximo",
             fecha: t.vencimiento_cert_fumigacion
           });

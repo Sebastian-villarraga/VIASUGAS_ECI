@@ -125,7 +125,7 @@ function initFormBanco() {
     "Bancolombia",
     "Nequi",
     "Daviplata",
-    "Banco de Bogot·",
+    "Banco de Bogot√°",
     "Davivienda",
     "BBVA Colombia",
     "Banco Popular",
@@ -145,14 +145,14 @@ function initFormBanco() {
     "Banco Santander Colombia",
     "Banco Serfinanza",
     "Banco Cooperativo Coopcentral",
-    "Ita˙ Colombia",
+    "Itau Colombia",
     "JP Morgan Colombia",
     "Mibanco",
     "Lulo Bank",
     "Nubank Colombia",
     "RappiPay",
     "Movii",
-    "Ual· Colombia",
+    "Ual√° Colombia",
     "Iris Bank",
     "Banco BTG Pactual Colombia",
     "Banco Credifinanciera",
@@ -207,7 +207,7 @@ function initFormBanco() {
       // =========================
 
       if (!nombre_banco || !numero_cuenta) {
-        showToast("Nombre banco y n˙mero de cuenta son obligatorios", "error");
+        showToast("Nombre banco y n√∫mero de cuenta son obligatorios", "error");
         return;
       }
 
@@ -228,7 +228,7 @@ function initFormBanco() {
       tipo_cuenta = tipo_cuenta.toLowerCase().trim();
 
       if (!["ahorros", "corriente"].includes(tipo_cuenta)) {
-        showToast("Tipo de cuenta inv·lido", "error");
+        showToast("Tipo de cuenta inv√°lido", "error");
         return;
       }
 
@@ -297,7 +297,7 @@ function editarBanco(btn, id) {
     "Bancolombia",
     "Nequi",
     "Daviplata",
-    "Banco de Bogot·",
+    "Banco de Bogot√°",
     "Davivienda",
     "BBVA Colombia",
     "Banco Popular",
@@ -317,14 +317,14 @@ function editarBanco(btn, id) {
     "Banco Santander Colombia",
     "Banco Serfinanza",
     "Banco Cooperativo Coopcentral",
-    "Ita˙ Colombia",
+    "Ita√∫ Colombia",
     "JP Morgan Colombia",
     "Mibanco",
     "Lulo Bank",
     "Nubank Colombia",
     "RappiPay",
     "Movii",
-    "Ual· Colombia",
+    "Ual√° Colombia",
     "Iris Bank",
     "Banco BTG Pactual Colombia",
     "Banco Credifinanciera",
@@ -457,7 +457,7 @@ function llenarSelectBanco() {
     "Bancolombia",
     "Nequi",
     "Daviplata",
-    "Banco de Bogot·",
+    "Banco de Bogot√°",
     "Davivienda",
     "BBVA Colombia",
     "Banco Popular",
@@ -477,14 +477,14 @@ function llenarSelectBanco() {
     "Banco Santander Colombia",
     "Banco Serfinanza",
     "Banco Cooperativo Coopcentral",
-    "Ita˙ Colombia",
+    "Ita√∫ Colombia",
     "JP Morgan Colombia",
     "Mibanco",
     "Lulo Bank",
     "Nubank Colombia",
     "RappiPay",
     "Movii",
-    "Ual· Colombia",
+    "Ual√° Colombia",
     "Iris Bank",
     "Banco BTG Pactual Colombia",
     "Banco Credifinanciera",

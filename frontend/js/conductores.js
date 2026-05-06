@@ -8,7 +8,7 @@ function initConductores() {
   cargarAlertasConductores();
   initFormConductor();
 
-  // ?? listeners dinámicos
+  // ?? listeners dinamicos
   document.getElementById("filtroNombre")
     .addEventListener("input", aplicarFiltrosConductores);
 
@@ -400,7 +400,7 @@ function editarConductor(btn, id) {
     </select>
   `;
 
-  // Botón guardar
+  // Boton guardar
   celdas[6].innerHTML = `
     <button class="btn-icon btn-save" onclick="guardarConductor(this, ${id})">
       <i class="fas fa-save"></i>
@@ -480,7 +480,7 @@ async function filtrarConductoresPorAlerta(tipo) {
   // ?? FILTRAR SOLO POR EL TIPO CORRECTO
   const alertasFiltradas = alertas.filter(a => a.estado === tipo);
 
-  // Obtener cedulas únicas SOLO del tipo seleccionado
+  // Obtener cedulas unicas SOLO del tipo seleccionado
   const cedulas = [...new Set(alertasFiltradas.map(a => a.cedula))];
 
   if (cedulas.length === 0) {

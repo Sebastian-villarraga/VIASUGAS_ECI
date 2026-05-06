@@ -572,3 +572,32 @@
 .hidden{
   display:none;
 }
+
+
+/* =========================
+   HEADER PERMISOS
+========================= */
+
+.us-perm-header{
+  grid-column:1 / -1;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:10px;
+}
+
+.us-select-all-btn{
+  border:none;
+  background:#e8eefc;
+  color:#2f56a6;
+  font-size:11px;
+  font-weight:600;
+  padding:5px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.us-select-all-btn:hover{
+  background:#d7e3ff;
+}

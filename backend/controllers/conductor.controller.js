@@ -280,7 +280,7 @@ const getAlertasConductores = async (req, res) => {
       };
 
       revisar(c.vencimiento_licencia, "Licencia");
-      revisar(c.vencimiento_manip_alimentos, "Manipulación alimentos");
+      revisar(c.vencimiento_manip_alimentos, "ManipulaciÃ³n alimentos");
       revisar(c.vencimiento_sustancia_peligrosa, "Sustancias peligrosas");
 
     });

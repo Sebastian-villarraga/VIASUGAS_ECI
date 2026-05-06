@@ -181,20 +181,24 @@ INSERT INTO permiso (id, codigo, nombre, descripcion) VALUES
 ('P5','conductores', 'Conductores', 'Acceso a conductores'),
 ('P6','clientes', 'Clientes', 'Acceso a clientes'),
 ('P7','empresas-a-cargo', 'Terceros', 'Acceso a terceros'),
+
 ('P8','bancos', 'Bancos', 'Acceso a bancos'),
 ('P9','tipo-transaccion', 'Categoria gastos', 'Acceso a categorias de gasto'),
 ('P10','transacciones', 'Transacciones', 'Acceso a transacciones'),
 ('P11','gastos-conductor', 'Gastos conductor', 'Acceso a gastos de conductor'),
 ('P12','registro-conductor', 'Registro conductor', 'Acceso a registro de conductor'),
 ('P13','facturas', 'Facturas', 'Acceso a facturas'),
+
 ('P14','dashboard', 'Gerencial', 'Acceso a dashboard gerencial'),
 ('P15','dashboard-contable', 'Contable', 'Acceso a dashboard contable'),
 ('P16','dashboard-cartera', 'Cartera', 'Acceso a dashboard cartera'),
-('P17','dashboard-proyecciones', 'Proyecciones', 'Acceso a proyecciones'),
-('P18','usuarios', 'Usuarios', 'Gestion de usuarios'),
-('P19','auditoria', 'Auditoria', 'Acceso a auditoria'),
-('P20', 'admin', 'Administrador', 'Acceso total'),
-('P21', 'inicio', 'Inicio', 'Acceso a inicio');
+('P17','dashboard-proyecciones', 'Proyecciones', 'Acceso a dashboard proyecciones'),
+('P18','dashboard-conductores', 'Conductores', 'Acceso a dashboard conductores'),
+
+('P19','usuarios', 'Usuarios', 'Gestion de usuarios'),
+('P20','auditoria', 'Auditoria', 'Acceso a auditoria'),
+('P21','admin', 'Administrador', 'Acceso total'),
+('P22','inicio', 'Inicio', 'Acceso a inicio');
 
 -- =====================================================
 -- USUARIO PERMISO
@@ -217,7 +221,7 @@ SELECT 'US1', id FROM permiso WHERE codigo IN (
 'registro-conductor',
 'facturas', 
 'dashboard', 
-'dashboard-contable',
+'dashboard-contable',  
 'dashboard-cartera',
 'dashboard-proyecciones',
 'usuarios', 

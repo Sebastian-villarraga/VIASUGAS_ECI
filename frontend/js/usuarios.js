@@ -134,7 +134,7 @@ function renderPermisos(permisosSeleccionados = []) {
   }
 
   // =========================
-  // ? FILTRAR
+  // FILTRAR
   // =========================
   const permisosFiltrados = permisosDisponibles.filter(p =>
     p.codigo !== "admin" &&
@@ -142,7 +142,7 @@ function renderPermisos(permisosSeleccionados = []) {
   );
 
   // =========================
-  // ?? AGRUPAR
+  // AGRUPAR
   // =========================
   const grupos = {
     "Flota": [
@@ -153,6 +153,7 @@ function renderPermisos(permisosSeleccionados = []) {
       "clientes",
       "empresas-a-cargo"
     ],
+
     "Finanzas": [
       "bancos",
       "tipo-transaccion",
@@ -161,12 +162,15 @@ function renderPermisos(permisosSeleccionados = []) {
       "registro-conductor",
       "facturas"
     ],
+
     "Reportes": [
       "dashboard",
       "dashboard-contable",
       "dashboard-cartera",
-      "dashboard-proyecciones"
+      "dashboard-proyecciones",
+      "dashboard-conductores"
     ],
+
     "Otros": [
       "manifiestos",
       "auditoria"
@@ -174,29 +178,52 @@ function renderPermisos(permisosSeleccionados = []) {
   };
 
   // =========================
-  // ?? RENDER
+  // RENDER
   // =========================
   let html = "";
 
   Object.entries(grupos).forEach(([titulo, codigos]) => {
 
-    // filtrar permisos que existan
     const items = permisosFiltrados.filter(p =>
       codigos.includes(p.codigo)
     );
 
     if (!items.length) return;
 
-    // tÃºtulo
-    html += `<div class="us-perm-section">${titulo}</div>`;
+    // HEADER CON BOTON
+    html += `
+      <div class="us-perm-header">
+        <div class="us-perm-section">
+          ${titulo}
+        </div>
 
-    // items
+        <button
+          type="button"
+          class="us-select-all-btn"
+          onclick="toggleGrupoPermisos(this)"
+          data-codigos='${JSON.stringify(codigos)}'
+        >
+          Seleccionar todo
+        </button>
+      </div>
+    `;
+
+    // ITEMS
     items.forEach(p => {
-      const checked = permisosSeleccionados.includes(p.codigo) ? "checked" : "";
+
+      const checked =
+        permisosSeleccionados.includes(p.codigo)
+          ? "checked"
+          : "";
 
       html += `
         <label class="us-check">
-          <input type="checkbox" value="${p.codigo}" ${checked}>
+          <input
+            type="checkbox"
+            value="${p.codigo}"
+            ${checked}
+          >
+
           <span>${p.nombre}</span>
         </label>
       `;
@@ -206,6 +233,7 @@ function renderPermisos(permisosSeleccionados = []) {
 
   container.innerHTML = html;
 }
+
 // =========================
 // OBTENER PERMISOS CHECKED
 // =========================
@@ -477,29 +505,133 @@ function renderPermisosUsuario(permisosSeleccionados = []) {
 
   container.innerHTML = "";
 
-  // quitar admin y usuarios
   const permisosFiltrados = permisosDisponibles.filter(p =>
     p.codigo !== "admin" &&
     p.codigo !== "usuarios"
   );
 
+  const grupos = {
+    "Flota": [
+      "vehiculos",
+      "trailer",
+      "propietarios",
+      "conductores",
+      "clientes",
+      "empresas-a-cargo"
+    ],
+
+    "Finanzas": [
+      "bancos",
+      "tipo-transaccion",
+      "transacciones",
+      "gastos-conductor",
+      "registro-conductor",
+      "facturas"
+    ],
+
+    "Reportes": [
+      "dashboard",
+      "dashboard-contable",
+      "dashboard-cartera",
+      "dashboard-proyecciones",
+      "dashboard-conductores"
+    ],
+
+    "Otros": [
+      "manifiestos",
+      "auditoria"
+    ]
+  };
+
   let html = "";
 
-  permisosFiltrados.forEach(p => {
+  Object.entries(grupos).forEach(([titulo, codigos]) => {
 
-    const checked = permisosSeleccionados.includes(p.codigo)
-      ? "checked"
-      : "";
+    const items = permisosFiltrados.filter(p =>
+      codigos.includes(p.codigo)
+    );
+
+    if (!items.length) return;
 
     html += `
-      <label class="us-check">
-        <input type="checkbox" value="${p.codigo}" ${checked}>
-        <span>${p.nombre}</span>
-      </label>
+      <div class="us-perm-header">
+
+        <div class="us-perm-section">
+          ${titulo}
+        </div>
+
+        <button
+          type="button"
+          class="us-select-all-btn"
+          onclick="toggleGrupoPermisos(this)"
+          data-codigos='${JSON.stringify(codigos)}'
+        >
+          Seleccionar todo
+        </button>
+
+      </div>
     `;
+
+    items.forEach(p => {
+
+      const checked =
+        permisosSeleccionados.includes(p.codigo)
+          ? "checked"
+          : "";
+
+      html += `
+        <label class="us-check">
+          <input
+            type="checkbox"
+            value="${p.codigo}"
+            ${checked}
+          >
+
+          <span>${p.nombre}</span>
+        </label>
+      `;
+    });
+
   });
 
   container.innerHTML = html;
+}
+
+// =========================
+// GRUPO DE PERMISOS
+// =========================
+function toggleGrupoPermisos(button) {
+
+  const codigos =
+    JSON.parse(button.dataset.codigos || "[]");
+
+  if (!codigos.length) return;
+
+  const contenedor =
+    button.closest(".us-perm-header")
+      ?.parentElement;
+
+  if (!contenedor) return;
+
+  const checks =
+    contenedor.querySelectorAll(
+      "input[type='checkbox']"
+    );
+
+  const checksGrupo = Array.from(checks)
+    .filter(c => codigos.includes(c.value));
+
+  const todosMarcados =
+    checksGrupo.every(c => c.checked);
+
+  checksGrupo.forEach(c => {
+    c.checked = !todosMarcados;
+  });
+
+  button.textContent =
+    todosMarcados
+      ? "Seleccionar todo"
+      : "Quitar selección";
 }
 
 // =========================
