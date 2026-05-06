@@ -214,6 +214,9 @@ CREATE TABLE factura (
     valor moneda,
     retencion_fuente moneda,
     retencion_ica moneda,
+
+    fopat moneda, -- ?? NUEVO (opcional, puede ser NULL)
+
     plazo_pago INT,
     creado TIMESTAMP,
     FOREIGN KEY (id_manifiesto) REFERENCES manifiesto(id_manifiesto)

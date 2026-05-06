@@ -115,8 +115,10 @@ function initFormCliente() {
   });
 
   inputNombre.addEventListener("input", () => {
-    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
-    inputNombre.value.trim() ? limpiarError(inputNombre) : marcarError(inputNombre);
+    inputNombre.value = inputNombre.value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, "");
+    inputNombre.value.trim()
+      ? limpiarError(inputNombre)
+      : marcarError(inputNombre);
   });
 
   inputTelefono.addEventListener("input", () => {

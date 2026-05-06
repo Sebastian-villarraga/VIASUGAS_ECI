@@ -56,6 +56,14 @@
         <button class="mfx-btn mfx-btn-danger" id="btnLimpiarFiltrosManifiestos">
           Limpiar
         </button>
+        
+        <button 
+          class="mfx-btn mfx-btn-excel" 
+          id="btnExportarExcelManifiestos"
+          title="Exportar manifiestos a Excel"
+        >
+          <i class="fas fa-file-excel"></i>
+        </button>
 
       </div>
     </div>
@@ -265,7 +273,31 @@
       <!-- INFO GENERAL -->
       <div class="mfx-detail-card mfx-detail-main">
         <h4>MANIFIESTO</h4>
-
+        
+        <!-- TRACKING ESTADO -->
+        <div id="trackingManifiesto" class="mfx-tracking">
+        
+          <div class="mfx-track-line"></div>
+        
+          <!-- 🚛 TRACTOMULA -->
+          <div class="mfx-truck">
+            <i class="fas fa-truck"></i>
+          </div>
+        
+          <div class="mfx-track-step" data-step="1">
+            <span>En tránsito</span>
+          </div>
+        
+          <div class="mfx-track-step" data-step="2">
+            <span>Por cobrar</span>
+          </div>
+        
+          <div class="mfx-track-step" data-step="3">
+            <span>Pagado</span>
+          </div>
+        
+        </div>
+                
         <div id="detalleInfoManifiesto" class="mfx-info-grid">
           <p>-</p>
         </div>

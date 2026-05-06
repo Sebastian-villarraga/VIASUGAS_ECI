@@ -304,23 +304,39 @@ async function dprCargarKPI() {
 // MENSUAL
 // ======================================================
 async function dprCargarMensual() {
-  const data = await dprApi(`/api/dashboard-proyecciones/proyeccion-mensual${dprGetQuery()}`);
+  const data = await dprApi(
+    `/api/dashboard-proyecciones/proyeccion-mensual${dprGetQuery()}`
+  );
 
   const ctx = dprEl("dprGraficaMensual").getContext("2d");
 
   if (dprChartMensual) dprChartMensual.destroy();
 
+  const labels = dprSafe(data).map(x => dprMes(x.mes));
+
+  const proyectado = dprSafe(data).map(x => Number(x.proyectado || 0));
+  const recibido = dprSafe(data).map(x => Number(x.recibido || 0));
+
   dprChartMensual = new Chart(ctx, {
     type: "bar",
     data: {
-      labels: dprSafe(data).map(x => dprMes(x.mes)),
-      datasets: [{
-        label: "Ingreso proyectado",
-        data: dprSafe(data).map(x => Number(x.total || 0)),
-        backgroundColor: "#2f56a6",
-        borderRadius: 8,
-        maxBarThickness: 60
-      }]
+      labels,
+      datasets: [
+        {
+          label: "Ingreso proyectado",
+          data: proyectado,
+          backgroundColor: "#2f56a6",
+          borderRadius: 8,
+          maxBarThickness: 50
+        },
+        {
+          label: "Ingreso recibido",
+          data: recibido,
+          backgroundColor: "#16a34a",
+          borderRadius: 8,
+          maxBarThickness: 50
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -339,7 +355,6 @@ async function dprCargarMensual() {
     }
   });
 }
-
 
 
 
@@ -378,6 +393,7 @@ async function dprCargarDetalle() {
       <td>${dprMoney(row.valor_bruto)}</td>
       <td>${dprMoney(row.retencion_fuente)}</td>
       <td>${dprMoney(row.retencion_ica)}</td>
+      <td>${dprMoney(row.fopat || 0)}</td>
       <td>${dprMoney(row.valor_neto)}</td>
       <td>${dprMoney(row.pagado)}</td>
       <td>${dprMoney(row.pendiente_proyectado)}</td>

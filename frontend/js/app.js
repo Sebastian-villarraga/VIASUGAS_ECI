@@ -144,6 +144,9 @@ async function loadView(view) {
       case "audit":
         if (typeof initAudit === "function") initAudit();
         break;
+      case "dashboard-conductores":
+        if (typeof initDashboardConductores === "function") initDashboardConductores();
+        break;
     }
 
     // =========================
@@ -192,7 +195,7 @@ function navigate(view) {
 // BACK / FORWARD
 // =========================
 window.addEventListener("popstate", () => {
-  const view = window.location.hash.replace("#", "") || "home";
+  const view = window.location.hash.replace("#", "") || "inicio";
   loadView(view);
 });
 
@@ -217,51 +220,52 @@ function setActiveMenu(view) {
 function initApp() {
   console.log("App iniciando...");
 
-  // =========================
-  // AUTH
-  // =========================
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.replace("/index.html");
+    return;
+  }
+
   if (typeof checkAuth === "function") {
-    checkAuth();
-  }
+    const autorizado = checkAuth();
 
-  // =========================
-  // SET USER NAME (TOPBAR)
-  // =========================
-  try {
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    if (user && user.correo) {
-      const nombre = user.correo.split("@")[0];
-
-      const span = document.getElementById("userName");
-      if (span) {
-        span.textContent = nombre.charAt(0).toUpperCase() + nombre.slice(1);
-      }
+    if (!autorizado) {
+      window.location.replace("/index.html");
+      return;
     }
-  } catch (err) {
-    console.error("Error obteniendo usuario:", err);
   }
 
-  // =========================
-  // ROUTING INICIAL
-  // =========================
-  let view = window.location.hash.replace("#", "");
-
-  if (!view) {
-    view = "home";
-    history.replaceState({}, "", "#home");
+  // usuario topbar
+  const user = JSON.parse(
+    localStorage.getItem("user") || "{}"
+  );
+  
+  const span = document.getElementById("userName");
+  
+  if (span) {
+    span.textContent =
+      user.nombre ||
+      user.correo ||
+      "Usuario";
   }
 
+  // ?? MOSTRAR APP SOLO SI YA PASÓ LOGIN
+  document.body.style.display = "block";
+
+  // ?? aplicar permisos apenas entra
+  aplicarPermisosMenu();
+  
+  let view =
+  window.location.hash.replace("#", "") || "inicio";
+  // luego cargar vista
   loadView(view);
 }
+
 // =========================
 // DOM READY
 // =========================
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initApp);
-} else {
-  initApp();
-}
+window.addEventListener("load", initApp);
 
 
 // =========================

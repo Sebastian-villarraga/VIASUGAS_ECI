@@ -118,7 +118,7 @@ function renderFacturas(data) {
   tbody.innerHTML = "";
 
   if (!data || data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9">Sin datos</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11">Sin datos</td></tr>`;
     
     if (totalF) totalF.innerText = "$0";
     if (totalC) totalC.innerText = "$0";
@@ -139,13 +139,13 @@ function renderFacturas(data) {
     const valor = Number(f.valor || 0);
     const retFuente = Number(f.retencion_fuente || 0);
     const retIca = Number(f.retencion_ica || 0);
-    const neto = valor - retFuente - retIca;
+    const fopat = Number(f.fopat || 0); // ?? NUEVO
+
+    // ?? NETO CORRECTO
+    const neto = valor - retFuente - retIca - fopat;
 
     totalFacturado += valor;
 
-    // =========================
-    // ?? PAGOS REALES DESDE TRANSACCIONES
-    // =========================
     const pagos = (window._transaccionesFacturas || [])
       .filter(t =>
         t.id_manifiesto === f.id_manifiesto &&
@@ -155,9 +155,6 @@ function renderFacturas(data) {
 
     const saldo = neto - pagos;
 
-    // =========================
-    // ESTADO REAL
-    // =========================
     let estado;
 
     if (saldo <= 0) {
@@ -185,11 +182,12 @@ function renderFacturas(data) {
         <td>$${valor.toLocaleString()}</td>
         <td>$${retFuente.toLocaleString()}</td>
         <td>$${retIca.toLocaleString()}</td>
+        <td>$${fopat.toLocaleString()}</td> <!-- ?? NUEVO -->
         <td>$${neto.toLocaleString()}</td>
         <td>$${saldo.toLocaleString()}</td>
         <td>${estadoHTML}</td>
       </tr>
-      `;
+    `;
   });
 
   const porcentajeCobro = totalFacturado > 0
@@ -206,9 +204,7 @@ function renderFacturas(data) {
 // EVENTOS
 // =========================
 function eventosFacturas() {
-  // =========================
-  // HELPERS
-  // =========================
+
   function getModalFactura() {
     return document.getElementById("modalFactura");
   }
@@ -222,21 +218,21 @@ function eventosFacturas() {
     const modal = getModalFactura();
     modal?.classList.add("hidden");
 
-    const codigoFactura = document.getElementById("codigoFactura");
-    const fechaEmision = document.getElementById("fechaEmision");
-    const fechaVencimiento = document.getElementById("fechaVencimiento");
-    const valorFactura = document.getElementById("valorFactura");
-    const retencionFuente = document.getElementById("retencionFuente");
-    const retencionIca = document.getElementById("retencionIca");
-    const plazoPago = document.getElementById("plazoPago");
+    const ids = [
+      "codigoFactura",
+      "fechaEmision",
+      "fechaVencimiento",
+      "valorFactura",
+      "retencionFuente",
+      "retencionIca",
+      "plazoPago",
+      "fopat" // ?? NUEVO
+    ];
 
-    if (codigoFactura) codigoFactura.value = "";
-    if (fechaEmision) fechaEmision.value = "";
-    if (fechaVencimiento) fechaVencimiento.value = "";
-    if (valorFactura) valorFactura.value = "";
-    if (retencionFuente) retencionFuente.value = "";
-    if (retencionIca) retencionIca.value = "";
-    if (plazoPago) plazoPago.value = "";
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
 
     const wrapper = document.querySelector("#modalFactura .select-search-wrapper");
     if (wrapper) {
@@ -267,46 +263,41 @@ function eventosFacturas() {
     });
   }
 
-  // =========================
-  // FORMATO DINERO
-  // =========================
+  // ?? FORMATO (AGREGADO FOPAT)
   aplicarFormatoMonedaInput(document.getElementById("valorFactura"));
   aplicarFormatoMonedaInput(document.getElementById("retencionFuente"));
   aplicarFormatoMonedaInput(document.getElementById("retencionIca"));
+  aplicarFormatoMonedaInput(document.getElementById("fopat")); // ?? NUEVO
 
-  // =========================
-  // LISTENERS GLOBALES SOLO UNA VEZ
-  // =========================
   if (!window.__facturasEventosDelegadosInit) {
     window.__facturasEventosDelegadosInit = true;
 
     document.addEventListener("click", async (e) => {
-      const btnNuevaFactura = e.target.closest("#btnNuevaFactura");
-      if (btnNuevaFactura) {
+
+      if (e.target.closest("#btnNuevaFactura")) {
         abrirModalFactura();
         return;
       }
 
-      const fondoModalFactura = e.target.closest("#modalFactura");
-      if (fondoModalFactura && e.target.id === "modalFactura") {
+      if (e.target.id === "modalFactura") {
         cerrarModalFactura();
         return;
       }
 
-      const btnGuardarFactura = e.target.closest("#guardarFactura");
-      if (btnGuardarFactura) {
+      if (e.target.closest("#guardarFactura")) {
         try {
+
           const codigo_factura = document.getElementById("codigoFactura")?.value.trim() || "";
-          const valorInput = document.getElementById("valorFactura");
-          const fuenteInput = document.getElementById("retencionFuente");
-          const icaInput = document.getElementById("retencionIca");
+
+          const valor = limpiarNumero(document.getElementById("valorFactura")?.value);
+          const retencion_fuente = limpiarNumero(document.getElementById("retencionFuente")?.value);
+          const retencion_ica = limpiarNumero(document.getElementById("retencionIca")?.value);
+
+          const fopatInput = document.getElementById("fopat")?.value;
+          const fopat = fopatInput ? limpiarNumero(fopatInput) : null; // ?? NUEVO
 
           const wrapper = document.querySelector("#modalFactura .select-search-wrapper");
           const id_manifiesto = wrapper && wrapper._value ? wrapper._value : "";
-
-          const valor = limpiarNumero(valorInput?.value);
-          const retencion_fuente = limpiarNumero(fuenteInput?.value);
-          const retencion_ica = limpiarNumero(icaInput?.value);
 
           const body = {
             codigo_factura,
@@ -316,7 +307,8 @@ function eventosFacturas() {
             valor,
             retencion_fuente,
             retencion_ica,
-            plazo_pago: Number(document.getElementById("plazoPago")?.value) || 0
+            plazo_pago: Number(document.getElementById("plazoPago")?.value) || 0,
+            fopat // ?? NUEVO
           };
 
           if (!codigo_factura) {
@@ -351,100 +343,12 @@ function eventosFacturas() {
 
         } catch (error) {
           console.error("Error guardando factura:", error);
-
-          if (error.message?.toLowerCase().includes("manifiesto")) {
-            showToast("Este manifiesto ya tiene una factura", "error");
-            return;
-          }
-
-          if (error.message?.toLowerCase().includes("código")) {
-            showToast("Ya existe una factura con ese código", "error");
-            return;
-          }
-
           showToast("Error al guardar la factura", "error");
         }
 
         return;
       }
 
-      const btnLimpiarFacturas = e.target.closest("#btnLimpiarFacturas");
-      if (btnLimpiarFacturas) {
-        const fDesde = document.getElementById("fDesde");
-        const fHasta = document.getElementById("fHasta");
-        const fCodigo = document.getElementById("fCodigo");
-
-        if (fDesde) fDesde.value = "";
-        if (fHasta) fHasta.value = "";
-        if (fCodigo) fCodigo.value = "";
-
-        const wrapper = document.querySelector(".transacciones-filtros .select-search-wrapper");
-        if (wrapper) {
-          const input = wrapper.querySelector("input");
-          if (input) input.value = "";
-          wrapper._value = "";
-        }
-
-        aplicarFiltrosFacturas();
-        return;
-      }
-
-      const btnEsteMes = e.target.closest("#btnEsteMesFacturas");
-      if (btnEsteMes) {
-        const hoy = new Date();
-        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-        const finMes = new Date(hoy);
-
-        const fDesde = document.getElementById("fDesde");
-        const fHasta = document.getElementById("fHasta");
-
-        if (fDesde) fDesde.value = formatearFechaInput(inicioMes);
-        if (fHasta) fHasta.value = formatearFechaInput(finMes);
-
-        aplicarFiltrosFacturas();
-        return;
-      }
-
-      const btnMesAnterior = e.target.closest("#btnMesAnteriorFacturas");
-      if (btnMesAnterior) {
-        const hoy = new Date();
-        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-        const finMes = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
-
-        const fDesde = document.getElementById("fDesde");
-        const fHasta = document.getElementById("fHasta");
-
-        if (fDesde) fDesde.value = formatearFechaInput(inicioMes);
-        if (fHasta) fHasta.value = formatearFechaInput(finMes);
-
-        aplicarFiltrosFacturas();
-      }
-    });
-
-    document.addEventListener("input", (e) => {
-      const target = e.target;
-
-      if (
-        target?.id === "fDesde" ||
-        target?.id === "fHasta" ||
-        target?.id === "fCodigo" ||
-        target?.id === "fManifiesto"
-      ) {
-        aplicarFiltrosFacturas();
-      }
-    });
-
-    document.addEventListener("change", (e) => {
-      const target = e.target;
-
-      if (
-        target?.id === "fDesde" ||
-        target?.id === "fHasta" ||
-        target?.id === "fCodigo" ||
-        target?.id === "fManifiesto"
-      ) {
-        aplicarFiltrosFacturas();
-      }
     });
   }
 }

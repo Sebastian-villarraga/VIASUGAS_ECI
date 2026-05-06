@@ -8,7 +8,7 @@
       <h2 id="rc-title">Registro de Conductor</h2>
 
       <div class="rcx-field">
-        <label>Cédula</label>
+        <label>CÃ©dula</label>
         <input type="text" id="rc-cedula">
       </div>
 
@@ -29,7 +29,12 @@
 
         <div class="rcx-field">
           <label>Valor</label>
-          <input type="number" id="rc-valor">
+          <input 
+              type="text" 
+              id="rc-valor"
+              inputmode="numeric"
+              placeholder="Ej: 1.200.000"
+            >
         </div>
 
         <div class="rcx-field">
@@ -38,7 +43,7 @@
         </div>
 
         <div class="rcx-field">
-          <label>Descripción</label>
+          <label>DescripciÃ³n</label>
           <textarea id="rc-descripcion"></textarea>
         </div>
 
@@ -63,7 +68,7 @@
             <tr>
               <th>Fecha</th>
               <th>Valor</th>
-              <th>Descripción</th>
+              <th>DescripciÃ³n</th>
             </tr>
           </thead>
 

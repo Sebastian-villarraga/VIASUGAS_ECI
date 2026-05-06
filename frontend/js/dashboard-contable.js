@@ -149,7 +149,7 @@ function dbcxRenderKPIs(data) {
     </div>
 
     <div class="dbcx-card dbcx-promedio">
-      <h3>Facturación Total</h3>
+      <h3>FacturaciÃ³n Total</h3>
       <p>${dbcxMoney(data.facturacion_total)}</p>
     </div>
 
@@ -517,7 +517,7 @@ function dbcxRenderTablaFlujoBancos(data){
   if(!data.length){
     tbody.innerHTML = `
       <tr>
-        <td colspan="3">Sin información</td>
+        <td colspan="3">Sin informaciÃ³n</td>
       </tr>
     `;
     return;
@@ -567,12 +567,12 @@ function dbcxRenderGraficaFlujoBancos(data){
 
       datasets:[
         {
-          label:"Entró",
+          label:"EntrÃ³",
           data:data.map(x => Number(x.ingresos)),
           backgroundColor:"#00a63e"
         },
         {
-          label:"Salió",
+          label:"SaliÃ³",
           data:data.map(x => Number(x.egresos)),
           backgroundColor:"#e53935"
         }

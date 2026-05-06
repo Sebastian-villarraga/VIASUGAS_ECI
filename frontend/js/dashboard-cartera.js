@@ -1,7 +1,7 @@
 // =====================================================
 // DASHBOARD CARTERA PREMIUM JS
 // CSS/HTML nuevos con prefijo dcrt-
-// Lógica original de cartera preservada
+// Logica original de cartera preservada
 // =====================================================
 
 let dcrtFiltro = {
@@ -143,7 +143,7 @@ function dcrtRenderKPIs(data) {
 
     <div class="dcrt-card dcrt-mora">
       <h3>Mora Promedio</h3>
-      <p>${dcrtNum(data.mora_promedio)} días</p>
+      <p>${dcrtNum(data.mora_promedio)} dÃ­as</p>
     </div>
 
     <div class="dcrt-card dcrt-retenciones">
@@ -334,7 +334,7 @@ function dcrtRenderDetalle(data) {
   if (!data.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="11" class="dcr-empty-row">
+        <td colspan="12" class="dcr-empty-row">
           No hay cartera pendiente.
         </td>
       </tr>
@@ -353,6 +353,7 @@ function dcrtRenderDetalle(data) {
         <td>${dcrtMoney(row.valor_bruto)}</td>
         <td>${dcrtMoney(row.retencion_fuente)}</td>
         <td>${dcrtMoney(row.retencion_ica)}</td>
+        <td>${dcrtMoney(row.fopat || 0)}</td> <!-- ?? NUEVO -->
         <td>${dcrtMoney(row.valor_neto)}</td>
         <td>${dcrtMoney(row.pagado)}</td>
         <td>${dcrtMoney(row.pendiente)}</td>
@@ -425,8 +426,8 @@ function dcrtConfigurarEventos() {
 
   document.getElementById("dcrtFiltroAnio")
     ?.addEventListener("change", () => {
-      // no dispara nada solo al cambiar año;
-      // queda listo para quarter/semestre/año completo
+      // no dispara nada solo al cambiar aÃ±o;
+      // queda listo para quarter/semestre/aÃ±o completo
     });
 }
 
@@ -506,3 +507,4 @@ function dcrtAnioCompleto() {
     new Date(year, 12, 0)
   );
 }
+

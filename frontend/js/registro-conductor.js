@@ -92,7 +92,10 @@ function eventosRegistroConductor() {
     try {
   
       const tipo = document.getElementById("rc-tipo")?.value;
-      const valor = document.getElementById("rc-valor")?.value;
+      const valorInput = document.getElementById("rc-valor")?.value;
+      
+      // ?? quitar puntos antes de enviar
+      const valor = valorInput.replace(/\./g, "");
   
       if (!tipo || !valor) {
         alert("Completa tipo y valor");
@@ -120,6 +123,23 @@ function eventosRegistroConductor() {
     }
   
   });
+  
+  const inputValor = document.getElementById("rc-valor");
+  
+  if (inputValor) {
+    inputValor.addEventListener("input", (e) => {
+      
+      let valor = e.target.value;
+  
+      // quitar todo lo que no sea número
+      valor = valor.replace(/\D/g, "");
+  
+      // formatear con separadores de miles (Colombia)
+      valor = Number(valor).toLocaleString("es-CO");
+  
+      e.target.value = valor;
+    });
+  }
 }
 
 // =========================

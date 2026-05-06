@@ -48,6 +48,9 @@ function initEventosManifiestos() {
 
   document.getElementById("btnLimpiarFiltrosManifiestos")
     ?.addEventListener("click", limpiarFiltrosManifiestos);
+    
+  document.getElementById("btnExportarExcelManifiestos")
+    ?.addEventListener("click", exportarExcelManifiestos);
 
   document.getElementById("filtroAnio")
     ?.addEventListener("change", filtrarManifiestos);
@@ -332,6 +335,63 @@ function limpiarFiltrosManifiestos() {
   document.getElementById("filtroCliente").value = "";
 
   cargarManifiestos();
+}
+
+function obtenerParamsFiltrosManifiestos() {
+  const idManifiesto = document.getElementById("filtroIdManifiesto")?.value.trim() || "";
+  const fechaDesde = document.getElementById("filtroFechaDesde")?.value || "";
+  const fechaHasta = document.getElementById("filtroFechaHasta")?.value || "";
+  const estado = document.getElementById("filtroEstado")?.value || "";
+  const idCliente = document.getElementById("filtroCliente")?.value || "";
+
+  const params = new URLSearchParams();
+
+  if (idManifiesto) params.append("id_manifiesto", idManifiesto);
+  if (fechaDesde) params.append("fecha_desde", fechaDesde);
+  if (fechaHasta) params.append("fecha_hasta", fechaHasta);
+  if (estado) params.append("estado", estado);
+  if (idCliente) params.append("id_cliente", idCliente);
+
+  return params;
+}
+
+async function exportarExcelManifiestos() {
+  try {
+    const params = obtenerParamsFiltrosManifiestos();
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`/api/manifiestos/exportar-excel?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` })
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error("No se pudo exportar el Excel");
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+
+    const hoy = new Date().toISOString().split("T")[0];
+    link.download = `Manifiestos_${hoy}.xlsx`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+
+    showToast("Excel descargado correctamente", "success");
+
+  } catch (error) {
+    console.error("Error exportando Excel:", error);
+    showToast("Error descargando Excel", "error");
+  }
 }
 
 // =========================
@@ -980,6 +1040,7 @@ function renderDetalleModoLectura(data) {
   
   resumenEl.textContent =
     `${resumen < 0 ? "-$" : "$"}${Math.abs(resumen).toLocaleString("es-CO")}`;
+  actualizarTrackingEstado(manifiesto.estado);
 }
 
   // =========================
@@ -1261,4 +1322,35 @@ function aplicarFormatoMonedaInputsManifiesto() {
       e.target.value = formatearMilesInput(e.target.value);
     });
   });
+}
+
+function actualizarTrackingEstado(estado) {
+  const truck = document.querySelector(".mfx-truck");
+  const line = document.querySelector(".mfx-track-line");
+  const steps = document.querySelectorAll(".mfx-track-step");
+
+  let paso = 1;
+
+  if (estado === "CREADO-EN TRANSITO") paso = 1;
+  if (estado === "ENTREGADO POR COBRAR") paso = 2;
+  if (estado === "MANIFIESTO PAGO") paso = 3;
+
+  // ?? obtener posición REAL del step
+  const step = steps[paso - 1];
+
+  if (step && truck) {
+    const rect = step.getBoundingClientRect();
+    const parentRect = step.parentElement.getBoundingClientRect();
+
+    const center = rect.left + rect.width / 2 - parentRect.left;
+
+    truck.style.left = `${center}px`;
+  }
+
+  // progreso visual
+  const porcentaje = ((paso - 1) / 2) * 100;
+
+  if (line) {
+    line.style.setProperty("--progress", `${porcentaje}%`);
+  }
 }

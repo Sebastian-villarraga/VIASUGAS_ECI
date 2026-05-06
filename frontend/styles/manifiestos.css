@@ -776,6 +776,7 @@
     .95fr    /* estado */
     .95fr    /* cliente */
     .85fr    /* limpiar */
+    .45fr    /* excel */
     !important;
 
   gap:8px !important;
@@ -871,3 +872,169 @@
     width:100% !important;
   }
 }
+
+.mfx-btn-excel {
+  background: #15803d !important;
+  color: #fff !important;
+  width: 42px !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mfx-btn-excel:hover {
+  background: #166534 !important;
+}
+
+.mfx-btn-excel i {
+  font-size: 16px;
+}
+
+/* =========================
+   TRACKING MANIFIESTO
+========================= */
+.mfx-tracking{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0 16px;
+  padding: 0 10px;
+  height: 50px;
+}
+
+/* línea base */
+.mfx-track-line{
+  position: absolute;
+  top: 18px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  z-index: 1;
+}
+
+/* línea progreso */
+.mfx-track-line::after{
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2f56a6, #16a34a);
+  border-radius: 10px;
+  transition: width .4s ease;
+}
+
+/* step */
+.mfx-track-step{
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  flex: 1;
+}
+
+/* punto */
+.mfx-track-step .dot{
+  width: 14px;
+  height: 14px;
+  background: #d1d5db;
+  border-radius: 50%;
+  margin: 0 auto 6px;
+  transition: .3s;
+}
+
+/* texto */
+.mfx-track-step span{
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* activo */
+.mfx-track-step.active .dot{
+  background: #2f56a6;
+  transform: scale(1.2);
+}
+
+.mfx-track-step.active span{
+  color: #111827;
+}
+
+/* completado */
+.mfx-track-step.completed .dot{
+  background: #16a34a;
+}
+
+.mfx-track-step.completed span{
+  color: #16a34a;
+}
+
+/* =========================
+   TRACKING MANIFIESTO FIX
+========================= */
+
+.mfx-tracking{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* ?? clave */
+  margin: 10px 0 22px;
+  padding: 0 20px;
+  height: 70px;
+}
+
+/* línea (más abajo) */
+.mfx-track-line{
+  position: absolute;
+  bottom: 18px; /* ?? BAJA la línea */
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 10px;
+  background: linear-gradient(
+    to right,
+    #16a34a var(--progress, 0%),
+    #e5e7eb var(--progress, 0%)
+  );
+  z-index: 1;
+}
+
+/* steps */
+.mfx-track-step{
+  position: relative;
+  z-index: 2; /* ?? encima de la línea */
+  text-align: center;
+  flex: 1;
+}
+
+/* texto */
+.mfx-track-step span{
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  background: #fff; /* ?? evita que la línea lo ensucie */
+  padding: 0 6px;
+}
+
+/* ?? TRACTOMULA */
+.mfx-truck{
+  position: absolute;
+  bottom: 30px; /* ?? justo encima de la línea */
+  left: 0%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  transition: left .45s ease;
+  z-index: 3;
+}
+
+/* línea progreso visual */
+.mfx-track-line{
+  background: linear-gradient(
+    to right,
+    #16a34a var(--progress, 0%),
+    #e5e7eb var(--progress, 0%)
+  );
+}
+

@@ -1,0 +1,75 @@
+<div class="dbx-layout">
+
+  <!-- HEADER -->
+  <div class="dbx-header">
+    <h2>Dashboard Conductores</h2>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="dbx-filters-box dbx-full">
+
+    <div class="dbx-toolbar-bottom">
+
+      <div class="dbx-group">
+        <label>Fecha desde</label>
+        <input type="date" id="dcDesde">
+      </div>
+
+      <div class="dbx-group">
+        <label>Fecha hasta</label>
+        <input type="date" id="dcHasta">
+      </div>
+
+      <div class="dbx-group">
+        <label>Conductor</label>
+        <select id="dcConductor" class="dbx-select">
+          <option value="">Todos</option>
+        </select>
+      </div>
+
+      <div class="dbx-group dbx-btn-group">
+        <label>&nbsp;</label>
+        <button id="dcLimpiar" class="dbx-btn dbx-btn-danger">
+          Limpiar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TABLA -->
+  <div class="dbx-table-card">
+
+    <h2>Liquidación por Viaje</h2>
+
+    <div class="tabla-scroll-wrap">
+
+      <table class="dbx-table" id="tablaDC">
+
+        <thead>
+          <tr>
+            <th>Manifiesto</th>
+            <th>Fecha</th>
+            <th>Conductor</th>
+            <th>Valor Total</th>
+            <th>Comisiones</th>
+            <th>Base</th>
+            <th>% Conductor</th>
+            <th>Anticipo</th>
+            <th>Gastos</th>
+            <th>Saldo</th>
+            <th>Total a pagar</th>
+          </tr>
+        </thead>
+
+        <tbody id="dcBody"></tbody>
+
+        <tfoot id="dcFooter"></tfoot>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

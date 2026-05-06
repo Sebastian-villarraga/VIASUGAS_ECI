@@ -152,7 +152,6 @@ const getRentabilidad = async (req, res) => {
         m.id_manifiesto,
 
         COALESCE(c.nombre,'Sin cliente') AS cliente,
-
         COALESCE(eac.nombre,'Sin empresa') AS empresa_a_cargo,
 
         COALESCE(f.valor,0) AS valor_facturado,
@@ -160,6 +159,7 @@ const getRentabilidad = async (req, res) => {
         (
           COALESCE(f.retencion_fuente,0)
           + COALESCE(f.retencion_ica,0)
+          + COALESCE(f.fopat,0) -- ?? NUEVO
         ) AS retenciones,
 
         COALESCE(SUM(
@@ -183,23 +183,21 @@ const getRentabilidad = async (req, res) => {
           END
         ),0) AS gasto_conductor,
 
-        COALESCE(SUM(
-          CASE
-            WHEN tt.tipo='INGRESO MANIFIESTO'
-            THEN t.valor ELSE 0
-          END
-        ),0)
-
-        -
-
-        COALESCE(SUM(
-          CASE
-            WHEN tt.tipo='EGRESO MANIFIESTO'
-            THEN t.valor ELSE 0
-          END
-        ),0)
-
-        AS utilidad
+        (
+          COALESCE(SUM(
+            CASE
+              WHEN tt.tipo='INGRESO MANIFIESTO'
+              THEN t.valor ELSE 0
+            END
+          ),0)
+          -
+          COALESCE(SUM(
+            CASE
+              WHEN tt.tipo='EGRESO MANIFIESTO'
+              THEN t.valor ELSE 0
+            END
+          ),0)
+        ) AS utilidad
 
       FROM manifiesto m
 
@@ -228,7 +226,8 @@ const getRentabilidad = async (req, res) => {
         eac.nombre,
         f.valor,
         f.retencion_fuente,
-        f.retencion_ica
+        f.retencion_ica,
+        f.fopat -- ?? NUEVO
 
       ORDER BY utilidad DESC
     `,[desde || null, hasta || null]);
@@ -242,49 +241,45 @@ const getRentabilidad = async (req, res) => {
 };
 
 // =========================
-// INGRESOS VS EGRESOS POR MES
+// INGRESOS VS EGRESOS POR MES (CORREGIDO)
 // =========================
 const getIngresosEgresos = async (req, res) => {
   try {
 
     const { desde, hasta } = req.query;
 
-    const ingresosQ = await pool.query(`
+    const result = await pool.query(`
       SELECT 
-        TO_CHAR(fecha_emision, 'YYYY-MM') AS mes,
-        COALESCE(SUM(valor), 0) AS ingresos
-      FROM factura
-      WHERE ($1::date IS NULL OR fecha_emision >= $1)
-        AND ($2::date IS NULL OR fecha_emision <= $2)
+        TO_CHAR(t.fecha_pago, 'YYYY-MM') AS mes,
+
+        SUM(
+          CASE 
+            WHEN tt.tipo = 'INGRESO MANIFIESTO'
+            THEN t.valor ELSE 0
+          END
+        ) AS ingresos,
+
+        SUM(
+          CASE 
+            WHEN tt.tipo = 'EGRESO MANIFIESTO'
+            THEN t.valor ELSE 0
+          END
+        ) AS egresos
+
+      FROM transaccion t
+
+      JOIN tipo_transaccion tt 
+        ON t.id_tipo_transaccion = tt.id
+
+      WHERE
+        ($1::date IS NULL OR t.fecha_pago >= $1)
+        AND ($2::date IS NULL OR t.fecha_pago <= $2)
+
       GROUP BY mes
       ORDER BY mes
     `, [desde || null, hasta || null]);
 
-    const egresosQ = await pool.query(`
-      SELECT 
-        TO_CHAR(t.fecha_pago, 'YYYY-MM') AS mes,
-        COALESCE(SUM(t.valor), 0) AS egresos
-      FROM transaccion t
-      JOIN tipo_transaccion tt 
-        ON t.id_tipo_transaccion = tt.id
-      WHERE tt.tipo = 'EGRESO MANIFIESTO'
-        AND ($1::date IS NULL OR t.fecha_pago >= $1)
-        AND ($2::date IS NULL OR t.fecha_pago <= $2)
-      GROUP BY mes
-    `, [desde || null, hasta || null]);
-
-    const mapEgresos = {};
-    egresosQ.rows.forEach(e => {
-      mapEgresos[e.mes] = Number(e.egresos);
-    });
-
-    const final = ingresosQ.rows.map(r => ({
-      mes: r.mes,
-      ingresos: Number(r.ingresos),
-      egresos: mapEgresos[r.mes] || 0
-    }));
-
-    return res.json(final);
+    return res.json(result.rows);
 
   } catch (error) {
     console.error("Error getIngresosEgresos:", error);
@@ -355,6 +350,7 @@ const getEstadoFacturacion = async (req, res) => {
           SUM(
             COALESCE(f.retencion_fuente,0)
             + COALESCE(f.retencion_ica,0)
+            + COALESCE(f.fopat,0) -- ?? NUEVO
           ) AS retenciones
 
         FROM factura f

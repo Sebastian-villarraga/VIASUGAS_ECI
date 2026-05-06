@@ -18,8 +18,12 @@ function initTiposTransaccion() {
     ?.addEventListener("change", aplicarFiltrosTipos);
 
   const inputCategoria = document.getElementById("categoria");
+
   if (inputCategoria) {
-    inputCategoria.addEventListener("input", validarCategoriaDuplicada);
+    inputCategoria.addEventListener("input", () => {
+      inputCategoria.value = inputCategoria.value.toUpperCase();
+      validarCategoriaDuplicada();
+    });
   }
 }
 
@@ -179,8 +183,8 @@ function initFormTipo() {
     }
 
     const data = {
-      categoria: document.getElementById("categoria").value,
-      descripcion: document.getElementById("descripcion").value,
+      categoria: document.getElementById("categoria").value.trim().toUpperCase(),
+      descripcion: document.getElementById("descripcion").value.trim(),
       tipo: document.getElementById("tipo").value,
       estado: document.getElementById("estado").value
     };

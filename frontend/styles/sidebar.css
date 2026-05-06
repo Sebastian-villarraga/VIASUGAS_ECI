@@ -18,7 +18,7 @@
 
 /* abierto */
 .sidebar.open{
-  width:190px;
+  width:220px;
 }
 
 /* scrollbar */
@@ -46,18 +46,18 @@
 .menu-item a{
   display:flex;
   align-items:center;
-  gap:8px;                 /* menos espacio icono-texto */
-  height:34px;             /* más compacto */
+  gap:8px;
+  height:34px;
   padding:0 14px;
   color:#fff;
   text-decoration:none;
   white-space:nowrap;
-  font-size:12px;          /* texto más pequeño */
+  font-size:12px;
   font-weight:400;
   transition:.2s;
 }
 
-/* ICONOS MÁS PEQUEÑOS */
+/* iconos */
 .menu-item i{
   width:16px;
   min-width:16px;
@@ -65,14 +65,14 @@
   text-align:center;
 }
 
-/* texto oculto */
+/* texto oculto cerrado */
 .menu-item span{
   opacity:0;
   visibility:hidden;
   transition:.15s;
 }
 
-/* mostrar texto */
+/* mostrar texto abierto */
 .sidebar.open .menu-item span{
   opacity:1;
   visibility:visible;
@@ -88,7 +88,7 @@
   background:rgba(255,255,255,.18);
 }
 
-/* TEXTO AGRUPADOR MÁS PEQUEÑO */
+/* secciones */
 .menu-section{
   display:none;
 }
@@ -104,20 +104,22 @@
   line-height:1;
 }
 
-/* contenido */
+/* contenido principal */
 .content{
   margin-top:60px;
-  margin-left:60px;
+  margin-left:64px;
   width:calc(100% - 64px);
   min-height:calc(100vh - 60px);
-  transition:.25s ease;
+  transition:all .25s ease;
 }
 
-/* cuando abre sidebar */
+/* abierto empuja contenido */
 .sidebar.open ~ .content{
-  margin-left:60px;
+  margin-left:220px;
+  width:calc(100% - 220px);
 }
 
+/* botón topbar */
 .menu-toggle{
   background:none;
   border:none;
@@ -125,18 +127,4 @@
   font-size:20px;
   cursor:pointer;
   margin-right:15px;
-}
-
-.sidebar{
-   width:64px;
-   transition:.25s;
-}
-
-.sidebar.open{
-   width:220px;
-}
-
-.sidebar.open ~ .content{
-   margin-left:220px;
-   width:calc(100% - 220px);
 }
