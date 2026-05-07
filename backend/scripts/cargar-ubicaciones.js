@@ -6,13 +6,11 @@ const { Pool } = require("pg");
 // =========================================
 // CONFIG
 // =========================================
-const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "viasugas",
-  password: "1003526827",
-  port: 5432,
+require("dotenv").config({
+  path: require("path").resolve(__dirname, "../.env")
 });
+
+const pool = require("../config/db");
 
 const CSV_PATH = path.join(__dirname, "../database/divipola_municipios.csv");
 const LIMPIAR_TABLA_ANTES = true;

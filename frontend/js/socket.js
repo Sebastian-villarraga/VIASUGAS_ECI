@@ -1,0 +1,123 @@
+// =========================
+// USER INFO
+// =========================
+function obtenerUsuarioActual() {
+
+  try {
+
+    return (
+      JSON.parse(localStorage.getItem("usuario")) ||
+      JSON.parse(localStorage.getItem("user")) ||
+      JSON.parse(localStorage.getItem("usuarioData")) ||
+      {}
+    );
+
+  } catch {
+
+    return {};
+
+  }
+
+}
+
+// =========================
+// SOCKET.IO CLIENT
+// =========================
+
+const socket = io();
+
+// =========================
+// CONNECTION EVENTS
+// =========================
+socket.on("connect", () => {
+
+  console.log("?? Socket conectado:", socket.id);
+
+});
+
+socket.on("disconnect", () => {
+
+  console.log("?? Socket desconectado");
+
+});
+
+// =========================
+// TEST EVENT
+// =========================
+socket.on("test", (data) => {
+
+  console.log("?? Evento recibido:", data);
+
+});
+
+// =========================
+// EDITING TRACKER
+// =========================
+const manifiestosEditando = {};
+
+// =========================
+// MANIFIESTO CREATED
+// =========================
+socket.on("manifiesto:created", async (data) => {
+
+  console.log("?? Nuevo manifiesto:", data);
+
+  // Solo si estamos en módulo manifiestos
+  const tabla = document.getElementById("manifiestosTable");
+
+  if (!tabla) return;
+
+  // Recargar tabla automáticamente
+  await filtrarManifiestos();
+
+  showToast(
+    "Nuevo manifiesto agregado",
+    "success"
+  );
+
+});
+
+// =========================
+// MANIFIESTO UPDATED
+// =========================
+socket.on("manifiesto:updated", async (data) => {
+
+  console.log(
+    "?? Manifiesto actualizado:",
+    data
+  );
+
+  const tabla =
+    document.getElementById(
+      "manifiestosTable"
+    );
+
+  if (tabla) {
+    await filtrarManifiestos();
+  }
+
+  // =========================
+  // DETALLE ABIERTO
+  // =========================
+  if (
+    detalleManifiestoActual &&
+    data?.manifiesto?.id_manifiesto ===
+      detalleManifiestoActual.id_manifiesto
+  ) {
+
+    // =========================
+    // SOLO AVISAR
+    // =========================
+    showToast(
+      "Este manifiesto fue actualizado por otro usuario",
+      "warning"
+    );
+
+  }
+
+  showToast(
+    "Manifiesto actualizado",
+    "success"
+  );
+
+});

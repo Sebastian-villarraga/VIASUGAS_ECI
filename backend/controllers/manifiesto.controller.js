@@ -365,6 +365,13 @@ const createManifiesto = async (req, res) => {
       console.error("AUDIT CREATE MANIFIESTO:", e.message);
     }
 
+    // =========================
+    // SOCKET EVENT
+    // =========================
+    global.io.emit("manifiesto:created", {
+      manifiesto: result.rows[0]
+    });
+    
     res.status(201).json(result.rows[0]);
 
   } catch (error) {
@@ -410,7 +417,8 @@ const updateManifiesto = async (req, res) => {
       id_trailer,
       id_empresa_a_cargo,
       novedades,
-      observaciones
+      observaciones,
+      originalSnapshot
     } = req.body;
 
     const existe = await pool.query(
@@ -426,6 +434,38 @@ const updateManifiesto = async (req, res) => {
       `SELECT * FROM manifiesto WHERE id_manifiesto = $1`,
       [id_manifiesto]
     );
+    
+    // =========================
+    // OPTIMISTIC LOCK
+    // =========================
+    if (originalSnapshot) {
+    
+      const actual = viejo.rows[0];
+    
+      const conflicto =
+        String(actual.estado || "") !== String(originalSnapshot.estado || "") ||
+    
+        String(actual.gastos || "") !== String(originalSnapshot.gastos || "") ||
+    
+        String(actual.documentos || "") !== String(originalSnapshot.documentos || "") ||
+    
+        String(actual.observaciones || "") !== String(originalSnapshot.observaciones || "") ||
+    
+        String(actual.id_conductor || "") !== String(originalSnapshot.id_conductor || "") ||
+    
+        String(actual.id_vehiculo || "") !== String(originalSnapshot.id_vehiculo || "") ||
+    
+        String(actual.id_trailer || "") !== String(originalSnapshot.id_trailer || "");
+    
+      if (conflicto) {
+    
+        return res.status(409).json({
+          error: "Este manifiesto fue modificado por otro usuario. Recarga antes de guardar."
+        });
+    
+      }
+    
+    }
 
     // ? radicado y cliente NO obligatorios
     if (
@@ -557,6 +597,13 @@ const updateManifiesto = async (req, res) => {
       console.error("AUDIT UPDATE MANIFIESTO:", e.message);
     }
 
+    // =========================
+    // SOCKET EVENT
+    // =========================
+    global.io.emit("manifiesto:updated", {
+      manifiesto: result.rows[0]
+    });
+    
     res.json(result.rows[0]);
 
   } catch (error) {

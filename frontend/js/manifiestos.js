@@ -781,6 +781,10 @@ async function verDetalleManifiesto(id) {
 
     detalleDataActual = data;
     detalleManifiestoActual = data.manifiesto;
+    
+    window.manifiestoOriginalSnapshot =
+      JSON.parse(JSON.stringify(data.manifiesto));
+    
     modoEdicionDetalle = false;
 
     actualizarBotonesDetalle();
@@ -799,6 +803,11 @@ function actualizarBotonesDetalle() {
 }
 
 function cerrarModalDetalleManifiesto() {
+
+  socket.emit("manifiesto:stop-editing", {
+    id_manifiesto: detalleManifiestoActual?.id_manifiesto
+  });
+
   document.getElementById("modalDetalleManifiesto")?.classList.add("hidden");
   modoEdicionDetalle = false;
   detalleManifiestoActual = null;
@@ -1043,24 +1052,84 @@ function renderDetalleModoLectura(data) {
   actualizarTrackingEstado(manifiesto.estado);
 }
 
-  // =========================
-  // ACTIVAR EDICION
-  // =========================
+// =========================
+// ACTIVAR EDICION
+// =========================
+// =========================
+// ACTIVAR EDICION
+// =========================
 async function activarEdicionDetalle() {
-  if (!detalleManifiestoActual || !catalogosManifiesto) return;
+
+  if (
+    !detalleManifiestoActual ||
+    !catalogosManifiesto
+  ) {
+    return;
+  }
 
   modoEdicionDetalle = true;
+
+  // =========================
+  // USUARIO ACTUAL
+  // =========================
+  let currentUser = {};
+
+  try {
+
+    currentUser =
+      JSON.parse(localStorage.getItem("usuario")) ||
+      JSON.parse(localStorage.getItem("user")) ||
+      JSON.parse(localStorage.getItem("usuarioData")) ||
+      {};
+
+  } catch {
+
+    currentUser = {};
+
+  }
+
+  // =========================
+  // SOCKET EDITING
+  // =========================
+  socket.emit("manifiesto:editing", {
+    id_manifiesto:
+      detalleManifiestoActual.id_manifiesto,
+
+    usuario:
+      currentUser?.nombre ||
+      currentUser?.usuario ||
+      currentUser?.correo ||
+      currentUser?.email ||
+      "Usuario"
+  });
+
   actualizarBotonesDetalle();
 
-  const manifiesto = detalleManifiestoActual;
-  const contInfo = document.getElementById("detalleInfoManifiesto");
+  const manifiesto =
+    detalleManifiestoActual;
 
-  const ciudades = await apiFetch("/api/ubicaciones/municipios");
+  const contInfo =
+    document.getElementById(
+      "detalleInfoManifiesto"
+    );
+
+  const ciudades = await apiFetch(
+    "/api/ubicaciones/municipios"
+  );
+
   if (!ciudades) {
-    showToast("No se pudieron cargar las ciudades", "error");
+
+    showToast(
+      "No se pudieron cargar las ciudades",
+      "error"
+    );
+
     modoEdicionDetalle = false;
+
     actualizarBotonesDetalle();
+
     return;
+
   }
 
   const opcionesCiudades = ciudades.map(c => `
@@ -1093,7 +1162,12 @@ async function activarEdicionDetalle() {
       <select id="detalleEditCliente">
         <option value="">Seleccione</option>
         ${catalogosManifiesto.clientes.map(c => `
-          <option value="${c.nit}" ${String(c.nit) === String(manifiesto.id_cliente) ? "selected" : ""}>
+          <option
+            value="${c.nit}"
+            ${String(c.nit) === String(manifiesto.id_cliente)
+              ? "selected"
+              : ""}
+          >
             ${c.nombre} - ${c.nit}
           </option>
         `).join("")}
@@ -1102,11 +1176,21 @@ async function activarEdicionDetalle() {
 
     <div class="detalle-info-item editando">
       <label for="detalleEditFecha">Fecha</label>
-      <input type="date" id="detalleEditFecha" value="${manifiesto.fecha ? String(manifiesto.fecha).split("T")[0] : ""}">
+
+      <input
+        type="date"
+        id="detalleEditFecha"
+        value="${
+          manifiesto.fecha
+            ? String(manifiesto.fecha).split("T")[0]
+            : ""
+        }"
+      >
     </div>
 
     <div class="detalle-info-item editando">
       <label for="detalleEditOrigen">Origen</label>
+
       <select id="detalleEditOrigen">
         <option value="">Seleccione</option>
         ${opcionesCiudades}
@@ -1115,6 +1199,7 @@ async function activarEdicionDetalle() {
 
     <div class="detalle-info-item editando">
       <label for="detalleEditDestino">Destino</label>
+
       <select id="detalleEditDestino">
         <option value="">Seleccione</option>
         ${opcionesCiudades}
@@ -1123,10 +1208,17 @@ async function activarEdicionDetalle() {
 
     <div class="detalle-info-item editando">
       <label for="detalleEditVehiculo">Vehículo</label>
+
       <select id="detalleEditVehiculo">
         <option value="">Seleccione</option>
+
         ${catalogosManifiesto.vehiculos.map(v => `
-          <option value="${v.placa}" ${v.placa === manifiesto.id_vehiculo ? "selected" : ""}>
+          <option
+            value="${v.placa}"
+            ${v.placa === manifiesto.id_vehiculo
+              ? "selected"
+              : ""}
+          >
             ${v.placa}
           </option>
         `).join("")}
@@ -1135,10 +1227,17 @@ async function activarEdicionDetalle() {
 
     <div class="detalle-info-item editando">
       <label for="detalleEditTrailer">Trailer</label>
+
       <select id="detalleEditTrailer">
         <option value="">Seleccione</option>
+
         ${catalogosManifiesto.trailers.map(t => `
-          <option value="${t.placa}" ${t.placa === manifiesto.id_trailer ? "selected" : ""}>
+          <option
+            value="${t.placa}"
+            ${t.placa === manifiesto.id_trailer
+              ? "selected"
+              : ""}
+          >
             ${t.placa}
           </option>
         `).join("")}
@@ -1147,10 +1246,17 @@ async function activarEdicionDetalle() {
 
     <div class="detalle-info-item editando">
       <label for="detalleEditConductor">Conductor</label>
+
       <select id="detalleEditConductor">
         <option value="">Seleccione</option>
+
         ${catalogosManifiesto.conductores.map(c => `
-          <option value="${c.cedula}" ${String(c.cedula) === String(manifiesto.id_conductor) ? "selected" : ""}>
+          <option
+            value="${c.cedula}"
+            ${String(c.cedula) === String(manifiesto.id_conductor)
+              ? "selected"
+              : ""}
+          >
             ${c.nombre} - ${c.cedula}
           </option>
         `).join("")}
@@ -1159,10 +1265,17 @@ async function activarEdicionDetalle() {
 
     <div class="detalle-info-item editando">
       <label for="detalleEditEstado">Estado</label>
+
       <select id="detalleEditEstado">
         <option value="">Seleccione</option>
+
         ${catalogosManifiesto.estados.map(e => `
-          <option value="${e}" ${e === manifiesto.estado ? "selected" : ""}>
+          <option
+            value="${e}"
+            ${e === manifiesto.estado
+              ? "selected"
+              : ""}
+          >
             ${e}
           </option>
         `).join("")}
@@ -1171,64 +1284,153 @@ async function activarEdicionDetalle() {
 
     <div class="detalle-info-item readonly-soft">
       <span>Valor Flete</span>
-      <strong>$${Number(manifiesto.valor_flete || 0).toLocaleString()}</strong>
+
+      <strong>
+        $${Number(
+          manifiesto.valor_flete || 0
+        ).toLocaleString()}
+      </strong>
     </div>
 
     <div class="detalle-info-item readonly-soft">
       <span>Porcentaje Flete</span>
-      <strong>$${Number(manifiesto.valor_flete_porcentaje || 0).toLocaleString()}</strong>
+
+      <strong>
+        $${Number(
+          manifiesto.valor_flete_porcentaje || 0
+        ).toLocaleString()}
+      </strong>
     </div>
 
     <div class="detalle-info-item readonly-soft">
       <span>Anticipo</span>
-      <strong>$${Number(manifiesto.anticipo_manifiesto || 0).toLocaleString()}</strong>
+
+      <strong>
+        $${Number(
+          manifiesto.anticipo_manifiesto || 0
+        ).toLocaleString()}
+      </strong>
     </div>
 
     <div class="detalle-info-item readonly-soft">
       <span>Empresa a cargo</span>
-      <strong>${safe(manifiesto.empresa_nombre)}, Nit: ${safe(manifiesto.empresa_nit)}</strong>
+
+      <strong>
+        ${safe(manifiesto.empresa_nombre)},
+        Nit: ${safe(manifiesto.empresa_nit)}
+      </strong>
     </div>
 
     <div class="detalle-info-item editando">
-      <label for="detalleEditGastos">Docs. gastos</label>
+      <label for="detalleEditGastos">
+        Docs. gastos
+      </label>
+
       <select id="detalleEditGastos">
-        ${(catalogosManifiesto.entregas || ["PENDIENTES", "ENTREGADOS"]).map(e => `
-          <option value="${e}" ${e === manifiesto.gastos ? "selected" : ""}>${e}</option>
+        ${(catalogosManifiesto.entregas ||
+          ["PENDIENTES", "ENTREGADOS"]
+        ).map(e => `
+          <option
+            value="${e}"
+            ${e === manifiesto.gastos
+              ? "selected"
+              : ""}
+          >
+            ${e}
+          </option>
         `).join("")}
       </select>
     </div>
 
     <div class="detalle-info-item editando">
-      <label for="detalleEditDocumentos">Documentos</label>
+      <label for="detalleEditDocumentos">
+        Documentos
+      </label>
+
       <select id="detalleEditDocumentos">
-        ${(catalogosManifiesto.entregas || ["PENDIENTES", "ENTREGADOS"]).map(e => `
-          <option value="${e}" ${e === manifiesto.documentos ? "selected" : ""}>${e}</option>
+        ${(catalogosManifiesto.entregas ||
+          ["PENDIENTES", "ENTREGADOS"]
+        ).map(e => `
+          <option
+            value="${e}"
+            ${e === manifiesto.documentos
+              ? "selected"
+              : ""}
+          >
+            ${e}
+          </option>
         `).join("")}
       </select>
     </div>
 
     <div class="detalle-info-item editando">
-      <label for="detalleEditNovedades">Novedades</label>
+      <label for="detalleEditNovedades">
+        Novedades
+      </label>
+
       <select id="detalleEditNovedades">
-        <option value="true" ${manifiesto.novedades ? "selected" : ""}>Si</option>
-        <option value="false" ${!manifiesto.novedades ? "selected" : ""}>No</option>
+        <option
+          value="true"
+          ${manifiesto.novedades
+            ? "selected"
+            : ""}
+        >
+          Si
+        </option>
+
+        <option
+          value="false"
+          ${!manifiesto.novedades
+            ? "selected"
+            : ""}
+        >
+          No
+        </option>
       </select>
     </div>
 
     <div class="detalle-info-item editando full-span">
-      <label for="detalleEditObservaciones">Observaciones</label>
-      <textarea id="detalleEditObservaciones">${manifiesto.observaciones || ""}</textarea>
+      <label for="detalleEditObservaciones">
+        Observaciones
+      </label>
+
+      <textarea id="detalleEditObservaciones">${
+        manifiesto.observaciones || ""
+      }</textarea>
     </div>
   `;
 
-  const origenSelect = document.getElementById("detalleEditOrigen");
-  const destinoSelect = document.getElementById("detalleEditDestino");
+  const origenSelect =
+    document.getElementById(
+      "detalleEditOrigen"
+    );
 
-  if (origenSelect) origenSelect.value = manifiesto.origen_ciudad || "";
-  if (destinoSelect) destinoSelect.value = manifiesto.destino_ciudad || "";
+  const destinoSelect =
+    document.getElementById(
+      "detalleEditDestino"
+    );
+
+  if (origenSelect) {
+    origenSelect.value =
+      manifiesto.origen_ciudad || "";
+  }
+
+  if (destinoSelect) {
+    destinoSelect.value =
+      manifiesto.destino_ciudad || "";
+  }
+
 }
 
+
+
+
 function cancelarEdicionDetalle() {
+
+  socket.emit("manifiesto:stop-editing", {
+    id_manifiesto: detalleManifiestoActual.id_manifiesto
+  });
+
   if (!detalleDataActual) return;
   modoEdicionDetalle = false;
   actualizarBotonesDetalle();
@@ -1236,54 +1438,176 @@ function cancelarEdicionDetalle() {
 }
 
 async function guardarEdicionDetalle() {
+
   if (!detalleManifiestoActual) return;
 
-  const origenSelect = document.getElementById("detalleEditOrigen");
-  const destinoSelect = document.getElementById("detalleEditDestino");
+  try {
 
-  const payload = {
-    radicado:  document.getElementById("detalleEditRadicado")?.value?.trim() || null,
-    fecha: document.getElementById("detalleEditFecha")?.value || "",
-    origen_ciudad: origenSelect?.value || "",
-    origen_departamento: origenSelect?.selectedOptions?.[0]?.dataset?.departamento || "",
-    destino_ciudad: destinoSelect?.value || "",
-    destino_departamento: destinoSelect?.selectedOptions?.[0]?.dataset?.departamento || "",
-    estado: document.getElementById("detalleEditEstado")?.value || "",
-    valor_flete: detalleManifiestoActual.valor_flete,
-    valor_flete_porcentaje: detalleManifiestoActual.valor_flete_porcentaje,
-    anticipo_manifiesto: detalleManifiestoActual.anticipo_manifiesto,
-    gastos: document.getElementById("detalleEditGastos")?.value || "",
-    documentos: document.getElementById("detalleEditDocumentos")?.value || "",
-    id_cliente: document.getElementById("detalleEditCliente")?.value || "",
-    id_conductor: document.getElementById("detalleEditConductor")?.value || "",
-    id_vehiculo: document.getElementById("detalleEditVehiculo")?.value || "",
-    id_trailer: document.getElementById("detalleEditTrailer")?.value || "",
-    id_empresa_a_cargo: detalleManifiestoActual.id_empresa_a_cargo,
-    novedades: document.getElementById("detalleEditNovedades")?.value === "true",
-    observaciones: document.getElementById("detalleEditObservaciones")?.value?.trim() || ""
-  };
+    const origenSelect = document.getElementById("detalleEditOrigen");
+    const destinoSelect = document.getElementById("detalleEditDestino");
 
-  const res = await apiFetch(`/api/manifiestos/${encodeURIComponent(detalleManifiestoActual.id_manifiesto)}`, {
-    method: "PUT",
-    body: JSON.stringify(payload)
-  });
+    const payload = {
+      radicado:
+        document.getElementById("detalleEditRadicado")
+          ?.value
+          ?.trim() || null,
 
-  if (!res) return;
+      fecha:
+        document.getElementById("detalleEditFecha")
+          ?.value || "",
 
-  showToast("Manifiesto actualizado correctamente", "success");
+      origen_ciudad:
+        origenSelect?.value || "",
 
-  modoEdicionDetalle = false;
+      origen_departamento:
+        origenSelect?.selectedOptions?.[0]?.dataset?.departamento || "",
 
-  const dataActualizada = await apiFetch(`/api/manifiestos/${encodeURIComponent(detalleManifiestoActual.id_manifiesto)}/detalle`);
-  if (!dataActualizada) return;
+      destino_ciudad:
+        destinoSelect?.value || "",
 
-  detalleDataActual = dataActualizada;
-  detalleManifiestoActual = dataActualizada.manifiesto;
+      destino_departamento:
+        destinoSelect?.selectedOptions?.[0]?.dataset?.departamento || "",
 
-  actualizarBotonesDetalle();
-  renderDetalleModoLectura(dataActualizada);
+      estado:
+        document.getElementById("detalleEditEstado")
+          ?.value || "",
 
-  await filtrarManifiestos();
+      valor_flete:
+        detalleManifiestoActual.valor_flete,
+
+      valor_flete_porcentaje:
+        detalleManifiestoActual.valor_flete_porcentaje,
+
+      anticipo_manifiesto:
+        detalleManifiestoActual.anticipo_manifiesto,
+
+      gastos:
+        document.getElementById("detalleEditGastos")
+          ?.value || "",
+
+      documentos:
+        document.getElementById("detalleEditDocumentos")
+          ?.value || "",
+
+      id_cliente:
+        document.getElementById("detalleEditCliente")
+          ?.value || "",
+
+      id_conductor:
+        document.getElementById("detalleEditConductor")
+          ?.value || "",
+
+      id_vehiculo:
+        document.getElementById("detalleEditVehiculo")
+          ?.value || "",
+
+      id_trailer:
+        document.getElementById("detalleEditTrailer")
+          ?.value || "",
+
+      id_empresa_a_cargo:
+        detalleManifiestoActual.id_empresa_a_cargo,
+
+      novedades:
+        document.getElementById("detalleEditNovedades")
+          ?.value === "true",
+
+      observaciones:
+        document.getElementById("detalleEditObservaciones")
+          ?.value
+          ?.trim() || "",
+
+      // =========================
+      // OPTIMISTIC LOCK SNAPSHOT
+      // =========================
+      originalSnapshot:
+        window.manifiestoOriginalSnapshot
+    };
+
+    const res = await apiFetch(
+      `/api/manifiestos/${encodeURIComponent(
+        detalleManifiestoActual.id_manifiesto
+      )}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(payload)
+      }
+    );
+
+    if (!res) return;
+
+    socket.emit("manifiesto:stop-editing", {
+      id_manifiesto: detalleManifiestoActual.id_manifiesto
+    });
+
+    showToast(
+      "Manifiesto actualizado correctamente",
+      "success"
+    );
+
+    modoEdicionDetalle = false;
+
+    const dataActualizada = await apiFetch(
+      `/api/manifiestos/${encodeURIComponent(
+        detalleManifiestoActual.id_manifiesto
+      )}/detalle`
+    );
+
+    if (!dataActualizada) return;
+
+    detalleDataActual = dataActualizada;
+
+    detalleManifiestoActual =
+      dataActualizada.manifiesto;
+
+    // =========================
+    // ACTUALIZAR SNAPSHOT
+    // =========================
+    window.manifiestoOriginalSnapshot =
+      JSON.parse(
+        JSON.stringify(dataActualizada.manifiesto)
+      );
+
+    actualizarBotonesDetalle();
+
+    renderDetalleModoLectura(
+      dataActualizada
+    );
+
+    await filtrarManifiestos();
+
+  } catch (error) {
+
+    console.error(
+      "Error guardando manifiesto:",
+      error
+    );
+
+    // =========================
+    // CONFLICTO EDICIÓN
+    // =========================
+    if (
+      error?.message?.includes(
+        "modificado por otro usuario"
+      )
+    ) {
+
+      showToast(
+        error.message,
+        "error"
+      );
+
+      return;
+    }
+
+    showToast(
+      error?.message ||
+      "Error actualizando manifiesto",
+      "error"
+    );
+
+  }
+
 }
 
 
@@ -1353,4 +1677,56 @@ function actualizarTrackingEstado(estado) {
   if (line) {
     line.style.setProperty("--progress", `${porcentaje}%`);
   }
+}
+
+
+function mostrarBannerEdicion(
+  idManifiesto,
+  usuario
+) {
+
+  if (
+    !detalleManifiestoActual ||
+    detalleManifiestoActual.id_manifiesto !== idManifiesto
+  ) {
+    return;
+  }
+
+  let banner =
+    document.getElementById("bannerEdicionRealtime");
+
+  if (!banner) {
+
+    banner = document.createElement("div");
+
+    banner.id = "bannerEdicionRealtime";
+
+    banner.style.background = "#fff3cd";
+    banner.style.color = "#856404";
+    banner.style.padding = "10px";
+    banner.style.marginBottom = "10px";
+    banner.style.borderRadius = "6px";
+    banner.style.fontWeight = "600";
+
+    const modal =
+      document.getElementById("detalleInfoManifiesto");
+
+    modal?.prepend(banner);
+
+  }
+
+  banner.innerHTML =
+    `?? ${usuario} está editando este manifiesto`;
+
+}
+
+function ocultarBannerEdicion() {
+
+  const banner =
+    document.getElementById("bannerEdicionRealtime");
+
+  if (banner) {
+    banner.remove();
+  }
+
 }

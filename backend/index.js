@@ -6,9 +6,24 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
+const http = require("http");
+const { Server } = require("socket.io");
+
 const pool = require("./config/db");
 
 const app = express();
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"]
+  }
+});
+
+// GLOBAL SOCKET INSTANCE
+global.io = io;
 
 // =====================
 // CONFIG
@@ -21,6 +36,47 @@ const frontendPath = path.join(__dirname, "../frontend");
 // =====================
 app.use(cors());
 app.use(express.json());
+
+// =====================
+// SOCKETS
+// =====================
+io.on("connection", (socket) => {
+
+  console.log("?? Cliente conectado:", socket.id);
+
+  socket.emit("test", {
+    mensaje: "Socket funcionando correctamente"
+  });
+  
+  // =========================
+  // MANIFIESTO EDITING
+  // =========================
+  socket.on("manifiesto:editing", (data) => {
+  
+    socket.broadcast.emit(
+      "manifiesto:editing",
+      data
+    );
+  
+  });
+  
+  // =========================
+  // MANIFIESTO STOP EDITING
+  // =========================
+  socket.on("manifiesto:stop-editing", (data) => {
+  
+    socket.broadcast.emit(
+      "manifiesto:stop-editing",
+      data
+    );
+  
+  });
+
+  socket.on("disconnect", () => {
+    console.log("? Cliente desconectado:", socket.id);
+  });
+
+});
 
 // =====================
 // LOG REQUESTS (PRO)
@@ -57,7 +113,6 @@ const permisosRoutes = require("./routes/permisos.routes");
 const auditRoutes = require("./routes/audit.routes");
 const dashboardConductoresRoutes = require("./routes/dashboardConductores.routes");
 
-
 app.use("/api", authRoutes);
 app.use("/api/manifiestos", manifiestoRoutes);
 app.use("/api/vehiculos", vehiculoRoutes);
@@ -79,14 +134,17 @@ app.use("/api/dashboard-cartera", dashboardCarteraRoutes);
 app.use("/api/dashboard-proyecciones", dashboardProyeccionesRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/permisos", permisosRoutes);
-app.use("/api/audit", require("./routes/audit.routes"));
+app.use("/api/audit", auditRoutes);
 app.use("/api/dashboard-conductores", dashboardConductoresRoutes);
 
 // =====================
 // HEALTH CHECKS
 // =====================
 app.get("/api", (req, res) => {
-  res.json({ ok: true, message: "API funcionando correctamente" });
+  res.json({
+    ok: true,
+    message: "API funcionando correctamente"
+  });
 });
 
 app.get("/ping", (req, res) => {
@@ -99,38 +157,53 @@ app.get("/ping", (req, res) => {
 app.use(express.static(frontendPath));
 
 // =====================
-// SPA FALLBACK (?? FIX REAL)
+// SPA FALLBACK
 // =====================
-app.use((req, res, next) => {
-  // ?? NO tocar API
+app.use((req, res) => {
+
+  // NO tocar API
   if (req.originalUrl.startsWith("/api")) {
-    return res.status(404).json({ error: "API route not found" });
+    return res.status(404).json({
+      error: "API route not found"
+    });
   }
 
-  // ? SPA fallback
-  res.sendFile(path.join(frontendPath, "pages/home.html"));
+  // SPA fallback
+  res.sendFile(
+    path.join(frontendPath, "pages/home.html")
+  );
+
 });
+
 // =====================
 // SERVER START
 // =====================
-app.listen(PORT, "0.0.0.0", async () => {
-  console.log(`? Servidor corriendo en puerto ${PORT}`);
+server.listen(PORT, "0.0.0.0", async () => {
+
+  console.log(`?? Servidor corriendo en puerto ${PORT}`);
 
   try {
+
     const result = await pool.query("SELECT NOW()");
-    console.log("?? DB conectada:", result.rows[0]);
+
+    console.log("? DB conectada:", result.rows[0]);
+
   } catch (error) {
-    console.error("?? Error DB:", error.message);
+
+    console.error("? Error DB:", error.message);
+
   }
+
 });
 
 // =====================
 // ERROR HANDLING GLOBAL
 // =====================
 process.on("uncaughtException", (err) => {
-  console.error("?? Error no controlado:", err);
+  console.error("? Error no controlado:", err);
 });
 
 process.on("unhandledRejection", (err) => {
-  console.error("?? Promesa rechazada:", err);
+  console.error("? Promesa rechazada:", err);
 });
+
