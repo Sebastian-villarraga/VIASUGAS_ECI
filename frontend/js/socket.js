@@ -160,3 +160,30 @@ socket.on(
 
   }
 );
+
+
+// =========================
+// AUDIT REALTIME
+// =========================
+socket.on(
+  "audit:new-log",
+  async () => {
+
+    console.log(
+      "📋 Nuevo log auditoría"
+    );
+
+    // Solo si la tabla existe
+    const tabla =
+      document.querySelector(
+        "#tabla-audit tbody"
+      );
+
+    if (!tabla) {
+      return;
+    }
+
+    await cargarAudit();
+
+  }
+);

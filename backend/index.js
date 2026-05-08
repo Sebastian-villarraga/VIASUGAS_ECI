@@ -52,8 +52,8 @@ io.on("connection", (socket) => {
   // MANIFIESTO EDITING
   // =========================
   socket.on("manifiesto:editing", (data) => {
-  
-    socket.broadcast.emit(
+
+    io.emit(
       "manifiesto:editing",
       data
     );

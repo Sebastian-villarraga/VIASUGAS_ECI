@@ -452,87 +452,93 @@ const updateManifiesto = async (req, res) => {
     // OPTIMISTIC LOCK
     // =========================
     if (originalSnapshot) {
-    
+
       const actual = viejo.rows[0];
     
       const camposValidar = [
-
+    
         "radicado",
         "fecha",
-      
+    
         "origen_departamento",
         "origen_ciudad",
-      
+    
         "destino_departamento",
         "destino_ciudad",
-      
+    
         "estado",
-      
+    
         "gastos",
         "documentos",
-      
+    
         "id_cliente",
         "id_conductor",
         "id_vehiculo",
         "id_trailer",
-      
+    
         "novedades",
         "observaciones"
-      
+    
       ];
     
       let conflicto = false;
     
       for (const campo of camposValidar) {
     
-        let actualValor =
-          actual[campo];
-    
-        let snapshotValor =
-          originalSnapshot[campo];
+        let actualValor = actual[campo];
+        let snapshotValor = originalSnapshot[campo];
     
         // =========================
-        // NORMALIZAR NULL
-        // =========================
-        if (
-          actualValor === null ||
-          actualValor === undefined
-        ) {
-          actualValor = "";
-        }
-    
-        if (
-          snapshotValor === null ||
-          snapshotValor === undefined
-        ) {
-          snapshotValor = "";
-        }
-    
-        // =========================
-        // NORMALIZAR FECHA
+        // FECHA
         // =========================
         if (campo === "fecha") {
     
-          actualValor =
-            String(actualValor)
-              .split("T")[0];
+          actualValor = actualValor
+            ? new Date(actualValor)
+                .toISOString()
+                .split("T")[0]
+            : "";
     
-          snapshotValor =
-            String(snapshotValor)
-              .split("T")[0];
+          snapshotValor = snapshotValor
+            ? String(snapshotValor)
+                .split("T")[0]
+            : "";
     
         }
     
         // =========================
-        // NORMALIZAR STRING
+        // BOOLEAN
         // =========================
-        actualValor =
-          String(actualValor).trim();
+        else if (campo === "novedades") {
     
-        snapshotValor =
-          String(snapshotValor).trim();
+          actualValor = Boolean(actualValor);
+          snapshotValor = Boolean(snapshotValor);
     
-        if (actualValor !== snapshotValor) {
+        }
+    
+        // =========================
+        // NORMAL
+        // =========================
+        else {
+    
+          actualValor =
+            actualValor === null ||
+            actualValor === undefined
+              ? ""
+              : String(actualValor).trim();
+    
+          snapshotValor =
+            snapshotValor === null ||
+            snapshotValor === undefined
+              ? ""
+              : String(snapshotValor).trim();
+    
+        }
+    
+        if (
+          String(actualValor) !==
+          String(snapshotValor)
+        ) {
     
           console.log(
             "?? Conflicto:",
@@ -544,7 +550,6 @@ const updateManifiesto = async (req, res) => {
           );
     
           conflicto = true;
-    
           break;
     
         }
@@ -555,7 +560,7 @@ const updateManifiesto = async (req, res) => {
     
         return res.status(409).json({
           error:
-            "Este manifiesto fue modificado por otro usuario. Recarga antes de guardar."
+            "Este manifiesto fue modificado por otro usuario. Intente de nuevo."
         });
     
       }

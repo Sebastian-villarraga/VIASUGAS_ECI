@@ -9,7 +9,9 @@ async function registrarAuditoria({
   nuevo,
   req
 }) {
-  await pool.query(`
+
+  await pool.query(
+    `
     INSERT INTO audit_logs
     (
       nombre_tabla,
@@ -22,16 +24,47 @@ async function registrarAuditoria({
       user_agent
     )
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-  `,[
-    tabla,
-    operacion,
-    registroId,
-    usuarioId,
-    viejo || null,
-    nuevo || null,
-    req.ip,
-    req.headers['user-agent']
-  ]);
+    `,
+    [
+      tabla,
+      operacion,
+      registroId,
+      usuarioId,
+      viejo || null,
+      nuevo || null,
+      req.ip,
+      req.headers["user-agent"]
+    ]
+  );
+
+  // =========================
+  // SOCKET EVENT
+  // =========================
+  try {
+
+    if (global.io) {
+
+      global.io.emit(
+        "audit:new-log",
+        {
+          tabla,
+          operacion,
+          registroId,
+          usuarioId
+        }
+      );
+
+    }
+
+  } catch (e) {
+
+    console.error(
+      "SOCKET AUDIT:",
+      e.message
+    );
+
+  }
+
 }
 
 module.exports = registrarAuditoria;

@@ -15,10 +15,26 @@ const {
 // GET
 // =========================================
 router.get("/", getManifiestos);
-router.get("/catalogos", getCatalogosManifiesto);
-router.get("/exportar-excel", exportarManifiestosExcel);
-router.get("/:id_manifiesto", getManifiestoById);
-router.get("/:id/detalle", obtenerDetalleManifiesto);
+
+router.get(
+  "/catalogos",
+  getCatalogosManifiesto
+);
+
+router.get(
+  "/exportar-excel",
+  exportarManifiestosExcel
+);
+
+router.get(
+  "/:id/detalle",
+  obtenerDetalleManifiesto
+);
+
+router.get(
+  "/:id_manifiesto",
+  getManifiestoById
+);
 // =========================================
 // POST
 // =========================================
