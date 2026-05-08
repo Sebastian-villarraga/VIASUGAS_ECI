@@ -769,32 +769,110 @@ function formatearFechaLarga(fechaStr) {
 
 
 // =========================
-// VER DETALLE MANIFIESTO 
+// VER DETALLE MANIFIESTO
 // =========================
 async function verDetalleManifiesto(id) {
+
   try {
-    const modal = document.getElementById("modalDetalleManifiesto");
+
+    const modal =
+      document.getElementById(
+        "modalDetalleManifiesto"
+      );
+
     modal?.classList.remove("hidden");
 
-    const data = await apiFetch(`/api/manifiestos/${id}/detalle`);
-    if (!data) return;
+    const data = await apiFetch(
+      `/api/manifiestos/${id}/detalle`
+    );
+
+    if (!data) {
+      return;
+    }
 
     detalleDataActual = data;
-    detalleManifiestoActual = data.manifiesto;
-    
-    window.manifiestoOriginalSnapshot =
-      JSON.parse(JSON.stringify(data.manifiesto));
-    
+
+    detalleManifiestoActual =
+      data.manifiesto;
+
+    // =========================
+    // SNAPSHOT LIMPIO
+    // =========================
+    window.manifiestoOriginalSnapshot = {
+
+      radicado:
+        data.manifiesto.radicado,
+
+      fecha:
+        data.manifiesto.fecha,
+
+      origen_departamento:
+        data.manifiesto.origen_departamento,
+
+      origen_ciudad:
+        data.manifiesto.origen_ciudad,
+
+      destino_departamento:
+        data.manifiesto.destino_departamento,
+
+      destino_ciudad:
+        data.manifiesto.destino_ciudad,
+
+      estado:
+        data.manifiesto.estado,
+
+      gastos:
+        data.manifiesto.gastos,
+
+      documentos:
+        data.manifiesto.documentos,
+
+      id_cliente:
+        data.manifiesto.id_cliente,
+
+      id_conductor:
+        data.manifiesto.id_conductor,
+
+      id_vehiculo:
+        data.manifiesto.id_vehiculo,
+
+      id_trailer:
+        data.manifiesto.id_trailer,
+
+      novedades:
+        data.manifiesto.novedades,
+
+      observaciones:
+        data.manifiesto.observaciones
+
+    };
+
     modoEdicionDetalle = false;
 
     actualizarBotonesDetalle();
-    renderDetalleModoLectura(data);
+
+    renderDetalleModoLectura(
+      data
+    );
 
   } catch (error) {
-    console.error("Error cargando detalle del manifiesto:", error);
-    showToast("No se pudo cargar el detalle del manifiesto", "error");
+
+    console.error(
+      "Error cargando detalle del manifiesto:",
+      error
+    );
+
+    showToast(
+      "No se pudo cargar el detalle del manifiesto",
+      "error"
+    );
+
   }
+
 }
+
+
+
 
 function actualizarBotonesDetalle() {
   document.getElementById("btnEditarDetalle")?.classList.toggle("hidden", modoEdicionDetalle);
@@ -1052,9 +1130,6 @@ function renderDetalleModoLectura(data) {
   actualizarTrackingEstado(manifiesto.estado);
 }
 
-// =========================
-// ACTIVAR EDICION
-// =========================
 // =========================
 // ACTIVAR EDICION
 // =========================
@@ -1439,38 +1514,52 @@ function cancelarEdicionDetalle() {
 
 async function guardarEdicionDetalle() {
 
-  if (!detalleManifiestoActual) return;
+  if (!detalleManifiestoActual) {
+    return;
+  }
 
   try {
 
-    const origenSelect = document.getElementById("detalleEditOrigen");
-    const destinoSelect = document.getElementById("detalleEditDestino");
+    const origenSelect =
+      document.getElementById(
+        "detalleEditOrigen"
+      );
+
+    const destinoSelect =
+      document.getElementById(
+        "detalleEditDestino"
+      );
 
     const payload = {
+
       radicado:
-        document.getElementById("detalleEditRadicado")
-          ?.value
-          ?.trim() || null,
+        document.getElementById(
+          "detalleEditRadicado"
+        )?.value?.trim() || null,
 
       fecha:
-        document.getElementById("detalleEditFecha")
-          ?.value || "",
+        document.getElementById(
+          "detalleEditFecha"
+        )?.value || "",
 
       origen_ciudad:
         origenSelect?.value || "",
 
       origen_departamento:
-        origenSelect?.selectedOptions?.[0]?.dataset?.departamento || "",
+        origenSelect?.selectedOptions?.[0]
+          ?.dataset?.departamento || "",
 
       destino_ciudad:
         destinoSelect?.value || "",
 
       destino_departamento:
-        destinoSelect?.selectedOptions?.[0]?.dataset?.departamento || "",
+        destinoSelect?.selectedOptions?.[0]
+          ?.dataset?.departamento || "",
 
       estado:
-        document.getElementById("detalleEditEstado")
-          ?.value || "",
+        document.getElementById(
+          "detalleEditEstado"
+        )?.value || "",
 
       valor_flete:
         detalleManifiestoActual.valor_flete,
@@ -1482,46 +1571,54 @@ async function guardarEdicionDetalle() {
         detalleManifiestoActual.anticipo_manifiesto,
 
       gastos:
-        document.getElementById("detalleEditGastos")
-          ?.value || "",
+        document.getElementById(
+          "detalleEditGastos"
+        )?.value || "",
 
       documentos:
-        document.getElementById("detalleEditDocumentos")
-          ?.value || "",
+        document.getElementById(
+          "detalleEditDocumentos"
+        )?.value || "",
 
       id_cliente:
-        document.getElementById("detalleEditCliente")
-          ?.value || "",
+        document.getElementById(
+          "detalleEditCliente"
+        )?.value || "",
 
       id_conductor:
-        document.getElementById("detalleEditConductor")
-          ?.value || "",
+        document.getElementById(
+          "detalleEditConductor"
+        )?.value || "",
 
       id_vehiculo:
-        document.getElementById("detalleEditVehiculo")
-          ?.value || "",
+        document.getElementById(
+          "detalleEditVehiculo"
+        )?.value || "",
 
       id_trailer:
-        document.getElementById("detalleEditTrailer")
-          ?.value || "",
+        document.getElementById(
+          "detalleEditTrailer"
+        )?.value || "",
 
       id_empresa_a_cargo:
         detalleManifiestoActual.id_empresa_a_cargo,
 
       novedades:
-        document.getElementById("detalleEditNovedades")
-          ?.value === "true",
+        document.getElementById(
+          "detalleEditNovedades"
+        )?.value === "true",
 
       observaciones:
-        document.getElementById("detalleEditObservaciones")
-          ?.value
-          ?.trim() || "",
+        document.getElementById(
+          "detalleEditObservaciones"
+        )?.value?.trim() || "",
 
       // =========================
-      // OPTIMISTIC LOCK SNAPSHOT
+      // SNAPSHOT ORIGINAL
       // =========================
       originalSnapshot:
         window.manifiestoOriginalSnapshot
+
     };
 
     const res = await apiFetch(
@@ -1534,38 +1631,53 @@ async function guardarEdicionDetalle() {
       }
     );
 
-    if (!res) return;
-
-    socket.emit("manifiesto:stop-editing", {
-      id_manifiesto: detalleManifiestoActual.id_manifiesto
-    });
+    if (!res) {
+      return;
+    }
 
     showToast(
       "Manifiesto actualizado correctamente",
       "success"
     );
 
-    modoEdicionDetalle = false;
-
-    const dataActualizada = await apiFetch(
-      `/api/manifiestos/${encodeURIComponent(
-        detalleManifiestoActual.id_manifiesto
-      )}/detalle`
+    socket.emit(
+      "manifiesto:stop-editing",
+      {
+        id_manifiesto:
+          detalleManifiestoActual.id_manifiesto
+      }
     );
 
-    if (!dataActualizada) return;
+    modoEdicionDetalle = false;
 
-    detalleDataActual = dataActualizada;
+    // =========================
+    // RECARGAR DESDE DB
+    // =========================
+    const dataActualizada =
+      await apiFetch(
+        `/api/manifiestos/${encodeURIComponent(
+          detalleManifiestoActual.id_manifiesto
+        )}/detalle`
+      );
+
+    if (!dataActualizada) {
+      return;
+    }
+
+    detalleDataActual =
+      dataActualizada;
 
     detalleManifiestoActual =
       dataActualizada.manifiesto;
 
     // =========================
-    // ACTUALIZAR SNAPSHOT
+    // NUEVO SNAPSHOT
     // =========================
     window.manifiestoOriginalSnapshot =
       JSON.parse(
-        JSON.stringify(dataActualizada.manifiesto)
+        JSON.stringify(
+          dataActualizada.manifiesto
+        )
       );
 
     actualizarBotonesDetalle();
@@ -1578,13 +1690,10 @@ async function guardarEdicionDetalle() {
 
   } catch (error) {
 
-    console.error(
-      "Error guardando manifiesto:",
-      error
-    );
+    console.error(error);
 
     // =========================
-    // CONFLICTO EDICIÓN
+    // CONFLICTO
     // =========================
     if (
       error?.message?.includes(
@@ -1594,14 +1703,50 @@ async function guardarEdicionDetalle() {
 
       showToast(
         error.message,
-        "error"
+        "warning"
       );
 
+      modoEdicionDetalle = false;
+
+      // =========================
+      // RECARGAR MANIFIESTO REAL
+      // =========================
+      const dataActualizada =
+        await apiFetch(
+          `/api/manifiestos/${encodeURIComponent(
+            detalleManifiestoActual.id_manifiesto
+          )}/detalle`
+        );
+
+      if (dataActualizada) {
+
+        detalleDataActual =
+          dataActualizada;
+
+        detalleManifiestoActual =
+          dataActualizada.manifiesto;
+
+        // RESET SNAPSHOT
+        window.manifiestoOriginalSnapshot =
+          JSON.parse(
+            JSON.stringify(
+              dataActualizada.manifiesto
+            )
+          );
+
+        actualizarBotonesDetalle();
+
+        renderDetalleModoLectura(
+          dataActualizada
+        );
+
+      }
+
       return;
+
     }
 
     showToast(
-      error?.message ||
       "Error actualizando manifiesto",
       "error"
     );

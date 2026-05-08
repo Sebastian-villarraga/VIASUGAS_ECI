@@ -121,3 +121,42 @@ socket.on("manifiesto:updated", async (data) => {
   );
 
 });
+
+// =========================
+// MANIFIESTO EDITING
+// =========================
+socket.on("manifiesto:editing", (data) => {
+
+  console.log(
+    "?? Editando:",
+    data
+  );
+
+  if (
+    !detalleManifiestoActual ||
+    data.id_manifiesto !==
+      detalleManifiestoActual.id_manifiesto
+  ) {
+    return;
+  }
+
+  showToast(
+    `${data.usuario} está editando este manifiesto`,
+    "warning"
+  );
+
+});
+
+// =========================
+// STOP EDITING
+// =========================
+socket.on(
+  "manifiesto:stop-editing",
+  () => {
+
+    console.log(
+      "? Usuario dejó de editar"
+    );
+
+  }
+);

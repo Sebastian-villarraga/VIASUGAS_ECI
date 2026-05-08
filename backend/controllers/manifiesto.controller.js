@@ -396,6 +396,7 @@ const createManifiesto = async (req, res) => {
 // =========================================
 const updateManifiesto = async (req, res) => {
   try {
+
     const { id_manifiesto } = req.params;
 
     const {
@@ -422,19 +423,31 @@ const updateManifiesto = async (req, res) => {
     } = req.body;
 
     const existe = await pool.query(
-      `SELECT id_manifiesto FROM manifiesto WHERE id_manifiesto = $1`,
+      `
+      SELECT id_manifiesto
+      FROM manifiesto
+      WHERE id_manifiesto = $1
+      `,
       [id_manifiesto]
     );
 
     if (existe.rows.length === 0) {
-      return res.status(404).json({ error: "Manifiesto no encontrado" });
+
+      return res.status(404).json({
+        error: "Manifiesto no encontrado"
+      });
+
     }
 
     const viejo = await pool.query(
-      `SELECT * FROM manifiesto WHERE id_manifiesto = $1`,
+      `
+      SELECT *
+      FROM manifiesto
+      WHERE id_manifiesto = $1
+      `,
       [id_manifiesto]
     );
-    
+
     // =========================
     // OPTIMISTIC LOCK
     // =========================
@@ -442,32 +455,116 @@ const updateManifiesto = async (req, res) => {
     
       const actual = viejo.rows[0];
     
-      const conflicto =
-        String(actual.estado || "") !== String(originalSnapshot.estado || "") ||
+      const camposValidar = [
+
+        "radicado",
+        "fecha",
+      
+        "origen_departamento",
+        "origen_ciudad",
+      
+        "destino_departamento",
+        "destino_ciudad",
+      
+        "estado",
+      
+        "gastos",
+        "documentos",
+      
+        "id_cliente",
+        "id_conductor",
+        "id_vehiculo",
+        "id_trailer",
+      
+        "novedades",
+        "observaciones"
+      
+      ];
     
-        String(actual.gastos || "") !== String(originalSnapshot.gastos || "") ||
+      let conflicto = false;
     
-        String(actual.documentos || "") !== String(originalSnapshot.documentos || "") ||
+      for (const campo of camposValidar) {
     
-        String(actual.observaciones || "") !== String(originalSnapshot.observaciones || "") ||
+        let actualValor =
+          actual[campo];
     
-        String(actual.id_conductor || "") !== String(originalSnapshot.id_conductor || "") ||
+        let snapshotValor =
+          originalSnapshot[campo];
     
-        String(actual.id_vehiculo || "") !== String(originalSnapshot.id_vehiculo || "") ||
+        // =========================
+        // NORMALIZAR NULL
+        // =========================
+        if (
+          actualValor === null ||
+          actualValor === undefined
+        ) {
+          actualValor = "";
+        }
     
-        String(actual.id_trailer || "") !== String(originalSnapshot.id_trailer || "");
+        if (
+          snapshotValor === null ||
+          snapshotValor === undefined
+        ) {
+          snapshotValor = "";
+        }
+    
+        // =========================
+        // NORMALIZAR FECHA
+        // =========================
+        if (campo === "fecha") {
+    
+          actualValor =
+            String(actualValor)
+              .split("T")[0];
+    
+          snapshotValor =
+            String(snapshotValor)
+              .split("T")[0];
+    
+        }
+    
+        // =========================
+        // NORMALIZAR STRING
+        // =========================
+        actualValor =
+          String(actualValor).trim();
+    
+        snapshotValor =
+          String(snapshotValor).trim();
+    
+        if (actualValor !== snapshotValor) {
+    
+          console.log(
+            "?? Conflicto:",
+            campo,
+            {
+              actual: actualValor,
+              snapshot: snapshotValor
+            }
+          );
+    
+          conflicto = true;
+    
+          break;
+    
+        }
+    
+      }
     
       if (conflicto) {
     
         return res.status(409).json({
-          error: "Este manifiesto fue modificado por otro usuario. Recarga antes de guardar."
+          error:
+            "Este manifiesto fue modificado por otro usuario. Recarga antes de guardar."
         });
     
       }
     
     }
-
-    // ? radicado y cliente NO obligatorios
+    
+    // =========================
+    // VALIDACIONES
+    // =========================
     if (
       !fecha ||
       !origen_departamento ||
@@ -486,17 +583,31 @@ const updateManifiesto = async (req, res) => {
       !id_empresa_a_cargo ||
       novedades === undefined
     ) {
+
       return res.status(400).json({
-        error: "Todos los campos obligatorios para actualizar deben estar completos"
+        error:
+          "Todos los campos obligatorios para actualizar deben estar completos"
       });
+
     }
 
     if (!validarEstado(estado)) {
-      return res.status(400).json({ error: "Estado de manifiesto inválido" });
+
+      return res.status(400).json({
+        error: "Estado de manifiesto inválido"
+      });
+
     }
 
-    if (!validarEntrega(gastos) || !validarEntrega(documentos)) {
-      return res.status(400).json({ error: "Gastos o documentos inválidos" });
+    if (
+      !validarEntrega(gastos) ||
+      !validarEntrega(documentos)
+    ) {
+
+      return res.status(400).json({
+        error: "Gastos o documentos inválidos"
+      });
+
     }
 
     await validarRelaciones({
@@ -507,25 +618,45 @@ const updateManifiesto = async (req, res) => {
       id_empresa_a_cargo
     });
 
-    // ? Validar radicado duplicado solo si viene dato
-    if (radicado !== null && radicado !== undefined && radicado !== "") {
-      const radicadoDuplicado = await pool.query(
-        `
-        SELECT radicado
-        FROM manifiesto
-        WHERE radicado = $1
-          AND id_manifiesto <> $2
-        `,
-        [Number(radicado), id_manifiesto]
-      );
+    // =========================
+    // VALIDAR RADICADO DUPLICADO
+    // =========================
+    if (
+      radicado !== null &&
+      radicado !== undefined &&
+      radicado !== ""
+    ) {
 
-      if (radicadoDuplicado.rows.length > 0) {
+      const radicadoDuplicado =
+        await pool.query(
+          `
+          SELECT radicado
+          FROM manifiesto
+          WHERE radicado = $1
+            AND id_manifiesto <> $2
+          `,
+          [
+            Number(radicado),
+            id_manifiesto
+          ]
+        );
+
+      if (
+        radicadoDuplicado.rows.length > 0
+      ) {
+
         return res.status(400).json({
-          error: "El radicado ya está en uso por otro manifiesto"
+          error:
+            "El radicado ya está en uso por otro manifiesto"
         });
+
       }
+
     }
 
+    // =========================
+    // UPDATE
+    // =========================
     const query = `
       UPDATE manifiesto
       SET
@@ -553,73 +684,136 @@ const updateManifiesto = async (req, res) => {
     `;
 
     const values = [
-      radicado !== null && radicado !== undefined && radicado !== ""
+
+      radicado !== null &&
+      radicado !== undefined &&
+      radicado !== ""
         ? Number(radicado)
         : null,
 
-      id_cliente && id_cliente !== ""
+      id_cliente &&
+      id_cliente !== ""
         ? id_cliente
         : null,
 
       Number(id_conductor),
+
       id_vehiculo,
+
       id_trailer,
+
       id_empresa_a_cargo,
+
       fecha,
+
       origen_departamento,
+
       origen_ciudad,
+
       destino_departamento,
+
       destino_ciudad,
+
       estado,
+
       normalizarNumero(valor_flete),
-      normalizarNumero(valor_flete_porcentaje),
-      normalizarNumero(anticipo_manifiesto),
+
+      normalizarNumero(
+        valor_flete_porcentaje
+      ),
+
+      normalizarNumero(
+        anticipo_manifiesto
+      ),
+
       gastos,
+
       documentos,
+
       Boolean(novedades),
+
       observaciones || null,
+
       id_manifiesto
+
     ];
 
-    const result = await pool.query(query, values);
+    const result =
+      await pool.query(query, values);
 
+    // =========================
+    // AUDIT
+    // =========================
     try {
+
       await audit({
         tabla: "manifiesto",
         operacion: "UPDATE",
         registroId: id_manifiesto,
-        usuarioId: req.headers["x-usuario-id"] || "US1",
+        usuarioId:
+          req.headers["x-usuario-id"] ||
+          "US1",
         viejo: viejo.rows[0],
         nuevo: result.rows[0],
         req
       });
+
     } catch (e) {
-      console.error("AUDIT UPDATE MANIFIESTO:", e.message);
+
+      console.error(
+        "AUDIT UPDATE MANIFIESTO:",
+        e.message
+      );
+
     }
 
     // =========================
     // SOCKET EVENT
     // =========================
-    global.io.emit("manifiesto:updated", {
-      manifiesto: result.rows[0]
-    });
-    
+    global.io.emit(
+      "manifiesto:updated",
+      {
+        manifiesto: result.rows[0]
+      }
+    );
+
     res.json(result.rows[0]);
 
   } catch (error) {
-    console.error("Error actualizando manifiesto:", error);
+
+    console.error(
+      "Error actualizando manifiesto:",
+      error
+    );
 
     if (
-      error.message === "Cliente no encontrado" ||
-      error.message === "Conductor no encontrado" ||
-      error.message === "Vehículo no encontrado" ||
-      error.message === "Trailer no encontrado" ||
-      error.message === "Empresa a cargo no encontrada"
+      error.message ===
+        "Cliente no encontrado" ||
+
+      error.message ===
+        "Conductor no encontrado" ||
+
+      error.message ===
+        "Vehículo no encontrado" ||
+
+      error.message ===
+        "Trailer no encontrado" ||
+
+      error.message ===
+        "Empresa a cargo no encontrada"
     ) {
-      return res.status(400).json({ error: error.message });
+
+      return res.status(400).json({
+        error: error.message
+      });
+
     }
 
-    res.status(500).json({ error: "Error actualizando manifiesto" });
+    res.status(500).json({
+      error:
+        "Error actualizando manifiesto"
+    });
+
   }
 };
 
