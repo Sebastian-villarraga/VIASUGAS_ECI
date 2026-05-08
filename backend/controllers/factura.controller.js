@@ -15,7 +15,7 @@ const getFacturas = async (req, res) => {
         f.valor,
         f.retencion_fuente,
         f.retencion_ica,
-        f.fopat, -- ?? NUEVO
+        f.fopat, 
         f.plazo_pago,
         f.creado,
 
@@ -118,7 +118,7 @@ const createFactura = async (req, res) => {
       retencion_fuente = 0,
       retencion_ica = 0,
       plazo_pago = 0,
-      fopat = null // ?? NUEVO
+      fopat = null 
     } = req.body;
 
     // =========================
@@ -136,15 +136,47 @@ const createFactura = async (req, res) => {
       });
     }
 
-    valor = Number(valor) || 0;
-    retencion_fuente = Number(retencion_fuente) || 0;
-    retencion_ica = Number(retencion_ica) || 0;
-    plazo_pago = Number(plazo_pago) || 0;
-
-    // ?? FOPAT opcional
-    fopat = fopat !== null && fopat !== undefined
-      ? Number(fopat) || 0
-      : null;
+    // =========================
+    // NORMALIZAR NUMEROS
+    // =========================
+    function limpiarNumero(valor) {
+    
+      if (
+        valor === undefined ||
+        valor === null ||
+        valor === ""
+      ) {
+        return 0;
+      }
+    
+      const limpio = Number(valor);
+    
+      return Number.isNaN(limpio)
+        ? 0
+        : limpio;
+    
+    }
+    
+    valor =
+      limpiarNumero(valor);
+    
+    retencion_fuente =
+      limpiarNumero(
+        retencion_fuente
+      );
+    
+    retencion_ica =
+      limpiarNumero(
+        retencion_ica
+      );
+    
+    plazo_pago =
+      limpiarNumero(
+        plazo_pago
+      );
+    
+    fopat =
+      limpiarNumero(fopat);
 
     if (valor <= 0) {
       return res.status(400).json({
@@ -171,6 +203,21 @@ const createFactura = async (req, res) => {
     }
 
     // =========================
+    // DEBUG
+    // =========================
+    console.log({
+      codigo_factura,
+      id_manifiesto,
+      fecha_emision,
+      fecha_vencimiento,
+      valor,
+      retencion_fuente,
+      retencion_ica,
+      fopat,
+      plazo_pago
+    });
+    
+    // =========================
     // INSERT REAL
     // =========================
     const result = await pool.query(
@@ -183,7 +230,7 @@ const createFactura = async (req, res) => {
         valor,
         retencion_fuente,
         retencion_ica,
-        fopat, -- ?? NUEVO
+        fopat,
         plazo_pago,
         creado
       )
@@ -198,7 +245,7 @@ const createFactura = async (req, res) => {
         valor,
         retencion_fuente,
         retencion_ica,
-        fopat, // ?? NUEVO
+        fopat || 0,
         plazo_pago
       ]
     );
@@ -218,6 +265,31 @@ const createFactura = async (req, res) => {
       });
     } catch (e) {
       console.error("AUDIT CREATE FACTURA:", e.message);
+    }
+    
+    // =========================
+    // SOCKET EVENT
+    // =========================
+    try {
+    
+      if (global.io) {
+    
+        global.io.emit(
+          "factura:created",
+          {
+            factura: result.rows[0]
+          }
+        );
+    
+      }
+    
+    } catch (e) {
+    
+      console.error(
+        "SOCKET FACTURA:",
+        e.message
+      );
+    
     }
 
     return res.status(201).json(result.rows[0]);

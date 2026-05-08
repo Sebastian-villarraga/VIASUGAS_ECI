@@ -187,3 +187,56 @@ socket.on(
 
   }
 );
+
+// =========================
+// FACTURA CREATED
+// =========================
+socket.on(
+  "factura:created",
+  async (data) => {
+
+    console.log(
+      "🧾 Nueva factura:",
+      data
+    );
+
+    // Solo si estamos en facturas
+    const tabla =
+      document.getElementById(
+        "tablaFacturas"
+      );
+
+    if (!tabla) {
+      return;
+    }
+
+    try {
+
+      // =========================
+      // RECARGAR DATOS
+      // =========================
+      await cargarCatalogosFacturas();
+
+      await cargarFacturas();
+
+      // =========================
+      // FORZAR RENDER
+      // =========================
+      aplicarFiltrosFacturas();
+
+      showToast(
+        "Nueva factura registrada",
+        "success"
+      );
+
+    } catch (e) {
+
+      console.error(
+        "SOCKET FACTURA:",
+        e
+      );
+
+    }
+
+  }
+);

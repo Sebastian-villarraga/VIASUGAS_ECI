@@ -49,8 +49,28 @@ async function cargarFacturas() {
   try {
     facturasData = await apiFetch("/api/facturas");
 
-    const transacciones = await apiFetch("/api/transacciones");
-    window._transaccionesFacturas = transacciones || [];
+    try {
+
+      const transacciones =
+        await apiFetch(
+          "/api/transacciones"
+        );
+    
+      window._transaccionesFacturas =
+        Array.isArray(transacciones)
+          ? transacciones
+          : [];
+    
+    } catch (e) {
+    
+      console.error(
+        "ERROR TRANSACCIONES FACTURAS:",
+        e
+      );
+    
+      window._transaccionesFacturas = [];
+    
+    }
 
 
     if (!Array.isArray(facturasData)) {
@@ -79,7 +99,19 @@ function aplicarFiltrosFacturas() {
     ? codigoInput.value.toLowerCase()
     : "";
 
-  const manifiesto = document.getElementById("fManifiesto")?.value || "";
+  const wrappers =
+    document.querySelectorAll(
+      ".select-search-wrapper"
+    );
+  
+  const wrapper =
+    wrappers[1];
+  
+  const manifiesto =
+    wrapper &&
+    wrapper._value
+      ? wrapper._value
+      : "";
 
   let filtradas = facturasData.filter(f => {
 
@@ -147,10 +179,25 @@ function renderFacturas(data) {
     totalFacturado += valor;
 
     const pagos = (window._transaccionesFacturas || [])
-      .filter(t =>
-        t.id_manifiesto === f.id_manifiesto &&
-        t.tipo === "INGRESO MANIFIESTO"
-      )
+      .filter(t => {
+
+        if (!t) {
+          return false;
+        }
+      
+        if (!t.id_manifiesto) {
+          return false;
+        }
+      
+        return (
+          String(t.id_manifiesto) ===
+          String(f.id_manifiesto)
+          &&
+          t.tipo ===
+            "INGRESO MANIFIESTO"
+        );
+      
+      })
       .reduce((sum, t) => sum + Number(t.valor || 0), 0);
 
     const saldo = neto - pagos;
@@ -206,248 +253,816 @@ function renderFacturas(data) {
 function eventosFacturas() {
 
   function getModalFactura() {
-    return document.getElementById("modalFactura");
+    return document.getElementById(
+      "modalFactura"
+    );
   }
 
   function limpiarNumero(val) {
-    if (!val) return 0;
-    return Number(String(val).replace(/\./g, "").replace(/\D/g, "")) || 0;
+
+    if (!val) {
+      return 0;
+    }
+
+    return Number(
+      String(val)
+        .replace(/\./g, "")
+        .replace(/\D/g, "")
+    ) || 0;
+
   }
 
   function cerrarModalFactura() {
-    const modal = getModalFactura();
-    modal?.classList.add("hidden");
+
+    const modal =
+      getModalFactura();
+
+    modal?.classList.add(
+      "hidden"
+    );
 
     const ids = [
+
       "codigoFactura",
+
       "fechaEmision",
+
       "fechaVencimiento",
+
       "valorFactura",
+
       "retencionFuente",
+
       "retencionIca",
+
       "plazoPago",
-      "fopat" // ?? NUEVO
+
+      "fopat"
+
     ];
 
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
+    ids.forEach((id) => {
+
+      const el =
+        document.getElementById(id);
+
+      if (el) {
+        el.value = "";
+      }
+
     });
 
-    const wrapper = document.querySelector("#modalFactura .select-search-wrapper");
+    const wrapper =
+      document.querySelector(
+        "#modalFactura .select-search-wrapper"
+      );
+
     if (wrapper) {
-      const input = wrapper.querySelector("input");
-      if (input) input.value = "";
+
+      const input =
+        wrapper.querySelector(
+          "input"
+        );
+
+      if (input) {
+        input.value = "";
+      }
+
       wrapper._value = "";
+      aplicarFiltrosFacturas();
+
     }
+
   }
 
   function abrirModalFactura() {
-    const modal = getModalFactura();
-    if (!modal) return;
-    modal.classList.remove("hidden");
+
+    const modal =
+      getModalFactura();
+
+    if (!modal) {
+      return;
+    }
+
+    modal.classList.remove(
+      "hidden"
+    );
+
   }
 
-  function aplicarFormatoMonedaInput(input) {
-    if (!input) return;
+  function aplicarFormatoMonedaInput(
+    input
+  ) {
 
-    input.addEventListener("input", (e) => {
-      let limpio = e.target.value.replace(/\D/g, "");
+    if (!input) {
+      return;
+    }
 
-      if (!limpio) {
-        e.target.value = "";
-        return;
+    // evitar múltiples listeners
+    if (input.dataset.moneyInit) {
+      return;
+    }
+
+    input.dataset.moneyInit = "true";
+
+    input.addEventListener(
+      "input",
+      (e) => {
+
+        let limpio =
+          e.target.value.replace(
+            /\D/g,
+            ""
+          );
+
+        if (!limpio) {
+
+          e.target.value = "";
+
+          return;
+
+        }
+
+        e.target.value =
+          limpio.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            "."
+          );
+
       }
+    );
 
-      e.target.value = limpio.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    });
   }
 
-  // ?? FORMATO (AGREGADO FOPAT)
-  aplicarFormatoMonedaInput(document.getElementById("valorFactura"));
-  aplicarFormatoMonedaInput(document.getElementById("retencionFuente"));
-  aplicarFormatoMonedaInput(document.getElementById("retencionIca"));
-  aplicarFormatoMonedaInput(document.getElementById("fopat")); // ?? NUEVO
+  // =========================
+  // FORMATOS
+  // =========================
+  aplicarFormatoMonedaInput(
+    document.getElementById(
+      "valorFactura"
+    )
+  );
 
-  if (!window.__facturasEventosDelegadosInit) {
-    window.__facturasEventosDelegadosInit = true;
+  aplicarFormatoMonedaInput(
+    document.getElementById(
+      "retencionFuente"
+    )
+  );
 
-    document.addEventListener("click", async (e) => {
+  aplicarFormatoMonedaInput(
+    document.getElementById(
+      "retencionIca"
+    )
+  );
 
-      if (e.target.closest("#btnNuevaFactura")) {
+  aplicarFormatoMonedaInput(
+    document.getElementById(
+      "fopat"
+    )
+  );
+
+  // =========================
+  // BOTON NUEVA FACTURA
+  // =========================
+  const btnNuevaFactura =
+    document.getElementById(
+      "btnNuevaFactura"
+    );
+
+  if (
+    btnNuevaFactura &&
+    !btnNuevaFactura.dataset.init
+  ) {
+
+    btnNuevaFactura.dataset.init =
+      "true";
+
+    btnNuevaFactura.addEventListener(
+      "click",
+      () => {
+
         abrirModalFactura();
-        return;
-      }
 
-      if (e.target.id === "modalFactura") {
-        cerrarModalFactura();
-        return;
       }
+    );
 
-      if (e.target.closest("#guardarFactura")) {
+  }
+
+  // =========================
+  // CERRAR MODAL
+  // =========================
+  const modalFactura =
+    document.getElementById(
+      "modalFactura"
+    );
+
+  if (
+    modalFactura &&
+    !modalFactura.dataset.init
+  ) {
+
+    modalFactura.dataset.init =
+      "true";
+
+    modalFactura.addEventListener(
+      "click",
+      (e) => {
+
+        if (
+          e.target.id ===
+          "modalFactura"
+        ) {
+
+          cerrarModalFactura();
+
+        }
+
+      }
+    );
+
+  }
+
+  // =========================
+  // BOTON GUARDAR
+  // =========================
+  const btnGuardarFactura =
+    document.getElementById(
+      "guardarFactura"
+    );
+
+  if (
+    btnGuardarFactura &&
+    !btnGuardarFactura.dataset.init
+  ) {
+
+    btnGuardarFactura.dataset.init =
+      "true";
+
+    btnGuardarFactura.addEventListener(
+      "click",
+      async () => {
+
         try {
 
-          const codigo_factura = document.getElementById("codigoFactura")?.value.trim() || "";
+          btnGuardarFactura.disabled =
+            true;
 
-          const valor = limpiarNumero(document.getElementById("valorFactura")?.value);
-          const retencion_fuente = limpiarNumero(document.getElementById("retencionFuente")?.value);
-          const retencion_ica = limpiarNumero(document.getElementById("retencionIca")?.value);
+          const codigo_factura =
+            document.getElementById(
+              "codigoFactura"
+            )?.value.trim() || "";
 
-          const fopatInput = document.getElementById("fopat")?.value;
-          const fopat = fopatInput ? limpiarNumero(fopatInput) : null; // ?? NUEVO
+          const valor =
+            limpiarNumero(
+              document.getElementById(
+                "valorFactura"
+              )?.value
+            );
 
-          const wrapper = document.querySelector("#modalFactura .select-search-wrapper");
-          const id_manifiesto = wrapper && wrapper._value ? wrapper._value : "";
+          const retencion_fuente =
+            limpiarNumero(
+              document.getElementById(
+                "retencionFuente"
+              )?.value
+            );
+
+          const retencion_ica =
+            limpiarNumero(
+              document.getElementById(
+                "retencionIca"
+              )?.value
+            );
+
+          const fopatInput =
+            document.getElementById(
+              "fopat"
+            )?.value;
+
+          const fopat =
+            fopatInput
+              ? limpiarNumero(
+                  fopatInput
+                )
+              : null;
+
+          const wrapper =
+            document.querySelector(
+              "#modalFactura .select-search-wrapper"
+            );
+
+          const id_manifiesto =
+            wrapper &&
+            wrapper._value
+              ? wrapper._value
+              : "";
 
           const body = {
+
             codigo_factura,
+
             id_manifiesto,
-            fecha_emision: document.getElementById("fechaEmision")?.value || "",
-            fecha_vencimiento: document.getElementById("fechaVencimiento")?.value || "",
+
+            fecha_emision:
+              document.getElementById(
+                "fechaEmision"
+              )?.value || "",
+
+            fecha_vencimiento:
+              document.getElementById(
+                "fechaVencimiento"
+              )?.value || "",
+
             valor,
+
             retencion_fuente,
+
             retencion_ica,
-            plazo_pago: Number(document.getElementById("plazoPago")?.value) || 0,
-            fopat // ?? NUEVO
+
+            plazo_pago:
+              Number(
+                document.getElementById(
+                  "plazoPago"
+                )?.value
+              ) || 0,
+
+            fopat
+
           };
 
+          // =========================
+          // VALIDACIONES
+          // =========================
           if (!codigo_factura) {
-            showToast("El ID de factura es obligatorio", "warning");
+
+            showToast(
+              "El ID de factura es obligatorio",
+              "warning"
+            );
+
             return;
+
           }
 
           if (!body.id_manifiesto) {
-            showToast("Selecciona un manifiesto válido", "warning");
+
+            showToast(
+              "Selecciona un manifiesto válido",
+              "warning"
+            );
+
             return;
+
           }
 
           if (!body.fecha_emision) {
-            showToast("La fecha de emisión es obligatoria", "warning");
+
+            showToast(
+              "La fecha de emisión es obligatoria",
+              "warning"
+            );
+
             return;
+
           }
 
-          if (!body.valor || body.valor <= 0) {
-            showToast("El valor debe ser mayor a 0", "warning");
+          if (
+            !body.valor ||
+            body.valor <= 0
+          ) {
+
+            showToast(
+              "El valor debe ser mayor a 0",
+              "warning"
+            );
+
             return;
+
           }
 
-          await apiFetch("/api/facturas", {
-            method: "POST",
-            body: JSON.stringify(body)
-          });
+          // =========================
+          // API
+          // =========================
+          await apiFetch(
+            "/api/facturas",
+            {
+              method: "POST",
+              body: JSON.stringify(body)
+            }
+          );
 
-          showToast("Factura creada correctamente", "success");
+          showToast(
+            "Factura creada correctamente",
+            "success"
+          );
+
           cerrarModalFactura();
-          await cargarCatalogosFacturas();
-          await cargarFacturas();
 
         } catch (error) {
-          console.error("Error guardando factura:", error);
-          showToast("Error al guardar la factura", "error");
+
+          console.error(
+            "Error guardando factura:",
+            error
+          );
+
+          showToast(
+            error.message ||
+            "Error al guardar la factura",
+            "error"
+          );
+
+        } finally {
+
+          btnGuardarFactura.disabled =
+            false;
+
         }
 
-        return;
       }
+    );
 
-    });
   }
+  
+  // =========================
+  // BOTON LIMPIAR FILTROS
+  // =========================
+  const btnLimpiar =
+    document.getElementById(
+      "btnLimpiarFacturas"
+    );
+
+  if (
+    btnLimpiar &&
+    !btnLimpiar.dataset.init
+  ) {
+
+    btnLimpiar.dataset.init =
+      "true";
+
+    btnLimpiar.addEventListener(
+      "click",
+      async () => {
+
+        // =========================
+        // FECHAS
+        // =========================
+        const fDesde =
+          document.getElementById(
+            "fDesde"
+          );
+
+        const fHasta =
+          document.getElementById(
+            "fHasta"
+          );
+
+        if (fDesde) {
+          fDesde.value = "";
+        }
+
+        if (fHasta) {
+          fHasta.value = "";
+        }
+
+        // =========================
+        // CODIGO
+        // =========================
+        const fCodigo =
+          document.getElementById(
+            "fCodigo"
+          );
+
+        if (fCodigo) {
+          fCodigo.value = "";
+        }
+
+        // =========================
+        // SELECT CUSTOM
+        // =========================
+        const wrappers =
+          document.querySelectorAll(
+            ".select-search-wrapper"
+          );
+        
+        const wrapper =
+          wrappers[1];
+
+        if (
+          wrapper &&
+          wrapper.classList.contains(
+            "select-search-wrapper"
+          )
+        ) {
+
+          const input =
+            wrapper.querySelector(
+              "input"
+            );
+
+          if (input) {
+            input.value = "";
+          }
+
+          wrapper._value = "";
+
+        }
+
+        // =========================
+        // RECARGAR
+        // =========================
+        await cargarFacturas();
+
+        aplicarFiltrosFacturas();
+
+      }
+    );
+
+  }
+  
+  // =========================
+  // FILTRO CODIGO
+  // =========================
+  const fCodigo =
+    document.getElementById(
+      "fCodigo"
+    );
+
+  if (
+    fCodigo &&
+    !fCodigo.dataset.init
+  ) {
+
+    fCodigo.dataset.init = "true";
+
+    fCodigo.addEventListener(
+      "input",
+      () => {
+
+        aplicarFiltrosFacturas();
+
+      }
+    );
+
+  }
+
 }
 
 
 // =========================
 // SELECT MANIFIESTO BONITO
 // =========================
-function llenarSelectManifiesto(id, data, usados = new Set()) {
-  const select = document.getElementById(id);
-  if (!select) return;
+function llenarSelectManifiesto(
+  id,
+  data,
+  usados = new Set()
+) {
 
-  // ?? evitar duplicar
-  if (select.parentNode.classList.contains("select-search-wrapper")) return;
+  const select =
+    document.getElementById(id);
 
-  const wrapper = document.createElement("div");
-  wrapper.classList.add("select-search-wrapper");
-
-  const input = document.createElement("input");
-  input.type = "text";
-  input.placeholder = "Buscar manifiesto...";
-  input.classList.add("select-search-input");
-
-  const dropdown = document.createElement("div");
-  dropdown.classList.add("select-search-dropdown");
-
-  wrapper.appendChild(input);
-  wrapper.appendChild(dropdown);
-
-  select.parentNode.replaceChild(wrapper, select);
-
-  let valorSeleccionado = "";
-  wrapper._value = "";
-
-  function renderOpciones(filtro = "") {
-    dropdown.innerHTML = "";
-
-    const filtrados = data.filter(m => {
-      const texto = `${m.id_manifiesto} ${m.cliente_nombre || ""}`.toLowerCase();
-      return texto.includes(filtro.toLowerCase());
-    });
-
-    if (filtrados.length === 0) {
-      dropdown.innerHTML = `<div class="no-results">Sin resultados</div>`;
-      return;
-    }
-
-    filtrados.forEach(m => {
-
-      const yaUsado = usados.has(m.id_manifiesto);
-
-      const option = document.createElement("div");
-      option.classList.add("select-option");
-
-      // ?? TEXTO CON ESTADO
-      option.textContent = `${m.id_manifiesto} - ${m.cliente_nombre || ""}${
-        yaUsado ? " (Ya facturado)" : ""
-      }`;
-
-      // ?? ESTILO VISUAL
-      if (yaUsado) {
-        option.classList.add("disabled");
-      }
-
-      option.addEventListener("click", () => {
-
-        // ?? BLOQUEAR SELECCIÓN
-        if (yaUsado) {
-          showToast("Este manifiesto ya tiene factura", "warning");
-          return;
-        }
-
-        input.value = option.textContent;
-
-        valorSeleccionado = m.id_manifiesto;
-        wrapper._value = m.id_manifiesto;
-
-        dropdown.innerHTML = "";
-      });
-
-      dropdown.appendChild(option);
-    });
+  if (!select) {
+    return;
   }
 
-  input.addEventListener("input", (e) => {
-    renderOpciones(e.target.value);
-  });
+  // =========================
+  // EVITAR DUPLICAR
+  // =========================
+  if (
+    select.parentNode.classList.contains(
+      "select-search-wrapper"
+    )
+  ) {
+    return;
+  }
 
-  input.addEventListener("focus", () => {
-    renderOpciones(input.value);
-  });
+  // =========================
+  // WRAPPER
+  // =========================
+  const wrapper =
+    document.createElement("div");
 
-  document.addEventListener("click", (e) => {
-    if (!wrapper.contains(e.target)) {
-      dropdown.innerHTML = "";
+  wrapper.classList.add(
+    "select-search-wrapper"
+  );
+
+  const input =
+    document.createElement("input");
+
+  input.type = "text";
+
+  input.placeholder =
+    "Buscar manifiesto...";
+
+  input.classList.add(
+    "select-search-input"
+  );
+
+  const dropdown =
+    document.createElement("div");
+
+  dropdown.classList.add(
+    "select-search-dropdown"
+  );
+
+  wrapper.appendChild(input);
+
+  wrapper.appendChild(dropdown);
+
+  select.parentNode.replaceChild(
+    wrapper,
+    select
+  );
+
+  let valorSeleccionado = "";
+
+  wrapper._value = "";
+
+  // =========================
+  // RENDER OPCIONES
+  // =========================
+  function renderOpciones(
+    filtro = ""
+  ) {
+
+    dropdown.innerHTML = "";
+
+    const filtrados =
+      data.filter((m) => {
+
+        const texto =
+          `${m.id_manifiesto} ${
+            m.cliente_nombre || ""
+          }`.toLowerCase();
+
+        return texto.includes(
+          filtro.toLowerCase()
+        );
+
+      });
+
+    // =========================
+    // SIN RESULTADOS
+    // =========================
+    if (filtrados.length === 0) {
+
+      dropdown.innerHTML =
+        `
+        <div class="no-results">
+          Sin resultados
+        </div>
+        `;
+
+      return;
+
     }
-  });
 
-  wrapper.getValue = () => valorSeleccionado;
+    // =========================
+    // OPCIONES
+    // =========================
+    filtrados.forEach((m) => {
+
+      const yaUsado =
+        usados.has(
+          m.id_manifiesto
+        );
+
+      const option =
+        document.createElement(
+          "div"
+        );
+
+      option.classList.add(
+        "select-option"
+      );
+
+      option.textContent =
+        `${m.id_manifiesto} - ${
+          m.cliente_nombre || ""
+        }${
+          yaUsado
+            ? " (Ya facturado)"
+            : ""
+        }`;
+
+      // =========================
+      // DESHABILITADO
+      // =========================
+      if (yaUsado) {
+
+        option.classList.add(
+          "disabled"
+        );
+
+      }
+
+      // =========================
+      // CLICK OPCION
+      // =========================
+      option.addEventListener(
+        "click",
+        () => {
+
+          // =========================
+          // BLOQUEAR USADOS
+          // =========================
+          if (yaUsado) {
+
+            showToast(
+              "Este manifiesto ya tiene factura",
+              "warning"
+            );
+
+            return;
+
+          }
+
+          input.value =
+            option.textContent;
+
+          valorSeleccionado =
+            m.id_manifiesto;
+
+          wrapper._value =
+            m.id_manifiesto;
+
+          dropdown.innerHTML = "";
+
+          // =========================
+          // FILTRO AUTOMATICO
+          // =========================
+          if (
+            id ===
+            "fManifiesto"
+          ) {
+
+            aplicarFiltrosFacturas();
+
+          }
+
+        }
+      );
+
+      dropdown.appendChild(
+        option
+      );
+
+    });
+
+  }
+
+  // =========================
+  // INPUT
+  // =========================
+  input.addEventListener(
+    "input",
+    (e) => {
+
+      renderOpciones(
+        e.target.value
+      );
+
+    }
+  );
+
+  // =========================
+  // FOCUS
+  // =========================
+  input.addEventListener(
+    "focus",
+    () => {
+
+      renderOpciones(
+        input.value
+      );
+
+    }
+  );
+
+  // =========================
+  // CLICK FUERA
+  // =========================
+  document.addEventListener(
+    "click",
+    (e) => {
+
+      if (
+        !wrapper.contains(
+          e.target
+        )
+      ) {
+
+        dropdown.innerHTML = "";
+
+      }
+
+    }
+  );
+
+  // =========================
+  // GET VALUE
+  // =========================
+  wrapper.getValue = () =>
+    valorSeleccionado;
+
 }
 
 // =========================
