@@ -115,7 +115,7 @@ socket.on("manifiesto:updated", async (data) => {
     // =========================
     showToast(
       "Este manifiesto fue actualizado por otro usuario",
-      "warning"
+      "error"
     );
 
   }
