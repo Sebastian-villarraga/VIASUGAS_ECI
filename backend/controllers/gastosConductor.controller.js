@@ -116,6 +116,23 @@ const createGastoConductor = async (req, res) => {
       req
     });
 
+    // =========================
+    // SOCKET EVENT
+    // =========================
+    if (global.io) {
+    
+      global.io.emit(
+        "gasto-conductor:created",
+        {
+          gasto: gasto.rows[0]
+        }
+      );
+    
+    }
+    
+    // =========================
+    // RESPONSE
+    // =========================
     res.status(201).json(gasto.rows[0]);
 
   } catch(error){
@@ -200,6 +217,25 @@ const updateGastoConductor = async (req, res) => {
       req
     });
 
+    // =========================
+    // SOCKET EVENT
+    // =========================
+    if (global.io) {
+    
+      global.io.emit(
+        "gasto-conductor:updated",
+        {
+          id,
+          valor,
+          descripcion
+        }
+      );
+    
+    }
+    
+    // =========================
+    // RESPONSE
+    // =========================
     res.json({
       ok:true
     });

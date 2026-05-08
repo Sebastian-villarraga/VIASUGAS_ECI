@@ -1,8 +1,14 @@
 async function initGastosConductor() {
+
   await gc_cargarCatalogos();
-  gc_setearFechasMesActual(); // ?? nuevo
+
+  document.getElementById("fDesde").value = "";
+  document.getElementById("fHasta").value = "";
+
   await gc_cargarGastos();
+
   gc_eventos();
+
 }
 
 let gc_catalogos = {};
@@ -120,8 +126,39 @@ function gc_editarGasto(btn, id) {
     showToast("Termina de editar primero", "info");
     return;
   }
+  
+  // =========================
+  // YA EDITANDO OTRO USUARIO
+  // =========================
+  if (gastosEditando[id]) {
+  
+    showToast(
+      `Este gasto está siendo editado por ${gastosEditando[id]}`,
+      "warning"
+    );
+  
+    return;
+  
+  }
 
   window.gc_editando = true;
+  
+  // =========================
+  // SOCKET EDITING
+  // =========================
+  const usuario =
+    obtenerUsuarioActual();
+  
+  socket.emit(
+    "gasto-conductor:editing",
+    {
+      id,
+      usuario:
+        usuario.nombre ||
+        usuario.correo ||
+        "Usuario"
+    }
+  );
 
   const fila = btn.closest("tr");
   fila.classList.add("gsx-editing");
@@ -180,45 +217,106 @@ async function gc_guardarGasto(btn, id) {
     const fila = btn.closest("tr");
 
     const valorRaw =
-      fila.querySelector("#editValor").value.replace(/\D/g, "");
+      fila.querySelector("#editValor")
+        .value
+        .replace(/\D/g, "");
 
     const descripcion =
-      fila.querySelector("#editDescripcion").value.trim();
+      fila.querySelector("#editDescripcion")
+        .value
+        .trim();
 
     if (!valorRaw) {
-      showToast("Ingresa valor", "warning");
+
+      showToast(
+        "Ingresa valor",
+        "warning"
+      );
+
       return;
+
     }
 
-    await apiFetch(`/api/gastos-conductor/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        valor: Number(valorRaw),
-        descripcion
-      })
-    });
+    // =========================
+    // API UPDATE
+    // =========================
+    await apiFetch(
+      `/api/gastos-conductor/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          valor: Number(valorRaw),
+          descripcion
+        })
+      }
+    );
 
-    showToast("Actualizado correctamente", "success");
+    showToast(
+      "Actualizado correctamente",
+      "success"
+    );
 
+    // =========================
+    // RESET FLAGS
+    // =========================
     window.gc_editando = false;
 
-    document.querySelectorAll(".btn-icon").forEach(b => {
-      b.disabled = false;
-    });
+    document
+      .querySelectorAll(".btn-icon")
+      .forEach(b => {
+        b.disabled = false;
+      });
 
+    // =========================
+    // RECARGAR TABLA
+    // =========================
     await gc_cargarGastos();
 
+    // =========================
+    // STOP EDITING
+    // =========================
+    socket.emit(
+      "gasto-conductor:stop-editing",
+      {
+        id
+      }
+    );
+
   } catch (error) {
-    console.error("Error actualizando:", error);
 
-    showToast("Error actualizando", "error");
+    console.error(
+      "Error actualizando:",
+      error
+    );
 
+    showToast(
+      "Error actualizando",
+      "error"
+    );
+
+    // =========================
+    // RESET FLAGS
+    // =========================
     window.gc_editando = false;
 
-    document.querySelectorAll(".btn-icon").forEach(b => {
-      b.disabled = false;
-    });
+    document
+      .querySelectorAll(".btn-icon")
+      .forEach(b => {
+        b.disabled = false;
+      });
+
+    // =========================
+    // LIBERAR LOCK
+    // =========================
+    socket.emit(
+      "gasto-conductor:stop-editing",
+      {
+        id
+      }
+    );
+
   }
+
 }
 
 // =========================

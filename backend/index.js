@@ -75,6 +75,36 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("? Cliente desconectado:", socket.id);
   });
+  
+  // =========================
+  // GASTO CONDUCTOR EDITING
+  // =========================
+  socket.on(
+    "gasto-conductor:editing",
+    (data) => {
+  
+      socket.broadcast.emit(
+        "gasto-conductor:editing",
+        data
+      );
+  
+    }
+  );
+  
+  // =========================
+  // GASTO CONDUCTOR STOP EDITING
+  // =========================
+  socket.on(
+    "gasto-conductor:stop-editing",
+    (data) => {
+  
+      socket.broadcast.emit(
+        "gasto-conductor:stop-editing",
+        data
+      );
+  
+    }
+  );
 
 });
 

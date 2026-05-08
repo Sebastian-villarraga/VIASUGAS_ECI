@@ -56,6 +56,11 @@ socket.on("test", (data) => {
 const manifiestosEditando = {};
 
 // =========================
+// GASTOS EDITANDO
+// =========================
+const gastosEditando = {};
+
+// =========================
 // MANIFIESTO CREATED
 // =========================
 socket.on("manifiesto:created", async (data) => {
@@ -284,6 +289,201 @@ socket.on(
         e
       );
 
+    }
+
+  }
+);
+
+// =========================
+// GASTO CONDUCTOR CREATED
+// =========================
+socket.on(
+  "gasto-conductor:created",
+  async (data) => {
+
+    console.log(
+      "🚛 Nuevo gasto conductor:",
+      data
+    );
+
+    // =========================
+    // SOLO SI ESTAMOS EN MODULO
+    // =========================
+    const tabla =
+      document.getElementById(
+        "tablaGastos"
+      );
+
+    if (!tabla) {
+      return;
+    }
+
+    try {
+
+      await gc_cargarGastos();
+
+      showToast(
+        "Nuevo gasto registrado",
+        "success"
+      );
+
+    } catch (e) {
+
+      console.error(
+        "SOCKET GASTO:",
+        e
+      );
+
+    }
+
+  }
+);
+
+// =========================
+// GASTO CONDUCTOR UPDATED
+// =========================
+socket.on(
+  "gasto-conductor:updated",
+  async (data) => {
+
+    console.log(
+      "✏️ Gasto actualizado:",
+      data
+    );
+
+    // =========================
+    // SOLO SI ESTAMOS EN MODULO
+    // =========================
+    const tabla =
+      document.getElementById(
+        "tablaGastos"
+      );
+
+    if (!tabla) {
+      return;
+    }
+
+    try {
+
+      await gc_cargarGastos();
+
+      showToast(
+        "Gasto actualizado",
+        "info"
+      );
+
+    } catch (e) {
+
+      console.error(
+        "SOCKET UPDATE GASTO:",
+        e
+      );
+
+    }
+
+  }
+);
+
+// =========================
+// GASTO CONDUCTOR EDITING
+// =========================
+socket.on(
+  "gasto-conductor:editing",
+  (data) => {
+
+    console.log(
+      "✏️ Gasto en edición:",
+      data
+    );
+
+    // guardar lock
+    gastosEditando[data.id] = data.usuario;
+
+    // =========================
+    // SOLO SI ESTAMOS EN MODULO
+    // =========================
+    const tabla =
+      document.getElementById(
+        "tablaGastos"
+      );
+
+    if (!tabla) {
+      return;
+    }
+
+    // =========================
+    // BUSCAR FILA
+    // =========================
+    const fila =
+      document.querySelector(
+        `tr[data-id="${data.id}"]`
+      );
+
+    if (!fila) {
+      return;
+    }
+
+    // =========================
+    // UI BLOQUEADA
+    // =========================
+    fila.classList.add(
+      "gsx-editando-otro"
+    );
+
+    const btn =
+      fila.querySelector(
+        ".btn-icon"
+      );
+
+    if (btn) {
+      btn.disabled = true;
+      btn.title =
+        `Editando: ${data.usuario}`;
+    }
+
+    showToast(
+      `${data.usuario} está editando un gasto`,
+      "warning"
+    );
+
+  }
+);
+
+// =========================
+// GASTO CONDUCTOR STOP EDITING
+// =========================
+socket.on(
+  "gasto-conductor:stop-editing",
+  (data) => {
+
+    console.log(
+      "🛑 Fin edición gasto:",
+      data
+    );
+
+    delete gastosEditando[data.id];
+
+    const fila =
+      document.querySelector(
+        `tr[data-id="${data.id}"]`
+      );
+
+    if (!fila) {
+      return;
+    }
+
+    fila.classList.remove(
+      "gsx-editando-otro"
+    );
+
+    const btn =
+      fila.querySelector(
+        ".btn-icon"
+      );
+
+    if (btn) {
+      btn.disabled = false;
+      btn.title = "";
     }
 
   }
