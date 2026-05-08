@@ -479,6 +479,23 @@ const createTransaccion = async (req, res) => {
       );
     }
 
+    // =========================
+    // SOCKET EVENT
+    // =========================
+    if (global.io) {
+    
+      global.io.emit(
+        "transaccion:created",
+        {
+          transaccion: result.rows[0]
+        }
+      );
+    
+    }
+    
+    // =========================
+    // RESPONSE
+    // =========================
     res.status(201).json(result.rows[0]);
 
   } catch (error) {

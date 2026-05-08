@@ -383,7 +383,6 @@ function eventosFacturas() {
       return;
     }
 
-    // evitar múltiples listeners
     if (input.dataset.moneyInit) {
       return;
     }
@@ -614,9 +613,6 @@ function eventosFacturas() {
 
           };
 
-          // =========================
-          // VALIDACIONES
-          // =========================
           if (!codigo_factura) {
 
             showToast(
@@ -664,9 +660,6 @@ function eventosFacturas() {
 
           }
 
-          // =========================
-          // API
-          // =========================
           await apiFetch(
             "/api/facturas",
             {
@@ -706,7 +699,7 @@ function eventosFacturas() {
     );
 
   }
-  
+
   // =========================
   // BOTON LIMPIAR FILTROS
   // =========================
@@ -727,9 +720,6 @@ function eventosFacturas() {
       "click",
       async () => {
 
-        // =========================
-        // FECHAS
-        // =========================
         const fDesde =
           document.getElementById(
             "fDesde"
@@ -748,9 +738,6 @@ function eventosFacturas() {
           fHasta.value = "";
         }
 
-        // =========================
-        // CODIGO
-        // =========================
         const fCodigo =
           document.getElementById(
             "fCodigo"
@@ -760,9 +747,6 @@ function eventosFacturas() {
           fCodigo.value = "";
         }
 
-        // =========================
-        // SELECT CUSTOM
-        // =========================
         const wrapper =
           getSelectWrapper(
             "fManifiesto"
@@ -788,9 +772,6 @@ function eventosFacturas() {
 
         }
 
-        // =========================
-        // RECARGAR
-        // =========================
         await cargarFacturas();
 
         aplicarFiltrosFacturas();
@@ -799,7 +780,7 @@ function eventosFacturas() {
     );
 
   }
-  
+
   // =========================
   // FILTRO CODIGO
   // =========================
@@ -825,37 +806,36 @@ function eventosFacturas() {
     );
 
   }
-  
+
   // =========================
   // FILTROS FECHA
   // =========================
   ["fDesde", "fHasta"]
     .forEach((id) => {
-  
+
       const el =
         document.getElementById(id);
-  
+
       if (
         el &&
         !el.dataset.init
       ) {
-  
+
         el.dataset.init = "true";
-  
+
         el.addEventListener(
           "change",
           () => {
-  
+
             aplicarFiltrosFacturas();
-  
+
           }
         );
-  
+
       }
-  
+
     });
 
-  }
 }
 
 

@@ -240,3 +240,51 @@ socket.on(
 
   }
 );
+
+// =========================
+// TRANSACCION CREATED
+// =========================
+socket.on(
+  "transaccion:created",
+  async (data) => {
+
+    console.log(
+      "💰 Nueva transacción:",
+      data
+    );
+
+    // =========================
+    // SOLO SI ESTAMOS EN MODULO
+    // =========================
+    const tabla =
+      document.getElementById(
+        "tablaTransacciones"
+      );
+
+    if (!tabla) {
+      return;
+    }
+
+    try {
+
+      // =========================
+      // RECARGAR TABLA
+      // =========================
+      await cargarTransacciones();
+
+      showToast(
+        "Nueva transacción registrada",
+        "success"
+      );
+
+    } catch (e) {
+
+      console.error(
+        "SOCKET TRANSACCION:",
+        e
+      );
+
+    }
+
+  }
+);

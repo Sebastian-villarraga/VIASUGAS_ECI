@@ -1,8 +1,11 @@
 async function initTransacciones() {
+
   await cargarCatalogos();
-  setearFechasMesActual(); 
+  setearFechasPorDefecto();
   await cargarTransacciones();
+
   eventos();
+
 }
 
 let catalogos = {};
