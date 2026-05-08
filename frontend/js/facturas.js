@@ -87,6 +87,29 @@ async function cargarFacturas() {
 }
 
 // =========================
+// OBTENER WRAPPER SELECT
+// =========================
+function getSelectWrapper(id) {
+
+  const original =
+    document.getElementById(id);
+
+  if (
+    original &&
+    original.classList.contains(
+      "select-search-wrapper"
+    )
+  ) {
+    return original;
+  }
+
+  return document.querySelector(
+    `[data-select-id="${id}"]`
+  );
+
+}
+
+// =========================
 // FILTRAR + RENDER
 // =========================
 function aplicarFiltrosFacturas() {
@@ -99,18 +122,15 @@ function aplicarFiltrosFacturas() {
     ? codigoInput.value.toLowerCase()
     : "";
 
-  const wrappers =
-    document.querySelectorAll(
-      ".select-search-wrapper"
-    );
-  
   const wrapper =
-    wrappers[1];
+    getSelectWrapper(
+      "fManifiesto"
+    );
   
   const manifiesto =
     wrapper &&
     wrapper._value
-      ? wrapper._value
+      ? String(wrapper._value)
       : "";
 
   let filtradas = facturasData.filter(f => {
@@ -122,7 +142,12 @@ function aplicarFiltrosFacturas() {
 
     if (codigo && !(f.codigo_factura || "").toLowerCase().includes(codigo)) return false;
 
-    if (manifiesto && f.id_manifiesto !== manifiesto) return false;
+    if (
+      manifiesto &&
+      String(f.id_manifiesto) !== String(manifiesto)
+    ) {
+      return false;
+    }
 
     return true;
   });
@@ -738,13 +763,10 @@ function eventosFacturas() {
         // =========================
         // SELECT CUSTOM
         // =========================
-        const wrappers =
-          document.querySelectorAll(
-            ".select-search-wrapper"
-          );
-        
         const wrapper =
-          wrappers[1];
+          getSelectWrapper(
+            "fManifiesto"
+          );
 
         if (
           wrapper &&
@@ -803,7 +825,37 @@ function eventosFacturas() {
     );
 
   }
+  
+  // =========================
+  // FILTROS FECHA
+  // =========================
+  ["fDesde", "fHasta"]
+    .forEach((id) => {
+  
+      const el =
+        document.getElementById(id);
+  
+      if (
+        el &&
+        !el.dataset.init
+      ) {
+  
+        el.dataset.init = "true";
+  
+        el.addEventListener(
+          "change",
+          () => {
+  
+            aplicarFiltrosFacturas();
+  
+          }
+        );
+  
+      }
+  
+    });
 
+  }
 }
 
 
@@ -839,10 +891,12 @@ function llenarSelectManifiesto(
   // =========================
   const wrapper =
     document.createElement("div");
-
+  
   wrapper.classList.add(
     "select-search-wrapper"
   );
+  
+  wrapper.dataset.selectId = id;
 
   const input =
     document.createElement("input");
@@ -1015,11 +1069,30 @@ function llenarSelectManifiesto(
   input.addEventListener(
     "input",
     (e) => {
-
+  
+      // =========================
+      // SI BORRA EL INPUT
+      // =========================
+      if (!e.target.value.trim()) {
+  
+        wrapper._value = "";
+        valorSeleccionado = "";
+  
+        if (
+          id ===
+          "fManifiesto"
+        ) {
+  
+          aplicarFiltrosFacturas();
+  
+        }
+  
+      }
+  
       renderOpciones(
         e.target.value
       );
-
+  
     }
   );
 
