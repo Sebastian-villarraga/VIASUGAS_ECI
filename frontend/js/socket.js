@@ -128,40 +128,142 @@ socket.on("manifiesto:updated", async (data) => {
 });
 
 // =========================
+// =========================
 // MANIFIESTO EDITING
 // =========================
-socket.on("manifiesto:editing", (data) => {
+socket.on(
+  "manifiesto:editing",
+  (data) => {
 
-  console.log(
-    "?? Editando:",
-    data
-  );
+    console.log(
+      "✏️ Editando:",
+      data
+    );
 
-  if (
-    !detalleManifiestoActual ||
-    data.id_manifiesto !==
-      detalleManifiestoActual.id_manifiesto
-  ) {
-    return;
+    // =========================
+    // GUARDAR LOCK
+    // =========================
+    manifiestosEditando[
+      data.id_manifiesto
+    ] = data.usuario;
+
+    // =========================
+    // SOLO SI MODULO EXISTE
+    // =========================
+    const tabla =
+      document.getElementById(
+        "manifiestosTable"
+      );
+
+    if (!tabla) {
+      return;
+    }
+
+    // =========================
+    // BUSCAR FILA
+    // =========================
+    const fila =
+      document.querySelector(
+        `tr[data-id_manifiesto="${data.id_manifiesto}"]`
+      );
+
+    if (!fila) {
+      return;
+    }
+
+    // =========================
+    // BLOQUEAR BOTON
+    // =========================
+    const btn =
+      fila.querySelector(
+        ".btn-icon"
+      );
+
+    if (btn) {
+
+      btn.disabled = true;
+
+      btn.title =
+        `Editando: ${data.usuario}`;
+
+    }
+
+    // =========================
+    // HIGHLIGHT
+    // =========================
+    fila.classList.add(
+      "mf-editando-otro"
+    );
+
+    // =========================
+    // SI MODAL ABIERTO
+    // =========================
+    if (
+      detalleManifiestoActual &&
+      data.id_manifiesto ===
+        detalleManifiestoActual.id_manifiesto
+    ) {
+
+      showToast(
+        `${data.usuario} está editando este manifiesto`,
+        "warning"
+      );
+
+    }
+
   }
-
-  showToast(
-    `${data.usuario} está editando este manifiesto`,
-    "warning"
-  );
-
-});
+);
 
 // =========================
 // STOP EDITING
 // =========================
 socket.on(
   "manifiesto:stop-editing",
-  () => {
+  (data) => {
 
     console.log(
-      "? Usuario dejó de editar"
+      "🛑 Usuario dejó de editar:",
+      data
     );
+
+    // =========================
+    // BORRAR LOCK
+    // =========================
+    delete manifiestosEditando[
+      data.id_manifiesto
+    ];
+
+    // =========================
+    // BUSCAR FILA
+    // =========================
+    const fila =
+      document.querySelector(
+        `tr[data-id_manifiesto="${data.id_manifiesto}"]`
+      );
+
+    if (!fila) {
+      return;
+    }
+
+    // =========================
+    // DESBLOQUEAR
+    // =========================
+    fila.classList.remove(
+      "mf-editando-otro"
+    );
+
+    const btn =
+      fila.querySelector(
+        ".btn-icon"
+      );
+
+    if (btn) {
+
+      btn.disabled = false;
+
+      btn.title = "";
+
+    }
 
   }
 );

@@ -971,6 +971,12 @@
   color: #16a34a;
 }
 
+.mf-editando-otro {
+  opacity: 0.6;
+  background: #fff3cd;
+  transition: all 0.2s ease;
+}
+
 /* =========================
    TRACKING MANIFIESTO FIX
 ========================= */

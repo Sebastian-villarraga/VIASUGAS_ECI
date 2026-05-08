@@ -1136,6 +1136,25 @@ function renderDetalleModoLectura(data) {
 // =========================
 async function activarEdicionDetalle() {
 
+  // =========================
+  // YA EDITANDO
+  // =========================
+  const id =
+    detalleManifiestoActual?.id_manifiesto;
+  
+  if (
+    manifiestosEditando[id]
+  ) {
+  
+    showToast(
+      `Este manifiesto está siendo editado por ${manifiestosEditando[id]}`,
+      "warning"
+    );
+  
+    return;
+  
+  }
+
   if (
     !detalleManifiestoActual ||
     !catalogosManifiesto
@@ -1144,6 +1163,25 @@ async function activarEdicionDetalle() {
   }
 
   modoEdicionDetalle = true;
+  
+  // =========================
+  // SOCKET EDITING
+  // =========================
+  const usuario =
+    obtenerUsuarioActual();
+  
+  socket.emit(
+    "manifiesto:editing",
+    {
+      id_manifiesto:
+        detalleManifiestoActual.id_manifiesto,
+  
+      usuario:
+        usuario.nombre ||
+        usuario.correo ||
+        "Usuario"
+    }
+  );
 
   // =========================
   // USUARIO ACTUAL
@@ -1503,6 +1541,17 @@ async function activarEdicionDetalle() {
 
 function cancelarEdicionDetalle() {
 
+  // =========================
+  // STOP EDITING
+  // =========================
+  socket.emit(
+    "manifiesto:stop-editing",
+    {
+      id_manifiesto:
+        detalleManifiestoActual.id_manifiesto
+    }
+  );
+
   socket.emit("manifiesto:stop-editing", {
     id_manifiesto: detalleManifiestoActual.id_manifiesto
   });
@@ -1633,7 +1682,20 @@ async function guardarEdicionDetalle() {
     );
 
     if (!res) {
+
+      // =========================
+      // LIBERAR LOCK
+      // =========================
+      socket.emit(
+        "manifiesto:stop-editing",
+        {
+          id_manifiesto:
+            detalleManifiestoActual.id_manifiesto
+        }
+      );
+
       return;
+
     }
 
     showToast(
@@ -1641,6 +1703,9 @@ async function guardarEdicionDetalle() {
       "success"
     );
 
+    // =========================
+    // STOP EDITING
+    // =========================
     socket.emit(
       "manifiesto:stop-editing",
       {
@@ -1692,6 +1757,17 @@ async function guardarEdicionDetalle() {
   } catch (error) {
 
     console.error(error);
+
+    // =========================
+    // LIBERAR LOCK
+    // =========================
+    socket.emit(
+      "manifiesto:stop-editing",
+      {
+        id_manifiesto:
+          detalleManifiestoActual.id_manifiesto
+      }
+    );
 
     // =========================
     // CONFLICTO
