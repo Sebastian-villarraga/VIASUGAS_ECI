@@ -803,8 +803,9 @@ async function verDetalleManifiesto(id) {
       radicado:
         data.manifiesto.radicado,
 
-      fecha:
-        data.manifiesto.fecha,
+      fecha: data.manifiesto.fecha
+        ? String(data.manifiesto.fecha).split("T")[0]
+        : "",
 
       origen_departamento:
         data.manifiesto.origen_departamento,

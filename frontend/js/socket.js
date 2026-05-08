@@ -62,12 +62,12 @@ socket.on("manifiesto:created", async (data) => {
 
   console.log("?? Nuevo manifiesto:", data);
 
-  // Solo si estamos en módulo manifiestos
+  // Solo si estamos en modulo manifiestos
   const tabla = document.getElementById("manifiestosTable");
 
   if (!tabla) return;
 
-  // Recargar tabla automáticamente
+  // Recargar tabla automaticamente
   await filtrarManifiestos();
 
   showToast(
@@ -141,7 +141,7 @@ socket.on("manifiesto:editing", (data) => {
   }
 
   showToast(
-    `${data.usuario} está editando este manifiesto`,
+    `${data.usuario} estÃ¡ editando este manifiesto`,
     "warning"
   );
 
@@ -155,7 +155,7 @@ socket.on(
   () => {
 
     console.log(
-      "? Usuario dejó de editar"
+      "? Usuario dejÃ³ de editar"
     );
 
   }
