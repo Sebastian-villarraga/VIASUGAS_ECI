@@ -181,6 +181,13 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
+app.get("/server-id", (req, res) => {
+  res.json({
+    server: `Backend en puerto ${PORT}`,
+    pid: process.pid
+  });
+});
+
 // =====================
 // STATIC FRONTEND
 // =====================

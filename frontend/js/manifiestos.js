@@ -18,7 +18,7 @@ async function initManifiestos() {
   initEventosManifiestos();
   initFormManifiesto();
 
-  // ?? NUEVO: aplicar filtro autom·tico
+  // ?? NUEVO: aplicar filtro autom√†tico
   aplicarFiltroFechaActual();
 
   // ?? Cargar con filtros activos
@@ -109,7 +109,7 @@ async function cargarCatalogosManifiesto() {
   const data = await apiFetch("/api/manifiestos/catalogos");
 
   if (!data) {
-    showToast("No se pudieron cargar los cat·logos de manifiestos", "error");
+    showToast("No se pudieron cargar los cat√†logos de manifiestos", "error");
     return;
   }
 
@@ -644,15 +644,15 @@ function actualizarCardPeriodo() {
     return;
   }
 
-  // ?? PRIORIDAD 2: AÒo + Mes
+  // ?? PRIORIDAD 2: A√±o + Mes
   if (anio && mes) {
     card.textContent = `${meses[Number(mes) - 1]} ${anio}`;
     return;
   }
 
-  // ?? PRIORIDAD 3: Solo AÒo
+  // ?? PRIORIDAD 3: Solo A√±o
   if (anio) {
-    card.textContent = `AÒo ${anio}`;
+    card.textContent = `A√±o ${anio}`;
     return;
   }
 
@@ -706,7 +706,7 @@ function aplicarFiltroEsteMes() {
   if (inputDesde) inputDesde.value = format(primerDia);
   if (inputHasta) inputHasta.value = format(hoy);
 
-  // Limpiar filtros de aÒo/mes para evitar conflicto
+  // Limpiar filtros de a√±o/mes para evitar conflicto
   if (selectAnio) selectAnio.value = "";
   if (selectMes) selectMes.value = "";
 
@@ -722,14 +722,14 @@ function aplicarFiltroMesAnterior() {
 
   const hoy = new Date();
 
-  // Primer dÌa del mes anterior
+  // Primer d√¨a del mes anterior
   const primerDiaMesAnterior = new Date(
     hoy.getFullYear(),
     hoy.getMonth() - 1,
     1
   );
 
-  // ⁄ltimo dÌa del mes anterior
+  // Ultimo d√¨a del mes anterior
   const ultimoDiaMesAnterior = new Date(
     hoy.getFullYear(),
     hoy.getMonth(),
@@ -741,7 +741,7 @@ function aplicarFiltroMesAnterior() {
   if (inputDesde) inputDesde.value = format(primerDiaMesAnterior);
   if (inputHasta) inputHasta.value = format(ultimoDiaMesAnterior);
 
-  // Limpiar filtros de aÒo/mes
+  // Limpiar filtros de a√±o/mes
   if (selectAnio) selectAnio.value = "";
   if (selectMes) selectMes.value = "";
 
@@ -1091,7 +1091,7 @@ function renderDetalleModoLectura(data) {
       </div>
   
       <div class="detalle-item">
-        <span>Fecha emisiÛn</span>
+        <span>Fecha emisi√≤n</span>
         <span>${formatearFechaSafe(factura.fecha_emision)}</span>
       </div>
   
@@ -1147,7 +1147,7 @@ async function activarEdicionDetalle() {
   ) {
   
     showToast(
-      `Este manifiesto est· siendo editado por ${manifiestosEditando[id]}`,
+      `Este manifiesto est√† siendo editado por ${manifiestosEditando[id]}`,
       "warning"
     );
   
@@ -1321,7 +1321,7 @@ async function activarEdicionDetalle() {
     </div>
 
     <div class="detalle-info-item editando">
-      <label for="detalleEditVehiculo">VehÌculo</label>
+      <label for="detalleEditVehiculo">Veh√¨culo</label>
 
       <select id="detalleEditVehiculo">
         <option value="">Seleccione</option>
@@ -1836,7 +1836,7 @@ async function guardarEdicionDetalle() {
 function formatearMilesInput(valor) {
   if (!valor) return "";
 
-  // solo n˙meros
+  // solo n√πmeros
   valor = valor.replace(/\D/g, "");
 
   return valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -1881,7 +1881,7 @@ function actualizarTrackingEstado(estado) {
   if (estado === "ENTREGADO POR COBRAR") paso = 2;
   if (estado === "MANIFIESTO PAGO") paso = 3;
 
-  // ?? obtener posiciÛn REAL del step
+  // ?? obtener posici√≤n REAL del step
   const step = steps[paso - 1];
 
   if (step && truck) {
@@ -1938,7 +1938,7 @@ function mostrarBannerEdicion(
   }
 
   banner.innerHTML =
-    `?? ${usuario} est· editando este manifiesto`;
+    `?? ${usuario} est√† editando este manifiesto`;
 
 }
 
